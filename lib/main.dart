@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'auto_image_slider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart'; // ✅ AdMob ইম্পোর্ট
 
-// নিজের অন্যান্য পেজ ইম্পোর্ট
+// নিজেরf অন্যান্য পেজ ইম্পোর্ট
 import 'mcq_page.dart';
 import 'about_page.dart';
 import 'contact_page.dart';
