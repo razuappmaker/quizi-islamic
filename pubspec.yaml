@@ -35,6 +35,12 @@ dependencies:
   share_plus: ^7.2.1
   audioplayers: ^5.2.1
   google_mobile_ads: ^5.0.0
+  http: ^1.1.0
+  geolocator: ^12.0.0
+  geocoding: ^3.0.0
+  shared_preferences: ^2.1.1
+  flutter_compass: ^0.8.0
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -44,6 +50,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -79,6 +91,7 @@ flutter:
     - assets/images/slider3.png
     - assets/images/slider4.png
     - assets/images/slider5.png
+    - assets/images/compass.png
 
 
 

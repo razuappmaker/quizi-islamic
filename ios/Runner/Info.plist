@@ -45,5 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>এই অ্যাপ নামাজের সময় দেখানোর জন্য আপনার লোকেশন ব্যবহার করবে।</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>আপনার লোকেশন ব্যবহার করা হবে নামাজের সময় এবং কিবলা জন্য</string>
+
 </dict>
 </plist>

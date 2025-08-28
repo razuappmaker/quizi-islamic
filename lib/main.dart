@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'auto_image_slider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart'; // ✅ AdMob ইম্পোর্ট
+import 'prayer_time_page.dart';
 
 // নিজেরf অন্যান্য পেজ ইম্পোর্ট
 import 'mcq_page.dart';
@@ -106,7 +107,7 @@ class _HomePageState extends State<HomePage> {
     'বিচার দিবস',
     'নারী ও ইসলাম',
     'ইসলামী নৈতিকতা ও আচার',
-    'ইসলামিক আইন (বিহাহ-বিচ্ছেদ)',
+    'ধর্মীয় আইন(বিবাহ-বিচ্ছেদ)',
     'শিষ্টাচার',
     'দাম্পত্য ও পারিবারিক সম্পর্ক',
   ];
@@ -275,6 +276,8 @@ class _HomePageState extends State<HomePage> {
 
                     _buildNavButton(
                         context, 'দৈনন্দিন ব্যাবহারিত দোয়া', DoyaPage()),
+                    _buildNavButton(
+                        context, 'আজকের নামাজের সময়', const PrayerTimePage()),
                     _buildNavButton(
                         context, 'আমাদের কথা', const AboutPage()),
                     _buildNavButton(

@@ -175,25 +175,19 @@ class ContactPage extends StatelessWidget {
                   iconUrl: 'https://img.icons8.com/color/48/000000/facebook-new.png',
                   onTap: _openUrl,
                 ),
-                const SizedBox(width: 25),
+                const SizedBox(width: 40),
                 _socialIcon(
                   url: 'https://twitter.com/yourprofile',
                   iconUrl: 'https://img.icons8.com/color/48/000000/twitter.png',
                   onTap: _openUrl,
                 ),
-                const SizedBox(width: 25),
-                _socialIcon(
-                  url: 'https://instagram.com/yourprofile',
-                  iconUrl: 'https://img.icons8.com/color/48/000000/instagram-new.png',
-                  onTap: _openUrl,
-                ),
-                const SizedBox(width: 25),
+                const SizedBox(width: 40),
                 _socialIcon(
                   url: 'https://whatsapp.com/yourprofile',
                   iconUrl: 'https://img.icons8.com/color/48/000000/whatsapp',
                   onTap: _openUrl,
                 ),
-                const SizedBox(width: 25),
+                const SizedBox(width: 40),
                 _socialIcon(
                   url: 'https://m.me/yourprofile',  // Messenger প্রোফাইল লিঙ্ক
                   iconUrl: 'https://img.icons8.com/color/48/000000/facebook-messenger.png',  // Messenger আইকন URL
