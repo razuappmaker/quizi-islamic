@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
-import 'qibla_page.dart';
-
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -42,10 +42,43 @@ class _PrayerTimePageState extends State<PrayerTimePage>
 
   Future<void> fetchLocationAndPrayerTimes() async {
     try {
+      // 1. লোকেশন সার্ভিস চালু আছে কিনা চেক করুন
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        setState(() {
+          cityName = "লোকেশন বন্ধ";
+          countryName = "GPS চালু করুন";
+        });
+        return;
+      }
+
+      // 2. Permission চেক করুন
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          setState(() {
+            cityName = "Permission Denied";
+            countryName = "Allow Location";
+          });
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        setState(() {
+          cityName = "Permission Denied Forever";
+          countryName = "Settings থেকে Location Allow করুন";
+        });
+        return;
+      }
+
+      // 3. লোকেশন নিন
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
+      // 4. শহর ও দেশ বের করুন
       List<Placemark> placemarks =
       await placemarkFromCoordinates(position.latitude, position.longitude);
 
@@ -56,9 +89,9 @@ class _PrayerTimePageState extends State<PrayerTimePage>
         });
       }
 
+      // 5. API থেকে নামাজের সময়সুচি নিন
       final url =
-          "http://api.aladhan.com/v1/timings?latitude=${position
-          .latitude}&longitude=${position.longitude}&method=2";
+          "http://api.aladhan.com/v1/timings?latitude=${position.latitude}&longitude=${position.longitude}&method=2";
 
       final response = await http.get(Uri.parse(url));
 
@@ -81,10 +114,11 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     } catch (e) {
       setState(() {
         cityName = "Error";
-        countryName = "Error";
+        countryName = "Location Failed";
       });
     }
   }
+
 
   void findNextPrayer() {
     final now = DateTime.now();
@@ -236,21 +270,26 @@ class _PrayerTimePageState extends State<PrayerTimePage>
               ),
             ),
           ),
+          const SizedBox(height: 20), // ---------- এটা যুক্ত করেছি অতিরিক্ত
         ],
       ),
     );
   }
 
   // ---------- Tasbeeh Tab ----------
-  // State class member
-  String selectedPhrase = "সুবহানাল্লাহ"; // <-- এখানে declare করুন
+// State class members
+  int subhanallahCount = 0;
+  int alhamdulillahCount = 0;
+  int allahuakbarCount = 0;
+
+  String selectedPhrase = "সুবহানাল্লাহ";
 
 // Tasbeeh Tab
   Widget _buildTasbeehTab() {
     final List<String> tasbeehPhrases = [
-      "সুবহানাল্লাহ ( سبحان الل )",
-      "আলহামদুলিল্লাহা ( الحمد لله )",
-      "আল্লাহু আকবার ( الله أكبر )",
+      "সুবহানাল্লাহ",
+      "আলহামদুলিল্লাহা",
+      "আল্লাহু আকবার",
     ];
 
     final List<Color> colors = [
@@ -294,7 +333,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "$tasbeehCount",
+                    _getCurrentCount().toString(),   // কাউন্ট দেখাবে
                     style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold, color: Colors.green),
                   ),
                 ],
@@ -312,9 +351,15 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: GestureDetector(
                   onTap: () {
-                    setState(() { // <-- এখানে StatefulWidget এর setState ব্যবহার করুন
+                    setState(() {
                       selectedPhrase = phrase;
-                      tasbeehCount++;
+                      if (phrase == "সুবহানাল্লাহ") {
+                        subhanallahCount++;
+                      } else if (phrase == "আলহামদুলিল্লাহা") {
+                        alhamdulillahCount++;
+                      } else if (phrase == "আল্লাহু আকবার") {
+                        allahuakbarCount++;
+                      }
                     });
                   },
                   child: AnimatedContainer(
@@ -345,7 +390,9 @@ class _PrayerTimePageState extends State<PrayerTimePage>
           ElevatedButton.icon(
             onPressed: () {
               setState(() {
-                tasbeehCount = 0;
+                subhanallahCount = 0;
+                alhamdulillahCount = 0;
+                allahuakbarCount = 0;
               });
             },
             icon: const Icon(Icons.refresh),
@@ -361,6 +408,15 @@ class _PrayerTimePageState extends State<PrayerTimePage>
       ),
     );
   }
+
+// Helper function for current counter
+  int _getCurrentCount() {
+    if (selectedPhrase == "সুবহানাল্লাহ") return subhanallahCount;
+    if (selectedPhrase == "আলহামদুলিল্লাহা") return alhamdulillahCount;
+    if (selectedPhrase == "আল্লাহু আকবার") return allahuakbarCount;
+    return 0;
+  }
+
 
 
 
@@ -441,9 +497,33 @@ class _PrayerTimePageState extends State<PrayerTimePage>
           ),
           const SizedBox(height: 30),
           Text(
-            "🔺 নীচের সূচক দেখাবে কিবলা দিক",
+            "🔺 সূচক দেখাবে কিবলা দিক",
             style: TextStyle(fontSize: 16, color: Colors.green.shade700),
           ),
+          const SizedBox(height: 20),
+          // i am using this section for aleart notice
+          Center(
+            child: Container(
+              padding: EdgeInsets.all(16),
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.redAccent.withOpacity(0.1),
+                border: Border.all(color: Colors.redAccent, width: 1.5),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                "নোটঃ পশ্চিম দিক নির্বচনের ক্ষেত্রে কিছুটা ভুল থাকতে পারে। "
+                    "১০০% নিশ্চিত হতে আপনার মোবাইলের কম্পসাস ব্যাবহার করুন। ",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          )
+
         ],
       ),
     );
