@@ -170,6 +170,7 @@ class ContactPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                const SizedBox(width: 20),
                 _socialIcon(
                   url: 'https://www.facebook.com/yourpage',
                   iconUrl: 'https://img.icons8.com/color/48/000000/facebook-new.png',

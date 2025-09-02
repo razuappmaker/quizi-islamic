@@ -28,6 +28,9 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dark / Light mode চেক
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('আমাদের কথা'),
@@ -40,21 +43,14 @@ class AboutPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // হেডার ইমেজ বা লোগো (ঐচ্ছিক)
+              // হেডার ইমেজ বা লোগো
               Center(
                 child: CircleAvatar(
-                  radius: 75,  // 150 / 2
-                  backgroundImage: AssetImage('assets/images/logo.png'),
+                  radius: 75,
+                  backgroundImage: const AssetImage('assets/images/logo.png'),
                 ),
               ),
-             // If imgae from Network
-              /*Center(
-                child: Image.network(
-                  'https://cdn-icons-png.flaticon.com/512/148/148836.png',
-                  height: 100,
-                  width: 100,
-                ),
-              ),*/
+
               const SizedBox(height: 20),
 
               // টাইটেল
@@ -63,7 +59,7 @@ class AboutPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green[800],
+                  color: isDark ? Colors.white : Colors.green[800],
                 ),
               ),
               const SizedBox(height: 15),
@@ -72,21 +68,21 @@ class AboutPage extends StatelessWidget {
               Text(
                 aboutText,
                 textAlign: TextAlign.justify,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   height: 1.5,
-                  color: Colors.black87,
+                  color: isDark ? Colors.white70 : Colors.black87,
                 ),
               ),
 
               const SizedBox(height: 30),
 
-              // একদম নিচে ছোট করে কন্টাক্ট বা সোর্স উল্লেখ (ঐচ্ছিক)
+              // নিচের ছোট টেক্সট
               Center(
                 child: Text(
                   '© ২০২৫ ইসলামিক কুইজ টিম',
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontSize: 14,
                   ),
                 ),

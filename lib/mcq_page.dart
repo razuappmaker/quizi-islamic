@@ -284,7 +284,7 @@ class _MCQPageState extends State<MCQPage> {
                         ),
                       );
                     }).toList(),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30), // 20 k 30 kra hoyeche
                     ElevatedButton(
                       onPressed: isAnswered ? goToNextQuestion : null,
                       child: const Text('পরবর্তী প্রশ্ন'),

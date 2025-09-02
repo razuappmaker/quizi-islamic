@@ -1,7 +1,10 @@
+// -------------------- আপনার main.dart --------------------
+
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart'; // ✅ Provider for theme switching
 import 'auto_image_slider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart'; // ✅ AdMob ইম্পোর্ট
 import 'prayer_time_page.dart';
@@ -61,6 +64,19 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   }
 }
 
+// ✅ Theme Provider Class
+class ThemeProvider extends ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.light;
+  ThemeMode get themeMode => _themeMode;
+
+  bool get isDarkMode => _themeMode == ThemeMode.dark;
+
+  void toggleTheme(bool isOn) {
+    _themeMode = isOn ? ThemeMode.dark : ThemeMode.light;
+    notifyListeners();
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -70,7 +86,12 @@ void main() async {
   // অ্যাপ শুরুতেই ইন্টারস্টিশিয়াল লোড
   AdHelper.loadInterstitialAd();
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -78,10 +99,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       title: 'ইসলামিক কুইজ অনলাইন',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.green),
+      themeMode: themeProvider.themeMode,
+      theme: ThemeData(primarySwatch: Colors.green, brightness: Brightness.light),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.green,
+        brightness: Brightness.dark,
+        appBarTheme: AppBarTheme(backgroundColor: Colors.green[900]),
+      ),
       home: SplashScreen(),
     );
   }
@@ -99,9 +128,7 @@ class _HomePageState extends State<HomePage> {
   final List<String> categories = [
     'ইসলামী প্রাথমিক জ্ঞান',
     'কোরআন',
-    'হাদিস',
-    'নবী-রাসূল',
-    'ইসলামের ইতিহাস',
+    'মহানবী সঃ এর জীবনী',
     'ইবাদত',
     'আখিরাত',
     'বিচার দিবস',
@@ -110,20 +137,23 @@ class _HomePageState extends State<HomePage> {
     'ধর্মীয় আইন(বিবাহ-বিচ্ছেদ)',
     'শিষ্টাচার',
     'দাম্পত্য ও পারিবারিক সম্পর্ক',
+    'হাদিস',
+    'নবী-রাসূল',
+    'ইসলামের ইতিহাস',
   ];
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return WillPopScope(
-      // ✅ সিস্টেম ব্যাক বাটন প্রেস হ্যান্ডেল করা
       onWillPop: () async {
         bool exitConfirmed = await showExitConfirmationDialog(context);
         if (exitConfirmed) {
-          // ✅ Exit এর আগে ফুল স্ক্রিন অ্যাড দেখানো
           AdHelper.loadInterstitialAd();
-          return true; // অ্যাপ বন্ধ হবে
+          return true;
         }
-        return false; // অ্যাপ খোলা থাকবে
+        return false;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -132,6 +162,61 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.green[800],
         ),
 
+        // ✅ Drawer যোগ করা হলো
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.green[800],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Icon(Icons.menu_book, size: 50, color: Colors.white),
+                    SizedBox(height: 10),
+                    Text(
+                      "ইসলামিক কুইজ অনলাইন",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "সঠিক জ্ঞানের সাথী",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildDrawerItem(context, Icons.book, 'দৈনন্দিন ব্যাবহারিত দোয়া', DoyaPage()),
+              _buildDrawerItem(context, Icons.access_time, 'আজকের নামাজের সময়', const PrayerTimePage()),
+              _buildDrawerItem(context, Icons.info, 'আমাদের কথা', const AboutPage()),
+              _buildDrawerItem(context, Icons.call, 'যোগাযোগ', const ContactPage()),
+              _buildDrawerItem(context, Icons.privacy_tip, 'Privacy Policy', const PrivacyPolicyPage()),
+              _buildDrawerItem(context, Icons.developer_mode, 'ডেভেলপার', DeveloperPage()),
+
+              const Divider(),
+
+              // ✅ Dark Mode Toggle
+              SwitchListTile(
+                title: Text("ডার্ক মোড"),
+                secondary: Icon(themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode),
+                value: themeProvider.isDarkMode,
+                onChanged: (value) {
+                  themeProvider.toggleTheme(value);
+                },
+              ),
+            ],
+          ),
+        ),
+
+        // --- আপনার আগের body + bottomNavigationBar অপরিবর্তিত থাকবে ---
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -183,8 +268,7 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     Container(
-                      margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -203,18 +287,24 @@ class _HomePageState extends State<HomePage> {
 
                           // Dropdown
                           Container(
-                            padding:
-                            const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
                               color: Colors.grey[100],
                               borderRadius: BorderRadius.circular(10),
-                              border:
-                              Border.all(color: Colors.green.shade200),
+                              border: Border.all(color: Colors.green.shade200),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: selectedCategory,
-                                hint: const Text('বিষয় বেছে নিন'),
+                                hint: Text(
+                                  'বিষয় বেছে নিন',
+                                  style: TextStyle(
+                                    // Dark mode হলে কালো, নাহলে default
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? Colors.black
+                                        : null,
+                                  ),
+                                ),
                                 icon: const Icon(Icons.arrow_drop_down),
                                 isExpanded: true,
                                 onChanged: (String? newValue) {
@@ -246,27 +336,31 @@ class _HomePageState extends State<HomePage> {
                             onPressed: selectedCategory == null
                                 ? null
                                 : () {
-
-                              //AdHelper.loadInterstitialAd(); // ✅ কুইজ শুরুর আগে ইন্টারস্টিশিয়াল অ্যাড দেখানো
-
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MCQPage(
-                                      category: selectedCategory!),
+                                  builder: (context) =>
+                                      MCQPage(category: selectedCategory!),
                                 ),
                               );
                             },
-                            //-----------------------------------------------------------
                             icon: const Icon(Icons.play_arrow),
-                            label: const Text('শুরু করুন',
-                                style: TextStyle(fontSize: 16)),
+                            label: Text(
+                              'শুরু করুন',
+                              style: TextStyle(
+                                fontSize: 16,
+                                // Dark mode হলে কালো, নাহলে default white থাকবে
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.black
+                                    : Colors.black54,
+                              ),
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green[800],
                               foregroundColor: Colors.white,
-                              padding:
-                              const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
+
                           ),
                         ],
                       ),
@@ -274,18 +368,13 @@ class _HomePageState extends State<HomePage> {
 
                     const SizedBox(height: 10),
 
-                    _buildNavButton(
-                        context, 'দৈনন্দিন ব্যাবহারিত দোয়া', DoyaPage()),
-                    _buildNavButton(
-                        context, 'আজকের নামাজের সময়', const PrayerTimePage()),
-                    _buildNavButton(
-                        context, 'আমাদের কথা', const AboutPage()),
-                    _buildNavButton(
-                        context, 'যোগাযোগ', const ContactPage()),
-                    _buildNavButton(context, 'Privacy Policy',
-                        const PrivacyPolicyPage()),
-                    _buildNavButton(
-                        context, 'ডেভেলপার', DeveloperPage()),
+                    // 👉 Body-তে আগের মতো Nav Button গুলোও থাকবে
+                    _buildNavButton(context, 'দৈনন্দিন ব্যাবহারিত দোয়া', DoyaPage()),
+                    _buildNavButton(context, 'আজকের নামাজের সময়', const PrayerTimePage()),
+                    _buildNavButton(context, 'আমাদের কথা', const AboutPage()),
+                    _buildNavButton(context, 'যোগাযোগ', const ContactPage()),
+                    _buildNavButton(context, 'Privacy Policy', const PrivacyPolicyPage()),
+                    _buildNavButton(context, 'ডেভেলপার', DeveloperPage()),
                   ],
                 ),
               ),
@@ -293,7 +382,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        // ✅ নিচে ব্যানার অ্যাড
         bottomNavigationBar: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -330,7 +418,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
   Widget _buildNavButton(BuildContext context, String title, Widget page) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -343,16 +430,26 @@ class _HomePageState extends State<HomePage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            textStyle: const TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold),
+            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => page));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => page));
           },
           child: Text(title, textAlign: TextAlign.center),
         ),
       ),
+    );
+  }
+
+  // ✅ Drawer Item Builder
+  Widget _buildDrawerItem(BuildContext context, IconData icon, String title, Widget page) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.green[800]),
+      title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+      onTap: () {
+        Navigator.pop(context); // Drawer বন্ধ হবে
+        Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+      },
     );
   }
 }
