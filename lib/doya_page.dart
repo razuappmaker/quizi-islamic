@@ -11,7 +11,8 @@ class DoyaPage extends StatefulWidget {
 }
 
 class _DoyaPageState extends State<DoyaPage> {
-  final List<Map<String, String>> dailyDoyas = [
+  final List<Map<String, String>> dailyDoyas =
+  [
     {
       'title': 'বাসা থেকে বের হওয়ার দোয়া',
       'bangla': 'বিসমিল্লাহি তাওয়াক্কালতু আলাল্লাহি, ওয়া লা হাওলা ওয়া লা কুওয়াতা ইল্লা বিল্লাহ।',
@@ -1226,16 +1227,17 @@ class _DoyaPageState extends State<DoyaPage> {
               },
             ),
           ),
-          // ✅ নিচে Banner Ad দেখানো
-          if (_isBannerAdReady)
-            Container(
-              alignment: Alignment.center,
-              width: _bannerAd.size.width.toDouble(),
-              height: _bannerAd.size.height.toDouble(),
-              child: AdWidget(ad: _bannerAd),
-            ),
         ],
       ),
+      // ✅ Banner Ad কে bottomNavigationBar এ রাখা হয়েছে
+      bottomNavigationBar: _isBannerAdReady
+          ? Container(
+        color: Colors.white,
+        width: _bannerAd.size.width.toDouble(),
+        height: _bannerAd.size.height.toDouble(),
+        child: AdWidget(ad: _bannerAd),
+      )
+          : null,
     );
   }
 }

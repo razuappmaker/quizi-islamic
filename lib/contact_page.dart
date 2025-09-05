@@ -117,7 +117,7 @@ class ContactPage extends StatelessWidget {
                   'ইমেইল',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
-                subtitle: const Text('info@islamicquiz.com'),
+                subtitle: const Text('razu.appmaker@gmail.com'),
                 trailing: ElevatedButton.icon(
                   icon: const Icon(Icons.send),
                   label: const Text('ইমেইল পাঠান'),
@@ -128,7 +128,7 @@ class ContactPage extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
-                  onPressed: () => _sendEmail('info@islamicquiz.com'),
+                  onPressed: () => _sendEmail('razu.appmaker@gmail.com.com'),
                 ),
               ),
             ),
@@ -170,27 +170,21 @@ class ContactPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const SizedBox(width: 20),
+                const SizedBox(width: 40),
                 _socialIcon(
-                  url: 'https://www.facebook.com/yourpage',
+                  url: 'https://www.facebook.com/RazuInspires',
                   iconUrl: 'https://img.icons8.com/color/48/000000/facebook-new.png',
                   onTap: _openUrl,
                 ),
-                const SizedBox(width: 40),
+                const SizedBox(width: 60),
                 _socialIcon(
-                  url: 'https://twitter.com/yourprofile',
-                  iconUrl: 'https://img.icons8.com/color/48/000000/twitter.png',
-                  onTap: _openUrl,
-                ),
-                const SizedBox(width: 40),
-                _socialIcon(
-                  url: 'https://whatsapp.com/yourprofile',
+                  url: 'https://wa.me/8801724184271?text=Assalamu%20Alaikum%20Bhai',
                   iconUrl: 'https://img.icons8.com/color/48/000000/whatsapp',
                   onTap: _openUrl,
                 ),
-                const SizedBox(width: 40),
+                const SizedBox(width: 60),
                 _socialIcon(
-                  url: 'https://m.me/yourprofile',  // Messenger প্রোফাইল লিঙ্ক
+                  url: 'https://m.me/RazuInspires',  // Messenger প্রোফাইল লিঙ্ক
                   iconUrl: 'https://img.icons8.com/color/48/000000/facebook-messenger.png',  // Messenger আইকন URL
                   onTap: _openUrl,
                 ),

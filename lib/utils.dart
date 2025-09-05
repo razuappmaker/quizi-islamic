@@ -16,7 +16,7 @@ Future<bool> showExitConfirmationDialog(BuildContext context) async {
         ],
       ),
       content: const Text(
-        "তুমি কি অ্যাপ থেকে সত্যি বের হতে চাও?\n\nচাইলে এই আমলের কাজের সাথে কিছুকক্ষণ থাকতে পারো।",
+        "আপনি কি অ্যাপ থেকে সত্যি বের হতে চান?\n\nচাইলে এই নেক কাজের সাথে কিছুকক্ষণ থাকতে পারেন।",
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(20)),

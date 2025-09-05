@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class DeveloperPage extends StatelessWidget {
   DeveloperPage({Key? key}) : super(key: key);
 
-  final String developerName = 'মোহাম্মদ রাজু হোসেন';
+  final String developerName = 'মোঃ রাজু হোসেন';
   final String experience =
       '১০ বছর অভিজ্ঞতা\n(ফ্লাটার অ্যাপস ডেভেলপার ও IT এক্সপার্ট)';
 

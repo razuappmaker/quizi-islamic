@@ -206,28 +206,25 @@ class _PrayerTimePageState extends State<PrayerTimePage>
             ],
           ),
         ),
-        body: Column(
+        body: TabBarView(
+          controller: _tabController,
           children: [
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildPrayerTab(),
-                  _buildTasbeehTab(),
-                  _buildQiblaTab(),
-                ],
-              ),
-            ),
-            // ✅ Banner Ad নিচে সবসময়
-            if (_isBannerAdReady)
-              Container(
-                alignment: Alignment.center,
-                width: _bannerAd.size.width.toDouble(),
-                height: _bannerAd.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd),
-              ),
+            _buildPrayerTab(),
+            _buildTasbeehTab(),
+            _buildQiblaTab(),
           ],
         ),
+
+        // ✅ Banner Ad নিচে সবসময় থাকবে, সিস্টেম বারের উপরে
+        bottomNavigationBar: _isBannerAdReady
+            ? Container(
+          color: Colors.white,
+          alignment: Alignment.center,
+          width: _bannerAd.size.width.toDouble(),
+          height: _bannerAd.size.height.toDouble(),
+          child: AdWidget(ad: _bannerAd),
+        )
+            : null,
       ),
     );
   }

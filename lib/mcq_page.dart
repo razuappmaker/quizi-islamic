@@ -193,6 +193,8 @@ class _MCQPageState extends State<MCQPage> {
     return false;
   }
 
+  // ... আপনার আগের সব কোড একই থাকবে ...
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -285,7 +287,7 @@ class _MCQPageState extends State<MCQPage> {
                         ),
                       );
                     }).toList(),
-                    const SizedBox(height: 30), // 20 k 30 kra hoyeche
+                    const SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: isAnswered ? goToNextQuestion : null,
                       child: const Text('পরবর্তী প্রশ্ন'),
@@ -294,12 +296,16 @@ class _MCQPageState extends State<MCQPage> {
                 ),
               ),
             ),
+
+            // ✅ Banner Ad সবসময় system bar এর উপরে থাকবে
             if (_isBannerAdReady)
-              Container(
-                alignment: Alignment.center,
-                height: _bannerAd.size.height.toDouble(),
-                width: _bannerAd.size.width.toDouble(),
-                child: AdWidget(ad: _bannerAd),
+              SafeArea(
+                child: Container(
+                  alignment: Alignment.center,
+                  height: _bannerAd.size.height.toDouble(),
+                  width: _bannerAd.size.width.toDouble(),
+                  child: AdWidget(ad: _bannerAd),
+                ),
               ),
           ],
         ),
