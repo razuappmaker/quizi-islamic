@@ -1229,13 +1229,15 @@ class _DoyaPageState extends State<DoyaPage> {
           ),
         ],
       ),
-      // ✅ Banner Ad কে bottomNavigationBar এ রাখা হয়েছে
+      // ✅ Banner Ad সবসময় system navigation bar-এর উপরে
       bottomNavigationBar: _isBannerAdReady
-          ? Container(
-        color: Colors.white,
-        width: _bannerAd.size.width.toDouble(),
-        height: _bannerAd.size.height.toDouble(),
-        child: AdWidget(ad: _bannerAd),
+          ? SafeArea(
+        child: Container(
+          color: Colors.white,
+          width: _bannerAd.size.width.toDouble(),
+          height: _bannerAd.size.height.toDouble(),
+          child: AdWidget(ad: _bannerAd),
+        ),
       )
           : null,
     );

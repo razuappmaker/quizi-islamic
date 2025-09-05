@@ -215,14 +215,16 @@ class _PrayerTimePageState extends State<PrayerTimePage>
           ],
         ),
 
-        // ✅ Banner Ad নিচে সবসময় থাকবে, সিস্টেম বারের উপরে
+        // ✅ Banner Ad এখন bottomNavigationBar-এ (সিস্টেম বারের উপরে সেফলি)
         bottomNavigationBar: _isBannerAdReady
-            ? Container(
-          color: Colors.white,
-          alignment: Alignment.center,
-          width: _bannerAd.size.width.toDouble(),
-          height: _bannerAd.size.height.toDouble(),
-          child: AdWidget(ad: _bannerAd),
+            ? SafeArea(
+          child: Container(
+            color: Colors.white,
+            alignment: Alignment.center,
+            width: _bannerAd.size.width.toDouble(),
+            height: _bannerAd.size.height.toDouble(),
+            child: AdWidget(ad: _bannerAd),
+          ),
         )
             : null,
       ),
@@ -231,13 +233,18 @@ class _PrayerTimePageState extends State<PrayerTimePage>
 
   // ---------- Prayer Tab ----------
   Widget _buildPrayerTab() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         const SizedBox(height: 10),
         Text(
           "$cityName, $countryName",
-          style: const TextStyle(
-              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
         ),
         const SizedBox(height: 10),
         Expanded(
@@ -246,8 +253,8 @@ class _PrayerTimePageState extends State<PrayerTimePage>
             children: prayerTimes.entries.map((entry) {
               return Card(
                 elevation: 3,
-                shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 child: ListTile(
                   leading:
                   const Icon(Icons.access_time, color: Colors.green, size: 28),
@@ -271,9 +278,14 @@ class _PrayerTimePageState extends State<PrayerTimePage>
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                Text("পরবর্তী ওয়াক্ত: $nextPrayer",
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  "পরবর্তী ওয়াক্ত: $nextPrayer",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.black54 : Colors.black, // Dark mode fix
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Text(
                   "${countdown.inHours.toString().padLeft(2, '0')}:${(countdown.inMinutes % 60).toString().padLeft(2, '0')}:${(countdown.inSeconds % 60).toString().padLeft(2, '0')}",
@@ -291,6 +303,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
       ],
     );
   }
+
 
   // ---------- Tasbeeh Tab ----------
   Widget _buildTasbeehTab() {

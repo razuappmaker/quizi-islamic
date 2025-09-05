@@ -314,7 +314,9 @@ class _HomePageState extends State<HomePage> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: Colors.grey[100],
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey[900]
+                                  : Colors.grey[100],
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: Colors.green.shade200),
                             ),
@@ -324,13 +326,16 @@ class _HomePageState extends State<HomePage> {
                                 hint: Text(
                                   'বিষয় বেছে নিন',
                                   style: TextStyle(
-                                    // Dark mode হলে কালো, নাহলে default
-                                    color: Theme
-                                        .of(context)
-                                        .brightness == Brightness.dark
-                                        ? Colors.black
-                                        : null,
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? Colors.white // ডার্ক মুডে হোয়াইট
+                                        : Colors.black, // লাইট মুডে ব্ল্যাক
                                   ),
+                                ),
+                                style: TextStyle(
+                                  color: Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.white // ডার্ক মুডে সিলেক্টেড টেক্সট হোয়াইট
+                                      : Colors.black, // লাইট মুডে ব্ল্যাক
+                                  fontSize: 16,
                                 ),
                                 icon: const Icon(Icons.arrow_drop_down),
                                 isExpanded: true,
@@ -344,10 +349,16 @@ class _HomePageState extends State<HomePage> {
                                     value: category,
                                     child: Row(
                                       children: [
-                                        const Icon(Icons.bookmark,
-                                            size: 18, color: Colors.green),
+                                        const Icon(Icons.bookmark, size: 18, color: Colors.green),
                                         const SizedBox(width: 8),
-                                        Text(category),
+                                        Text(
+                                          category,
+                                          style: TextStyle(
+                                            color: Theme.of(context).brightness == Brightness.dark
+                                                ? Colors.white // ডার্ক মুডে সিলেক্টেড আইটেম হোয়াইট
+                                                : Colors.black, // লাইট মুডে ব্ল্যাক
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   );
@@ -462,6 +473,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildNavButton(BuildContext context, String title, Widget page) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: SizedBox(
@@ -469,26 +482,35 @@ class _HomePageState extends State<HomePage> {
         height: 50,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.green.shade700,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            textStyle: const TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold,),
+            textStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.white, // লেখা ডার্ক মুডেও হোয়াইট
+            ),
           ),
           onPressed: () {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => page));
           },
-          child: Text(title, textAlign: TextAlign.center),
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.white, // এখানে লেখা রঙও নিশ্চিত
+            ),
+          ),
         ),
       ),
     );
   }
 
 
-  Widget _buildPrivacyPolicyButton(BuildContext context, String title,
-      String url) {
+
+  Widget _buildPrivacyPolicyButton(BuildContext context, String title, String url) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: SizedBox(
@@ -496,12 +518,14 @@ class _HomePageState extends State<HomePage> {
         height: 50,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.green.shade700,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
             textStyle: const TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           onPressed: () async {
             final Uri uri = Uri.parse(url);
@@ -513,11 +537,20 @@ class _HomePageState extends State<HomePage> {
               );
             }
           },
-          child: Text(title, textAlign: TextAlign.center),
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white, // ✅ লাইট ও ডার্ক মোড উভয়ের জন্য একই
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
         ),
       ),
     );
   }
+
 
 
 // Drawer Item Builder
