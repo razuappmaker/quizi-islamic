@@ -23,7 +23,7 @@ class _AutoImageSliderState extends State<AutoImageSlider> {
   }
 
   void _startAutoScroll() {
-    _timer = Timer.periodic(Duration(seconds: 4), (Timer timer) {
+    _timer = Timer.periodic(Duration(seconds: 6), (Timer timer) {
       if (_pageController.hasClients) {
         int nextPage = (_currentPage + 1) % widget.imageUrls.length;
         _pageController.animateToPage(

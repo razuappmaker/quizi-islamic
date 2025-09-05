@@ -67,7 +67,7 @@ class _MCQPageState extends State<MCQPage> {
   }
 
   // JSON থেকে প্রশ্ন লোড
-  Future<void> loadQuestions() async {
+ Future<void> loadQuestions() async {
     final String response = await rootBundle.loadString('assets/questions.json');
     final data = json.decode(response);
     setState(() {
@@ -75,6 +75,7 @@ class _MCQPageState extends State<MCQPage> {
       startTimer();
     });
   }
+
 
   // টাইমার চালু
   void startTimer() {
@@ -263,7 +264,7 @@ class _MCQPageState extends State<MCQPage> {
                     ),
                     const SizedBox(height: 20),
                     ...(question['options'] as List<dynamic>).map((option) {
-                      Color optionColor = isDarkMode ? Colors.grey[800]! : Colors.white;
+                      Color optionColor = isDarkMode ? Colors.grey : Colors.white;
                       if (isAnswered) {
                         if (option == question['answer']) {
                           optionColor = Colors.greenAccent;

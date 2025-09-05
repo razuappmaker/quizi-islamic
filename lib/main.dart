@@ -9,6 +9,8 @@ import 'auto_image_slider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart'; // ✅ AdMob ইম্পোর্ট
 import 'prayer_time_page.dart';
 
+
+
 // নিজেরf অন্যান্য পেজ ইম্পোর্ট
 import 'mcq_page.dart';
 import 'about_page.dart';
@@ -194,19 +196,39 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              _buildDrawerItem(context, Icons.book, 'দৈনন্দিন ব্যাবহারিত দোয়া', DoyaPage()),
-              _buildDrawerItem(context, Icons.access_time, 'আজকের নামাজের সময়', const PrayerTimePage()),
-              _buildDrawerItem(context, Icons.info, 'আমাদের কথা', const AboutPage()),
-              _buildDrawerItem(context, Icons.call, 'যোগাযোগ', const ContactPage()),
-              _buildDrawerItem(context, Icons.privacy_tip, 'Privacy Policy', const PrivacyPolicyPage()),
-              _buildDrawerItem(context, Icons.developer_mode, 'ডেভেলপার', DeveloperPage()),
-
+              //_buildDrawerItem(context, Icons.book, 'দৈনন্দিন ব্যাবহারিত দোয়া', DoyaPage()),
+              //_buildDrawerItem(context, Icons.access_time, 'আজকের নামাজের সময়', const PrayerTimePage()),
+              //_buildDrawerItem(context, Icons.info, 'আমাদের কথা', const AboutPage()),
+              //_buildDrawerItem(context, Icons.call, 'যোগাযোগ', const ContactPage()),
+              // _buildDrawerItem(context, Icons.developer_mode, 'ডেভেলপার', DeveloperPage()),
+              //_buildDrawerItem(context, Icons.privacy_tip, 'Privacy Policy', const PrivacyPolicyPage()),
+              // Normal Pages
+              _buildDrawerItem(context, Icons.book, 'দৈনন্দিন ব্যাবহারিত দোয়া',
+                  page: DoyaPage()),
+              _buildDrawerItem(context, Icons.access_time, 'আজকের নামাজের সময়',
+                  page: const PrayerTimePage()),
+              _buildDrawerItem(
+                  context, Icons.info, 'আমাদের কথা', page: const AboutPage()),
+              _buildDrawerItem(context, Icons.contact_page, 'যোগাযোগ',
+                  page: const ContactPage()),
+              _buildDrawerItem(context, Icons.developer_mode, 'ডেভেলপার',
+                  page: DeveloperPage()),
+              // Privacy Policy আলাদা ব্রাউজারে খুলবে
+              // Privacy Policy → এখন External Browser ওপেন হবে
+              _buildDrawerItem(
+                context,
+                Icons.privacy_tip,
+                'Privacy Policy',
+                url: 'https://sites.google.com/view/islamicquize/home',
+              ),
               const Divider(),
 
               // ✅ Dark Mode Toggle
               SwitchListTile(
                 title: Text("ডার্ক মোড"),
-                secondary: Icon(themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode),
+                secondary: Icon(
+                    themeProvider.isDarkMode ? Icons.dark_mode : Icons
+                        .light_mode),
                 value: themeProvider.isDarkMode,
                 onChanged: (value) {
                   themeProvider.toggleTheme(value);
@@ -227,9 +249,11 @@ class _HomePageState extends State<HomePage> {
                 child: Center(
                   child: Marquee(
                     text:
-                    "📖 ইসলামই একমাত্র সত্য ধর্ম (আলে ইমরান: ১৯)   •   আল্লাহকে ভয় করো ও সত্যবাদীদের সাথে থাকো (তাওবা: ১১৯)   •  "
-                        " নামাজ অশ্লীলতা ও মন্দ কাজ থেকে বিরত রাখে (আনকাবুত: ৪৫)   •   হে আমার প্রতিপালক! আমাকে জ্ঞান বৃদ্ধি করে দিন "
-                        "(ত্ব-হা: ১১৪)   •   সৎকাজে প্রতিযোগিতা করো (বাকারাহ: ১৪৮)   ",
+                    "📖 ইসলামই একমাত্র সত্য ধর্ম (আলে ইমরান: ১৯)      📖 আল্লাহকে ভয় করো ও সত্যবাদীদের সাথে থাকো (তাওবা: ১১৯)  "
+                        " 📖 নামাজ অশ্লীলতা ও মন্দ কাজ থেকে বিরত রাখে (আনকাবুত: ৪৫)     📖 হে আমার প্রতিপালক! আমাকে জ্ঞান বৃদ্ধি করে দিন (ত্ব-হা: ১১৪)   "
+                        " 📖  সৎকাজে প্রতিযোগিতা করো (বাকারাহ: ১৪৮)    📖 আল্লাহর স্মরণে হৃদয় শান্তি পায় (রা‘দ: ২৮)   "
+                        " 📖 আল্লাহর রহমত থেকে নিরাশ হয়ো না (জুমার: ৫৩)    📖 পিতামাতার সাথে সদ্ব্যবহার করো (বনী-ইসরাঈল: ২৩)   "
+                        " 📖 যারা ধৈর্য ধরে, আল্লাহ তাদের সাথে আছেন (বাকারাহ: ১৫৩)    📖 নিশ্চয়ই কষ্টের সাথে আছে স্বস্তি (ইনশিরাহ: ৬)   ",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -268,7 +292,8 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 20),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -300,7 +325,9 @@ class _HomePageState extends State<HomePage> {
                                   'বিষয় বেছে নিন',
                                   style: TextStyle(
                                     // Dark mode হলে কালো, নাহলে default
-                                    color: Theme.of(context).brightness == Brightness.dark
+                                    color: Theme
+                                        .of(context)
+                                        .brightness == Brightness.dark
                                         ? Colors.black
                                         : null,
                                   ),
@@ -350,7 +377,9 @@ class _HomePageState extends State<HomePage> {
                               style: TextStyle(
                                 fontSize: 16,
                                 // Dark mode হলে কালো, নাহলে default white থাকবে
-                                color: Theme.of(context).brightness == Brightness.dark
+                                color: Theme
+                                    .of(context)
+                                    .brightness == Brightness.dark
                                     ? Colors.black
                                     : Colors.black54,
                               ),
@@ -369,12 +398,21 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 10),
 
                     // 👉 Body-তে আগের মতো Nav Button গুলোও থাকবে
-                    _buildNavButton(context, 'দৈনন্দিন ব্যাবহারিত দোয়া', DoyaPage()),
-                    _buildNavButton(context, 'আজকের নামাজের সময়', const PrayerTimePage()),
+                    _buildNavButton(
+                        context, 'দৈনন্দিন ব্যাবহারিত দোয়া', DoyaPage()),
+                    _buildNavButton(
+                        context, 'আজকের নামাজের সময়', const PrayerTimePage()),
                     _buildNavButton(context, 'আমাদের কথা', const AboutPage()),
                     _buildNavButton(context, 'যোগাযোগ', const ContactPage()),
-                    _buildNavButton(context, 'Privacy Policy', const PrivacyPolicyPage()),
                     _buildNavButton(context, 'ডেভেলপার', DeveloperPage()),
+                    //_buildNavButton(context, 'Privacy Policy', const PrivacyPolicyPage()),
+
+                    // Privacy Policy আলাদা ব্রাউজারে খুলবে
+                    _buildPrivacyPolicyButton(
+                      context,
+                      'Privacy Policy',
+                      'https://sites.google.com/view/islamicquize/home',
+                    ),
                   ],
                 ),
               ),
@@ -392,17 +430,22 @@ class _HomePageState extends State<HomePage> {
               unselectedItemColor: Colors.grey,
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                BottomNavigationBarItem(icon: Icon(Icons.star_rate), label: 'Rating'),
-                BottomNavigationBarItem(icon: Icon(Icons.apps), label: 'Other Apps'),
-                BottomNavigationBarItem(icon: Icon(Icons.share), label: 'Share'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.star_rate), label: 'Rating'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.apps), label: 'Other Apps'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.share), label: 'Share'),
               ],
               onTap: (index) {
                 switch (index) {
                   case 1:
-                    launchUrl(Uri.parse('https://play.google.com/store/apps/details?id=com.example.quizapp'));
+                    launchUrl(Uri.parse(
+                        'https://play.google.com/store/apps/details?id=com.example.quizapp'));
                     break;
                   case 2:
-                    launchUrl(Uri.parse('https://play.google.com/store/apps/dev?id=YOUR_DEVELOPER_ID'));
+                    launchUrl(Uri.parse(
+                        'https://play.google.com/store/apps/dev?id=YOUR_DEVELOPER_ID'));
                     break;
                   case 3:
                     Share.share(
@@ -430,10 +473,12 @@ class _HomePageState extends State<HomePage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            textStyle: const TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold,),
           ),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => page));
           },
           child: Text(title, textAlign: TextAlign.center),
         ),
@@ -441,14 +486,65 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ✅ Drawer Item Builder
-  Widget _buildDrawerItem(BuildContext context, IconData icon, String title, Widget page) {
+
+  Widget _buildPrivacyPolicyButton(BuildContext context, String title,
+      String url) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            textStyle: const TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          onPressed: () async {
+            final Uri uri = Uri.parse(url);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Could not open Privacy Policy')),
+              );
+            }
+          },
+          child: Text(title, textAlign: TextAlign.center),
+        ),
+      ),
+    );
+  }
+
+
+// Drawer Item Builder
+  Widget _buildDrawerItem(BuildContext context, IconData icon, String title,
+      {Widget? page, String? url}) {
     return ListTile(
       leading: Icon(icon, color: Colors.green[800]),
-      title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-      onTap: () {
+      title: Text(title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+      onTap: () async {
         Navigator.pop(context); // Drawer বন্ধ হবে
-        Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+
+        if (url != null) {
+          // যদি URL দেওয়া থাকে → External Browser ওপেন হবে
+          final Uri uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Could not open link')),
+            );
+          }
+        } else if (page != null) {
+          // যদি Page দেওয়া থাকে → Navigator দিয়ে ওপেন হবে
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => page));
+        }
       },
     );
   }
