@@ -495,3 +495,4 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     );
   }
 }
+
