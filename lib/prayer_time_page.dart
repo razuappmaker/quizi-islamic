@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'ad_helper.dart'; // ✅ Ad Helper ফাইল
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -19,7 +19,7 @@ class PrayerTimePage extends StatefulWidget {
 
 class _PrayerTimePageState extends State<PrayerTimePage>
     with SingleTickerProviderStateMixin {
-  // Prayer Times
+  // ---------- Prayer Times ----------
   String? cityName = "Loading...";
   String? countryName = "Loading...";
   Map<String, String> prayerTimes = {};
@@ -27,17 +27,17 @@ class _PrayerTimePageState extends State<PrayerTimePage>
   Duration countdown = Duration.zero;
   Timer? timer;
 
-  // Tasbeeh Counter
+  // ---------- Tasbeeh Counter ----------
   int tasbeehCount = 0;
   int subhanallahCount = 0;
   int alhamdulillahCount = 0;
   int allahuakbarCount = 0;
   String selectedPhrase = "সুবহানাল্লাহ";
 
-  // Tabs
+  // ---------- Tabs ----------
   late TabController _tabController;
 
-  // Banner Ad
+  // ---------- Banner Ad ----------
   late BannerAd _bannerAd;
   bool _isBannerAdReady = false;
 
@@ -61,6 +61,27 @@ class _PrayerTimePageState extends State<PrayerTimePage>
         },
       ),
     )..load();
+
+    // Awesome Notifications Initialize
+    AwesomeNotifications().initialize('resource://drawable/res_app_icon', [
+      NotificationChannel(
+        channelKey: 'azan_channel',
+        channelName: 'Azan Notifications',
+        channelDescription: 'Prayer time reminders',
+        defaultColor: Colors.green,
+        importance: NotificationImportance.High,
+        playSound: true,
+        soundSource: 'resource://raw/azan',
+        // raw/azan.mp3
+        ledColor: Colors.white,
+      ),
+    ]);
+
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
   }
 
   @override
@@ -71,6 +92,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     super.dispose();
   }
 
+  // ---------- Location & Prayer Time Fetch ----------
   Future<void> fetchLocationAndPrayerTimes() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -105,8 +127,10 @@ class _PrayerTimePageState extends State<PrayerTimePage>
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      List<Placemark> placemarks =
-      await placemarkFromCoordinates(position.latitude, position.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
       if (placemarks.isNotEmpty) {
         setState(() {
@@ -132,6 +156,11 @@ class _PrayerTimePageState extends State<PrayerTimePage>
           };
         });
         findNextPrayer();
+
+        // Schedule notifications for all prayers
+        for (var entry in prayerTimes.entries) {
+          _schedulePrayerNotification(entry.key, entry.value);
+        }
       }
     } catch (e) {
       setState(() {
@@ -141,6 +170,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     }
   }
 
+  // ---------- Next Prayer Countdown ----------
   void findNextPrayer() {
     final now = DateTime.now();
     DateTime? nextPrayerTime;
@@ -180,6 +210,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     }
   }
 
+  // ---------- Tasbeeh Counter ----------
   int _getCurrentCount() {
     if (selectedPhrase == "সুবহানাল্লাহ") return subhanallahCount;
     if (selectedPhrase == "আলহামদুলিল্লাহা") return alhamdulillahCount;
@@ -187,47 +218,99 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     return 0;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.green,
-          centerTitle: true,
-          title: const Text("ইসলামিক টুলস"),
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: Colors.white,
-            tabs: const [
-              Tab(icon: Icon(Icons.access_time), text: "নামাজ"),
-              Tab(icon: Icon(Icons.fingerprint), text: "তসবীহ"),
-              Tab(icon: Icon(Icons.explore), text: "কিবলা"),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildPrayerTab(),
-            _buildTasbeehTab(),
-            _buildQiblaTab(),
-          ],
-        ),
+  // ---------- SharedPreferences Helpers ----------
+  Future<bool> _getAzanEnabled(String prayerName) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool("azan_sound_$prayerName") ?? true;
+  }
 
-        // ✅ Banner Ad এখন bottomNavigationBar-এ (সিস্টেম বারের উপরে সেফলি)
-        bottomNavigationBar: _isBannerAdReady
-            ? SafeArea(
-          child: Container(
-            color: Colors.white,
-            alignment: Alignment.center,
-            width: _bannerAd.size.width.toDouble(),
-            height: _bannerAd.size.height.toDouble(),
-            child: AdWidget(ad: _bannerAd),
-          ),
-        )
-            : null,
+  Future<void> _setAzanEnabled(String prayerName, bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("azan_sound_$prayerName", enabled);
+    _schedulePrayerNotification(prayerName, prayerTimes[prayerName]!);
+  }
+
+  // ---------- Schedule Notification ----------
+  Future<void> _schedulePrayerNotification(
+    String prayerName,
+    String time,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    bool soundEnabled = prefs.getBool("azan_sound_$prayerName") ?? true;
+
+    final now = DateTime.now();
+    final parts = time.split(":");
+    final prayerDate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+    );
+
+    final notificationTime = prayerDate.subtract(const Duration(minutes: 10));
+    final notificationId = prayerDate.millisecondsSinceEpoch ~/ 1000;
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: notificationId,
+        channelKey: 'azan_channel',
+        title: 'নামাজের সময়',
+        body: '$prayerName নামাজ শুরু হওয়ার ১০ মিনিট বাকি',
+        notificationLayout: NotificationLayout.Default,
+        autoDismissible: true,
       ),
+      schedule: NotificationCalendar(
+        year: notificationTime.year,
+        month: notificationTime.month,
+        day: notificationTime.day,
+        hour: notificationTime.hour,
+        minute: notificationTime.minute,
+        second: 0,
+        repeats: true,
+      ),
+    );
+  }
+
+  // ---------- Prayer Row Widget ----------
+  Widget prayerRow(String prayerName, String time) {
+    return FutureBuilder<bool>(
+      future: _getAzanEnabled(prayerName),
+      builder: (context, snapshot) {
+        bool enabled = snapshot.data ?? true;
+
+        return Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            leading: const Icon(
+              Icons.access_time,
+              color: Colors.green,
+              size: 28,
+            ),
+            title: Text(
+              prayerName,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(time, style: const TextStyle(fontSize: 18)),
+            trailing: SizedBox(
+              width: 100,
+              child: IconButton(
+                icon: Icon(
+                  enabled ? Icons.volume_up : Icons.volume_off,
+                  color: enabled ? Colors.green : Colors.red,
+                ),
+                onPressed: () {
+                  _setAzanEnabled(prayerName, !enabled);
+                  setState(() {});
+                },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -250,29 +333,17 @@ class _PrayerTimePageState extends State<PrayerTimePage>
         Expanded(
           child: ListView(
             padding: const EdgeInsets.all(8),
-            children: prayerTimes.entries.map((entry) {
-              return Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                child: ListTile(
-                  leading:
-                  const Icon(Icons.access_time, color: Colors.green, size: 28),
-                  title: Text(entry.key,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600)),
-                  trailing: Text(entry.value,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-              );
-            }).toList(),
+            children: prayerTimes.entries
+                .map((e) => prayerRow(e.key, e.value))
+                .toList(),
           ),
         ),
         Card(
           margin: const EdgeInsets.all(16),
           color: Colors.green[100],
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           elevation: 6,
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -283,17 +354,18 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.black54 : Colors.black, // Dark mode fix
+                    color: isDark ? Colors.black54 : Colors.black,
                   ),
                 ),
                 const SizedBox(height: 10),
                 Text(
                   "${countdown.inHours.toString().padLeft(2, '0')}:${(countdown.inMinutes % 60).toString().padLeft(2, '0')}:${(countdown.inSeconds % 60).toString().padLeft(2, '0')}",
                   style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                      letterSpacing: 2),
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                    letterSpacing: 2,
+                  ),
                 ),
               ],
             ),
@@ -303,7 +375,6 @@ class _PrayerTimePageState extends State<PrayerTimePage>
       ],
     );
   }
-
 
   // ---------- Tasbeeh Tab ----------
   Widget _buildTasbeehTab() {
@@ -323,12 +394,18 @@ class _PrayerTimePageState extends State<PrayerTimePage>
         const SizedBox(height: 10),
         const Text(
           "তসবীহ কাউন্টার",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
         ),
         const SizedBox(height: 20),
         Card(
           elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           color: Colors.green.shade100,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
@@ -336,13 +413,21 @@ class _PrayerTimePageState extends State<PrayerTimePage>
               children: [
                 Text(
                   selectedPhrase,
-                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.green),
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
                 Text(
                   _getCurrentCount().toString(),
-                  style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold, color: Colors.green),
+                  style: const TextStyle(
+                    fontSize: 50,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
                 ),
               ],
             ),
@@ -360,13 +445,9 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                   onTap: () {
                     setState(() {
                       selectedPhrase = phrase;
-                      if (phrase == "সুবহানাল্লাহ") {
-                        subhanallahCount++;
-                      } else if (phrase == "আলহামদুলিল্লাহা") {
-                        alhamdulillahCount++;
-                      } else if (phrase == "আল্লাহু আকবার") {
-                        allahuakbarCount++;
-                      }
+                      if (phrase == "সুবহানাল্লাহ") subhanallahCount++;
+                      if (phrase == "আলহামদুলিল্লাহা") alhamdulillahCount++;
+                      if (phrase == "আল্লাহু আকবার") allahuakbarCount++;
                     });
                   },
                   child: AnimatedContainer(
@@ -376,14 +457,25 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                       color: color,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: const [
-                        BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(2, 2))
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
+                        ),
                       ],
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 24,
+                    ),
                     child: Center(
                       child: Text(
                         phrase,
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -407,7 +499,9 @@ class _PrayerTimePageState extends State<PrayerTimePage>
             backgroundColor: Colors.redAccent,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         ),
         const SizedBox(height: 20),
@@ -424,26 +518,29 @@ class _PrayerTimePageState extends State<PrayerTimePage>
         Text(
           "$cityName, $countryName",
           style: const TextStyle(
-              fontSize: 22, fontWeight: FontWeight.bold, color: Colors.green),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
         ),
         const SizedBox(height: 20),
         Expanded(
           child: StreamBuilder<CompassEvent>(
             stream: FlutterCompass.events,
             builder: (context, snapshot) {
-              if (snapshot.hasError) {
+              if (snapshot.hasError)
                 return const Text(
                   "কম্পাস পাওয়া যাচ্ছে না",
                   style: TextStyle(color: Colors.red, fontSize: 18),
                 );
-              }
-
               if (!snapshot.hasData) return const CircularProgressIndicator();
 
               double? direction = snapshot.data!.heading;
-              if (direction == null) {
-                return const Text("কম্পাস চালু করুন", style: TextStyle(fontSize: 18));
-              }
+              if (direction == null)
+                return const Text(
+                  "কম্পাস চালু করুন",
+                  style: TextStyle(fontSize: 18),
+                );
 
               double qiblaDirection = 294;
 
@@ -494,5 +591,43 @@ class _PrayerTimePageState extends State<PrayerTimePage>
       ],
     );
   }
-}
 
+  // ---------- Build ----------
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.green,
+          centerTitle: true,
+          title: const Text("ইসলামিক টুলস"),
+          bottom: TabBar(
+            controller: _tabController,
+            indicatorColor: Colors.white,
+            tabs: const [
+              Tab(icon: Icon(Icons.access_time), text: "নামাজ"),
+              Tab(icon: Icon(Icons.fingerprint), text: "তসবীহ"),
+              Tab(icon: Icon(Icons.explore), text: "কিবলা"),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: [_buildPrayerTab(), _buildTasbeehTab(), _buildQiblaTab()],
+        ),
+        bottomNavigationBar: _isBannerAdReady
+            ? SafeArea(
+                child: Container(
+                  color: Colors.white,
+                  alignment: Alignment.center,
+                  width: _bannerAd.size.width.toDouble(),
+                  height: _bannerAd.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd),
+                ),
+              )
+            : null,
+      ),
+    );
+  }
+}
