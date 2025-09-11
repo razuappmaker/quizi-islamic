@@ -1,3 +1,4 @@
+// main.dart
 // -------------------- main.dart --------------------
 import 'package:flutter/material.dart';
 import 'package:islamicquiz/namaj_amol.dart';
@@ -28,17 +29,36 @@ class BannerAdWidget extends StatefulWidget {
 
 class _BannerAdWidgetState extends State<BannerAdWidget> {
   BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadAdaptiveBanner();
+  }
+
+  void _loadAdaptiveBanner() async {
+    final AnchoredAdaptiveBannerAdSize? size =
+        await AdSize.getAnchoredAdaptiveBannerAdSize(
+          Orientation.portrait,
+          MediaQuery.of(context).size.width.truncate(),
+        );
+
+    if (size == null) return;
+
     _bannerAd = BannerAd(
       adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-      size: AdSize.banner,
+      size: size,
       request: AdRequest(),
       listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
+          print('BannerAd failed to load: $error');
         },
       ),
     )..load();
@@ -46,14 +66,13 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _bannerAd == null
-        ? SizedBox()
-        : Container(
-            alignment: Alignment.center,
+    return _isAdLoaded && _bannerAd != null
+        ? Container(
             width: _bannerAd!.size.width.toDouble(),
             height: _bannerAd!.size.height.toDouble(),
             child: AdWidget(ad: _bannerAd!),
-          );
+          )
+        : SizedBox.shrink();
   }
 
   @override
@@ -165,13 +184,13 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               _buildMarquee(),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5), // আগের 10 → 5, gap কমানো
               _buildSlider(),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5), // আগের 10 → 5
               _buildCategorySelector(context),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5), // আগের 10 → 5
               _buildNavButtons(context),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
             ],
           ),
         ),
@@ -230,16 +249,16 @@ class _HomePageState extends State<HomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-      // ✅ responsive
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+      // আরও কম padding, প্রায় full width
       child: Column(
         children: [
           Container(
             margin: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.0, // ✅ responsive
-              vertical: screenHeight * 0.02, // ✅ responsive
+              horizontal: 0, // প্রায় পুরো প্রস্থ
+              vertical: screenHeight * 0.015,
             ),
-            padding: EdgeInsets.all(screenWidth * 0.04), // ✅ responsive
+            padding: EdgeInsets.all(screenWidth * 0.04),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -251,13 +270,14 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   'বিষয় নির্বাচন করুন',
                   style: TextStyle(
-                    fontSize: screenWidth * 0.045, // ✅ responsive font
+                    fontSize: screenWidth * 0.05, // একটু বড় font
                     fontWeight: FontWeight.bold,
                     color: Colors.green[800],
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.015), // ✅ responsive
+                SizedBox(height: screenHeight * 0.015),
                 Container(
+                  width: double.infinity, // পুরো প্রস্থ
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
                   decoration: BoxDecoration(
                     color: Theme.of(context).brightness == Brightness.dark
@@ -272,14 +292,14 @@ class _HomePageState extends State<HomePage> {
                       hint: Text(
                         'বিষয় বেছে নিন',
                         style: TextStyle(
-                          fontSize: screenWidth * 0.04, // ✅ responsive
+                          fontSize: screenWidth * 0.045, // font size সামঞ্জস্য
                           color: Theme.of(context).brightness == Brightness.dark
                               ? Colors.white
                               : Colors.black,
                         ),
                       ),
                       style: TextStyle(
-                        fontSize: screenWidth * 0.04, // ✅ responsive
+                        fontSize: screenWidth * 0.045,
                         color: Theme.of(context).brightness == Brightness.dark
                             ? Colors.white
                             : Colors.black,
@@ -302,7 +322,6 @@ class _HomePageState extends State<HomePage> {
                                 color: Colors.green,
                               ),
                               SizedBox(width: screenWidth * 0.02),
-                              // ✅ responsive
                               Text(category),
                             ],
                           ),
@@ -311,10 +330,10 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.02), // ✅ responsive
+                SizedBox(height: screenHeight * 0.02),
                 SizedBox(
                   width: double.infinity,
-                  height: screenHeight * 0.065, // ✅ responsive button height
+                  height: screenHeight * 0.07,
                   child: ElevatedButton.icon(
                     onPressed: selectedCategory == null
                         ? null
@@ -327,12 +346,22 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           },
-                    icon: const Icon(Icons.play_arrow),
+                    icon: Icon(
+                      Icons.play_arrow,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors
+                                .black // 🔹 Dark Mode → কালো Icon
+                          : Colors.white, // 🔹 Light Mode → সাদা Icon
+                    ),
                     label: Text(
                       'শুরু করুন',
                       style: TextStyle(
-                        fontSize: screenWidth * 0.045, // ✅ responsive font
-                        color: Colors.black87,
+                        fontSize: screenWidth * 0.05,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors
+                                  .black // 🔹 Dark Mode → কালো Text
+                            : Colors.white, // 🔹 Light Mode → সাদা Text
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -440,7 +469,7 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5, top: 0),
       child: SizedBox(
         width: double.infinity,
-        height: screenHeight * 0.07, // ✅ স্ক্রিনের 7% উচ্চতা নেবে (রেস্পনসিভ)
+        height: screenHeight * 0.065, // ✅ স্ক্রিনের 7% উচ্চতা নেবে (রেস্পনসিভ)
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green.shade700,

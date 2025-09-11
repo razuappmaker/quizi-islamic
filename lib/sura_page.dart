@@ -1,3 +1,5 @@
+// Sura Page
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'ad_helper.dart';
@@ -10,11 +12,10 @@ class SuraPage extends StatefulWidget {
 }
 
 class _SuraPageState extends State<SuraPage> {
-  final List<Map<String, dynamic>> dailySuras =
-  [
-// ১. সূরা ফাতিহা
+  final List<Map<String, dynamic>> dailySuras = [
+    // ১. সূরা ফাতিহা
     {
-      'title': 'সূরা আল ফাতিহা',
+      'title': 'সূরা আল ফাতিহা -  الفاتحة',
       'ayat': [
         {
           'arabic': 'بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ',
@@ -39,7 +40,8 @@ class _SuraPageState extends State<SuraPage> {
         {
           'arabic': 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ',
           'transliteration': 'ইয়্যাকা নাআবুদু ওয়া ইয়্যাকা নাস্তা’ইন',
-          'meaning': 'আমরা কেবল আপনাকেই উপাসনা করি এবং কেবল আপনাকেই সাহায্য চাই।',
+          'meaning':
+              'আমরা কেবল আপনাকেই উপাসনা করি এবং কেবল আপনাকেই সাহায্য চাই।',
         },
         {
           'arabic': 'اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ',
@@ -47,16 +49,19 @@ class _SuraPageState extends State<SuraPage> {
           'meaning': 'আমাদের সরল পথ প্রদর্শন করুন।',
         },
         {
-          'arabic': 'صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ',
-          'transliteration': 'সিরাতাল লাযীনা আন’আমতা ‘আলাইহিম গাইরিল মাগদুবি ‘আলাইহিম ওয়ালাদ-দাল্লীন',
-          'meaning': 'তাদের পথ যাদের প্রতি আপনি কৃপা করেছেন, যারা অভিশাপপ্রাপ্ত নয়, এবং যারা পথভ্রষ্ট নয়।',
+          'arabic':
+              'صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ',
+          'transliteration':
+              'সিরাতাল লাযীনা আন’আমতা ‘আলাইহিম গাইরিল মাগদুবি ‘আলাইহিম ওয়ালাদ-দাল্লীন',
+          'meaning':
+              'তাদের পথ যাদের প্রতি আপনি কৃপা করেছেন, যারা অভিশাপপ্রাপ্ত নয়, এবং যারা পথভ্রষ্ট নয়।',
         },
       ],
-      'reference': 'কুরআন, সূরা আল ফাতিহা, আয়াত ১-৭'
+      'reference': 'কুরআন, সূরা আল ফাতিহা, আয়াত ১-৭',
     },
-// ২. সূরা ইখলাস
+    // ২. সূরা ইখলাস
     {
-      'title': 'সূরা ইখলাস',
+      'title': 'সূরা ইখলাস - الإخلاص',
       'ayat': [
         {
           'arabic': 'بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ',
@@ -84,11 +89,11 @@ class _SuraPageState extends State<SuraPage> {
           'meaning': 'এবং তার সমকক্ষ কেউ নেই।',
         },
       ],
-      'reference': 'কুরআন, সূরা ইখলাস, আয়াত ১-৪'
+      'reference': 'কুরআন, সূরা ইখলাস, আয়াত ১-৪',
     },
-// ৩. সূরা ফালাক
+    // ৩. সূরা ফালাক
     {
-      'title': 'সূরা ফালাক',
+      'title': 'সূরা ফালাক - الفلق',
       'ayat': [
         {
           'arabic': 'بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ',
@@ -121,9 +126,9 @@ class _SuraPageState extends State<SuraPage> {
           'meaning': 'ইর্ষুকরী থেকে, যখন সে ইর্ষা করে।',
         },
       ],
-      'reference': 'কুরআন, সূরা ফালাক, আয়াত ১-৫'
+      'reference': 'কুরআন, সূরা ফালাক, আয়াত ১-৫',
     },
-// ৪. সূরা আন নাস
+    // ৪. সূরা আন নাস
     {
       'title': 'সূরা নাস',
       'ayat': [
@@ -163,9 +168,9 @@ class _SuraPageState extends State<SuraPage> {
           'meaning': 'জিন ও মানুষের মধ্যে থেকে।',
         },
       ],
-      'reference': 'কুরআন, সূরা নাস, আয়াত ১-৬'
+      'reference': 'কুরআন, সূরা নাস, আয়াত ১-৬',
     },
-// ৫. সূরা আল কাওসার
+    // ৫. সূরা আল কাওসার
     {
       'title': 'সূরা আল কাওসার',
       'ayat': [
@@ -177,22 +182,22 @@ class _SuraPageState extends State<SuraPage> {
         {
           'arabic': 'إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ',
           'transliteration': 'ইন্না আ‘তাইনা কাল কাওসার',
-          'meaning': 'আমরা তোমাকে অতি প্রাচুর্য প্রদান করেছি।'
+          'meaning': 'আমরা তোমাকে অতি প্রাচুর্য প্রদান করেছি।',
         },
         {
           'arabic': 'فَصَلِّ لِرَبِّكَ وَانْحَرْ',
           'transliteration': 'ফা সাল্লি লি রব্বিকা ওয়ানহার',
-          'meaning': 'অতএব, তোমার পালনকর্তার জন্য নামাজ পড়ো এবং বলি দাও।'
+          'meaning': 'অতএব, তোমার পালনকর্তার জন্য নামাজ পড়ো এবং বলি দাও।',
         },
         {
           'arabic': 'إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ',
           'transliteration': 'ইন্না শানইকা হুয়া আল-আবতার',
-          'meaning': 'তোমার শত্রু নিশ্চয়ই কেটে যাবে।'
+          'meaning': 'তোমার শত্রু নিশ্চয়ই কেটে যাবে।',
         },
       ],
-      'reference': 'কুরআন, সূরা আল কাওসার, আয়াত ১-৩'
+      'reference': 'কুরআন, সূরা আল কাওসার, আয়াত ১-৩',
     },
-// ৬. সূরা আন-নাসর
+    // ৬. সূরা আন-নাসর
     {
       'title': 'সূরা আন-নাসর',
       'ayat': [
@@ -204,22 +209,25 @@ class _SuraPageState extends State<SuraPage> {
         {
           'arabic': 'إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ',
           'transliteration': 'ইযা জা’ নসরুল্লাহি ওয়াল ফাতহ',
-          'meaning': 'যখন আল্লাহর সাহায্য এবং বিজয় এসেছে।'
+          'meaning': 'যখন আল্লাহর সাহায্য এবং বিজয় এসেছে।',
         },
         {
-          'arabic': 'وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا',
-          'transliteration': 'ওয়া রা’ইতান নাসা ইয়াদখুলুন ফি দিনিল্লাহি আফওয়াজা',
-          'meaning': 'এবং তুমি দেখো মানুষরা আল্লাহর পথে ঢুকছে অনেক দলের মাধ্যমে।'
+          'arabic':
+              'وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا',
+          'transliteration':
+              'ওয়া রা’ইতান নাসা ইয়াদখুলুন ফি দিনিল্লাহি আফওয়াজা',
+          'meaning':
+              'এবং তুমি দেখো মানুষরা আল্লাহর পথে ঢুকছে অনেক দলের মাধ্যমে।',
         },
         {
           'arabic': 'فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ',
           'transliteration': 'ফা সাব্বিহ বিহামদি রাব্বিকা ওয়াস্তাগফিরহু',
-          'meaning': 'সুতরাং তোমার পালনকর্তার প্রশংসা করো এবং তাঁকে ক্ষমা চাও।'
+          'meaning': 'সুতরাং তোমার পালনকর্তার প্রশংসা করো এবং তাঁকে ক্ষমা চাও।',
         },
       ],
-      'reference': 'কুরআন, সূরা আন-নাসর, আয়াত ১-৩'
+      'reference': 'কুরআন, সূরা আন-নাসর, আয়াত ১-৩',
     },
-// ৭. সূরা আল মাওন
+    // ৭. সূরা আল মাওন
     {
       'title': 'সূরা আল মাউন',
       'ayat': [
@@ -231,42 +239,42 @@ class _SuraPageState extends State<SuraPage> {
         {
           'arabic': 'أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ',
           'transliteration': 'আরাইতা আল-লাযী ইউকাজিবু বিল-দিন',
-          'meaning': 'তুমি কি দেখেছ সেইকে যে দিন বিচার অস্বীকার করে?'
+          'meaning': 'তুমি কি দেখেছ সেইকে যে দিন বিচার অস্বীকার করে?',
         },
         {
           'arabic': 'فَذَلِكَ الَّذِي يَدُعُّ الْيَتِيمَ',
           'transliteration': 'ফা জালিকা আল-লাযী যাদ্দু আল-ইতিম',
-          'meaning': 'যে অনাথকে তুচ্ছ করে।'
+          'meaning': 'যে অনাথকে তুচ্ছ করে।',
         },
         {
           'arabic': 'وَلَا يَحُضُّ عَلَى طَعَامِ الْمِسْكِينِ',
           'transliteration': 'ওয়া লা ইয়াহুদু ‘আলা তা‘ামিল মিসকিন',
-          'meaning': 'এবং দারিদ্রের জন্য আহার দেওয়ার উৎসাহ দেয় না।'
+          'meaning': 'এবং দারিদ্রের জন্য আহার দেওয়ার উৎসাহ দেয় না।',
         },
         {
           'arabic': 'فَوَيْلٌ لِلْمُصَلِّينَ',
           'transliteration': 'ফাওয়েলিল-লিল-মুসাল্লিন',
-          'meaning': 'সুতরাং নামাজিদের জন্য ধিক্কার।'
+          'meaning': 'সুতরাং নামাজিদের জন্য ধিক্কার।',
         },
         {
           'arabic': 'الَّذِينَ هُمْ عَنْ صَلَاتِهِمْ سَاهُونَ',
           'transliteration': 'আল্লাযীনা হুম আন সালাতিহিম সাহুন',
-          'meaning': 'যারা তাদের নামাজ থেকে উদাসীন।'
+          'meaning': 'যারা তাদের নামাজ থেকে উদাসীন।',
         },
         {
           'arabic': 'وَالَّذِينَ هُمْ يُرَاءُونَ',
           'transliteration': 'ওয়াল্লাযীনা হুম ইউরাউন',
-          'meaning': 'এবং যারা প্রদর্শনের জন্য করে।'
+          'meaning': 'এবং যারা প্রদর্শনের জন্য করে।',
         },
         {
           'arabic': 'وَيَمْنَعُونَ الْمَاعُونَ',
           'transliteration': 'ওয়া ইয়ামন‘ুনাল মাওন',
-          'meaning': 'এবং সাহায্য বন্ধ করে।'
+          'meaning': 'এবং সাহায্য বন্ধ করে।',
         },
       ],
-      'reference': 'কুরআন, সূরা আল মাওন, আয়াত ১-৭'
+      'reference': 'কুরআন, সূরা আল মাওন, আয়াত ১-৭',
     },
-// ৮. সূরা আল কফিরুন
+    // ৮. সূরা আল কফিরুন
     {
       'title': 'সূরা আল কফিরুন',
       'ayat': [
@@ -278,37 +286,37 @@ class _SuraPageState extends State<SuraPage> {
         {
           'arabic': 'قُلْ يَا أَيُّهَا الْكَافِرُونَ',
           'transliteration': 'কুলইয়া আয়্যুহাল কাফিরুন',
-          'meaning': 'বলুন, হে কাফিরগণ!'
+          'meaning': 'বলুন, হে কাফিরগণ!',
         },
         {
           'arabic': 'لَا أَعْبُدُ مَا تَعْبُدُونَ',
           'transliteration': 'লা আ‘বুদু মা তা‘বুদুন',
-          'meaning': 'আমি যা তোমরা উপাসনা করো তা উপাসনা করি না।'
+          'meaning': 'আমি যা তোমরা উপাসনা করো তা উপাসনা করি না।',
         },
         {
           'arabic': 'وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ',
           'transliteration': 'ওয়া লা আন্ত্রুম ‘আবিদুন মা আ‘বুদ',
-          'meaning': 'এবং তোমরা যা আমি উপাসনা করি তা উপাসনা করতে পারবে না।'
+          'meaning': 'এবং তোমরা যা আমি উপাসনা করি তা উপাসনা করতে পারবে না।',
         },
         {
           'arabic': 'وَلَا أَنَا عَابِدٌ مَّا عَبَدْتُمْ',
           'transliteration': 'ওয়া লা আনা ‘আবিদুম মা আ‘বাদতুম',
-          'meaning': 'আমি তা উপাসনা করি না যা তোমরা উপাসনা করছ।'
+          'meaning': 'আমি তা উপাসনা করি না যা তোমরা উপাসনা করছ।',
         },
         {
           'arabic': 'وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ',
           'transliteration': 'ওয়া লা আন্ত্রুম ‘আবিদুন মা আ‘বুদ',
-          'meaning': 'এবং তোমরা তা উপাসনা করবে না যা আমি উপাসনা করি।'
+          'meaning': 'এবং তোমরা তা উপাসনা করবে না যা আমি উপাসনা করি।',
         },
         {
           'arabic': 'لَكُمْ دِينُكُمْ وَلِيَ دِينِ',
           'transliteration': 'লাকুম দিনুম ওয়া লিয়াদিনি',
-          'meaning': 'তোমাদের জন্য তোমাদের ধর্ম, এবং আমার জন্য আমার ধর্ম।'
+          'meaning': 'তোমাদের জন্য তোমাদের ধর্ম, এবং আমার জন্য আমার ধর্ম।',
         },
       ],
-      'reference': 'কুরআন, সূরা আল কফিরুন, আয়াত ১-৬'
+      'reference': 'কুরআন, সূরা আল কফিরুন, আয়াত ১-৬',
     },
-//৯। সূরা কুরাইশ
+    //৯। সূরা কুরাইশ
     {
       'title': 'সূরা কুরাইশ',
       'ayat': [
@@ -334,13 +342,15 @@ class _SuraPageState extends State<SuraPage> {
         },
         {
           'arabic': 'الَّذِي أَطْعَمَهُم مِّن جُوعٍ وَآمَنَهُم مِّنْ خَوْفٍ',
-          'transliteration': 'আল্লাযী আত্‘আমাহুম মিন জু‘ঈঁ ওয়া-আমানাহুম মিন খাওফ',
-          'meaning': 'যিনি তাদের ক্ষুধায় আহার দিয়েছেন এবং ভয় থেকে নিরাপদ করেছেন।',
+          'transliteration':
+              'আল্লাযী আত্‘আমাহুম মিন জু‘ঈঁ ওয়া-আমানাহুম মিন খাওফ',
+          'meaning':
+              'যিনি তাদের ক্ষুধায় আহার দিয়েছেন এবং ভয় থেকে নিরাপদ করেছেন।',
         },
       ],
-      'reference': 'কুরআন, সূরা কুরাইশ, আয়াত ১-৪'
+      'reference': 'কুরআন, সূরা কুরাইশ, আয়াত ১-৪',
     },
-//১০। সূরা আল-লাহাব (মাসাদ)
+    //১০। সূরা আল-লাহাব (মাসাদ)
     {
       'title': 'সূরা আল-লাহাব',
       'ayat': [
@@ -375,9 +385,9 @@ class _SuraPageState extends State<SuraPage> {
           'meaning': 'তার গলায় থাকবে মোটা দড়ির ফাঁস।',
         },
       ],
-      'reference': 'কুরআন, সূরা আল-লাহাব, আয়াত ১-৫'
+      'reference': 'কুরআন, সূরা আল-লাহাব, আয়াত ১-৫',
     },
-// ১১. সূরা আল ক্বাদর
+    // ১১. সূরা আল ক্বাদর
     {
       'title': 'সূরা আল ক্বাদর',
       'ayat': [
@@ -389,22 +399,22 @@ class _SuraPageState extends State<SuraPage> {
         {
           'arabic': 'إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ',
           'transliteration': 'ইন্না আনজালনাহু ফি লাইলাতিল ক্বদর',
-          'meaning': 'নিশ্চয়ই আমরা এটি অবতীর্ণ করেছি লাইলাতুল ক্বদরে।'
+          'meaning': 'নিশ্চয়ই আমরা এটি অবতীর্ণ করেছি লাইলাতুল ক্বদরে।',
         },
         {
           'arabic': 'وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ',
           'transliteration': 'ওয়া মা আদ্রাকা মা লাইলাতুল ক্বদর',
-          'meaning': 'তুমি কি জানো লাইলাতুল ক্বদর কী?'
+          'meaning': 'তুমি কি জানো লাইলাতুল ক্বদর কী?',
         },
         {
           'arabic': 'لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ',
           'transliteration': 'লাইলাতুল ক্বদর খাইরুন মিন আলফি শাহর',
-          'meaning': 'লাইলাতুল ক্বদর এক হাজার মাসের চেয়ে উত্তম।'
+          'meaning': 'লাইলাতুল ক্বদর এক হাজার মাসের চেয়ে উত্তম।',
         },
       ],
-      'reference': 'কুরআন, সূরা আল ক্বাদর, আয়াত ১-৩'
+      'reference': 'কুরআন, সূরা আল ক্বাদর, আয়াত ১-৩',
     },
-// ১২. সূরা আল ফিল
+    // ১২. সূরা আল ফিল
     {
       'title': 'সূরা আল ফিল',
       'ayat': [
@@ -416,27 +426,28 @@ class _SuraPageState extends State<SuraPage> {
         {
           'arabic': 'أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ',
           'transliteration': 'আলাম তারা কাইফা ফ‘ালা রাব্বুকা বি আসহাবিল ফিল',
-          'meaning': 'তুমি কি দেখনি তোমার পালনকর্তা হাতির সাথে লোকদের কী করেছেন?'
+          'meaning':
+              'তুমি কি দেখনি তোমার পালনকর্তা হাতির সাথে লোকদের কী করেছেন?',
         },
         {
           'arabic': 'أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ',
           'transliteration': 'আলাম যাজ‘াল কায়দাহুম ফি তদলিল',
-          'meaning': 'তিনি কি তাদের পরিকল্পনাকে ব্যর্থ করেননি?'
+          'meaning': 'তিনি কি তাদের পরিকল্পনাকে ব্যর্থ করেননি?',
         },
         {
           'arabic': 'وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ',
           'transliteration': 'ওয়া আরসালা আলাইহিম তাইরান আবাবীল',
-          'meaning': 'এবং তিনি তাদের ওপর পাখি পাঠাল আবাবিল।'
+          'meaning': 'এবং তিনি তাদের ওপর পাখি পাঠাল আবাবিল।',
         },
         {
           'arabic': 'تَرْمِيهِم بِحِجَارَةٍ مِنْ سِجِّيلٍ',
           'transliteration': 'তারমিহিম বিহিজারাতিন মিন সিজজিল',
-          'meaning': 'যারা ইট দিয়ে নিক্ষেপ করেছিল।'
+          'meaning': 'যারা ইট দিয়ে নিক্ষেপ করেছিল।',
         },
       ],
-      'reference': 'কুরআন, সূরা আল ফিল, আয়াত ১-৫'
+      'reference': 'কুরআন, সূরা আল ফিল, আয়াত ১-৫',
     },
-// ১৩। সুরা ...।।
+    // ১৩। সুরা ...।।
     {
       'title': 'সূরা ক্বারিয়াহ',
       'ayat': [
@@ -501,9 +512,9 @@ class _SuraPageState extends State<SuraPage> {
           'meaning': 'একটি তপ্ত আগুন।',
         },
       ],
-      'reference': 'কুরআন, সূরা ক্বারিয়াহ, আয়াত ১-১১'
+      'reference': 'কুরআন, সূরা ক্বারিয়াহ, আয়াত ১-১১',
     },
-// ১৪। সুরা মাআউন
+    // ১৪। সুরা মাআউন
     {
       'title': 'সূরা মাআউন',
       'ayat': [
@@ -548,9 +559,9 @@ class _SuraPageState extends State<SuraPage> {
           'meaning': 'এবং যেটি প্রয়োজন তা দান থেকে আটকায়।',
         },
       ],
-      'reference': 'কুরআন, সূরা মাআউন, আয়াত ১-৭'
+      'reference': 'কুরআন, সূরা মাআউন, আয়াত ১-৭',
     },
-// ১৫। সূরা আত-তীন
+    // ১৫। সূরা আত-তীন
     {
       'title': 'সূরা আত-তীন',
       'ayat': [
@@ -585,9 +596,12 @@ class _SuraPageState extends State<SuraPage> {
           'meaning': 'তারপর তাকে নীচেরতম স্তরে নামিয়ে দিয়েছি,',
         },
         {
-          'arabic': 'إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ فَلَهُمْ أَجْرٌ غَيْرُ مَمْنُونٍ',
-          'transliteration': 'ইল্লাল্লাযীনা আামানূ ওয়া আমিলুস্-সালিহাতি ফালাহুম আজরুগ্ইরু মামনূন',
-          'meaning': 'কেবল তারা ব্যতীত যারা ঈমান এনেছে এবং সৎকর্ম করেছে, তাদের জন্য নিরবচ্ছিন্ন পুরস্কার রয়েছে।',
+          'arabic':
+              'إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ فَلَهُمْ أَجْرٌ غَيْرُ مَمْنُونٍ',
+          'transliteration':
+              'ইল্লাল্লাযীনা আামানূ ওয়া আমিলুস্-সালিহাতি ফালাহুম আজরুগ্ইরু মামনূন',
+          'meaning':
+              'কেবল তারা ব্যতীত যারা ঈমান এনেছে এবং সৎকর্ম করেছে, তাদের জন্য নিরবচ্ছিন্ন পুরস্কার রয়েছে।',
         },
         {
           'arabic': 'فَمَا يُكَذِّبُكَ بَعْدُ بِالدِّينِ',
@@ -600,9 +614,9 @@ class _SuraPageState extends State<SuraPage> {
           'meaning': 'আল্লাহ কি সর্বাধিক ন্যায়বিচারক নন?',
         },
       ],
-      'reference': 'কুরআন, সূরা আত-তীন, আয়াত ১-৮'
+      'reference': 'কুরআন, সূরা আত-তীন, আয়াত ১-৮',
     },
-// ১৬। সূরা আত-তাকাসুর
+    // ১৬। সূরা আত-তাকাসুর
     {
       'title': 'সূরা আত-তাকাসুর',
       'ayat': [
@@ -644,15 +658,17 @@ class _SuraPageState extends State<SuraPage> {
         {
           'arabic': 'ثُمَّ لَتَرَوُنَّهَا عَيْنَ الْيَقِينِ',
           'transliteration': 'সুম্মা লাতারাওন্নাহা ‘আইনাল ইয়াকীন',
-          'meaning': 'পুনরায় অবশ্যই তোমরা তা প্রত্যক্ষ জ্ঞান দ্বারা দেখতে পাবে।',
+          'meaning':
+              'পুনরায় অবশ্যই তোমরা তা প্রত্যক্ষ জ্ঞান দ্বারা দেখতে পাবে।',
         },
         {
           'arabic': 'ثُمَّ لَتُسْأَلُنَّ يَوْمَئِذٍ عَنِ النَّعِيمِ',
           'transliteration': 'সুম্মা লাতুস্‌আলুন্না ইয়াওমাইযিন আনিন না’ইম',
-          'meaning': 'তারপর সেদিন তোমাদের অবশ্যই নেয়ামত সম্পর্কে জিজ্ঞাসা করা হবে।',
+          'meaning':
+              'তারপর সেদিন তোমাদের অবশ্যই নেয়ামত সম্পর্কে জিজ্ঞাসা করা হবে।',
         },
       ],
-      'reference': 'কুরআন, সূরা আত-তাকাসুর, আয়াত ১-৮'
+      'reference': 'কুরআন, সূরা আত-তাকাসুর, আয়াত ১-৮',
     },
   ];
 
@@ -685,119 +701,146 @@ class _SuraPageState extends State<SuraPage> {
     final bool isExpanded = expandedIndices.contains(index);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 4,
-        shadowColor: Colors.green.withOpacity(0.3),
-        child: Column(
-          children: [
-            ListTile(
-              tileColor: isExpanded ? Colors.green[100] : Colors.green[50],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Text(
-                sura['title'] ?? '',
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      child: Material(
+        borderRadius: BorderRadius.circular(16),
+        elevation: 10,
+        shadowColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.greenAccent.withOpacity(0.6)
+            : Colors.green.withOpacity(0.5),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              ListTile(
+                tileColor: isExpanded
+                    ? (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.green[900]
+                          : Colors.green[100])
+                    : (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.green[800]
+                          : Colors.green[50]),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
+                title: Text(
+                  sura['title'] ?? '',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
+                  ),
+                ),
+                trailing: Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.greenAccent
+                      : Colors.green[800],
+                  size: 28,
+                ),
+                onTap: () {
+                  setState(() {
+                    if (isExpanded) {
+                      expandedIndices.remove(index);
+                    } else {
+                      expandedIndices.add(index);
+                    }
+                  });
+                },
               ),
-              trailing: Icon(
-                isExpanded ? Icons.expand_less : Icons.expand_more,
-                color: Colors.green[800],
-                size: 28,
-              ),
-              onTap: () {
-                setState(() {
-                  if (isExpanded) {
-                    expandedIndices.remove(index);
-                  } else {
-                    expandedIndices.add(index);
-                  }
-                });
-              },
-            ),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
-              child: isExpanded
-                  ? Padding(
-                key: ValueKey('expanded_$index'),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ...List<Widget>.from(
-                      (sura['ayat'] as List<dynamic>).map(
-                            (ay) => Column(
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                child: isExpanded
+                    ? Padding(
+                        key: ValueKey('expanded_$index'),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: SelectableText(
-                                ay['arabic'] ?? '',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontFamily: 'Amiri',
-                                  fontWeight: FontWeight.w700,
-                                  color: Theme.of(context).brightness == Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black87,
-                                  height: 1.5,
+                            ...List<Widget>.from(
+                              (sura['ayat'] as List<dynamic>).map(
+                                (ay) => Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Directionality(
+                                      textDirection: TextDirection.rtl,
+                                      child: SelectableText(
+                                        ay['arabic'] ?? '',
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          fontFamily: 'Amiri',
+                                          fontWeight: FontWeight.w700,
+                                          color:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black87,
+                                          height: 1.5,
+                                        ),
+                                        textAlign: TextAlign.right,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      ay['transliteration'] ?? '',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontStyle: FontStyle.italic,
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.green[200]
+                                            : Colors.green[900],
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'অর্থ: ${ay['meaning'] ?? ''}',
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey[300]
+                                            : Colors.black87,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                  ],
                                 ),
-                                textAlign: TextAlign.right,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              ay['transliteration'] ?? '',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontStyle: FontStyle.italic,
-                                color: Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.green[200]
-                                    : Colors.green[900],
-                                height: 1.4,
+                            if ((sura['reference'] ?? '').isNotEmpty)
+                              Text(
+                                'সূত্র: ${sura['reference']}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontStyle: FontStyle.italic,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey[400]
+                                      : Colors.deepPurple[400],
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'অর্থ: ${ay['meaning'] ?? ''}',
-                              style: TextStyle(
-                                fontSize: 17,
-                                color: Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.grey[300]
-                                    : Colors.black87,
-                                height: 1.4,
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
                           ],
                         ),
-                      ),
-                    ),
-                    if ((sura['reference'] ?? '').isNotEmpty)
-                      Text(
-                        'সূত্র: ${sura['reference']}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontStyle: FontStyle.italic,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey[400]
-                              : Colors.deepPurple[400],
-                        ),
-                      ),
-
-                  ],
-                ),
-              )
-                  : const SizedBox.shrink(),
-            ),
-          ],
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -824,10 +867,16 @@ class _SuraPageState extends State<SuraPage> {
           ),
           if (_isBannerAdReady)
             SafeArea(
-              child: SizedBox(
-                width: _bannerAd.size.width.toDouble(),
-                height: _bannerAd.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd),
+              top: false, // সিস্টেম বার ঢেকে না যাওয়ার জন্য
+              child: Container(
+                width: double.infinity, // পুরো প্রস্থ
+                color: Colors.transparent,
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width, // স্ক্রিন ফিল
+                  height: _bannerAd.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd),
+                ),
               ),
             ),
         ],

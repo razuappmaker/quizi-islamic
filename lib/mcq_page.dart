@@ -5,10 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'result_page.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'ad_helper.dart'; // ✅ আপনার Ad Helper ফাইল ইমপোর্ট
+import 'ad_helper.dart';
 
 class MCQPage extends StatefulWidget {
   final String category;
+
   const MCQPage({required this.category, Key? key}) : super(key: key);
 
   @override
@@ -25,22 +26,40 @@ class _MCQPageState extends State<MCQPage> {
   Timer? _timer;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  // Banner Ad ভেরিয়েবল
-  late BannerAd _bannerAd;
+  // Banner Ad
+  BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
 
-  // ইন্টারস্টিশিয়াল দেখানো হয়েছে কিনা চেক করার ফ্ল্যাগ
-  bool _hasShownInterstitial = false;
+  // Interstitial Ad flags
+  bool _hasShownHalfwayAd = false;
+  bool _hasShownFinalAd = false;
 
   @override
   void initState() {
     super.initState();
     _audioPlayer.setVolume(1.0);
 
-    // Banner Ad লোড
+    loadQuestions();
+    AdHelper.loadInterstitialAd();
+
+    // Load adaptive banner after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAdaptiveBanner();
+    });
+  }
+
+  // Load adaptive Banner
+  void _loadAdaptiveBanner() async {
+    final AnchoredAdaptiveBannerAdSize? size =
+        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+          MediaQuery.of(context).size.width.truncate(),
+        );
+
+    if (size == null) return;
+
     _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Banner ID
-      size: AdSize.banner,
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Banner
+      size: size,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (_) {
@@ -48,27 +67,25 @@ class _MCQPageState extends State<MCQPage> {
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
+          print('BannerAd failed to load: $error');
         },
       ),
     )..load();
-
-    loadQuestions();
-
-    // ✅ Interstitial শুরুতে শুধু লোড হবে
-    AdHelper.loadInterstitialAd();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     _audioPlayer.dispose();
-    _bannerAd.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
-  // JSON থেকে প্রশ্ন লোড
- Future<void> loadQuestions() async {
-    final String response = await rootBundle.loadString('assets/questions.json');
+  // Load questions from JSON
+  Future<void> loadQuestions() async {
+    final String response = await rootBundle.loadString(
+      'assets/questions.json',
+    );
     final data = json.decode(response);
     setState(() {
       questions = data[widget.category] ?? [];
@@ -76,8 +93,6 @@ class _MCQPageState extends State<MCQPage> {
     });
   }
 
-
-  // টাইমার চালু
   void startTimer() {
     _timer?.cancel();
     _timeLeft = 20;
@@ -91,19 +106,16 @@ class _MCQPageState extends State<MCQPage> {
     });
   }
 
-  // সঠিক উত্তর সাউন্ড
   void playCorrectSound() async {
     await _audioPlayer.stop();
     await _audioPlayer.play(AssetSource('sounds/correct.mp3'));
   }
 
-  // ভুল উত্তর সাউন্ড
   void playWrongSound() async {
     await _audioPlayer.stop();
     await _audioPlayer.play(AssetSource('sounds/wrong.mp3'));
   }
 
-  // উত্তর চেক করা
   void checkAnswer(String selected) {
     if (isAnswered) return;
     setState(() {
@@ -118,12 +130,10 @@ class _MCQPageState extends State<MCQPage> {
     });
   }
 
-  // পরবর্তী প্রশ্নে যাওয়া
   void goToNextQuestion() {
     _timer?.cancel();
 
     if (currentQuestionIndex < questions.length - 1) {
-      // প্রশ্ন বাকি থাকলে
       setState(() {
         currentQuestionIndex++;
         isAnswered = false;
@@ -131,10 +141,17 @@ class _MCQPageState extends State<MCQPage> {
         _timeLeft = 20;
       });
       startTimer();
+
+      // ✅ 50% questions finished -> show Interstitial
+      if (!_hasShownHalfwayAd &&
+          currentQuestionIndex >= (questions.length / 2).floor()) {
+        _hasShownHalfwayAd = true;
+        _showInterstitialAd();
+      }
     } else {
-      // ✅ ক্যাটাগরি শেষে শুধু একবার অ্যাড দেখাবে
-      if (!_hasShownInterstitial) {
-        _hasShownInterstitial = true;
+      // ✅ Last question finished -> show final Interstitial
+      if (!_hasShownFinalAd) {
+        _hasShownFinalAd = true;
         _showAdThenNavigate();
       } else {
         _navigateToResult();
@@ -142,7 +159,14 @@ class _MCQPageState extends State<MCQPage> {
     }
   }
 
-  // ✅ অ্যাড দেখানোর পর রেজাল্ট পেজে যাওয়ার লজিক
+  void _showInterstitialAd() {
+    if (AdHelper.isAdReady()) {
+      AdHelper.showAd(() {
+        // Nothing extra needed; just continue quiz
+      });
+    }
+  }
+
   void _showAdThenNavigate() {
     if (AdHelper.isAdReady()) {
       AdHelper.showAd(() {
@@ -153,21 +177,16 @@ class _MCQPageState extends State<MCQPage> {
     }
   }
 
-
-  // রেজাল্ট পেজে যাওয়া
   void _navigateToResult() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => ResultPage(
-          total: questions.length,
-          correct: score,
-        ),
+        builder: (context) =>
+            ResultPage(total: questions.length, correct: score),
       ),
     );
   }
 
-  // টাইম শেষ হলে ডায়লগ
   void showTimeUpDialog() {
     showDialog(
       context: context,
@@ -187,13 +206,10 @@ class _MCQPageState extends State<MCQPage> {
     );
   }
 
-  // ব্যাক প্রেস করলে সরাসরি পপ
   Future<bool> _onWillPop() async {
     Navigator.of(context).pop();
     return false;
   }
-
-  // ... আপনার আগের সব কোড একই থাকবে ...
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +252,10 @@ class _MCQPageState extends State<MCQPage> {
                     Text(
                       'প্রশ্ন ${currentQuestionIndex + 1} এর ${questions.length} টি',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -246,7 +265,10 @@ class _MCQPageState extends State<MCQPage> {
                         const SizedBox(width: 8),
                         Text(
                           'সময় বাকি: $_timeLeft সেকেন্ড',
-                          style: const TextStyle(fontSize: 18, color: Colors.red),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.red,
+                          ),
                         ),
                       ],
                     ),
@@ -262,11 +284,16 @@ class _MCQPageState extends State<MCQPage> {
                       ),
                     Text(
                       question['question'],
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 20),
                     ...(question['options'] as List<dynamic>).map((option) {
-                      Color optionColor = isDarkMode ? Colors.grey : Colors.white;
+                      Color optionColor = isDarkMode
+                          ? Colors.grey
+                          : Colors.white;
                       if (isAnswered) {
                         if (option == question['answer']) {
                           optionColor = Colors.greenAccent;
@@ -283,7 +310,10 @@ class _MCQPageState extends State<MCQPage> {
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           onPressed: () => checkAnswer(option),
-                          child: Text(option, style: const TextStyle(fontSize: 18)),
+                          child: Text(
+                            option,
+                            style: const TextStyle(fontSize: 18),
+                          ),
                         ),
                       );
                     }).toList(),
@@ -297,14 +327,14 @@ class _MCQPageState extends State<MCQPage> {
               ),
             ),
 
-            // ✅ Banner Ad সবসময় system bar এর উপরে থাকবে
-            if (_isBannerAdReady)
+            // ✅ Full-width adaptive Banner
+            if (_isBannerAdReady && _bannerAd != null)
               SafeArea(
                 child: Container(
                   alignment: Alignment.center,
-                  height: _bannerAd.size.height.toDouble(),
-                  width: _bannerAd.size.width.toDouble(),
-                  child: AdWidget(ad: _bannerAd),
+                  width: MediaQuery.of(context).size.width,
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
                 ),
               ),
           ],

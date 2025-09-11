@@ -1,3 +1,5 @@
+//১০০% ওকে আলহামদুলিল্লাহ্‌  with Test Button
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' show pi;
@@ -9,6 +11,7 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:intl/intl.dart';
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -27,6 +30,20 @@ class _PrayerTimePageState extends State<PrayerTimePage>
   Duration countdown = Duration.zero;
   Timer? timer;
 
+  // ------24 to 12 horu convert function-----
+  String formatTimeTo12Hour(String time24) {
+    final parts = time24.split(":");
+    final now = DateTime.now();
+    final dateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+    );
+    return DateFormat('hh:mm a').format(dateTime);
+  }
+
   // ---------- Tasbeeh Counter ----------
   int tasbeehCount = 0;
   int subhanallahCount = 0;
@@ -41,11 +58,22 @@ class _PrayerTimePageState extends State<PrayerTimePage>
   late BannerAd _bannerAd;
   bool _isBannerAdReady = false;
 
+  // ------Notification -------
+  void scheduleAllPrayers() {
+    prayerTimes.forEach((name, time) {
+      _schedulePrayerNotification(name, time);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchLocationAndPrayerTimes();
     _tabController = TabController(length: 3, vsync: this);
+
+    // Location fetch এবং prayer notification শিডিউল
+    fetchLocationAndPrayerTimes().then((_) {
+      scheduleAllPrayers(); // প্রতিটি ওয়াক্তের নোটিফিকেশন শিডিউল
+    });
 
     // Banner Ad লোড
     _bannerAd = BannerAd(
@@ -63,20 +91,22 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     )..load();
 
     // Awesome Notifications Initialize
-    AwesomeNotifications().initialize('resource://drawable/res_app_icon', [
-      NotificationChannel(
-        channelKey: 'azan_channel',
-        channelName: 'Azan Notifications',
-        channelDescription: 'Prayer time reminders',
-        defaultColor: Colors.green,
-        importance: NotificationImportance.High,
-        playSound: true,
-        soundSource: 'resource://raw/azan',
-        // raw/azan.mp3
-        ledColor: Colors.white,
-      ),
-    ]);
-
+    AwesomeNotifications().initialize(
+      'resource://drawable/res_app_icon', // default icon
+      [
+        NotificationChannel(
+          channelKey: 'azan_channel',
+          channelName: 'Azan Notifications',
+          channelDescription: 'Prayer time reminders',
+          defaultColor: Colors.green,
+          importance: NotificationImportance.High,
+          soundSource: 'resource://raw/azan',
+          ledColor: Colors.white,
+        ),
+      ],
+      debug: true,
+    );
+    // নোটিফিকেশন পারমিশন চাইবে
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
       if (!isAllowed) {
         AwesomeNotifications().requestPermissionToSendNotifications();
@@ -235,41 +265,56 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     String prayerName,
     String time,
   ) async {
-    final prefs = await SharedPreferences.getInstance();
-    bool soundEnabled = prefs.getBool("azan_sound_$prayerName") ?? true;
+    try {
+      // SharedPreferences থেকে আজানের setting check
+      final prefs = await SharedPreferences.getInstance();
+      bool soundEnabled = prefs.getBool("azan_sound_$prayerName") ?? true;
+      if (!soundEnabled) return; // যদি disabled থাকে, return
 
-    final now = DateTime.now();
-    final parts = time.split(":");
-    final prayerDate = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      int.parse(parts[0]),
-      int.parse(parts[1]),
-    );
+      final now = DateTime.now();
+      final parts = time.split(":");
+      final prayerDate = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+      );
 
-    final notificationTime = prayerDate.subtract(const Duration(minutes: 10));
-    final notificationId = prayerDate.millisecondsSinceEpoch ~/ 1000;
+      // নামাজের ১০ মিনিট আগে
+      final notificationTime = prayerDate.subtract(const Duration(minutes: 10));
 
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: notificationId,
-        channelKey: 'azan_channel',
-        title: 'নামাজের সময়',
-        body: '$prayerName নামাজ শুরু হওয়ার ১০ মিনিট বাকি',
-        notificationLayout: NotificationLayout.Default,
-        autoDismissible: true,
-      ),
-      schedule: NotificationCalendar(
-        year: notificationTime.year,
-        month: notificationTime.month,
-        day: notificationTime.day,
-        hour: notificationTime.hour,
-        minute: notificationTime.minute,
-        second: 0,
-        repeats: true,
-      ),
-    );
+      // যদি notificationTime already past হয়ে থাকে
+      if (notificationTime.isBefore(now)) return;
+
+      // dynamic notification ID
+      final notificationId = notificationTime.millisecondsSinceEpoch.remainder(
+        100000,
+      );
+
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: notificationId,
+          channelKey: 'azan_channel',
+          title: 'নামাজের সময়',
+          body: '$prayerName নামাজ শুরু হওয়ার ১০ মিনিট বাকি',
+          notificationLayout: NotificationLayout.Default,
+        ),
+        schedule: NotificationCalendar(
+          year: notificationTime.year,
+          month: notificationTime.month,
+          day: notificationTime.day,
+          hour: notificationTime.hour,
+          minute: notificationTime.minute,
+          second: 0,
+          repeats: false,
+        ),
+      );
+
+      print("Scheduled notification for $prayerName at $notificationTime");
+    } catch (e) {
+      print("Error scheduling notification: $e");
+    }
   }
 
   // ---------- Prayer Row Widget ----------
@@ -294,19 +339,25 @@ class _PrayerTimePageState extends State<PrayerTimePage>
               prayerName,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
-            subtitle: Text(time, style: const TextStyle(fontSize: 18)),
-            trailing: SizedBox(
-              width: 100,
-              child: IconButton(
-                icon: Icon(
-                  enabled ? Icons.volume_up : Icons.volume_off,
-                  color: enabled ? Colors.green : Colors.red,
+            subtitle: Text(
+              formatTimeTo12Hour(time),
+              style: const TextStyle(fontSize: 18),
+            ),
+
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("আজান", style: TextStyle(fontSize: 14)),
+                Switch(
+                  value: enabled,
+                  activeColor: Colors.green,
+                  inactiveThumbColor: Colors.red,
+                  onChanged: (value) {
+                    _setAzanEnabled(prayerName, value);
+                    setState(() {});
+                  },
                 ),
-                onPressed: () {
-                  _setAzanEnabled(prayerName, !enabled);
-                  setState(() {});
-                },
-              ),
+              ],
             ),
           ),
         );
@@ -333,9 +384,12 @@ class _PrayerTimePageState extends State<PrayerTimePage>
         Expanded(
           child: ListView(
             padding: const EdgeInsets.all(8),
-            children: prayerTimes.entries
-                .map((e) => prayerRow(e.key, e.value))
-                .toList(),
+            children: [
+              ...prayerTimes.entries
+                  .map((e) => prayerRow(e.key, e.value))
+                  .toList(),
+              _buildNotificationTestButton(), // এখানে যোগ
+            ],
           ),
         ),
         Card(
@@ -376,6 +430,58 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     );
   }
 
+  // ---------- Notification Test Button ----------
+  Widget _buildNotificationTestButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: ElevatedButton.icon(
+        onPressed: () async {
+          try {
+            bool isAllowed = await AwesomeNotifications()
+                .isNotificationAllowed();
+            if (!isAllowed) {
+              isAllowed = await AwesomeNotifications()
+                  .requestPermissionToSendNotifications();
+              if (!isAllowed) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Notification permission denied"),
+                  ),
+                );
+                return;
+              }
+            }
+
+            await AwesomeNotifications().createNotification(
+              content: NotificationContent(
+                id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+                channelKey: 'azan_channel',
+                title: 'টেস্ট নোটিফিকেশন',
+                body: 'নোটিফিকেশন সঠিকভাবে কাজ করছে কিনা পরীক্ষা করুন',
+                notificationLayout: NotificationLayout.Default,
+              ),
+            );
+          } catch (e) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("Error: $e")));
+          }
+        },
+        icon: const Icon(Icons.notifications),
+        label: const Text("নোটিফিকেশন চেক করুন"),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
+  //----------------------
   // ---------- Tasbeeh Tab ----------
   Widget _buildTasbeehTab() {
     final List<String> tasbeehPhrases = [
