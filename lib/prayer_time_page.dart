@@ -120,6 +120,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     });
   }
 
+  // 👉 এখানে রাখবেন এই কোড টিকু হল যদি পুরবের নোটিফিকেশন বার বার না আসে -----
+  Future<void> _cancelAllPrayerNotifications() async {
+    try {
+      await AwesomeNotifications().cancelAll();
+      print("All previous prayer notifications cancelled.");
+    } catch (e) {
+      print("Error cancelling notifications: $e");
+    }
+  }
+
   Future<void> _saveData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("cityName", cityName ?? "");
@@ -128,6 +138,90 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   }
 
   Future<void> fetchLocationAndPrayerTimes() async {
+    try {
+      // Check location services
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        print("Location services are disabled.");
+        return;
+      }
+
+      // Check permissions
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) return;
+      }
+      if (permission == LocationPermission.deniedForever) return;
+
+      // Get current position
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      );
+
+      // Get city/country name
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        setState(() {
+          cityName = placemarks[0].locality ?? "Unknown City";
+          countryName = placemarks[0].country ?? "Unknown Country";
+        });
+      }
+
+      // Build API URL with today's date
+      final today = DateTime.now();
+      final formattedDate =
+          "${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year}";
+      final url =
+          "https://api.aladhan.com/v1/timings/$formattedDate?latitude=${position.latitude}&longitude=${position.longitude}&method=2";
+
+      // Fetch data
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final timings = data["data"]["timings"];
+
+        setState(() {
+          prayerTimes = {
+            "ফজর": timings["Fajr"],
+            "যোহর": timings["Dhuhr"],
+            "আসর": timings["Asr"],
+            "মাগরিব": timings["Maghrib"],
+            "ইশা": timings["Isha"],
+          };
+        });
+
+        // Find next prayer
+        findNextPrayer();
+
+        // Save locally
+        _saveData();
+
+        // Cancel existing notifications before rescheduling
+        _cancelAllPrayerNotifications(); // আগের নোটিফিকেশন যদি আসে তাহিলে মুছে যাবে এটার জন্য
+
+        // Schedule notifications
+        final prefs = await SharedPreferences.getInstance();
+        for (final entry in prayerTimes.entries) {
+          final prayer = entry.key;
+          final time = entry.value;
+          final soundEnabled = prefs.getBool("azan_sound_$prayer") ?? true;
+          _schedulePrayerNotification(prayer, time, soundEnabled);
+        }
+      } else {
+        print("Failed to load prayer times: ${response.statusCode}");
+      }
+    } catch (e, stack) {
+      print("Location fetch error: $e");
+      print(stack);
+    }
+  }
+
+  /*Future<void> fetchLocationAndPrayerTimes() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -153,7 +247,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       }
 
       final url =
-          "http://api.aladhan.com/v1/timings?latitude=${position.latitude}&longitude=${position.longitude}&method=2";
+          //"http://api.aladhan.com/v1/timings?latitude=${position.latitude}&longitude=${position.longitude}&method=2";
+          //"https://api.aladhan.com/timingsByAddress/09-03-2015?address=Dubai,UAE&method=8";
+          "https://api.aladhan.com/v1/timings?latitude=${position.latitude}&longitude=${position.longitude}&method=2";
 
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -181,7 +277,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     } catch (e) {
       print("Location fetch error: $e");
     }
-  }
+  }*/
 
   void findNextPrayer() {
     final now = DateTime.now();
@@ -549,46 +645,108 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     );
   } //-------------------------------Test===========
 
+  /* @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3, // ৩টি ট্যাব: নামাজ, তসবিহ, কেবলা
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.green,
+          centerTitle: true,
+          title: const Text(
+            "আজকের সময়",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          bottom: const TabBar(
+            indicatorColor: Colors.white,
+            labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            tabs: [
+              Tab(text: "নামাজ"),
+              Tab(icon: Icon(Icons.fingerprint), text: "তসবিহ"),
+              Tab(icon: Icon(Icons.explore), text: "কেবলা"),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            _buildPrayerTab(), // প্রথম ট্যাব: নামাজের সময়
+            // দ্বিতীয় ট্যাব: তসবিহ
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: const TasbeehPage(),
+              ),
+            ),
+
+            // তৃতীয় ট্যাব: কেবলা
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: const QiblaPage(),
+              ),
+            ),
+          ],
+        ),
+
+        bottomNavigationBar: _isBannerAdReady
+            ? SafeArea(
+                child: Container(
+                  color: Colors.white,
+                  alignment: Alignment.center,
+                  width: _bannerAd.size.width.toDouble(),
+                  height: _bannerAd.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd),
+                ),
+              )
+            : null,
+      ),
+    );
+  }*/
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        centerTitle: true,
-        title: const Text("ইসলামিক টুলস"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.fingerprint),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const TasbeehPage()),
-              );
-            },
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.green,
+          centerTitle: true,
+          title: const Text(
+            "আজকের সময়",
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          IconButton(
-            icon: const Icon(Icons.explore),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const QiblaPage()),
-              );
-            },
+          bottom: const TabBar(
+            indicatorColor: Colors.white,
+            labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            tabs: [
+              Tab(text: "নামাজ"),
+              Tab(icon: Icon(Icons.fingerprint), text: "তসবিহ"),
+              Tab(icon: Icon(Icons.explore), text: "কেবলা"),
+            ],
           ),
-        ],
+        ),
+        body: TabBarView(
+          children: [
+            _buildPrayerTab(),
+
+            // তসবিহ ট্যাব
+            Padding(padding: const EdgeInsets.all(12.0), child: TasbeehPage()),
+
+            // কেবলা ট্যাব
+            Padding(padding: const EdgeInsets.all(12.0), child: QiblaPage()),
+          ],
+        ),
+        bottomNavigationBar: _isBannerAdReady
+            ? SafeArea(
+                child: Container(
+                  color: Colors.white,
+                  alignment: Alignment.center,
+                  width: _bannerAd.size.width.toDouble(),
+                  height: _bannerAd.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd),
+                ),
+              )
+            : null,
       ),
-      body: _buildPrayerTab(),
-      bottomNavigationBar: _isBannerAdReady
-          ? SafeArea(
-              child: Container(
-                color: Colors.white,
-                alignment: Alignment.center,
-                width: _bannerAd.size.width.toDouble(),
-                height: _bannerAd.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd),
-              ),
-            )
-          : null,
     );
   }
 }

@@ -81,139 +81,137 @@ class _TasbeehPageState extends State<TasbeehPage> {
       Colors.orange.shade700,
     ];
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("তসবীহ"), backgroundColor: Colors.green),
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-          const Text(
-            "তসবীহ কাউন্টার",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.green,
+    // Scaffold সরিয়ে দিন এবং সরাসরি Column রিটার্ন করুন
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        const Text(
+          "তসবীহ কাউন্টার",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          color: Colors.green.shade100,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+            child: Column(
+              children: [
+                Text(
+                  selectedPhrase,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  _getCurrentCount().toString(),
+                  style: const TextStyle(
+                    fontSize: 50,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 20),
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            color: Colors.green.shade100,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-              child: Column(
-                children: [
-                  Text(
-                    selectedPhrase,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
-                    textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 20),
+        Expanded(
+          child: ListView.builder(
+            itemCount: tasbeehPhrases.length,
+            itemBuilder: (context, index) {
+              String phrase = tasbeehPhrases[index];
+              Color color = colors[index % colors.length];
+              return GestureDetector(
+                onTap: () => _incrementCount(phrase),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  curve: Curves.easeOut,
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 6,
+                    horizontal: 12,
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _getCurrentCount().toString(),
-                    style: const TextStyle(
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 24,
                   ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: tasbeehPhrases.length,
-              itemBuilder: (context, index) {
-                String phrase = tasbeehPhrases[index];
-                Color color = colors[index % colors.length];
-                return GestureDetector(
-                  onTap: () => _incrementCount(phrase),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    curve: Curves.easeOut,
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 6,
-                      horizontal: 12,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 24,
-                    ),
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 4,
-                          offset: Offset(2, 2),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        phrase,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      phrase,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
-          ElevatedButton.icon(
-            onPressed: _resetCounts,
-            icon: const Icon(Icons.refresh),
-            label: const Text("রিসেট"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TasbeehStatsPage(
-                    subhanallahCount: subhanallahCount,
-                    alhamdulillahCount: alhamdulillahCount,
-                    allahuakbarCount: allahuakbarCount,
                   ),
                 ),
               );
             },
-            icon: const Icon(Icons.bar_chart),
-            label: const Text("স্ট্যাটস দেখুন"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+          ),
+        ),
+        ElevatedButton.icon(
+          onPressed: _resetCounts,
+          icon: const Icon(Icons.refresh),
+          label: const Text("রিসেট"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.redAccent,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-          const SizedBox(height: 20),
-        ],
-      ),
+        ),
+        const SizedBox(height: 10),
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TasbeehStatsPage(
+                  subhanallahCount: subhanallahCount,
+                  alhamdulillahCount: alhamdulillahCount,
+                  allahuakbarCount: allahuakbarCount,
+                ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.bar_chart),
+          label: const Text("স্ট্যাটস দেখুন"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blueAccent,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+      ],
     );
   }
 }
