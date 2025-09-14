@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -19,82 +18,11 @@ import 'sura_page.dart';
 import 'name_of_allah_page.dart';
 import 'kalema_page.dart';
 import 'utils.dart';
-import 'ad_helper.dart';
+import 'ad_helper.dart'; // ✅ AdHelper
+import 'tasbeeh_page.dart';
 import 'screens/splash_screen.dart';
 
-// -------------------- Banner Ad Widget --------------------
-class BannerAdWidget extends StatefulWidget {
-  const BannerAdWidget({Key? key}) : super(key: key);
-
-  @override
-  _BannerAdWidgetState createState() => _BannerAdWidgetState();
-}
-
-class _BannerAdWidgetState extends State<BannerAdWidget> {
-  BannerAd? _bannerAd;
-  bool _isAdLoaded = false;
-  bool _isConnected = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkInternet();
-  }
-
-  Future<void> _checkInternet() async {
-    final connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult == ConnectivityResult.none) {
-      setState(() => _isConnected = false);
-    } else {
-      setState(() => _isConnected = true);
-      _loadAdaptiveBanner();
-    }
-  }
-
-  void _loadAdaptiveBanner() async {
-    final AnchoredAdaptiveBannerAdSize? size =
-        await AdSize.getAnchoredAdaptiveBannerAdSize(
-          Orientation.portrait,
-          MediaQuery.of(context).size.width.truncate(),
-        );
-
-    if (size == null) return;
-
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test ID
-      size: size,
-      request: AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) => setState(() => _isAdLoaded = true),
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          print('BannerAd failed to load: $error');
-        },
-      ),
-    )..load();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_isConnected || !_isAdLoaded || _bannerAd == null) {
-      return SizedBox.shrink();
-    }
-
-    return Container(
-      width: _bannerAd!.size.width.toDouble(),
-      height: _bannerAd!.size.height.toDouble(),
-      child: AdWidget(ad: _bannerAd!),
-    );
-  }
-
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-    super.dispose();
-  }
-}
-
-// -------------------- Theme Provider --------------------
+/// -------------------- Theme Provider --------------------
 class ThemeProvider extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;
 
@@ -108,12 +36,10 @@ class ThemeProvider extends ChangeNotifier {
   }
 }
 
-// -------------------- Main --------------------
+/// -------------------- Main --------------------
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MobileAds.instance.initialize();
-  AdHelper.loadInterstitialAd();
-
+  await AdHelper.initialize(); // ✅ Google Mobile Ads init
   runApp(
     ChangeNotifierProvider(create: (_) => ThemeProvider(), child: MyApp()),
   );
@@ -131,18 +57,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
         brightness: Brightness.light,
+        fontFamily: 'HindSiliguri',
       ),
       darkTheme: ThemeData(
         primarySwatch: Colors.green,
         brightness: Brightness.dark,
         appBarTheme: AppBarTheme(backgroundColor: Colors.green[900]),
+        fontFamily: 'HindSiliguri',
       ),
       home: SplashScreen(),
     );
   }
 }
 
-// -------------------- Home Page --------------------
+/// -------------------- Home Page --------------------
 class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
@@ -150,6 +78,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? selectedCategory;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  BannerAd? _bannerAd; // ✅ Banner Ad variable
 
   final List<String> categories = [
     'ইসলামী প্রাথমিক জ্ঞান',
@@ -169,429 +100,502 @@ class _HomePageState extends State<HomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadBannerAd(); // ✅ HomePage লোড হলে ব্যানার অ্যাড লোড হবে
+    AdHelper.loadInterstitialAd(); // ✅ Interstitial আগে থেকে লোড রাখা হবে
+  }
+
+  /// ✅ Banner Ad লোড ফাংশন
+  void _loadBannerAd() async {
+    final canShow = await AdHelper.canShowBannerAd();
+    if (!canShow) return;
+
+    final banner = await AdHelper.createAdaptiveBannerAdWithFallback(context);
+    await banner.load();
+    setState(() {
+      _bannerAd = banner;
+    });
+    await AdHelper.recordBannerAdShown();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return WillPopScope(
       onWillPop: () async {
         bool exitConfirmed = await showExitConfirmationDialog(context);
         if (exitConfirmed) {
-          AdHelper.loadInterstitialAd();
+          await AdHelper.showInterstitialAd(adContext: "Exit App");
           return true;
         }
         return false;
       },
       child: Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           title: const Text('ইসলামিক কুইজ অনলাইন'),
           centerTitle: true,
           backgroundColor: Colors.green[800],
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.menu, color: Colors.white),
+            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.brightness_6, color: Colors.white),
+              onPressed: () {
+                themeProvider.toggleTheme(!themeProvider.isDarkMode);
+              },
+            ),
+          ],
         ),
         drawer: _buildDrawer(themeProvider),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              // ---------------- Marquee ----------------
-              Container(
-                color: Colors.green.shade100,
-                height: 50,
-                child: Center(
-                  child: Marquee(
-                    text:
-                        "📖 ইসলামই একমাত্র সত্য ধর্ম (আলে ইমরান: ১৯) 📖 আল্লাহকে ভয় করো ও সত্যবাদীদের সাথে থাকো (তাওবা: ১১৯) 📖 নামাজ অশ্লীলতা ও মন্দ কাজ থেকে বিরত রাখে (আনকাবুত: ৪৫) 📖 হে আমার প্রতিপালক! আমার জ্ঞানকে বৃদ্ধি করে দিন (ত্ব-হা: ১১৪) 📖 সৎকাজে প্রতিযোগিতা করো (বাকারাহ: ১৪৮) 📖 আল্লাহর স্মরণে হৃদয় শান্তি পায় (রা‘দ: ২৮)",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDarkMode
+                  ? [Colors.green[900]!, Colors.green[800]!]
+                  : [Colors.green[50]!, Colors.green[100]!],
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                /// ---------------- Marquee ----------------
+                Container(
+                  color: Colors.green.shade100.withOpacity(0.7),
+                  height: 40,
+                  child: Center(
+                    child: Marquee(
+                      text:
+                          "📖 ইসলামই একমাত্র সত্য ধর্ম (আলে ইমরান: ১৯) 📖 আল্লাহকে ভয় করো ও সত্যবাদীদের সাথে থাকো (তাওবা: ১১৯) 📖 নামাজ অশ্লীলতা ও মন্দ কাজ থেকে বিরত রাখে (আনকাবুত: ৪৫) 📖 হে আমার প্রতিপালক! আমার জ্ঞানকে বৃদ্ধি করে দিন (ত্ব-হা: ১১৪) 📖 সৎকাজে প্রতিযোগিতা করো (বাকারাহ: ১৪৮) 📖 আল্লাহর স্মরণে হৃদয় শান্তি পায় (রা‘দ: ২৮)",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      ),
+                      scrollAxis: Axis.horizontal,
+                      blankSpace: 50.0,
+                      velocity: 50.0,
+                      pauseAfterRound: Duration(seconds: 1),
+                      startPadding: 10.0,
                     ),
-                    scrollAxis: Axis.horizontal,
-                    blankSpace: 50.0,
-                    velocity: 50.0,
-                    pauseAfterRound: Duration(seconds: 1),
-                    startPadding: 10.0,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 5),
+                const SizedBox(height: 10),
 
-              // ---------------- Image Slider ----------------
-              Container(
-                height: 200,
-                color: Colors.green[100],
-                child: AutoImageSlider(
-                  imageUrls: [
-                    'assets/images/slider1.png',
-                    'assets/images/slider2.png',
-                    'assets/images/slider3.png',
-                    'assets/images/slider4.png',
-                    'assets/images/slider5.png',
-                  ],
+                /// ---------------- Image Slider ----------------
+                Container(
+                  height: 180,
+                  margin: EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 6,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: AutoImageSlider(
+                      imageUrls: [
+                        'assets/images/slider1.png',
+                        'assets/images/slider2.png',
+                        'assets/images/slider3.png',
+                        'assets/images/slider4.png',
+                        'assets/images/slider5.png',
+                      ],
+                    ),
+                  ),
                 ),
+
+                const SizedBox(height: 20),
+
+                /// ---------------- Category Selector ----------------
+                _buildCategorySelector(isDarkMode),
+
+                const SizedBox(height: 20),
+
+                /// ---------------- Quick Access ----------------
+                _buildQuickAccess(isDarkMode),
+
+                const SizedBox(height: 20),
+
+                /// ---------------- Additional Features ----------------
+                _buildAdditionalFeatures(isDarkMode),
+
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_bannerAd != null)
+              Container(
+                alignment: Alignment.center,
+                width: _bannerAd!.size.width.toDouble(),
+                height: _bannerAd!.size.height.toDouble(),
+                child: AdWidget(ad: _bannerAd!),
+              )
+            else
+              const SizedBox.shrink(), //  কোনো ফাঁকা জায়গা থাকবে না
+
+            _buildBottomNavBar(),
+            // তোমার বটম নেভিগেশন
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// ---------------- Category Selector ----------------
+  Widget _buildCategorySelector(bool isDarkMode) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.green[900] : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'বিষয় নির্বাচন করুন',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.green[800],
               ),
-
-              const SizedBox(height: 5),
-
-              // ---------------- Category Selector ----------------
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-                child: Column(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                        vertical: screenHeight * 0.015,
-                      ),
-                      padding: EdgeInsets.all(screenWidth * 0.04),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.green, width: 1.2),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: isDarkMode ? Colors.green[800] : Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green.shade300, width: 1.2),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: selectedCategory,
+                  hint: Text(
+                    'বিষয় বেছে নিন',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                    ),
+                  ),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  icon: Icon(Icons.arrow_drop_down, color: Colors.green),
+                  isExpanded: true,
+                  dropdownColor: isDarkMode ? Colors.green[800] : Colors.white,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedCategory = newValue;
+                    });
+                  },
+                  items: categories.map((String category) {
+                    return DropdownMenuItem<String>(
+                      value: category,
+                      child: Row(
                         children: [
-                          Text(
-                            'বিষয় নির্বাচন করুন',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.05,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green[800],
-                            ),
-                          ),
-                          SizedBox(height: screenHeight * 0.015),
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.03,
-                            ),
-                            decoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.grey[900]
-                                  : Colors.grey[100],
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.green.shade200),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: selectedCategory,
-                                hint: Text(
-                                  'বিষয় বেছে নিন',
-                                  style: TextStyle(
-                                    fontSize: screenWidth * 0.045,
-                                    color:
-                                        Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                                style: TextStyle(
-                                  fontSize: screenWidth * 0.045,
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                                icon: const Icon(Icons.arrow_drop_down),
-                                isExpanded: true,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    selectedCategory = newValue;
-                                  });
-                                },
-                                items: categories.map((String category) {
-                                  return DropdownMenuItem<String>(
-                                    value: category,
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.bookmark,
-                                          size: 18,
-                                          color: Colors.green,
-                                        ),
-                                        SizedBox(width: screenWidth * 0.02),
-                                        Text(category),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: screenHeight * 0.02),
-                          SizedBox(
-                            width: double.infinity,
-                            height: screenHeight * 0.07,
-                            child: ElevatedButton.icon(
-                              onPressed: selectedCategory == null
-                                  ? null
-                                  : () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => MCQPage(
-                                            category: selectedCategory!,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                              icon: Icon(
-                                Icons.play_arrow,
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.black
-                                    : Colors.white,
-                              ),
-                              label: Text(
-                                'শুরু করুন',
-                                style: TextStyle(
-                                  fontSize: screenWidth * 0.05,
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.black
-                                      : Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green[800],
-                              ),
+                          Icon(Icons.bookmark, size: 18, color: Colors.green),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              category,
+                              style: TextStyle(fontSize: 15),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                    );
+                  }).toList(),
                 ),
               ),
-
-              const SizedBox(height: 5),
-
-              // ---------------- Nav Buttons ----------------
-              _buildNavButtons(screenHeight, screenWidth, context),
-            ],
-          ),
-        ),
-
-        // ---------------- Bottom Navigation ----------------
-        bottomNavigationBar: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [const BannerAdWidget(), _buildBottomNavBar()],
+            ),
+            SizedBox(height: 16),
+            SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: selectedCategory == null
+                    ? null
+                    : () async {
+                        await AdHelper.showInterstitialAd(
+                          adContext: "Start Quiz",
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                MCQPage(category: selectedCategory!),
+                          ),
+                        );
+                      },
+                child: Text(
+                  'কুইজ শুরু করুন',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[700],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 4,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // ---------------- Nav Buttons ----------------
-  Widget _buildNavButtons(
-    double screenHeight,
-    double screenWidth,
-    BuildContext context,
-  ) {
-    return Column(
-      children: [
-        _buildNavButton(
-          context,
-          '১৬টি ছোট সূরা (অর্থসহ)',
-          SuraPage(),
-          screenHeight,
-        ),
-        _buildNavButton(
-          context,
-          'দৈনন্দিন ব্যাবহারিত দোয়া',
-          DoyaPage(),
-          screenHeight,
-        ),
-        _buildNavButton(
-          context,
-          'আজকের নামাজের সময়',
-          const PrayerTimePage(),
-          screenHeight,
-        ),
-        _buildNavButton(
-          context,
-          'ফরজ সালাতের পর জিকিরসমূহ',
-          const NamajAmol(),
-          screenHeight,
-        ),
+  /// ---------------- Quick Access ----------------
+  Widget _buildQuickAccess(bool isDarkMode) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'দ্রুত অ্যাক্সেস',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.green[800],
+            ),
+          ),
+          SizedBox(height: 12),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.6,
+            children: [
+              _buildFeatureCard('১৬টি ছোট সূরা', Icons.book, SuraPage()),
+              _buildFeatureCard('দৈনন্দিন দোয়া', Icons.lightbulb, DoyaPage()),
+              _buildFeatureCard(
+                'নামাজের সময়',
+                Icons.access_time,
+                PrayerTimePage(),
+              ),
+              _buildFeatureCard('সালাতের জিকির', Icons.psychology, NamajAmol()),
+              _buildFeatureCard(
+                'ডিজিটাল তসবিহ',
+                Icons.psychology,
+                TasbeehPage(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-        Padding(
-          padding: const EdgeInsets.only(left: 6, right: 6, bottom: 5, top: 1),
-          child: Row(
+  /// ---------------- Additional Features ----------------
+  Widget _buildAdditionalFeatures(bool isDarkMode) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'অন্যান্য ফিচার',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.green[800],
+            ),
+          ),
+          SizedBox(height: 12),
+          Row(
             children: [
               Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade700,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NameOfAllahPage(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'আল্লাহর নামসমূহ',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                child: _buildSmallButton('আল্লাহর নামসমূহ', NameOfAllahPage()),
               ),
-              const SizedBox(width: 3),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade700,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const KalemaPage(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'কালিমাহ',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+              SizedBox(width: 8),
+              Expanded(child: _buildSmallButton('কালিমাহ', KalemaPage())),
+            ],
+          ),
+          SizedBox(height: 8),
+          _buildPrivacyPolicyButton(),
+        ],
+      ),
+    );
+  }
+
+  /// ---------------- Feature Card ----------------
+  Widget _buildFeatureCard(String title, IconData icon, Widget page) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: isDark ? Colors.green[800] : Colors.white,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () async {
+          await AdHelper.showInterstitialAd(adContext: "Feature $title");
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => page),
+          );
+        },
+        child: Padding(
+          padding: EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 30,
+                color: isDark ? Colors.white : Colors.green[700],
+              ),
+              SizedBox(height: 8),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
             ],
           ),
         ),
-        _buildPrivacyPolicyButton(
-          context,
-          'Privacy Policy',
-          'https://sites.google.com/view/islamicquize/home',
-          screenHeight,
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildNavButton(
-    BuildContext context,
-    String title,
-    Widget page,
-    double screenHeight,
-  ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-      child: SizedBox(
-        width: double.infinity,
-        height: screenHeight * 0.065,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green.shade700,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            textStyle: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+  /// ---------------- Small Button ----------------
+  Widget _buildSmallButton(String title, Widget page) {
+    return SizedBox(
+      height: 45,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green[700],
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => page),
+        ),
+        onPressed: () async {
+          await AdHelper.showInterstitialAd(adContext: "SmallButton $title");
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => page),
+          );
+        },
+        child: Text(
+          title,
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+
+  /// ---------------- Privacy Policy Button ----------------
+  Widget _buildPrivacyPolicyButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 45,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green[700],
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onPressed: () async {
+          final Uri uri = Uri.parse(
+            'https://sites.google.com/view/islamicquize/home',
+          );
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Could not open Privacy Policy')),
             );
-          },
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white),
-          ),
+          }
+        },
+        child: Text(
+          'Privacy Policy',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ),
     );
   }
 
-  Widget _buildPrivacyPolicyButton(
-    BuildContext context,
-    String title,
-    String url,
-    double screenHeight,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-      child: SizedBox(
-        width: double.infinity,
-        height: screenHeight * 0.07,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green.shade700,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            textStyle: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          onPressed: () async {
-            final Uri uri = Uri.parse(url);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Could not open Privacy Policy')),
-              );
-            }
-          },
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ---------------- Drawer ----------------
+  /// ---------------- Drawer ----------------
   Widget _buildDrawer(ThemeProvider themeProvider) {
+    final isDarkMode = themeProvider.isDarkMode;
+
     return Drawer(
+      backgroundColor: isDarkMode ? Colors.green[900] : Colors.white,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.green[800]),
+            decoration: BoxDecoration(
+              color: Colors.green[800],
+              image: DecorationImage(
+                image: AssetImage('assets/images/mosque_background.png'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.2),
+                  BlendMode.darken,
+                ),
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Icon(Icons.menu_book, size: 50, color: Colors.white),
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                  radius: 25,
+                  child: Icon(
+                    Icons.menu_book,
+                    size: 30,
+                    color: Colors.green[800],
+                  ),
+                ),
                 SizedBox(height: 10),
                 Text(
                   "ইসলামিক কুইজ অনলাইন",
@@ -608,68 +612,61 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+          _buildDrawerItem(Icons.book, 'দৈনন্দিন দোয়া', DoyaPage()),
           _buildDrawerItem(
-            context,
-            Icons.book,
-            'দৈনন্দিন ব্যাবহারিত দোয়া',
-            page: DoyaPage(),
-          ),
-          _buildDrawerItem(
-            context,
             Icons.access_time,
             'আজকের নামাজের সময়',
-            page: const PrayerTimePage(),
+            PrayerTimePage(),
           ),
+          _buildDrawerItem(Icons.info, 'আমাদের কথা', AboutPage()),
+          _buildDrawerItem(Icons.contact_page, 'যোগাযোগ', ContactPage()),
+          _buildDrawerItem(Icons.developer_mode, 'ডেভেলপার', DeveloperPage()),
           _buildDrawerItem(
-            context,
-            Icons.info,
-            'আমাদের কথা',
-            page: const AboutPage(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.contact_page,
-            'যোগাযোগ',
-            page: const ContactPage(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.developer_mode,
-            'ডেভেলপার',
-            page: DeveloperPage(),
-          ),
-          _buildDrawerItem(
-            context,
             Icons.privacy_tip,
             'Privacy Policy',
+            null,
             url: 'https://sites.google.com/view/islamicquize/home',
           ),
-          const Divider(),
-          SwitchListTile(
-            title: const Text("ডার্ক মোড"),
-            secondary: Icon(
-              themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+          Divider(color: Colors.green.shade200),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Icon(Icons.brightness_6, color: Colors.green[700]),
+                SizedBox(width: 12),
+                Text("ডার্ক মোড", style: TextStyle(fontSize: 16)),
+                Spacer(),
+                Switch(
+                  value: themeProvider.isDarkMode,
+                  onChanged: (value) => themeProvider.toggleTheme(value),
+                  activeColor: Colors.green,
+                ),
+              ],
             ),
-            value: themeProvider.isDarkMode,
-            onChanged: (value) => themeProvider.toggleTheme(value),
           ),
         ],
       ),
     );
   }
 
+  /// ---------------- Drawer Item ----------------
   Widget _buildDrawerItem(
-    BuildContext context,
     IconData icon,
-    String title, {
-    Widget? page,
+    String title,
+    Widget? page, {
     String? url,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ListTile(
-      leading: Icon(icon, color: Colors.green[800]),
+      leading: Icon(icon, color: Colors.green[700]),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: isDark ? Colors.white : Colors.black87,
+        ),
       ),
       onTap: () async {
         Navigator.pop(context);
@@ -692,41 +689,88 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ---------------- Bottom Navigation ----------------
-  BottomNavigationBar _buildBottomNavBar() {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.green[800],
-      unselectedItemColor: Colors.grey,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.star_rate), label: 'Rating'),
-        BottomNavigationBarItem(icon: Icon(Icons.apps), label: 'Other Apps'),
-        BottomNavigationBarItem(icon: Icon(Icons.share), label: 'Share'),
-      ],
-      onTap: (index) {
-        switch (index) {
-          case 1:
-            launchUrl(
-              Uri.parse(
-                'https://play.google.com/store/apps/details?id=com.example.quizapp',
-              ),
-            );
-            break;
-          case 2:
-            launchUrl(
-              Uri.parse(
-                'https://play.google.com/store/apps/dev?id=YOUR_DEVELOPER_ID',
-              ),
-            );
-            break;
-          case 3:
-            Share.share(
-              'ইসলামিক কুইজ অনলাইন অ্যাপটি ডাউনলোড করুন:\nhttps://play.google.com/store/apps/details?id=com.example.quizapp',
-            );
-            break;
-        }
-      },
+  /// ---------------- Bottom Navigation ----------------
+  Widget _buildBottomNavBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? Colors.green[900] : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildBottomNavItem(Icons.home, 'হোম', 0),
+            _buildBottomNavItem(Icons.star_rate, 'রেটিং', 1),
+            _buildBottomNavItem(Icons.apps, 'অন্যান্য অ্যাপ', 2),
+            _buildBottomNavItem(Icons.share, 'শেয়ার', 3),
+          ],
+        ),
+      ),
     );
+  }
+
+  /// ---------------- Bottom Navigation Item Widget ----------------
+  Widget _buildBottomNavItem(IconData icon, String label, int index) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: () => _onBottomNavItemTapped(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isDark ? Colors.green[200] : Colors.green[700],
+            size: 24,
+          ),
+          SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.green[200] : Colors.green[700],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ---------------- Bottom Navigation Tap Handler ----------------
+  void _onBottomNavItemTapped(int index) {
+    switch (index) {
+      case 0:
+        // হোমে থাকলে কিছু করার দরকার নাই
+        break;
+      case 1:
+        launchUrl(
+          Uri.parse(
+            'https://play.google.com/store/apps/details?id=com.example.quizapp',
+          ),
+        );
+        break;
+      case 2:
+        launchUrl(
+          Uri.parse(
+            'https://play.google.com/store/apps/dev?id=YOUR_DEVELOPER_ID',
+          ),
+        );
+        break;
+      case 3:
+        Share.share(
+          'ইসলামিক কুইজ অনলাইন অ্যাপটি ডাউনলোড করুন:\nhttps://play.google.com/store/apps/details?id=com.example.quizapp',
+        );
+        break;
+    }
   }
 }

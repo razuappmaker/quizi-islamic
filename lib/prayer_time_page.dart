@@ -645,63 +645,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     );
   } //-------------------------------Test===========
 
-  /* @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3, // ৩টি ট্যাব: নামাজ, তসবিহ, কেবলা
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.green,
-          centerTitle: true,
-          title: const Text(
-            "আজকের সময়",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          bottom: const TabBar(
-            indicatorColor: Colors.white,
-            labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            tabs: [
-              Tab(text: "নামাজ"),
-              Tab(icon: Icon(Icons.fingerprint), text: "তসবিহ"),
-              Tab(icon: Icon(Icons.explore), text: "কেবলা"),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            _buildPrayerTab(), // প্রথম ট্যাব: নামাজের সময়
-            // দ্বিতীয় ট্যাব: তসবিহ
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: const TasbeehPage(),
-              ),
-            ),
-
-            // তৃতীয় ট্যাব: কেবলা
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: const QiblaPage(),
-              ),
-            ),
-          ],
-        ),
-
-        bottomNavigationBar: _isBannerAdReady
-            ? SafeArea(
-                child: Container(
-                  color: Colors.white,
-                  alignment: Alignment.center,
-                  width: _bannerAd.size.width.toDouble(),
-                  height: _bannerAd.size.height.toDouble(),
-                  child: AdWidget(ad: _bannerAd),
-                ),
-              )
-            : null,
-      ),
-    );
-  }*/
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(

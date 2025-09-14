@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'ad_helper.dart';
 import 'json_loader.dart'; // আপনার JsonLoader ক্লাস ইম্পোর্ট করুন
 
 class NamajAmol extends StatefulWidget {

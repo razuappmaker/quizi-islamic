@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'ad_helper.dart';
 import 'json_loader.dart'; // JsonLoader ইম্পোর্ট করুন
 
 class SuraPage extends StatefulWidget {
