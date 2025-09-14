@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
       onWillPop: () async {
         bool exitConfirmed = await showExitConfirmationDialog(context);
         if (exitConfirmed) {
-          await AdHelper.showInterstitialAd(adContext: "Exit App");
+          //await AdHelper.showInterstitialAd(adContext: "Exit App");
           return true;
         }
         return false;
@@ -353,6 +353,32 @@ class _HomePageState extends State<HomePage> {
               child: ElevatedButton(
                 onPressed: selectedCategory == null
                     ? null
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                MCQPage(category: selectedCategory!),
+                          ),
+                        );
+                      },
+                child: Text(
+                  'কুইজ শুরু করুন',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[700],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 4,
+                ),
+              ),
+              // যদি mcq page এর ভেতর অ্যাড ঠিকমত কাজ করে তাইলে এই কমেন্ট অঙ্ঘশ বাদ দিব
+              /*child: ElevatedButton(
+                onPressed: selectedCategory == null
+                    ? null
                     : () async {
                         await AdHelper.showInterstitialAd(
                           adContext: "Start Quiz",
@@ -377,7 +403,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   elevation: 4,
                 ),
-              ),
+              ),*/
             ),
           ],
         ),
@@ -474,7 +500,7 @@ class _HomePageState extends State<HomePage> {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
-          await AdHelper.showInterstitialAd(adContext: "Feature $title");
+          //await AdHelper.showInterstitialAd(adContext: "Feature $title");
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => page),
@@ -520,7 +546,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         onPressed: () async {
-          await AdHelper.showInterstitialAd(adContext: "SmallButton $title");
+          //await AdHelper.showInterstitialAd(adContext: "SmallButton $title"); // If you want to add show here
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => page),

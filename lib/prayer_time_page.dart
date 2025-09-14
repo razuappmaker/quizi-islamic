@@ -9,8 +9,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'tasbeeh_page.dart';
-import 'qiblah_page.dart';
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -61,7 +59,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         channelDescription: 'Prayer time reminders',
         defaultColor: Colors.green,
         importance: NotificationImportance.High,
-        //soundSource: 'resource://raw/azan',  // এজন্য মোবাইলের ডিফল্ট সাউন্ড প্লে হবে
         ledColor: Colors.white,
       ),
     ], debug: true);
@@ -220,64 +217,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       print(stack);
     }
   }
-
-  /*Future<void> fetchLocationAndPrayerTimes() async {
-    try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) return;
-      }
-      if (permission == LocationPermission.deniedForever) return;
-
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-
-      if (placemarks.isNotEmpty) {
-        setState(() {
-          cityName = placemarks[0].locality ?? "Unknown City";
-          countryName = placemarks[0].country ?? "Unknown Country";
-        });
-      }
-
-      final url =
-          //"http://api.aladhan.com/v1/timings?latitude=${position.latitude}&longitude=${position.longitude}&method=2";
-          //"https://api.aladhan.com/timingsByAddress/09-03-2015?address=Dubai,UAE&method=8";
-          "https://api.aladhan.com/v1/timings?latitude=${position.latitude}&longitude=${position.longitude}&method=2";
-
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final timings = data["data"]["timings"];
-        setState(() {
-          prayerTimes = {
-            "ফজর": timings["Fajr"],
-            "যোহর": timings["Dhuhr"],
-            "আসর": timings["Asr"],
-            "মাগরিব": timings["Maghrib"],
-            "ইশা": timings["Isha"],
-          };
-        });
-        findNextPrayer();
-        _saveData();
-
-        // Schedule notifications for all prayers
-        final prefs = await SharedPreferences.getInstance();
-        prayerTimes.forEach((prayer, time) async {
-          bool soundEnabled = prefs.getBool("azan_sound_$prayer") ?? true;
-          _schedulePrayerNotification(prayer, time, soundEnabled);
-        });
-      }
-    } catch (e) {
-      print("Location fetch error: $e");
-    }
-  }*/
 
   void findNextPrayer() {
     final now = DateTime.now();
@@ -442,36 +381,79 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       builder: (context, snapshot) {
         bool enabled = snapshot.data ?? true;
 
-        return Card(
-          elevation: 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green.shade50, Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.green.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: ListTile(
-            leading: const Icon(
-              Icons.access_time,
-              color: Colors.green,
-              size: 28,
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.access_time,
+                color: Colors.green.shade700,
+                size: 24,
+              ),
             ),
             title: Text(
               prayerName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
             ),
             subtitle: Text(
               formatTimeTo12Hour(time),
-              style: const TextStyle(fontSize: 18),
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text("আজান", style: TextStyle(fontSize: 14)),
-                Switch(
-                  value: enabled,
-                  activeColor: Colors.green,
-                  inactiveThumbColor: Colors.red,
-                  onChanged: (value) => _setAzanEnabled(prayerName, value),
-                ),
-              ],
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "আজান",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.green.shade800,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Switch(
+                    value: enabled,
+                    activeColor: Colors.green,
+                    inactiveThumbColor: Colors.grey.shade400,
+                    inactiveTrackColor: Colors.grey.shade300,
+                    onChanged: (value) => _setAzanEnabled(prayerName, value),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -484,70 +466,266 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
     return Column(
       children: [
-        const SizedBox(height: 10),
-        Text(
-          "$cityName, $countryName",
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.green,
+        // Header with location and refresh button
+        // Header with location and refresh button
+        Container(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: Theme.of(context).brightness == Brightness.dark
+                  ? [
+                      Colors.green.shade900,
+                      Colors.green.shade800,
+                      Colors.green.shade700,
+                    ]
+                  : [
+                      Colors.green.shade600,
+                      Colors.green.shade500,
+                      Colors.green.shade400,
+                    ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: const [0.0, 0.6, 1.0],
+            ),
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(32),
+              bottomRight: Radius.circular(32),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.black.withOpacity(0.5)
+                    : Colors.green.shade800.withOpacity(0.3),
+                blurRadius: 16,
+                spreadRadius: 2,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(height: 10),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(8),
+          child: Column(
             children: [
-              ...prayerTimes.entries
-                  .map((e) => prayerRow(e.key, e.value))
-                  .toList(),
+              // Location and refresh button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                size: 16,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                "বর্তমান অবস্থান",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withOpacity(0.9),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          "$cityName, $countryName",
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            height: 1.2,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      onPressed: fetchLocationAndPrayerTimes,
+                      icon: const Icon(
+                        Icons.refresh,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      tooltip: "রিফ্রেশ করুন",
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              // Next prayer countdown - New modern design
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white.withOpacity(0.15),
+                      Colors.white.withOpacity(0.08),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "পরবর্তী ওয়াক্ত",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white.withOpacity(0.8),
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 0),
+                    Text(
+                      nextPrayer,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 0),
+                    // Modern countdown design
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.15),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildTimeUnit("ঘণ্টা", countdown.inHours),
+                          _buildDivider(),
+                          _buildTimeUnit("মিনিট", countdown.inMinutes % 60),
+                          _buildDivider(),
+                          _buildTimeUnit("সেকেন্ড", countdown.inSeconds % 60),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-        Card(
-          // margin: const EdgeInsets.all(16), // পরবর্তী ওয়াক্ত ছোট করর জন্য -----
-          margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-          color: Colors.green[100],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 6,
-          child: Padding(
-            padding: const EdgeInsets.all(10),
+        const SizedBox(height: 16),
+        // Prayer times list
+        Expanded(
+          child: Container(
+            color: Colors.grey.shade50,
             child: Column(
               children: [
-                Text(
-                  "পরবর্তী ওয়াক্ত: $nextPrayer",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.black54 : Colors.black,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.schedule,
+                        color: Colors.green.shade700,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "নামাজের সময়সমূহ",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  "${countdown.inHours.toString().padLeft(2, '0')}:${(countdown.inMinutes % 60).toString().padLeft(2, '0')}:${(countdown.inSeconds % 60).toString().padLeft(2, '0')}",
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                    letterSpacing: 2,
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+                    children: [
+                      ...prayerTimes.entries
+                          .map((e) => prayerRow(e.key, e.value))
+                          .toList(),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 10),
-        _buildTestButtons(), // টেস্ট বাটন যোগ করা হলো------------
+
+        // Test buttons
+        //_buildTestButtons(),//------------
       ],
     );
   }
 
+  /*
   // ---------- টেস্ট বাটন উইজেট ---------------------
   Widget _buildTestButtons() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
       child: Column(
         children: [
           // নোটিফিকেশন টেস্ট বাটন
@@ -576,6 +754,15 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                     ),
                   );
                   print("Test notification created");
+
+                  // Show success snackbar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('নোটিফিকেশন টেস্ট করা হয়েছে'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
                 } else {
                   print("Notification permission denied");
                   AwesomeNotifications().requestPermissionToSendNotifications();
@@ -584,15 +771,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                 print("Notification error: $e");
               }
             },
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications_active, size: 20),
             label: const Text("নোটিফিকেশন টেস্ট করুন"),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: Colors.blue.shade600,
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             ),
           ),
 
@@ -611,6 +799,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('আযানের সাউন্ড টেস্ট করা হচ্ছে...'),
+                    backgroundColor: Colors.green,
                     duration: Duration(seconds: 2),
                   ),
                 );
@@ -629,67 +818,81 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                 );
               }
             },
-            icon: const Icon(Icons.volume_up),
+            icon: const Icon(Icons.volume_up, size: 20),
             label: const Text("আযান সাউন্ড টেস্ট করুন"),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.green.shade600,
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             ),
           ),
         ],
       ),
     );
-  } //-------------------------------Test===========
+  }*/
+  // Helper method for time units
+  Widget _buildTimeUnit(String label, int value) {
+    return Column(
+      children: [
+        Text(
+          value.toString().padLeft(2, '0'),
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            fontFeatures: [FontFeature.tabularFigures()],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.7)),
+        ),
+      ],
+    );
+  }
+
+  // Helper method for divider
+  Widget _buildDivider() {
+    return Container(
+      width: 1,
+      height: 30,
+      color: Colors.white.withOpacity(0.3),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.green,
-          centerTitle: true,
-          title: const Text(
-            "আজকের সময়",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          bottom: const TabBar(
-            indicatorColor: Colors.white,
-            labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            tabs: [
-              Tab(text: "নামাজ"),
-              Tab(icon: Icon(Icons.fingerprint), text: "তসবিহ"),
-              Tab(icon: Icon(Icons.explore), text: "কেবলা"),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+        centerTitle: true,
+        title: const Text(
+          "আজকের নামাজের সময়",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
-        body: TabBarView(
-          children: [
-            _buildPrayerTab(),
-
-            // তসবিহ ট্যাব
-            Padding(padding: const EdgeInsets.all(12.0), child: TasbeehPage()),
-
-            // কেবলা ট্যাব
-            Padding(padding: const EdgeInsets.all(12.0), child: QiblaPage()),
-          ],
+        elevation: 4,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
         ),
-        bottomNavigationBar: _isBannerAdReady
-            ? SafeArea(
-                child: Container(
-                  color: Colors.white,
-                  alignment: Alignment.center,
-                  width: _bannerAd.size.width.toDouble(),
-                  height: _bannerAd.size.height.toDouble(),
-                  child: AdWidget(ad: _bannerAd),
-                ),
-              )
-            : null,
       ),
+      body: _buildPrayerTab(),
+      bottomNavigationBar: _isBannerAdReady
+          ? SafeArea(
+              child: Container(
+                color: Colors.white,
+                alignment: Alignment.center,
+                width: _bannerAd.size.width.toDouble(),
+                height: _bannerAd.size.height.toDouble(),
+                child: AdWidget(ad: _bannerAd),
+              ),
+            )
+          : null,
     );
   }
 }
