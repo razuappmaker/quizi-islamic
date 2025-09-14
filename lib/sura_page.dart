@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'json_loader.dart'; // JsonLoader ইম্পোর্ট করুন
+import 'ad_helper.dart'; // AdHelper ইম্পোর্ট করুন
 
 class SuraPage extends StatefulWidget {
   const SuraPage({Key? key}) : super(key: key);
@@ -10,9 +11,9 @@ class SuraPage extends StatefulWidget {
 }
 
 class _SuraPageState extends State<SuraPage> {
-  List<Map<String, dynamic>> dailySuras = []; // খালি লিস্ট দিয়ে শুরু করুন
-  Set<int> expandedIndices = {}; // multiple expand
-  bool _isLoading = true; // লোডিং স্টেট ট্র্যাক করার জন্য
+  List<Map<String, dynamic>> dailySuras = [];
+  Set<int> expandedIndices = {};
+  bool _isLoading = true;
 
   late BannerAd _bannerAd;
   bool _isBannerAdReady = false;
@@ -20,27 +21,28 @@ class _SuraPageState extends State<SuraPage> {
   @override
   void initState() {
     super.initState();
-    _loadSuraData(); // JSON ডেটা লোড করার মেথড কল করুন
+    _loadSuraData();
 
     _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      adUnitId: AdHelper.bannerAdUnitId, // ad_helper.dart থেকে আইডি নিলো
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (_) => setState(() => _isBannerAdReady = true),
-        onAdFailedToLoad: (ad, error) => ad.dispose(),
+        onAdFailedToLoad: (ad, error) {
+          debugPrint("Banner Ad Failed: $error");
+          ad.dispose();
+        },
       ),
     )..load();
   }
 
-  // JSON ডেটা লোড করার মেথড
   Future<void> _loadSuraData() async {
     try {
       final loadedData = await JsonLoader.loadJsonList(
         'assets/daily_suras.json',
       );
 
-      // List<dynamic> কে List<Map<String, dynamic>> এ কনভার্ট করুন
       final List<Map<String, dynamic>> convertedData = loadedData
           .map<Map<String, dynamic>>((item) => Map<String, dynamic>.from(item))
           .toList();
@@ -50,11 +52,9 @@ class _SuraPageState extends State<SuraPage> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error loading sura data: $e');
-      setState(() => _isLoading = false);
-
-      // Fallback ডেটা (যদি JSON লোড করতে ব্যর্থ হয়)
+      debugPrint('Error loading sura data: $e');
       setState(() {
+        _isLoading = false;
         dailySuras = [
           {
             'title': 'সূরা আল ফাতিহা - الفاتحة',
@@ -70,40 +70,10 @@ class _SuraPageState extends State<SuraPage> {
                 'meaning':
                     'সমস্ত প্রশংসা আল্লাহর জন্য, যিনি সমস্ত জগতের পালনকর্তা।',
               },
-              {
-                'arabic': 'الرَّحْمٰنِ الرَّحِيمِ',
-                'transliteration': 'আর-রাহমানির রাহিম',
-                'meaning': 'পরম করুণাময়, পরম দয়ালু।',
-              },
-              {
-                'arabic': 'مَالِكِ يَوْمِ الدِّينِ',
-                'transliteration': 'মালিকি ইয়াওমিদ-দ্বিন',
-                'meaning': 'বিচার দিবসের মালিক।',
-              },
-              {
-                'arabic': 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ',
-                'transliteration': 'ইয়্যাকা নাআবুদু ওয়া ইয়্যাকা নাস্তাইন',
-                'meaning':
-                    'আমরা কেবল আপনাকেই উপাসনা করি এবং কেবল আপনাকেই সাহায্য চাই।',
-              },
-              {
-                'arabic': 'اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ',
-                'transliteration': 'ইহদিনাস-সিরাতাল মুস্তাকীম',
-                'meaning': 'আমাদের সরল পথ প্রদর্শন করুন।',
-              },
-              {
-                'arabic':
-                    'صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ',
-                'transliteration':
-                    'সিরাতাল লাযীনা আনআমতা আলাইহিম গাইরিল মাগদুবি আলাইহিম ওয়ালাদ-দাল্লীন',
-                'meaning':
-                    'তাদের পথ যাদের প্রতি আপনি কৃপা করেছেন, যারা অভিশাপপ্রাপ্ত নয়, এবং যারা পথভ্রষ্ট নয়।',
-              },
             ],
             'reference': 'কুরআন, সূরা আল ফাতিহা, আয়াত ১-৭',
           },
         ];
-        _isLoading = false;
       });
     }
   }
@@ -111,7 +81,7 @@ class _SuraPageState extends State<SuraPage> {
   @override
   void dispose() {
     _bannerAd.dispose();
-    expandedIndices.clear(); // exit page -> collapse all
+    expandedIndices.clear();
     super.dispose();
   }
 
@@ -287,13 +257,12 @@ class _SuraPageState extends State<SuraPage> {
           ),
           if (_isBannerAdReady)
             SafeArea(
-              top: false, // সিস্টেম বার ঢেকে না যাওয়ার জন্য
+              top: false,
               child: Container(
-                width: double.infinity, // পুরো প্রস্থ
-                color: Colors.transparent,
+                width: double.infinity,
                 alignment: Alignment.center,
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width, // স্ক্রিন ফিল
+                  width: MediaQuery.of(context).size.width,
                   height: _bannerAd.size.height.toDouble(),
                   child: AdWidget(ad: _bannerAd),
                 ),

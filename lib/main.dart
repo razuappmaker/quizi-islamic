@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:islamicquiz/qiblah_page.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ import 'prayer_time_page.dart';
 import 'doya_page.dart';
 import 'namaj_amol.dart';
 import 'about_page.dart';
+import 'qiblah_page.dart';
 import 'contact_page.dart';
 import 'developer_page.dart';
 import 'sura_page.dart';
@@ -417,9 +419,11 @@ class _HomePageState extends State<HomePage> {
               _buildFeatureCard('সালাতের জিকির', Icons.psychology, NamajAmol()),
               _buildFeatureCard(
                 'ডিজিটাল তসবিহ',
-                Icons.psychology,
+                Icons.fingerprint,
                 TasbeehPage(),
               ),
+              _buildFeatureCard('কেবলা', Icons.explore, QiblaPage()),
+              // ✅ নতুন কার্ড
             ],
           ),
         ],

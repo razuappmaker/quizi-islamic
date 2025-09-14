@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'ad_helper.dart';
 
 class AllahName {
   final String arabic;
@@ -1006,34 +1007,41 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
 
   List<AllahName> filteredNames = [];
   final List<BannerAd?> _bannerAds = [];
+  BannerAd? _bottomBanner; // পেইজের নিচের ব্যানার
   TextEditingController searchController = TextEditingController();
 
-  // Font multipliers
   double bodyMultiplier = 1.0;
   double arabicMultiplier = 1.0;
   double banglaMultiplier = 1.0;
-
-  bool isBigFont = false; // বড় ফন্ট সিলেকশন চেক
+  bool isBigFont = false;
 
   @override
   void initState() {
     super.initState();
     filteredNames = List.from(allahNames);
 
-    int adCount = (allahNames.length / 5).ceil();
+    // AdMob initialize
+    AdHelper.initialize();
+
+    // প্রতি ৬টি আল্লাহর নামের পরে ব্যানার অ্যাড তৈরি এবং লোড করা
+    int adCount = (allahNames.length / 6)
+        .ceil(); // মোট কতটি অ্যাড লাগবে তা হিসাব করা
     for (int i = 0; i < adCount; i++) {
-      final banner = BannerAd(
-        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-        size: AdSize.banner,
-        request: const AdRequest(),
-        listener: BannerAdListener(
-          onAdFailedToLoad: (ad, error) {
-            ad.dispose();
-          },
-        ),
-      )..load();
-      _bannerAds.add(banner);
+      // অ্যাড তৈরি করা এবং লোড করা
+      AdHelper.createAdaptiveBannerAdWithFallback(context).then((banner) {
+        banner.load(); // ব্যানার লোড করা
+        _bannerAds.add(banner); // ব্যানার অ্যাড লিস্টে যোগ করা
+        setState(() {}); // UI আপডেট করা যাতে অ্যাড দেখায়
+      });
     }
+
+    // পেইজের নিচের স্থায়ী ব্যানার অ্যাড তৈরি
+    AdHelper.createAdaptiveBannerAdWithFallback(context).then((banner) {
+      banner.load(); // নিচের ব্যানার লোড করা
+      setState(() {
+        _bottomBanner = banner; // স্থায়ী ব্যানার ভেরিয়েবলে রাখা
+      });
+    });
   }
 
   @override
@@ -1041,13 +1049,14 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
     for (var ad in _bannerAds) {
       ad?.dispose();
     }
+    _bottomBanner?.dispose();
     searchController.dispose();
     super.dispose();
   }
 
   void _setFontSizeMultiplier(double multiplier) {
     setState(() {
-      bodyMultiplier = multiplier; // body texts বড় হবে
+      bodyMultiplier = multiplier;
       if (multiplier > 1.0) {
         isBigFont = true;
         arabicMultiplier = 1.5;
@@ -1062,7 +1071,7 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
 
   @override
   Widget build(BuildContext context) {
-    int totalItems = filteredNames.length + (filteredNames.length / 5).floor();
+    int totalItems = filteredNames.length + (filteredNames.length / 6).floor();
 
     return Scaffold(
       appBar: AppBar(
@@ -1088,168 +1097,202 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: totalItems,
-        itemBuilder: (context, index) {
-          if ((index + 1) % 6 == 0) {
-            int adIndex = ((index + 1) / 6).floor() - 1;
-            if (adIndex < _bannerAds.length && _bannerAds[adIndex] != null) {
-              return Container(
-                alignment: Alignment.center,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                width: _bannerAds[adIndex]!.size.width.toDouble(),
-                height: _bannerAds[adIndex]!.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAds[adIndex]!),
-              );
-            } else {
-              return const SizedBox.shrink();
-            }
-          }
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.only(bottom: 10),
+              itemCount: totalItems,
+              itemBuilder: (context, index) {
+                // প্রতি ৬ নামের পরে অ্যাড
+                if ((index + 1) % 6 == 0) {
+                  int adIndex = ((index + 1) / 6).floor() - 1;
+                  final banner = (adIndex < _bannerAds.length)
+                      ? _bannerAds[adIndex]
+                      : null;
 
-          int nameIndex = index - (index / 6).floor();
-          final name = filteredNames[nameIndex];
+                  if (banner != null &&
+                      banner.responseInfo != null &&
+                      banner.size != null) {
+                    return Container(
+                      alignment: Alignment.center,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      width: banner.size!.width.toDouble(),
+                      height: banner.size!.height.toDouble(),
+                      child: AdWidget(ad: banner),
+                    );
+                  } else {
+                    // অ্যাড লোড না হলে কিছুই দেখাবে না
+                    return const SizedBox.shrink();
+                  }
+                }
 
-          return Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            elevation: 4,
-            shadowColor: Colors.black26,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      // Arabic
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          name.arabic,
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: 24 * arabicMultiplier,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.teal[700],
-                          ),
-                        ),
-                      ),
+                // নিচের স্থায়ী ব্যানার
+                if (_bottomBanner != null &&
+                    _bottomBanner!.responseInfo != null &&
+                    _bottomBanner!.size != null)
+                  Container(
+                    alignment: Alignment.center,
+                    width: _bottomBanner!.size!.width.toDouble(),
+                    height: _bottomBanner!.size!.height.toDouble(),
+                    child: AdWidget(ad: _bottomBanner!),
+                  );
 
-                      // Bangla - কোনোভাবেই ভাঙবে না
-                      Expanded(
-                        flex: 2,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          // ফন্ট shrink করবে যাতে লাইন ভাঙে না
-                          child: Text(
-                            name.bangla,
-                            textAlign: TextAlign.center,
-                            softWrap: false,
-                            // line break না
-                            overflow: TextOverflow.ellipsis,
-                            // খুব লম্বা হলে ... দেখাবে
-                            style: TextStyle(
-                              fontSize: 20 * banglaMultiplier,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodyLarge!.color,
-                            ),
-                          ),
-                        ),
-                      ),
+                int nameIndex = index - (index / 6).floor();
+                final name = filteredNames[nameIndex];
 
-                      // English
-                      if (!isBigFont)
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            name.english,
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w600,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white70
-                                  : Colors.grey[800],
-                            ),
-                          ),
-                        ),
-                    ],
+                return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  SizedBox(height: 12 * bodyMultiplier),
-                  Divider(color: Theme.of(context).dividerColor, thickness: 1),
-                  SizedBox(height: 8 * bodyMultiplier),
-
-                  // অর্থ
-                  Text.rich(
-                    TextSpan(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  elevation: 4,
+                  shadowColor: Colors.black26,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
                       children: [
-                        TextSpan(
-                          text: "অর্থ (বাংলা): ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16 * bodyMultiplier,
-                            color: Theme.of(context).textTheme.bodyLarge!.color,
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Text(
+                                name.arabic,
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontSize: 24 * arabicMultiplier,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.teal[700],
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  name.bangla,
+                                  textAlign: TextAlign.center,
+                                  softWrap: false,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 20 * banglaMultiplier,
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge!.color,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            if (!isBigFont)
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  name.english,
+                                  textAlign: TextAlign.right,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white70
+                                        : Colors.grey[800],
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        SizedBox(height: 12 * bodyMultiplier),
+                        Divider(
+                          color: Theme.of(context).dividerColor,
+                          thickness: 1,
+                        ),
+                        SizedBox(height: 8 * bodyMultiplier),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "অর্থ (বাংলা): ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16 * bodyMultiplier,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.color,
+                                ),
+                              ),
+                              TextSpan(
+                                text: name.meaningBn,
+                                style: TextStyle(
+                                  fontSize: 16 * bodyMultiplier,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.color,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        TextSpan(
-                          text: name.meaningBn,
+                        SizedBox(height: 4 * bodyMultiplier),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Meaning (English): ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16 * bodyMultiplier,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.color,
+                                ),
+                              ),
+                              TextSpan(
+                                text: name.meaningEn,
+                                style: TextStyle(
+                                  fontSize: 16 * bodyMultiplier,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.color,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 8 * bodyMultiplier),
+                        Text(
+                          "ফজিলত: ${name.fazilatBn}",
                           style: TextStyle(
-                            fontSize: 16 * bodyMultiplier,
-                            color: Theme.of(context).textTheme.bodyLarge!.color,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15 * bodyMultiplier,
+                            fontStyle: FontStyle.italic,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white70
+                                : Colors.black87,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 4 * bodyMultiplier),
-
-                  // Meaning (English)
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Meaning (English): ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16 * bodyMultiplier,
-                            color: Theme.of(context).textTheme.bodyLarge!.color,
-                          ),
-                        ),
-                        TextSpan(
-                          text: name.meaningEn,
-                          style: TextStyle(
-                            fontSize: 16 * bodyMultiplier,
-                            color: Theme.of(context).textTheme.bodyLarge!.color,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 8 * bodyMultiplier),
-
-                  // ফজিলত
-                  Text(
-                    "ফজিলত: ${name.fazilatBn}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15 * bodyMultiplier,
-                      fontStyle: FontStyle.italic,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white70
-                          : Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
+          ),
+          if (_bottomBanner != null)
+            Container(
+              alignment: Alignment.center,
+              width: _bottomBanner!.size.width.toDouble(),
+              height: _bottomBanner!.size.height.toDouble(),
+              child: AdWidget(ad: _bottomBanner!),
+            ),
+        ],
       ),
     );
   }

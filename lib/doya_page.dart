@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'json_loader.dart'; // JsonLoader ইম্পোর্ট করুন
+import 'ad_helper.dart'; // AdHelper ইম্পোর্ট
+import 'json_loader.dart'; // JsonLoader ইম্পোর্ট
 
 class DoyaPage extends StatefulWidget {
   const DoyaPage({Key? key}) : super(key: key);
@@ -14,27 +15,28 @@ class _DoyaPageState extends State<DoyaPage> {
   List<Map<String, String>> dailyDoyas = [];
   List<Map<String, String>> filteredDoyas = [];
   bool _isSearching = false;
-  bool _isLoading = true; // লোডিং স্টেট যোগ করুন
+  bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
 
-  // Banner Ad
-  late BannerAd _bannerAd;
-  bool _isBannerAdReady = false;
+  // Bottom Banner
+  late BannerAd _bottomBannerAd;
+  bool _isBottomBannerAdReady = false;
 
   @override
   void initState() {
     super.initState();
-    _loadDoyaData(); // JSON ডেটা লোড করার মেথড কল করুন
+    _loadDoyaData();
 
-    // Banner Ad লোড
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Banner ID
-      size: AdSize.banner,
-      request: const AdRequest(),
+    // AdMob initialize
+    AdHelper.initialize();
+
+    // Bottom Banner Ad লোড
+    _bottomBannerAd = AdHelper.createBannerAd(
+      AdSize.banner,
       listener: BannerAdListener(
         onAdLoaded: (_) {
           setState(() {
-            _isBannerAdReady = true;
+            _isBottomBannerAdReady = true;
           });
         },
         onAdFailedToLoad: (ad, error) {
@@ -44,14 +46,12 @@ class _DoyaPageState extends State<DoyaPage> {
     )..load();
   }
 
-  // JSON ডেটা লোড করার মেথড
   Future<void> _loadDoyaData() async {
     try {
       final loadedData = await JsonLoader.loadJsonList(
         'assets/dailydoyas.json',
       );
 
-      // List<dynamic> কে List<Map<String, String>> এ কনভার্ট করুন
       final List<Map<String, String>> convertedData = loadedData
           .map<Map<String, String>>((item) {
             final Map<String, dynamic> dynamicItem = Map<String, dynamic>.from(
@@ -72,20 +72,15 @@ class _DoyaPageState extends State<DoyaPage> {
       print('Error loading doya data: $e');
       setState(() => _isLoading = false);
 
-      // Fallback ডেটা (যদি JSON লোড করতে ব্যর্থ হয়)
       setState(() {
         dailyDoyas = [
           {
             'title': 'বাসা থেকে বের হওয়ার দোয়া',
-            'bangla':
-                'বিসমিল্লাহি তাওয়াক্কালতু আলাল্লাহি, ওয়া লা হাওলা ওয়া লা কুওয়াতা ইল্লা বিল্লাহ।',
-            'arabic':
-                'بِسْمِ اللهِ تَوَكَّلْتُ عَلَى اللهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ',
-            'transliteration':
-                'বিসমিল্লাহি তাওয়াক্কালতু আলাল্লাহি, ওয়া লা হাওলা ওয়া লا কুওয়াতা ইল্লা বিল্লাহ।',
-            'meaning':
-                'আল্লাহর নামে বের হচ্ছি। আল্লাহর উপর ভরসা করলাম। আল্লাহর সাহায্য ছাড়া শক্তি ও ক্ষমতা নেই।',
-            'reference': 'আবু দাউদ: 5095; তিরমিযি: 3426; নাসাঈ: 5539',
+            'bangla': 'বিসমিল্লাহি তাওয়াক্কালতু আলাল্লাহি...',
+            'arabic': 'بِسْمِ اللهِ تَوَكَّلْتُ عَلَى اللهِ...',
+            'transliteration': 'বিসমিল্লাহি তাওয়াক্কালতু আলাল্লাহি...',
+            'meaning': 'আল্লাহর নামে বের হচ্ছি...',
+            'reference': 'আবু দাউদ: 5095; তিরমিযি: 3426;',
           },
         ];
         filteredDoyas = dailyDoyas;
@@ -96,16 +91,12 @@ class _DoyaPageState extends State<DoyaPage> {
 
   @override
   void dispose() {
-    _bannerAd.dispose();
+    _bottomBannerAd.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
-  void _startSearch() {
-    setState(() {
-      _isSearching = true;
-    });
-  }
+  void _startSearch() => setState(() => _isSearching = true);
 
   void _stopSearch() {
     setState(() {
@@ -118,13 +109,10 @@ class _DoyaPageState extends State<DoyaPage> {
   void _searchDoya(String query) {
     final results = dailyDoyas.where((doya) {
       final titleLower = doya['title']!.toLowerCase();
-      final searchLower = query.toLowerCase();
-      return titleLower.contains(searchLower);
+      return titleLower.contains(query.toLowerCase());
     }).toList();
 
-    setState(() {
-      filteredDoyas = results;
-    });
+    setState(() => filteredDoyas = results);
   }
 
   void _showDoyaDetails(Map<String, String> doya) {
@@ -155,11 +143,7 @@ class _DoyaPageState extends State<DoyaPage> {
             children: [
               SelectableText(
                 duaArabic,
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontFamily: 'Amiri',
-                  color: Colors.black,
-                ),
+                style: const TextStyle(fontSize: 26, fontFamily: 'Amiri'),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),
@@ -168,14 +152,13 @@ class _DoyaPageState extends State<DoyaPage> {
                 style: const TextStyle(
                   fontSize: 22,
                   fontStyle: FontStyle.italic,
-                  color: Colors.black87,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),
               Text(
                 "অর্থ: $duaMeaning",
-                style: const TextStyle(fontSize: 20, color: Colors.black),
+                style: const TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),
@@ -202,24 +185,66 @@ class _DoyaPageState extends State<DoyaPage> {
             icon: const Icon(Icons.share, color: Colors.blue),
             label: Text(
               'শেয়ার',
-              style: TextStyle(
-                color: isDark ? Colors.black : Colors.blue,
-                fontSize: 18,
-              ),
+              style: TextStyle(color: isDark ? Colors.black : Colors.blue),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'বন্ধ করুন',
-              style: TextStyle(
-                color: isDark ? Colors.black : Colors.green,
-                fontSize: 18,
-              ),
+              style: TextStyle(color: isDark ? Colors.black : Colors.green),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDoyaCard(Map<String, String> doya) {
+    return Card(
+      elevation: 5,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 15,
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              doya['title'] ?? '',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Colors.green,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(doya['bangla'] ?? '', style: const TextStyle(fontSize: 18)),
+          ],
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.green),
+        onTap: () => _showDoyaDetails(doya),
+      ),
+    );
+  }
+
+  Widget _buildInlineBanner() {
+    final BannerAd inlineAd = AdHelper.createBannerAd(
+      AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (_) => setState(() {}),
+        onAdFailedToLoad: (ad, error) => ad.dispose(),
+      ),
+    )..load();
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      height: inlineAd.size.height.toDouble(),
+      alignment: Alignment.center,
+      child: AdWidget(ad: inlineAd),
     );
   }
 
@@ -245,7 +270,6 @@ class _DoyaPageState extends State<DoyaPage> {
                 cursorColor: Colors.white,
                 onChanged: _searchDoya,
               ),
-
         actions: [
           !_isSearching
               ? IconButton(
@@ -267,7 +291,7 @@ class _DoyaPageState extends State<DoyaPage> {
                 ? const Center(
                     child: Text(
                       'কোন দোয়া পাওয়া যায়নি।',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                      style: TextStyle(fontSize: 18),
                     ),
                   )
                 : ListView.builder(
@@ -275,67 +299,26 @@ class _DoyaPageState extends State<DoyaPage> {
                     itemCount: filteredDoyas.length,
                     itemBuilder: (context, index) {
                       final doya = filteredDoyas[index];
-                      return Card(
-                        elevation: 5,
-                        margin: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 5,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        shadowColor: Colors.greenAccent,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 15,
-                          ),
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                doya['title'] ?? '',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                doya['bangla'] ?? '',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                          trailing: const Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.green,
-                          ),
-                          onTap: () => _showDoyaDetails(doya),
-                        ),
-                      );
+                      List<Widget> widgets = [_buildDoyaCard(doya)];
+
+                      // প্রতি ৫ টা দোয়ার পর ব্যানার অ্যাড
+                      if ((index + 1) % 5 == 0) {
+                        widgets.add(_buildInlineBanner());
+                      }
+
+                      return Column(children: widgets);
                     },
                   ),
           ),
         ],
       ),
-      bottomNavigationBar: _isBannerAdReady
+      bottomNavigationBar: _isBottomBannerAdReady
           ? SafeArea(
-              top: false,
               child: Container(
                 width: double.infinity,
-                height: _bannerAd.size.height.toDouble(),
-                color: Colors.white,
+                height: _bottomBannerAd.size.height.toDouble(),
                 alignment: Alignment.center,
-                child: AdWidget(ad: _bannerAd),
+                child: AdWidget(ad: _bottomBannerAd),
               ),
             )
           : null,
