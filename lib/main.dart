@@ -127,6 +127,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  //----------------------------------
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -136,7 +137,6 @@ class _HomePageState extends State<HomePage> {
       onWillPop: () async {
         bool exitConfirmed = await showExitConfirmationDialog(context);
         if (exitConfirmed) {
-          //await AdHelper.showInterstitialAd(adContext: "Exit App");
           return true;
         }
         return false;
@@ -146,8 +146,11 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: const Text('ইসলামিক কুইজ অনলাইন'),
           centerTitle: true,
-          backgroundColor: Colors.green[800],
-          elevation: 0,
+          backgroundColor: isDarkMode ? Colors.green[900] : Colors.green[800],
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+          ),
           leading: IconButton(
             icon: Icon(Icons.menu, color: Colors.white),
             onPressed: () => _scaffoldKey.currentState?.openDrawer(),
@@ -172,79 +175,98 @@ class _HomePageState extends State<HomePage> {
                   : [Colors.green[50]!, Colors.green[100]!],
             ),
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                /// ---------------- Marquee ----------------
-                Container(
-                  color: Colors.green.shade100.withOpacity(0.7),
-                  height: 40,
-                  child: Center(
-                    child: Marquee(
-                      text:
-                          "📖 ইসলামই একমাত্র সত্য ধর্ম (আলে ইমরান: ১৯) 📖 আল্লাহকে ভয় করো ও সত্যবাদীদের সাথে থাকো (তাওবা: ১১৯) 📖 নামাজ অশ্লীলতা ও মন্দ কাজ থেকে বিরত রাখে (আনকাবুত: ৪৫) 📖 হে আমার প্রতিপালক! আমার জ্ঞানকে বৃদ্ধি করে দিন (ত্ব-হা: ১১৪) 📖 সৎকাজে প্রতিযোগিতা করো (বাকারাহ: ১৪৮) 📖 আল্লাহর স্মরণে হৃদয় শান্তি পায় (রা‘দ: ২৮)",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                      ),
-                      scrollAxis: Axis.horizontal,
-                      blankSpace: 50.0,
-                      velocity: 50.0,
-                      pauseAfterRound: Duration(seconds: 1),
-                      startPadding: 10.0,
+          child: Column(
+            children: [
+              /// ---------------- Marquee ----------------
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? Colors.green[800]!.withOpacity(0.8)
+                      : Colors.green.shade100.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
                     ),
+                  ],
+                ),
+                height: 40,
+                child: Center(
+                  child: Marquee(
+                    text:
+                        "📖 ইসলামই একমাত্র সত্য ধর্ম (আলে ইমরান: ১৯) 📖 আল্লাহকে ভয় করো ও সত্যবাদীদের সাথে থাকো (তাওবা: ১১৯) 📖 নামাজ অশ্লীলতা ও মন্দ কাজ থেকে বিরত রাখে (আনকাবুত: ৪৫) 📖 হে আমার প্রতিপালক! আমার জ্ঞানকে বৃদ্ধি করে দিন (ত্ব-হা: ১১৪) 📖 সৎকাজে প্রতিযোগিতা করো (বাকারাহ: ১৪৮) 📖 আল্লাহর স্মরণে হৃদয় শান্তি পায় (রা‘দ: ২৮)",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: isDarkMode ? Colors.white : Colors.green[900],
+                    ),
+                    scrollAxis: Axis.horizontal,
+                    blankSpace: 50.0,
+                    velocity: 50.0,
+                    pauseAfterRound: Duration(seconds: 1),
+                    startPadding: 10.0,
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 10),
-
-                /// ---------------- Image Slider ----------------
-                Container(
-                  height: 180,
-                  margin: EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 6,
-                        offset: Offset(0, 3),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: Column(
+                    children: [
+                      /// ---------------- Image Slider ----------------
+                      Container(
+                        height: 180,
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: AutoImageSlider(
+                            imageUrls: [
+                              'assets/images/slider1.png',
+                              'assets/images/slider2.png',
+                              'assets/images/slider3.png',
+                              'assets/images/slider4.png',
+                              'assets/images/slider5.png',
+                            ],
+                          ),
+                        ),
                       ),
+
+                      /// ---------------- Category Selector ----------------
+                      _buildCategorySelector(isDarkMode),
+
+                      SizedBox(height: 20),
+
+                      /// ---------------- Quick Access ----------------
+                      _buildQuickAccess(isDarkMode),
+
+                      SizedBox(height: 20),
+
+                      /// ---------------- Additional Features ----------------
+                      _buildAdditionalFeatures(isDarkMode),
+
+                      SizedBox(height: 20),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: AutoImageSlider(
-                      imageUrls: [
-                        'assets/images/slider1.png',
-                        'assets/images/slider2.png',
-                        'assets/images/slider3.png',
-                        'assets/images/slider4.png',
-                        'assets/images/slider5.png',
-                      ],
-                    ),
-                  ),
                 ),
-
-                const SizedBox(height: 20),
-
-                /// ---------------- Category Selector ----------------
-                _buildCategorySelector(isDarkMode),
-
-                const SizedBox(height: 20),
-
-                /// ---------------- Quick Access ----------------
-                _buildQuickAccess(isDarkMode),
-
-                const SizedBox(height: 20),
-
-                /// ---------------- Additional Features ----------------
-                _buildAdditionalFeatures(isDarkMode),
-
-                const SizedBox(height: 20),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         bottomNavigationBar: Column(
@@ -258,10 +280,9 @@ class _HomePageState extends State<HomePage> {
                 child: AdWidget(ad: _bannerAd!),
               )
             else
-              const SizedBox.shrink(), //  কোনো ফাঁকা জায়গা থাকবে না
+              const SizedBox.shrink(),
 
             _buildBottomNavBar(),
-            // তোমার বটম নেভিগেশন
           ],
         ),
       ),
@@ -269,71 +290,75 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// ---------------- Category Selector ----------------
+  /// ---------------- Category Selector ----------------
   Widget _buildCategorySelector(bool isDarkMode) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isDarkMode ? Colors.green[900] : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 8,
-              offset: Offset(0, 4),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.green[900] : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'বিষয় নির্বাচন করুন',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.green[800],
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'বিষয় নির্বাচন করুন',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.green[800],
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 16),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.green[800] : Colors.grey[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDarkMode ? Colors.green[600]! : Colors.green.shade300,
+                width: 1.5,
               ),
-              textAlign: TextAlign.center,
             ),
-            SizedBox(height: 12),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: isDarkMode ? Colors.green[800] : Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.green.shade300, width: 1.2),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: selectedCategory,
-                  hint: Text(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: selectedCategory,
+                hint: Padding(
+                  padding: EdgeInsets.only(left: 8),
+                  child: Text(
                     'বিষয় বেছে নিন',
                     style: TextStyle(
                       fontSize: 16,
                       color: isDarkMode ? Colors.white70 : Colors.black87,
                     ),
                   ),
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  icon: Icon(Icons.arrow_drop_down, color: Colors.green),
-                  isExpanded: true,
-                  dropdownColor: isDarkMode ? Colors.green[800] : Colors.white,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedCategory = newValue;
-                    });
-                  },
-                  items: categories.map((String category) {
-                    return DropdownMenuItem<String>(
-                      value: category,
+                ),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+                icon: Icon(Icons.arrow_drop_down, color: Colors.green),
+                isExpanded: true,
+                dropdownColor: isDarkMode ? Colors.green[800] : Colors.white,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedCategory = newValue;
+                  });
+                },
+                items: categories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
                       child: Row(
                         children: [
                           Icon(Icons.bookmark, size: 18, color: Colors.green),
-                          SizedBox(width: 8),
+                          SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               category,
@@ -342,71 +367,44 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                    );
-                  }).toList(),
-                ),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
-            SizedBox(height: 16),
-            SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                onPressed: selectedCategory == null
-                    ? null
-                    : () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                MCQPage(category: selectedCategory!),
-                          ),
-                        );
-                      },
-                child: Text(
-                  'কুইজ শুরু করুন',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 4,
-                ),
+          ),
+          SizedBox(height: 16),
+          SizedBox(
+            height: 50,
+            child: ElevatedButton.icon(
+              onPressed: selectedCategory == null
+                  ? null
+                  : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              MCQPage(category: selectedCategory!),
+                        ),
+                      );
+                    },
+              icon: Icon(Icons.play_arrow, size: 24),
+              label: Text(
+                'কুইজ শুরু করুন',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              // যদি mcq page এর ভেতর অ্যাড ঠিকমত কাজ করে তাইলে এই কমেন্ট অঙ্ঘশ বাদ দিব
-              /*child: ElevatedButton(
-                onPressed: selectedCategory == null
-                    ? null
-                    : () async {
-                        await AdHelper.showInterstitialAd(
-                          adContext: "Start Quiz",
-                        );
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                MCQPage(category: selectedCategory!),
-                          ),
-                        );
-                      },
-                child: Text(
-                  'কুইজ শুরু করুন',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[700],
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 4,
-                ),
-              ),*/
+                elevation: 4,
+                shadowColor: Colors.green.withOpacity(0.5),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -459,30 +457,38 @@ class _HomePageState extends State<HomePage> {
 
   /// ---------------- Additional Features ----------------
   Widget _buildAdditionalFeatures(bool isDarkMode) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.green[900] : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'অন্যান্য ফিচার',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: isDarkMode ? Colors.white : Colors.green[800],
             ),
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: _buildSmallButton('আল্লাহর নামসমূহ', NameOfAllahPage()),
               ),
-              SizedBox(width: 8),
+              SizedBox(width: 12),
               Expanded(child: _buildSmallButton('কালিমাহ', KalemaPage())),
             ],
           ),
-          SizedBox(height: 8),
+          SizedBox(height: 12),
           _buildPrivacyPolicyButton(),
         ],
       ),
@@ -499,34 +505,52 @@ class _HomePageState extends State<HomePage> {
       color: isDark ? Colors.green[800] : Colors.white,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () async {
-          //await AdHelper.showInterstitialAd(adContext: "Feature $title");
+        onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => page),
           );
         },
-        child: Padding(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 30,
-                color: isDark ? Colors.white : Colors.green[700],
-              ),
-              SizedBox(height: 8),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : Colors.black87,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [Colors.green[800]!, Colors.green[700]!]
+                  : [Colors.white, Colors.green[50]!],
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.green[900] : Colors.green[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 24,
+                    color: isDark ? Colors.white : Colors.green[700],
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 12),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -536,17 +560,17 @@ class _HomePageState extends State<HomePage> {
   /// ---------------- Small Button ----------------
   Widget _buildSmallButton(String title, Widget page) {
     return SizedBox(
-      height: 45,
+      height: 48,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.green[700],
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
+          elevation: 2,
         ),
-        onPressed: () async {
-          //await AdHelper.showInterstitialAd(adContext: "SmallButton $title"); // If you want to add show here
+        onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => page),
@@ -564,14 +588,15 @@ class _HomePageState extends State<HomePage> {
   Widget _buildPrivacyPolicyButton() {
     return SizedBox(
       width: double.infinity,
-      height: 45,
-      child: ElevatedButton(
+      height: 48,
+      child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.green[700],
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
+          elevation: 2,
         ),
         onPressed: () async {
           final Uri uri = Uri.parse(
@@ -585,7 +610,8 @@ class _HomePageState extends State<HomePage> {
             );
           }
         },
-        child: Text(
+        icon: Icon(Icons.lock, size: 18),
+        label: Text(
           'Privacy Policy',
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
@@ -602,39 +628,41 @@ class _HomePageState extends State<HomePage> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          DrawerHeader(
+          Container(
+            height: 200,
             decoration: BoxDecoration(
               color: Colors.green[800],
               image: DecorationImage(
                 image: AssetImage('assets/images/mosque_background.png'),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.2),
+                  Colors.black.withOpacity(0.3),
                   BlendMode.darken,
                 ),
               ),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(
                   backgroundColor: Colors.white,
-                  radius: 25,
+                  radius: 30,
                   child: Icon(
                     Icons.menu_book,
-                    size: 30,
+                    size: 36,
                     color: Colors.green[800],
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 16),
                 Text(
                   "ইসলামিক কুইজ অনলাইন",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                SizedBox(height: 4),
                 Text(
                   "সঠিক জ্ঞানের সাথী",
                   style: TextStyle(color: Colors.white70, fontSize: 14),
@@ -657,7 +685,7 @@ class _HomePageState extends State<HomePage> {
             null,
             url: 'https://sites.google.com/view/islamicquize/home',
           ),
-          Divider(color: Colors.green.shade200),
+          Divider(color: Colors.green.shade200, indent: 16, endIndent: 16),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
@@ -670,6 +698,7 @@ class _HomePageState extends State<HomePage> {
                   value: themeProvider.isDarkMode,
                   onChanged: (value) => themeProvider.toggleTheme(value),
                   activeColor: Colors.green,
+                  activeTrackColor: Colors.green[300],
                 ),
               ],
             ),
@@ -697,6 +726,11 @@ class _HomePageState extends State<HomePage> {
           fontWeight: FontWeight.w500,
           color: isDark ? Colors.white : Colors.black87,
         ),
+      ),
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: Colors.green[700],
       ),
       onTap: () async {
         Navigator.pop(context);
@@ -733,17 +767,21 @@ class _HomePageState extends State<HomePage> {
             offset: Offset(0, -2),
           ),
         ],
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildBottomNavItem(Icons.home, 'হোম', 0),
-            _buildBottomNavItem(Icons.star_rate, 'রেটিং', 1),
-            _buildBottomNavItem(Icons.apps, 'অন্যান্য অ্যাপ', 2),
-            _buildBottomNavItem(Icons.share, 'শেয়ার', 3),
-          ],
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildBottomNavItem(Icons.home, 'হোম', 0),
+              _buildBottomNavItem(Icons.star, 'রেটিং', 1),
+              _buildBottomNavItem(Icons.apps, 'অন্যান্য', 2),
+              _buildBottomNavItem(Icons.share, 'শেয়ার', 3),
+            ],
+          ),
         ),
       ),
     );
@@ -755,23 +793,30 @@ class _HomePageState extends State<HomePage> {
 
     return GestureDetector(
       onTap: () => _onBottomNavItemTapped(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isDark ? Colors.green[200] : Colors.green[700],
-            size: 24,
-          ),
-          SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.transparent,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
               color: isDark ? Colors.green[200] : Colors.green[700],
+              size: 24,
             ),
-          ),
-        ],
+            SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? Colors.green[200] : Colors.green[700],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
