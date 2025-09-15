@@ -123,17 +123,23 @@ class _DoyaPageState extends State<DoyaPage> {
     final String duaReference = doya['reference'] ?? '';
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // ডার্ক মোডের জন্য কালার সেট
+    final backgroundColor = isDark ? Colors.grey[900] : Colors.green[50];
+    final textColor = isDark ? Colors.white : Colors.black;
+    final titleColor = isDark ? Colors.green[200] : Colors.green;
+    final referenceColor = isDark ? Colors.purple[200] : Colors.deepPurple;
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.green[50],
+        backgroundColor: backgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: Text(
           duaTitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
-            color: Colors.green,
+            color: titleColor,
           ),
           textAlign: TextAlign.center,
         ),
@@ -143,31 +149,36 @@ class _DoyaPageState extends State<DoyaPage> {
             children: [
               SelectableText(
                 duaArabic,
-                style: const TextStyle(fontSize: 26, fontFamily: 'Amiri'),
+                style: TextStyle(
+                  fontSize: 26,
+                  fontFamily: 'Amiri',
+                  color: textColor,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),
               Text(
                 duaTransliteration,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontStyle: FontStyle.italic,
+                  color: textColor,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),
               Text(
                 "অর্থ: $duaMeaning",
-                style: const TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 20, color: textColor),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),
               if (duaReference.isNotEmpty)
                 Text(
                   "রেফারেন্স: $duaReference",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
-                    color: Colors.deepPurple,
+                    color: referenceColor,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -182,17 +193,16 @@ class _DoyaPageState extends State<DoyaPage> {
                 '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\nঅর্থ: $duaMeaning\n\nরেফারেন্স: $duaReference',
               );
             },
-            icon: const Icon(Icons.share, color: Colors.blue),
-            label: Text(
-              'শেয়ার',
-              style: TextStyle(color: isDark ? Colors.black : Colors.blue),
-            ),
+            icon: Icon(Icons.share, color: Colors.blue),
+            label: Text('শেয়ার', style: TextStyle(color: Colors.blue)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'বন্ধ করুন',
-              style: TextStyle(color: isDark ? Colors.black : Colors.green),
+              style: TextStyle(
+                color: isDark ? Colors.green[200] : Colors.green,
+              ),
             ),
           ),
         ],

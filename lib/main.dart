@@ -1,3 +1,5 @@
+// Main.dart with Responsive 100 %
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -13,7 +15,6 @@ import 'prayer_time_page.dart';
 import 'doya_page.dart';
 import 'namaj_amol.dart';
 import 'about_page.dart';
-import 'qiblah_page.dart';
 import 'contact_page.dart';
 import 'developer_page.dart';
 import 'sura_page.dart';
@@ -23,6 +24,9 @@ import 'utils.dart';
 import 'ad_helper.dart'; // ✅ AdHelper
 import 'tasbeeh_page.dart';
 import 'screens/splash_screen.dart';
+import '../widgets/responsive_widgets.dart';
+import '../utils/size_config.dart';
+import 'providers/theme_provider.dart'; // নতুন লাইন যোগ করুন
 
 /// -------------------- Theme Provider --------------------
 class ThemeProvider extends ChangeNotifier {
@@ -47,9 +51,11 @@ void main() async {
   );
 }
 
+// main.dart এ MyApp ক্লাস
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // ThemeProvider এখন context থেকে access করা যাবে
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
@@ -67,7 +73,13 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(backgroundColor: Colors.green[900]),
         fontFamily: 'HindSiliguri',
       ),
-      home: SplashScreen(),
+      home: Builder(
+        builder: (context) {
+          // SizeConfig init করুন
+          SizeConfig.init(context);
+          return SplashScreen();
+        },
+      ),
     );
   }
 }
@@ -104,6 +116,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    //WidgetsBinding.instance.addPostFrameCallback((_) {
+    // if (mounted) {
+    //  SizeConfig.init(context);
+    //}
+    //});
     _loadBannerAd(); // ✅ HomePage লোড হলে ব্যানার অ্যাড লোড হবে
     AdHelper.loadInterstitialAd(); // ✅ Interstitial আগে থেকে লোড রাখা হবে
   }
@@ -179,12 +196,17 @@ class _HomePageState extends State<HomePage> {
             children: [
               /// ---------------- Marquee ----------------
               Container(
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                margin: EdgeInsets.symmetric(
+                  vertical: SizeConfig.proportionalHeight(6),
+                  horizontal: SizeConfig.proportionalWidth(12),
+                ),
                 decoration: BoxDecoration(
                   color: isDarkMode
                       ? Colors.green[800]!.withOpacity(0.8)
                       : Colors.green.shade100.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(
+                    SizeConfig.proportionalWidth(8),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black12,
@@ -193,19 +215,19 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                height: 40,
+                height: SizeConfig.proportionalHeight(36),
                 child: Center(
                   child: Marquee(
                     text:
                         "📖 ইসলামই একমাত্র সত্য ধর্ম (আলে ইমরান: ১৯) 📖 আল্লাহকে ভয় করো ও সত্যবাদীদের সাথে থাকো (তাওবা: ১১৯) 📖 নামাজ অশ্লীলতা ও মন্দ কাজ থেকে বিরত রাখে (আনকাবুত: ৪৫) 📖 হে আমার প্রতিপালক! আমার জ্ঞানকে বৃদ্ধি করে দিন (ত্ব-হা: ১১৪) 📖 সৎকাজে প্রতিযোগিতা করো (বাকারাহ: ১৪৮) 📖 আল্লাহর স্মরণে হৃদয় শান্তি পায় (রা‘দ: ২৮)",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: SizeConfig.proportionalFontSize(14),
                       fontWeight: FontWeight.w500,
                       color: isDarkMode ? Colors.white : Colors.green[900],
                     ),
                     scrollAxis: Axis.horizontal,
-                    blankSpace: 50.0,
-                    velocity: 50.0,
+                    blankSpace: 40.0,
+                    velocity: 40.0,
                     pauseAfterRound: Duration(seconds: 1),
                     startPadding: 10.0,
                   ),
@@ -214,28 +236,32 @@ class _HomePageState extends State<HomePage> {
 
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.only(bottom: 16),
+                  padding: EdgeInsets.only(bottom: 8),
                   child: Column(
                     children: [
                       /// ---------------- Image Slider ----------------
                       Container(
-                        height: 180,
+                        height: SizeConfig.proportionalHeight(140),
                         margin: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                          horizontal: SizeConfig.proportionalWidth(16),
+                          vertical: SizeConfig.proportionalHeight(8),
                         ),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(
+                            SizeConfig.proportionalWidth(12),
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              blurRadius: 8,
-                              offset: Offset(0, 4),
+                              blurRadius: 6,
+                              offset: Offset(0, 3),
                             ),
                           ],
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(
+                            SizeConfig.proportionalWidth(12),
+                          ),
                           child: AutoImageSlider(
                             imageUrls: [
                               'assets/images/slider1.png',
@@ -251,17 +277,17 @@ class _HomePageState extends State<HomePage> {
                       /// ---------------- Category Selector ----------------
                       _buildCategorySelector(isDarkMode),
 
-                      SizedBox(height: 20),
+                      SizedBox(height: 16),
 
                       /// ---------------- Quick Access ----------------
                       _buildQuickAccess(isDarkMode),
 
-                      SizedBox(height: 20),
+                      SizedBox(height: 16),
 
                       /// ---------------- Additional Features ----------------
                       _buildAdditionalFeatures(isDarkMode),
 
-                      SizedBox(height: 20),
+                      SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -290,16 +316,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// ---------------- Category Selector ----------------
-  /// ---------------- Category Selector ----------------
   Widget _buildCategorySelector(bool isDarkMode) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      padding: EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(
+        horizontal: SizeConfig.proportionalWidth(16),
+      ),
+      padding: EdgeInsets.all(SizeConfig.proportionalWidth(12)),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.green[900] : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(12)),
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
         ],
       ),
       child: Column(
@@ -308,18 +335,22 @@ class _HomePageState extends State<HomePage> {
           Text(
             'বিষয় নির্বাচন করুন',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isDarkMode ? Colors.white : Colors.green[800],
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 10),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 12),
+            padding: EdgeInsets.symmetric(
+              horizontal: SizeConfig.proportionalWidth(10),
+            ),
             decoration: BoxDecoration(
               color: isDarkMode ? Colors.green[800] : Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(
+                SizeConfig.proportionalWidth(10),
+              ),
               border: Border.all(
                 color: isDarkMode ? Colors.green[600]! : Colors.green.shade300,
                 width: 1.5,
@@ -329,20 +360,26 @@ class _HomePageState extends State<HomePage> {
               child: DropdownButton<String>(
                 value: selectedCategory,
                 hint: Padding(
-                  padding: EdgeInsets.only(left: 8),
+                  padding: EdgeInsets.only(
+                    left: SizeConfig.proportionalWidth(8),
+                  ),
                   child: Text(
                     'বিষয় বেছে নিন',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: SizeConfig.proportionalFontSize(14),
                       color: isDarkMode ? Colors.white70 : Colors.black87,
                     ),
                   ),
                 ),
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: SizeConfig.proportionalFontSize(14),
                   color: isDarkMode ? Colors.white : Colors.black,
                 ),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.green),
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.green,
+                  size: 24,
+                ),
                 isExpanded: true,
                 dropdownColor: isDarkMode ? Colors.green[800] : Colors.white,
                 onChanged: (String? newValue) {
@@ -354,15 +391,24 @@ class _HomePageState extends State<HomePage> {
                   return DropdownMenuItem<String>(
                     value: category,
                     child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8),
+                      padding: EdgeInsets.symmetric(
+                        vertical: SizeConfig.proportionalHeight(6),
+                      ),
                       child: Row(
                         children: [
-                          Icon(Icons.bookmark, size: 18, color: Colors.green),
-                          SizedBox(width: 12),
+                          Icon(
+                            Icons.bookmark,
+                            size: SizeConfig.proportionalFontSize(16),
+                            color: Colors.green,
+                          ),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               category,
-                              style: TextStyle(fontSize: 15),
+                              style: TextStyle(
+                                fontSize: SizeConfig.proportionalFontSize(13),
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -373,9 +419,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 12),
           SizedBox(
-            height: 50,
+            height: SizeConfig.proportionalHeight(44),
             child: ElevatedButton.icon(
               onPressed: selectedCategory == null
                   ? null
@@ -388,19 +434,27 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     },
-              icon: Icon(Icons.play_arrow, size: 24),
+              icon: Icon(
+                Icons.play_arrow,
+                size: SizeConfig.proportionalFontSize(20),
+              ),
               label: Text(
                 'কুইজ শুরু করুন',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: SizeConfig.proportionalFontSize(14),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green[700],
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(
+                    SizeConfig.proportionalWidth(10),
+                  ),
                 ),
-                elevation: 4,
-                shadowColor: Colors.green.withOpacity(0.5),
+                elevation: 3,
+                shadowColor: Colors.green.withOpacity(0.4),
               ),
             ),
           ),
@@ -417,29 +471,29 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'দ্রুত অ্যাক্সেস',
+            'ইবাদাত ও দোয়া',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isDarkMode ? Colors.white : Colors.green[800],
             ),
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 10),
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.6,
+            mainAxisSpacing: SizeConfig.proportionalHeight(12),
+            crossAxisSpacing: SizeConfig.proportionalWidth(12),
+            childAspectRatio: 1.2,
             children: [
-              _buildFeatureCard('১৬টি ছোট সূরা', Icons.book, SuraPage()),
-              _buildFeatureCard('দৈনন্দিন দোয়া', Icons.lightbulb, DoyaPage()),
               _buildFeatureCard(
                 'নামাজের সময়',
-                Icons.access_time,
+                Icons.access_alarm,
                 PrayerTimePage(),
               ),
+              _buildFeatureCard('১৬টি ছোট সূরা', Icons.menu_book, SuraPage()),
+              _buildFeatureCard('দৈনন্দিন দোয়া', Icons.lightbulb, DoyaPage()),
               _buildFeatureCard('সালাতের জিকির', Icons.psychology, NamajAmol()),
               _buildFeatureCard(
                 'ডিজিটাল তসবিহ',
@@ -447,7 +501,6 @@ class _HomePageState extends State<HomePage> {
                 TasbeehPage(),
               ),
               _buildFeatureCard('কেবলা', Icons.explore, QiblaPage()),
-              // ✅ নতুন কার্ড
             ],
           ),
         ],
@@ -459,36 +512,36 @@ class _HomePageState extends State<HomePage> {
   Widget _buildAdditionalFeatures(bool isDarkMode) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16),
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.green[900] : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'অন্যান্য ফিচার',
+            'ইসলামী জ্ঞান',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isDarkMode ? Colors.white : Colors.green[800],
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: _buildSmallButton('আল্লাহর নামসমূহ', NameOfAllahPage()),
               ),
-              SizedBox(width: 12),
+              SizedBox(width: 10),
               Expanded(child: _buildSmallButton('কালিমাহ', KalemaPage())),
             ],
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 10),
           _buildPrivacyPolicyButton(),
         ],
       ),
@@ -496,15 +549,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// ---------------- Feature Card ----------------
+  // Feature Card কে রেসপনসিভ করুন
   Widget _buildFeatureCard(String title, IconData icon, Widget page) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(12)),
+      ),
       color: isDark ? Colors.green[800] : Colors.white,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(12)),
         onTap: () {
           Navigator.push(
             context,
@@ -513,7 +569,9 @@ class _HomePageState extends State<HomePage> {
         },
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(
+              SizeConfig.proportionalWidth(12),
+            ),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -523,30 +581,35 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.all(12),
+            padding: EdgeInsets.all(SizeConfig.proportionalWidth(12)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(SizeConfig.proportionalWidth(6)),
                   decoration: BoxDecoration(
                     color: isDark ? Colors.green[900] : Colors.green[100],
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     icon,
-                    size: 24,
+                    size: SizeConfig.proportionalFontSize(20),
                     color: isDark ? Colors.white : Colors.green[700],
                   ),
                 ),
-                SizedBox(height: 12),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : Colors.black87,
+                SizedBox(height: SizeConfig.proportionalHeight(8)),
+                Flexible(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: SizeConfig.proportionalFontSize(12),
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -610,9 +673,11 @@ class _HomePageState extends State<HomePage> {
             );
           }
         },
-        icon: Icon(Icons.lock, size: 18),
+        //icon: Icon(Icons.lock, size: 18),
+        icon: Icon(Icons.directions_run, size: 18),
         label: Text(
-          'Privacy Policy',
+          //'Privacy Policy',
+          'হজ্ব এবং ওমরা গাইড',
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ),

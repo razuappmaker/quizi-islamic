@@ -373,14 +373,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
-  Widget prayerRow(String prayerName, String time) {
+  // ডিলিট করবো না ====== যদি নামাজের টাইম নরমাল চাই নিচের এই সেকশন নিব ।  নিচের ২ টা হেল্পার বাদ দিব । নিচে - কমেন্ট করা আছে ----------ডিলিট করবো না --------------
+  // =============================Dont Delet ==========Be cearfull==============
+
+  /*  Widget prayerRow(String prayerName, String time) {
     return FutureBuilder<bool>(
       future: SharedPreferences.getInstance().then(
         (prefs) => prefs.getBool("azan_sound_$prayerName") ?? true,
       ),
       builder: (context, snapshot) {
         bool enabled = snapshot.data ?? true;
-
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
           decoration: BoxDecoration(
@@ -399,6 +401,10 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             ],
           ),
           child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -408,13 +414,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
               child: Icon(
                 Icons.access_time,
                 color: Colors.green.shade700,
-                size: 24,
+                size: 22,
               ),
             ),
             title: Text(
               prayerName,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 17,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
               ),
@@ -422,13 +428,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             subtitle: Text(
               formatTimeTo12Hour(time),
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 color: Colors.grey.shade700,
                 fontWeight: FontWeight.w500,
               ),
             ),
             trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               decoration: BoxDecoration(
                 color: Colors.green.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
@@ -439,18 +445,119 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   Text(
                     "আজান",
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: Colors.green.shade800,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Switch(
-                    value: enabled,
-                    activeColor: Colors.green,
-                    inactiveThumbColor: Colors.grey.shade400,
-                    inactiveTrackColor: Colors.grey.shade300,
-                    onChanged: (value) => _setAzanEnabled(prayerName, value),
+                  Transform.scale(
+                    scale: 0.8,
+                    child: Switch(
+                      value: enabled,
+                      activeColor: Colors.green,
+                      inactiveThumbColor: Colors.grey.shade400,
+                      inactiveTrackColor: Colors.grey.shade300,
+                      onChanged: (value) => _setAzanEnabled(prayerName, value),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }*/ // এই পর্যন্ত ======================
+
+  //  prayerRow widget -নামাজের সময় দেখানোতে এই রং বাভহার হয়েছে ------ ভাল না লাগলে বাদ দিয়ে উপরের কমেন্ট করা অংশ নিলে নরমাল হবে সাথে নিচের ২ টা হেল্পার বাদ দিব ===
+  Widget prayerRow(String prayerName, String time) {
+    return FutureBuilder<bool>(
+      future: SharedPreferences.getInstance().then(
+        (prefs) => prefs.getBool("azan_sound_$prayerName") ?? true,
+      ),
+      builder: (context, snapshot) {
+        bool enabled = snapshot.data ?? true;
+        Color prayerColor = getPrayerColor(prayerName);
+        IconData prayerIcon = getPrayerIcon(prayerName);
+
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [prayerColor.withOpacity(0.1), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: prayerColor.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: prayerColor.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                prayerIcon, // এখানে পরিবর্তিত আইকন
+                color: prayerColor,
+                size: 22,
+              ),
+            ),
+            title: Text(
+              prayerName,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: prayerColor,
+              ),
+            ),
+            subtitle: Text(
+              formatTimeTo12Hour(time),
+              style: TextStyle(
+                fontSize: 15,
+                color: prayerColor.withOpacity(0.8),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              decoration: BoxDecoration(
+                color: prayerColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "আজান",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: prayerColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Transform.scale(
+                    scale: 0.8,
+                    child: Switch(
+                      value: enabled,
+                      activeColor: prayerColor,
+                      inactiveThumbColor: Colors.grey.shade400,
+                      inactiveTrackColor: Colors.grey.shade300,
+                      onChanged: (value) => _setAzanEnabled(prayerName, value),
+                    ),
                   ),
                 ],
               ),
@@ -462,14 +569,11 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   }
 
   Widget _buildPrayerTab() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Column(
       children: [
         // Header with location and refresh button
-        // Header with location and refresh button
         Container(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: Theme.of(context).brightness == Brightness.dark
@@ -488,17 +592,17 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
               stops: const [0.0, 0.6, 1.0],
             ),
             borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(32),
-              bottomRight: Radius.circular(32),
+              bottomLeft: Radius.circular(24),
+              bottomRight: Radius.circular(24),
             ),
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.black.withOpacity(0.5)
                     : Colors.green.shade800.withOpacity(0.3),
-                blurRadius: 16,
-                spreadRadius: 2,
-                offset: const Offset(0, 6),
+                blurRadius: 12,
+                spreadRadius: 1,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -507,57 +611,56 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
               // Location and refresh button
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  Flexible(
+                    child: Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
+                            horizontal: 10,
+                            vertical: 5,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.location_on,
-                                size: 16,
+                                size: 14,
                                 color: Colors.white.withOpacity(0.9),
                               ),
-                              const SizedBox(width: 6),
-                              Text(
+                              //const SizedBox(width: 5),
+                              /*Text(
                                 "বর্তমান অবস্থান",
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white.withOpacity(0.9),
                                 ),
-                              ),
+                              ),*/
                             ],
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          "$cityName, $countryName",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            height: 1.2,
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            "$cityName, $countryName",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
@@ -565,8 +668,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.2),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
                         ),
                       ],
                     ),
@@ -575,19 +678,21 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       icon: const Icon(
                         Icons.refresh,
                         color: Colors.white,
-                        size: 24,
+                        size: 20,
                       ),
+                      iconSize: 20,
+                      padding: const EdgeInsets.all(6),
                       tooltip: "রিফ্রেশ করুন",
                     ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
 
-              // Next prayer countdown - New modern design
+              // Next prayer countdown
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -597,16 +702,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: Colors.white.withOpacity(0.2),
-                    width: 1.5,
+                    width: 1.2,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -615,31 +720,31 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                     Text(
                       "পরবর্তী ওয়াক্ত",
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: Colors.white.withOpacity(0.8),
-                        letterSpacing: 1.0,
+                        letterSpacing: 0.8,
                       ),
                     ),
-                    const SizedBox(height: 0),
+                    const SizedBox(height: 4),
                     Text(
-                      nextPrayer,
+                      nextPrayer.isNotEmpty ? nextPrayer : "লোড হচ্ছে...",
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 0),
+                    const SizedBox(height: 8),
                     // Modern countdown design
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                        horizontal: 12,
+                        vertical: 10,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.15),
                           width: 1,
@@ -662,7 +767,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         // Prayer times list
         Expanded(
           child: Container(
@@ -670,19 +775,19 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                   child: Row(
                     children: [
                       Icon(
                         Icons.schedule,
                         color: Colors.green.shade700,
-                        size: 20,
+                        size: 18,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Text(
                         "নামাজের সময়সমূহ",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey.shade700,
                         ),
@@ -692,7 +797,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                 ),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
                     children: [
                       ...prayerTimes.entries
                           .map((e) => prayerRow(e.key, e.value))
@@ -704,136 +809,48 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             ),
           ),
         ),
-
-        // Test buttons
-        //_buildTestButtons(),//------------
       ],
     );
   }
 
-  /*
-  // ---------- টেস্ট বাটন উইজেট ---------------------
-  Widget _buildTestButtons() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // নোটিফিকেশন টেস্ট বাটন
-          ElevatedButton.icon(
-            onPressed: () async {
-              print("Test Notification button pressed");
+  //-------------নামাজের সময় রঙ করার জন্য ব্যাবহার করেছি ভাল না লাগলে বাদ দিব এই ২ টা হেল্পার বাদ দিয়ে উপরের কমেন্ট অংশ নিবো ।
+  // প্রথমে এই দুটি হেল্পার মেথড ক্লাসের বাইরে (build মেথডের বাইরে) যোগ করুন
+  Color getPrayerColor(String prayerName) {
+    switch (prayerName) {
+      case "ফজর":
+        return Colors.orange.shade700;
+      case "যোহর":
+        return Colors.blue.shade700;
+      case "আসর":
+        return Colors.green.shade700;
+      case "মাগরিব":
+        return Colors.purple.shade700;
+      case "ইশা":
+        return Colors.indigo.shade700;
+      default:
+        return Colors.grey.shade700;
+    }
+  }
 
-              try {
-                bool isAllowed = await AwesomeNotifications()
-                    .isNotificationAllowed();
-                print("Notification allowed: $isAllowed");
+  // ------------নামাজের সময় রঙ করার জন্য ব্যাবহার করেছি ভাল না লাগলে বাদ দিব এই ২ টা হেল্পার বাদ দিয়ে উপরের কমেন্ট অংশ নিবো ।
+  IconData getPrayerIcon(String prayerName) {
+    switch (prayerName) {
+      case "ফজর":
+        return Icons.wb_twilight;
+      case "যোহর":
+        return Icons.wb_sunny;
+      case "আসর":
+        return Icons.brightness_4;
+      case "মাগরিব":
+        return Icons.nights_stay;
+      case "ইশা":
+        return Icons.nightlight_round;
+      default:
+        return Icons.access_time;
+    }
+  }
 
-                if (isAllowed) {
-                  final testNotificationId = DateTime.now()
-                      .millisecondsSinceEpoch
-                      .remainder(100000);
-
-                  await AwesomeNotifications().createNotification(
-                    content: NotificationContent(
-                      id: testNotificationId,
-                      channelKey: 'azan_channel',
-                      title: 'পরীক্ষামূলক নোটিফিকেশন',
-                      body:
-                          'এটি একটি টেস্ট নোটিফিকেশন। নামাজের সময় হলে এমন নোটিফিকেশন পাবেন।',
-                      notificationLayout: NotificationLayout.Default,
-                    ),
-                  );
-                  print("Test notification created");
-
-                  // Show success snackbar
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('নোটিফিকেশন টেস্ট করা হয়েছে'),
-                      backgroundColor: Colors.green,
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                } else {
-                  print("Notification permission denied");
-                  AwesomeNotifications().requestPermissionToSendNotifications();
-                }
-              } catch (e) {
-                print("Notification error: $e");
-              }
-            },
-            icon: const Icon(Icons.notifications_active, size: 20),
-            label: const Text("নোটিফিকেশন টেস্ট করুন"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue.shade600,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          // আযান সাউন্ড টেস্ট বাটন
-          ElevatedButton.icon(
-            onPressed: () async {
-              print("Test Azan Sound button pressed");
-
-              try {
-                await _audioPlayer.play(AssetSource('assets/sounds/azan.mp3'));
-                print("Azan audio play called");
-
-                // সাফল্য বার্তা দেখান
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('আযানের সাউন্ড টেস্ট করা হচ্ছে...'),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              } catch (e) {
-                print("Audio play error: $e");
-
-                // ত্রুটি বার্তা দেখান
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'সাউন্ড ফাইল লোড করতে সমস্যা হচ্ছে। assets/sounds/azan.mp3 চেক করুন।',
-                    ),
-                    backgroundColor: Colors.red,
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              }
-            },
-            icon: const Icon(Icons.volume_up, size: 20),
-            label: const Text("আযান সাউন্ড টেস্ট করুন"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green.shade600,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            ),
-          ),
-        ],
-      ),
-    );
-  }*/
+  //-----------
   // Helper method for time units
   Widget _buildTimeUnit(String label, int value) {
     return Column(
@@ -841,16 +858,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         Text(
           value.toString().padLeft(2, '0'),
           style: const TextStyle(
-            fontSize: 28,
+            fontSize: 22,
             fontWeight: FontWeight.w800,
             color: Colors.white,
             fontFeatures: [FontFeature.tabularFigures()],
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.7)),
+          style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.7)),
         ),
       ],
     );
@@ -860,9 +877,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   Widget _buildDivider() {
     return Container(
       width: 1,
-      height: 30,
+      height: 24,
       color: Colors.white.withOpacity(0.3),
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 6),
     );
   }
 
@@ -874,12 +891,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         centerTitle: true,
         title: const Text(
           "আজকের নামাজের সময়",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Colors.black54,
+          ),
         ),
-        elevation: 4,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
-        ),
+        //elevation: 3,
+        //shape: const RoundedRectangleBorder(
+        // borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+        //),
       ),
       body: _buildPrayerTab(),
       bottomNavigationBar: _isBannerAdReady

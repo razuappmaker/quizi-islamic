@@ -318,7 +318,7 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
                       fontSize: screenWidth > 600 ? 26 : 22,
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
+                          ? Colors.grey
                           : Colors.green.shade800,
                     ),
                   ),
