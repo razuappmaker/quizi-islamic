@@ -50,6 +50,7 @@ dependencies:
   intl: ^0.20.2
   connectivity_plus: ^7.0.0
   permission_handler: ^12.0.1
+  syncfusion_flutter_pdfviewer: ^31.1.19
 
 
 dev_dependencies:
@@ -105,6 +106,8 @@ flutter:
     - assets/images/slider4.png
     - assets/images/slider5.png
     - assets/images/compass.png
+    - assets/pdf/umrah_guide.pdf
+    - assets/pdf/namaj_amol.pdf
 
 
 

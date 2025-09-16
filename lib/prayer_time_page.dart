@@ -1,3 +1,4 @@
+// prayer page
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -189,6 +190,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             "আসর": timings["Asr"],
             "মাগরিব": timings["Maghrib"],
             "ইশা": timings["Isha"],
+            "সূর্যোদয়": timings["Sunrise"], // Add sunrise
+            "সূর্যাস্ত": timings["Sunset"], // Add sunset
           };
         });
 
@@ -373,104 +376,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
-  // ডিলিট করবো না ====== যদি নামাজের টাইম নরমাল চাই নিচের এই সেকশন নিব ।  নিচের ২ টা হেল্পার বাদ দিব । নিচে - কমেন্ট করা আছে ----------ডিলিট করবো না --------------
-  // =============================Dont Delet ==========Be cearfull==============
-
-  /*  Widget prayerRow(String prayerName, String time) {
-    return FutureBuilder<bool>(
-      future: SharedPreferences.getInstance().then(
-        (prefs) => prefs.getBool("azan_sound_$prayerName") ?? true,
-      ),
-      builder: (context, snapshot) {
-        bool enabled = snapshot.data ?? true;
-        return Container(
-          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green.shade50, Colors.white],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.green.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.access_time,
-                color: Colors.green.shade700,
-                size: 22,
-              ),
-            ),
-            title: Text(
-              prayerName,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            subtitle: Text(
-              formatTimeTo12Hour(time),
-              style: TextStyle(
-                fontSize: 15,
-                color: Colors.grey.shade700,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "আজান",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.green.shade800,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Transform.scale(
-                    scale: 0.8,
-                    child: Switch(
-                      value: enabled,
-                      activeColor: Colors.green,
-                      inactiveThumbColor: Colors.grey.shade400,
-                      inactiveTrackColor: Colors.grey.shade300,
-                      onChanged: (value) => _setAzanEnabled(prayerName, value),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }*/ // এই পর্যন্ত ======================
-
-  //  prayerRow widget -নামাজের সময় দেখানোতে এই রং বাভহার হয়েছে ------ ভাল না লাগলে বাদ দিয়ে উপরের কমেন্ট করা অংশ নিলে নরমাল হবে সাথে নিচের ২ টা হেল্পার বাদ দিব ===
   Widget prayerRow(String prayerName, String time) {
     return FutureBuilder<bool>(
       future: SharedPreferences.getInstance().then(
@@ -481,58 +386,65 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         Color prayerColor = getPrayerColor(prayerName);
         IconData prayerIcon = getPrayerIcon(prayerName);
 
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final cardColor = isDark ? Colors.grey[850] : Colors.white;
+        final textColor = isDark ? Colors.white : Colors.black87;
+        final subtitleColor = isDark ? Colors.grey[400] : Colors.grey[700];
+
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          // Reduced vertical margin
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [prayerColor.withOpacity(0.1), Colors.white],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: prayerColor.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            color: cardColor,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
           ),
           child: ListTile(
+            dense: true,
+            // This makes the ListTile more compact
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
-              vertical: 8,
+              vertical: 4, // Reduced vertical padding
             ),
             leading: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6), // Reduced padding
               decoration: BoxDecoration(
-                color: prayerColor.withOpacity(0.2),
+                color: prayerColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                prayerIcon, // এখানে পরিবর্তিত আইকন
+                prayerIcon,
                 color: prayerColor,
-                size: 22,
+                size: 18, // Reduced icon size
               ),
             ),
             title: Text(
               prayerName,
               style: TextStyle(
-                fontSize: 17,
+                fontSize: 15, // Slightly reduced font size
                 fontWeight: FontWeight.w600,
-                color: prayerColor,
+                color: textColor,
               ),
             ),
             subtitle: Text(
               formatTimeTo12Hour(time),
               style: TextStyle(
-                fontSize: 15,
-                color: prayerColor.withOpacity(0.8),
+                fontSize: 13, // Slightly reduced font size
+                color: subtitleColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
             trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              // Reduced padding
               decoration: BoxDecoration(
                 color: prayerColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
@@ -543,14 +455,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   Text(
                     "আজান",
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 11, // Reduced font size
                       color: prayerColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 2), // Reduced spacing
                   Transform.scale(
-                    scale: 0.8,
+                    scale: 0.6, // Further reduced switch size
                     child: Switch(
                       value: enabled,
                       activeColor: prayerColor,
@@ -568,253 +480,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     );
   }
 
-  Widget _buildPrayerTab() {
-    return Column(
-      children: [
-        // Header with location and refresh button
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: Theme.of(context).brightness == Brightness.dark
-                  ? [
-                      Colors.green.shade900,
-                      Colors.green.shade800,
-                      Colors.green.shade700,
-                    ]
-                  : [
-                      Colors.green.shade600,
-                      Colors.green.shade500,
-                      Colors.green.shade400,
-                    ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: const [0.0, 0.6, 1.0],
-            ),
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(24),
-              bottomRight: Radius.circular(24),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.black.withOpacity(0.5)
-                    : Colors.green.shade800.withOpacity(0.3),
-                blurRadius: 12,
-                spreadRadius: 1,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // Location and refresh button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.location_on,
-                                size: 14,
-                                color: Colors.white.withOpacity(0.9),
-                              ),
-                              //const SizedBox(width: 5),
-                              /*Text(
-                                "বর্তমান অবস্থান",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
-                              ),*/
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            "$cityName, $countryName",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 3,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      onPressed: fetchLocationAndPrayerTimes,
-                      icon: const Icon(
-                        Icons.refresh,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      iconSize: 20,
-                      padding: const EdgeInsets.all(6),
-                      tooltip: "রিফ্রেশ করুন",
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Next prayer countdown
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.white.withOpacity(0.15),
-                      Colors.white.withOpacity(0.08),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 1.2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      "পরবর্তী ওয়াক্ত",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white.withOpacity(0.8),
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      nextPrayer.isNotEmpty ? nextPrayer : "লোড হচ্ছে...",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Modern countdown design
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.15),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildTimeUnit("ঘণ্টা", countdown.inHours),
-                          _buildDivider(),
-                          _buildTimeUnit("মিনিট", countdown.inMinutes % 60),
-                          _buildDivider(),
-                          _buildTimeUnit("সেকেন্ড", countdown.inSeconds % 60),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        // Prayer times list
-        Expanded(
-          child: Container(
-            color: Colors.grey.shade50,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.schedule,
-                        color: Colors.green.shade700,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        "নামাজের সময়সমূহ",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
-                    children: [
-                      ...prayerTimes.entries
-                          .map((e) => prayerRow(e.key, e.value))
-                          .toList(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  //-------------নামাজের সময় রঙ করার জন্য ব্যাবহার করেছি ভাল না লাগলে বাদ দিব এই ২ টা হেল্পার বাদ দিয়ে উপরের কমেন্ট অংশ নিবো ।
-  // প্রথমে এই দুটি হেল্পার মেথড ক্লাসের বাইরে (build মেথডের বাইরে) যোগ করুন
   Color getPrayerColor(String prayerName) {
     switch (prayerName) {
       case "ফজর":
@@ -824,15 +489,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       case "আসর":
         return Colors.green.shade700;
       case "মাগরিব":
-        return Colors.purple.shade700;
+        return Colors.purple;
       case "ইশা":
-        return Colors.indigo.shade700;
+        return Colors.indigo;
       default:
         return Colors.grey.shade700;
     }
   }
 
-  // ------------নামাজের সময় রঙ করার জন্য ব্যাবহার করেছি ভাল না লাগলে বাদ দিব এই ২ টা হেল্পার বাদ দিয়ে উপরের কমেন্ট অংশ নিবো ।
   IconData getPrayerIcon(String prayerName) {
     switch (prayerName) {
       case "ফজর":
@@ -850,7 +514,610 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
-  //-----------
+  Widget _buildPrayerTab() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      children: [
+        // Header with location and refresh button
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [
+                      Colors.green.shade900,
+                      Colors.green.shade800,
+                      Colors.green.shade700,
+                    ]
+                  : [
+                      Colors.green.shade600,
+                      Colors.green.shade500,
+                      Colors.green.shade400,
+                    ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: const [0.0, 0.6, 1.0],
+            ),
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: isDark
+                    ? Colors.black.withOpacity(0.5)
+                    : Colors.green.shade800.withOpacity(0.3),
+                blurRadius: 8,
+                spreadRadius: 1,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Location and refresh button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.location_on,
+                            size: 12,
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            "$cityName, $countryName",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      onPressed: fetchLocationAndPrayerTimes,
+                      icon: const Icon(
+                        Icons.refresh,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      iconSize: 18,
+                      padding: const EdgeInsets.all(5),
+                      tooltip: "রিফ্রেশ করুন",
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 8),
+
+              // Next prayer and sunrise/sunset section
+              Row(
+                children: [
+                  // Left side - Next prayer countdown (60%)
+                  Expanded(
+                    flex: 6,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.15),
+                            Colors.white.withOpacity(0.08),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            "পরবর্তী ওয়াক্ত",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            nextPrayer.isNotEmpty ? nextPrayer : "লোড হচ্ছে...",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.15),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildTimeUnit("ঘণ্টা", countdown.inHours),
+                                _buildDivider(),
+                                _buildTimeUnit(
+                                  "মিনিট",
+                                  countdown.inMinutes % 60,
+                                ),
+                                _buildDivider(),
+                                _buildTimeUnit(
+                                  "সেকেন্ড",
+                                  countdown.inSeconds % 60,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  // Right side - Sunrise/Sunset (40%)
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.orange.withOpacity(0.3),
+                            Colors.deepOrange.withOpacity(0.2),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.orange.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Sunrise - Top section with orange background
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.wb_sunny,
+                                      color: Colors.yellow.shade200,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "সূর্যোদয়",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  prayerTimes.containsKey("সূর্যোদয়")
+                                      ? formatTimeTo12Hour(
+                                          prayerTimes["সূর্যোদয়"]!,
+                                        )
+                                      : "--:--",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Divider with sun icon
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 30,
+                                  height: 1,
+                                  color: Colors.white.withOpacity(0.5),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Sunset - Bottom section with deep orange background
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.deepOrange.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.nightlight_round,
+                                      color: Colors.orange.shade200,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "সূর্যাস্ত",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  prayerTimes.containsKey("সূর্যাস্ত")
+                                      ? formatTimeTo12Hour(
+                                          prayerTimes["সূর্যাস্ত"]!,
+                                        )
+                                      : "--:--",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ), //-----------
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Prayer times list section - এই অংশটি যোগ করুন
+        Expanded(
+          child: Container(
+            color: isDark ? Colors.grey[900] : Colors.grey.shade50,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.schedule,
+                        color: isDark
+                            ? Colors.green.shade400
+                            : Colors.green.shade700,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        "নামাজের সময়সমূহ",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? Colors.grey.shade300
+                              : Colors.grey.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+                    children: [
+                      // শুধুমাত্র নামাজের সময়গুলো দেখাবে (সূর্যোদয়/সূর্যাস্ত নয়)
+                      if (prayerTimes.isNotEmpty)
+                        ...prayerTimes.entries
+                            .where(
+                              (e) =>
+                                  e.key != "সূর্যোদয়" && e.key != "সূর্যাস্ত",
+                            )
+                            .map((e) => prayerRow(e.key, e.value))
+                            .toList(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // সালাতের নিষিদ্ধ সময় সেকশন
+        // সালাতের নিষিদ্ধ সময় সেকশন
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // বামে - নিষিদ্ধ সময় (প্রফেশনাল লুক)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12), // চারপাশে ফাঁকা জায়গা
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[850] : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // হেডার
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "নিষিদ্ধ সময়",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              _showFloatingInfo(
+                                context,
+                                "সালাতের নিষিদ্ধ সময় সম্পর্কে",
+                                "নবী করিম (সা.) তিন সময়ে নামাজ পড়তে নিষেধ করেছেন:\n\n"
+                                    "১. সূর্যোদয়ের সময় থেকে পরবর্তী ১৫ মিনিট\n"
+                                    "২. ঠিক দুপুরে যখন সূর্য মাথার উপরে থাকে\n"
+                                    "৩. সূর্যাস্তের আগের ১৫ মিনিট\n\n"
+                                    "এই সময়গুলোতে নফল নামাজ পড়া নিষিদ্ধ।",
+                              );
+                            },
+                            child: Icon(
+                              Icons.info_outline,
+                              color: isDark
+                                  ? Colors.blue[200]
+                                  : Colors.blue[700],
+                              size: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 2),
+
+                      // টাইম লিস্ট
+                      Text(
+                        "ভোর:  ${_calculateSunriseProhibitedTime()}",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark ? Colors.grey[300] : Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "দুপুর:  ${_calculateDhuhrProhibitedTime()}",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark ? Colors.grey[300] : Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "সন্ধ্যা:  ${_calculateSunsetProhibitedTime()}",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark ? Colors.grey[300] : Colors.grey[700],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // const SizedBox(width: 4),
+
+            // ডান পাশে ২ ভাগে ভাগ করা কলাম (নফল + বিশেষ ফ্যাক্ট)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: 12,
+                  right: 12,
+                  bottom: 12,
+                  // left নেই
+                ), // left বাদ // উপরে ফাঁকা
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // উপরে - নফল সালাত
+                    GestureDetector(
+                      onTap: () {
+                        _showFloatingInfo(
+                          context,
+                          "নফল সালাতের ওয়াক্ত",
+                          "নফল নামাজ পড়ার উত্তম সময়:\n\n"
+                              "• তাহাজ্জুদ - রাতের শেষ তৃতীয়াংশ\n"
+                              "• ইশরাক - সূর্যোদয়ের ১৫-২০ মিনিট পর\n"
+                              "• চাশত - সূর্যোদয়ের ২-৩ ঘন্টা পর\n"
+                              "• আউয়াবীন - মাগরিবের পর\n"
+                              "• তাহিয়্যাতুল ওযু - ওযুর পর\n"
+                              "• তাহিয়্যাতুল মসজিদ - মসজিদে প্রবেশের পর",
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[800] : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.keyboard_arrow_up,
+                              color: Colors.blue,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 2),
+                            Flexible(
+                              child: Text(
+                                "নফল সালাতের ওয়াক্ত",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 6),
+                    //নফল সালাতের ওয়াক্ত আর বিশেষ ফ্যাক্ট—এই দুইটা কার্ড/সেকশনের মাঝের gap
+                    // নিচে - বিশেষ ফ্যাক্ট
+                    GestureDetector(
+                      onTap: () {
+                        _showFloatingInfo(
+                          context,
+                          "সালাত সম্পর্কে বিশেষ ফ্যাক্ট",
+                          "সালাত সম্পর্কে কিছু বিশেষ তথ্য:\n\n"
+                              "• দিনে ৫ ওয়াক্ত নামাজ ফরজ\n"
+                              "• জুমার নামাজ সপ্তাহিক ফরজ\n"
+                              "• নামাজ ইসলামের দ্বিতীয় স্তম্ভ\n"
+                              "• নামাজ মুমিনের মিরাজ\n"
+                              "• নামাজ আল্লাহর সাথে সংযোগ স্থাপনের মাধ্যম\n"
+                              "• নামাজ গুনাহ মাফের কারণ\n"
+                              "• নামাজ ধৈর্য্য ও শৃঙ্খলা শেখায়",
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[800] : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.keyboard_arrow_up,
+                              color: Colors.orange,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 2),
+                            Flexible(
+                              child: Text(
+                                "বিশেষ ফ্যাক্ট",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ), //-------
+      ],
+    );
+  }
+
+  // ... rest of the existing code ...
+
+  // Next prayer countdown
+
   // Helper method for time units
   Widget _buildTimeUnit(String label, int value) {
     return Column(
@@ -883,6 +1150,159 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     );
   }
 
+  // নিষিদ্ধ সময়ের row widget
+  Widget _buildProhibitedTimeRow(String title, String time, bool isDark) {
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          "$title: ",
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+          ),
+        ),
+        Text(
+          time,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.red,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // সূর্যোদয় নিষিদ্ধ সময় calculation মেথডটি পরিবর্তন করুন
+  String _calculateSunriseProhibitedTime() {
+    if (prayerTimes.containsKey("সূর্যোদয়")) {
+      final sunriseTime = prayerTimes["সূর্যোদয়"]!;
+      final parts = sunriseTime.split(":");
+      final hour = int.parse(parts[0]);
+      final minute = int.parse(parts[1]);
+
+      final startTime = TimeOfDay(hour: hour, minute: minute);
+
+      // Calculate end time (15 minutes after sunrise)
+      int endMinute = minute + 15;
+      int endHour = hour;
+      if (endMinute >= 60) {
+        endHour += 1;
+        endMinute -= 60;
+      }
+      final endTime = TimeOfDay(hour: endHour, minute: endMinute);
+
+      return "${_formatTimeOfDay(startTime)} - ${_formatTimeOfDay(endTime)}";
+    }
+    return "--:-- - --:--";
+  }
+
+  // জোহর নিষিদ্ধ সময় calculation মেথডটি পরিবর্তন করুন
+  String _calculateDhuhrProhibitedTime() {
+    if (prayerTimes.containsKey("যোহর")) {
+      final dhuhrTime = prayerTimes["যোহর"]!;
+      final parts = dhuhrTime.split(":");
+      final hour = int.parse(parts[0]);
+      final minute = int.parse(parts[1]);
+
+      // Calculate start time (6 minutes before dhuhr)
+      int startMinute = minute - 6;
+      int startHour = hour;
+      if (startMinute < 0) {
+        startHour -= 1;
+        startMinute += 60;
+      }
+      final startTime = TimeOfDay(hour: startHour, minute: startMinute);
+
+      final endTime = TimeOfDay(hour: hour, minute: minute);
+
+      return "${_formatTimeOfDay(startTime)} - ${_formatTimeOfDay(endTime)}";
+    }
+    return "--:-- - --:--";
+  }
+
+  // সূর্যাস্ত নিষিদ্ধ সময় calculation মেথডটি পরিবর্তন করুন
+  String _calculateSunsetProhibitedTime() {
+    if (prayerTimes.containsKey("সূর্যাস্ত")) {
+      final sunsetTime = prayerTimes["সূর্যাস্ত"]!;
+      final parts = sunsetTime.split(":");
+      final hour = int.parse(parts[0]);
+      final minute = int.parse(parts[1]);
+
+      // Calculate start time (15 minutes before sunset)
+      int startMinute = minute - 15;
+      int startHour = hour;
+      if (startMinute < 0) {
+        startHour -= 1;
+        startMinute += 60;
+      }
+      final startTime = TimeOfDay(hour: startHour, minute: startMinute);
+
+      final endTime = TimeOfDay(hour: hour, minute: minute);
+
+      return "${_formatTimeOfDay(startTime)} - ${_formatTimeOfDay(endTime)}";
+    }
+    return "--:-- - --:--";
+  }
+
+  // TimeOfDay কে string format এ convert করার helper method
+  String _formatTimeOfDay(TimeOfDay time) {
+    final now = DateTime.now();
+    final dateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
+    return DateFormat('h:mm').format(dateTime);
+  }
+
+  // ফ্লোটিং তথ্য প্রদর্শন
+  void _showFloatingInfo(BuildContext context, String title, String message) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(message, style: const TextStyle(fontSize: 16, height: 1.5)),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -894,19 +1314,17 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.black54,
+            color: Colors.white,
           ),
         ),
-        //elevation: 3,
-        //shape: const RoundedRectangleBorder(
-        // borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-        //),
       ),
       body: _buildPrayerTab(),
       bottomNavigationBar: _isBannerAdReady
           ? SafeArea(
               child: Container(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
                 alignment: Alignment.center,
                 width: _bannerAd.size.width.toDouble(),
                 height: _bannerAd.size.height.toDouble(),

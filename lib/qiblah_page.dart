@@ -506,19 +506,19 @@ class _QiblaPageState extends State<QiblaPage>
                             _buildQuranInstructionRow(
                               "জামাতের সাথে নামাজ আদায় করুন",
                               "সুরা আল-বাকারা: ৪৩",
-                              Icons.group,
+                              Icons.menu_book,
                             ),
                             const SizedBox(height: 8),
                             _buildQuranInstructionRow(
                               "যেখানেই থাকুন নামাজ প্রতিষ্ঠা করুন",
                               "সুরা আল-বাকারা: ১১৫",
-                              Icons.public,
+                              Icons.menu_book,
                             ),
                             const SizedBox(height: 8),
                             _buildQuranInstructionRow(
                               "নামাজের সময় হলে তা আদায়ে অবহেলা করবেন না",
                               "সুরা আল-বাকারা: ২৩৮",
-                              Icons.access_time,
+                              Icons.menu_book,
                             ),
                           ],
                         ),

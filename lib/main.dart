@@ -494,13 +494,13 @@ class _HomePageState extends State<HomePage> {
               ),
               _buildFeatureCard('১৬টি ছোট সূরা', Icons.menu_book, SuraPage()),
               _buildFeatureCard('দৈনন্দিন দোয়া', Icons.lightbulb, DoyaPage()),
-              _buildFeatureCard('সালাতের জিকির', Icons.psychology, NamajAmol()),
               _buildFeatureCard(
                 'ডিজিটাল তসবিহ',
                 Icons.fingerprint,
                 TasbeehPage(),
               ),
               _buildFeatureCard('কেবলা', Icons.explore, QiblaPage()),
+              _buildFeatureCard('অন্যান্য', Icons.picture_as_pdf, NamajAmol()),
             ],
           ),
         ],
@@ -674,10 +674,10 @@ class _HomePageState extends State<HomePage> {
           }
         },
         //icon: Icon(Icons.lock, size: 18),
-        icon: Icon(Icons.directions_run, size: 18),
+        icon: Icon(Icons.lock, size: 18),
         label: Text(
           //'Privacy Policy',
-          'হজ্ব এবং ওমরা গাইড',
+          'Privacy Policy',
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ),
@@ -736,14 +736,22 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           _buildDrawerItem(Icons.book, 'দৈনন্দিন দোয়া', DoyaPage()),
+          _buildDrawerItem(Icons.mosque, 'আজকের নামাজের সময়', PrayerTimePage()),
           _buildDrawerItem(
-            Icons.access_time,
-            'আজকের নামাজের সময়',
-            PrayerTimePage(),
+            Icons.mosque,
+            'নিকটবর্তী মসজিদ',
+            null,
+            url: "https://www.google.com/maps/search/?api=1&query=মসজিদ",
           ),
-          _buildDrawerItem(Icons.info, 'আমাদের কথা', AboutPage()),
-          _buildDrawerItem(Icons.contact_page, 'যোগাযোগ', ContactPage()),
+          _buildDrawerItem(Icons.info, 'আমাদের সম্বন্ধে', AboutPage()),
+
           _buildDrawerItem(Icons.developer_mode, 'ডেভেলপার', DeveloperPage()),
+
+          _buildDrawerItem(
+            Icons.contact_page,
+            'আমাদের সাথে যোগাযোগ',
+            ContactPage(),
+          ),
           _buildDrawerItem(
             Icons.privacy_tip,
             'Privacy Policy',

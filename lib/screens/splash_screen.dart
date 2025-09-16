@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:islamicquiz/main.dart';  // আপনার মূল হোম পেজের ফাইল নাম এখানে বসাবেন
+import 'package:islamicquiz/main.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -8,31 +10,82 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool _permissionsRequested = false;
 
   @override
   void initState() {
     super.initState();
+    _initializeNotifications();
+    _requestPermissions();
+  }
 
-    // ৩ সেকেন্ড অপেক্ষা করার পর হোম পেজে নেভিগেট করবে
-    Timer(Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomePage()), // আপনার হোম পেজ ক্লাস
+  Future<void> _initializeNotifications() async {
+    try {
+      await AwesomeNotifications().initialize(
+        null, // null means default app icon
+        [
+          NotificationChannel(
+            channelKey: 'prayer_times_channel',
+            channelName: 'Prayer Times Notifications',
+            channelDescription: 'Notifications for prayer times',
+            defaultColor: Colors.green,
+            ledColor: Colors.green,
+            importance: NotificationImportance.High,
+            channelShowBadge: true,
+            playSound: true,
+            soundSource: 'resource://raw/res_custom_notification',
+          ),
+        ],
       );
-    });
+    } catch (e) {
+      print('Notification initialization error: $e');
+    }
+  }
+
+  Future<void> _requestPermissions() async {
+    try {
+      // লোকেশন পারমিশন রিকোয়েস্ট
+      final locationStatus = await Geolocator.requestPermission();
+      print('Location Permission Status: $locationStatus');
+
+      // Awesome Notifications পারমিশন রিকোয়েস্ট
+      final notificationPermission = await AwesomeNotifications()
+          .requestPermissionToSendNotifications();
+      print('Notification Permission Result: $notificationPermission');
+
+      setState(() {
+        _permissionsRequested = true;
+      });
+
+      // ৩ সেকেন্ড অপেক্ষা করার পর হোম পেজে নেভিগেট করবে
+      Timer(Duration(seconds: 3), () {
+        Navigator.of(
+          context,
+        ).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+      });
+    } catch (e) {
+      print('Permission request error: $e');
+      // error হলে direct navigate করবে
+      Timer(Duration(seconds: 3), () {
+        Navigator.of(
+          context,
+        ).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,  // আপনার পছন্দমতো ব্যাকগ্রাউন্ড কালার
+      backgroundColor: Colors.green,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircleAvatar(
-              radius: 75,  // 150 / 2
+              radius: 75,
               backgroundImage: AssetImage('assets/images/logo.png'),
-            ),  // আপনার splash লোগো ছবি (assets ফোল্ডারে রাখা)
+            ),
             SizedBox(height: 20),
             Text(
               "আল্লাহর পথে চলার জন্য\nইসলামের জ্ঞান জরুরি।\n\n'ইসলামিক কুইজ'\nআপনার পথপ্রদর্শক।",
@@ -51,11 +104,23 @@ class _SplashScreenState extends State<SplashScreen> {
                 ],
               ),
             ),
-
+            SizedBox(height: 20),
+            if (!_permissionsRequested)
+              Column(
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "অনুমতি অনুরোধ করা হচ্ছে...",
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
     );
   }
 }
-

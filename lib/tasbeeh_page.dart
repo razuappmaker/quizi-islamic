@@ -137,6 +137,31 @@ class _TasbeehPageState extends State<TasbeehPage> {
     });
   }
 
+  // নতুন মেথড: সম্পূর্ণ রিসেট (UI এবং SharedPreferences)
+  Future<void> _resetAllCounts() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // UI কাউন্ট রিসেট
+      uiSubhanallahCount = 0;
+      uiAlhamdulillahCount = 0;
+      uiAllahuakbarCount = 0;
+
+      // SharedPreferences কাউন্ট রিসেট
+      subhanallahCount = 0;
+      alhamdulillahCount = 0;
+      allahuakbarCount = 0;
+
+      // SharedPreferences-এ সেভ করুন
+      prefs.setInt("subhanallahCount", 0);
+      prefs.setInt("alhamdulillahCount", 0);
+      prefs.setInt("allahuakbarCount", 0);
+
+      selectedPhrase = "সুবহানাল্লাহ";
+      _updateBackgroundColor("সুবহানাল্লাহ");
+    });
+  }
+
+  // পুরানো মেথড: শুধু UI রিসেট (নাম পরিবর্তন করে স্পষ্ট করা)
   void _resetUICounts() {
     setState(() {
       uiSubhanallahCount = 0;
@@ -183,6 +208,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
     final isSmallScreen = screenWidth < 600;
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // ✅ Disable debug banner
       theme: _isDarkMode
           ? ThemeData.dark().copyWith(
               primaryColor: Colors.green[800],
@@ -217,7 +243,6 @@ class _TasbeehPageState extends State<TasbeehPage> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              // পেছনের পেজে ফিরে যাওয়ার লজিক
               if (Navigator.canPop(context)) {
                 Navigator.pop(context);
               }
@@ -232,10 +257,37 @@ class _TasbeehPageState extends State<TasbeehPage> {
               onPressed: _toggleDarkMode,
               tooltip: _isDarkMode ? "লাইট মোড" : "ডার্ক মোড",
             ),
-            IconButton(
-              icon: const Icon(Icons.refresh, size: 20),
-              onPressed: _resetUICounts,
-              tooltip: "বর্তমান সেশন রিসেট",
+            PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert, size: 20),
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem(
+                  value: "reset_session",
+                  child: Row(
+                    children: [
+                      Icon(Icons.refresh, size: 20),
+                      SizedBox(width: 8),
+                      Text("বর্তমান সেশন রিসেট"),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: "reset_all",
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_forever, size: 20),
+                      SizedBox(width: 8),
+                      Text("সম্পূর্ণ রিসেট"),
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (value) {
+                if (value == "reset_session") {
+                  _resetUICounts();
+                } else if (value == "reset_all") {
+                  _resetAllCounts();
+                }
+              },
             ),
           ],
         ),
@@ -449,7 +501,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                             onPressed: _resetUICounts,
                             icon: const Icon(Icons.refresh, size: 20),
                             label: const Text(
-                              "সেশন রিসেট",
+                              "স্ক্রিন শূন্য (০) করুন",
                               style: TextStyle(fontSize: 16),
                             ),
                             style: ElevatedButton.styleFrom(
@@ -468,6 +520,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                               elevation: 3,
                             ),
                           ),
+
                           const SizedBox(height: 12),
                           ElevatedButton.icon(
                             onPressed: () {
@@ -512,6 +565,31 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                 backgroundColor: _isDarkMode
                                     ? Colors.orange[800]
                                     : Colors.orangeAccent,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 15,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 3,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed:
+                                  _resetAllCounts, // সম্পূর্ণ রিসেটের জন্য
+                              icon: const Icon(Icons.delete_forever, size: 20),
+                              label: const Text(
+                                "সম্পূর্ণ রিসেট",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isDarkMode
+                                    ? Colors.red[800]
+                                    : Colors.redAccent,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 15,
