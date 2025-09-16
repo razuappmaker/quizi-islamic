@@ -79,7 +79,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     super.dispose();
   }
 
-  // নতুন মেথড: ডেটা ইনিশিয়ালাইজেশন
+  // ডেটা ইনিশিয়ালাইজেশন
   Future<void> _initializeData() async {
     await _loadSavedData();
     fetchLocationAndPrayerTimes();
@@ -98,7 +98,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     return DateFormat('hh:mm a').format(dateTime);
   }
 
-  // ---------- Load Saved Data ----------
+  // লোড সেভ করা ডেটা
   Future<void> _loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -111,23 +111,23 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       }
     });
 
-    // Restore schedule for each prayer (always schedule notifications)
+    // প্রতিটি নামাজের জন্য নোটিফিকেশন শিডিউল রাখা
     prayerTimes.forEach((prayer, time) async {
       bool soundEnabled = prefs.getBool("azan_sound_$prayer") ?? true;
       _schedulePrayerNotification(prayer, time, soundEnabled);
     });
   }
 
-  // 👉 এখানে রাখবেন এই কোড টিকু হল যদি পুরবের নোটিফিকেশন বার বার না আসে -----
+  // পুরনো নোটিফিকেশন বাতিল করা
   Future<void> _cancelAllPrayerNotifications() async {
     try {
       await AwesomeNotifications().cancelAll();
-      print("All previous prayer notifications cancelled.");
     } catch (e) {
       print("Error cancelling notifications: $e");
     }
   }
 
+  // ডেটা সেভ করা
   Future<void> _saveData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("cityName", cityName ?? "");
@@ -135,16 +135,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     await prefs.setString("prayerTimes", jsonEncode(prayerTimes));
   }
 
+  // লোকেশন এবং নামাজের সময় ফেচ করা
   Future<void> fetchLocationAndPrayerTimes() async {
     try {
-      // Check location services
+      // লোকেশন সার্ভিস চেক
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print("Location services are disabled.");
         return;
       }
 
-      // Check permissions
+      // পারমিশন চেক
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -152,12 +152,12 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       }
       if (permission == LocationPermission.deniedForever) return;
 
-      // Get current position
+      // বর্তমান পজিশন পাওয়া
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best,
       );
 
-      // Get city/country name
+      // শহর/দেশের নাম পাওয়া
       final placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
@@ -170,14 +170,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         });
       }
 
-      // Build API URL with today's date
+      // আজকের তারিখ সহ API URL বিল্ড করা
       final today = DateTime.now();
       final formattedDate =
           "${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year}";
       final url =
           "https://api.aladhan.com/v1/timings/$formattedDate?latitude=${position.latitude}&longitude=${position.longitude}&method=2";
 
-      // Fetch data
+      // ডেটা ফেচ করা
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -190,21 +190,21 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             "আসর": timings["Asr"],
             "মাগরিব": timings["Maghrib"],
             "ইশা": timings["Isha"],
-            "সূর্যোদয়": timings["Sunrise"], // Add sunrise
-            "সূর্যাস্ত": timings["Sunset"], // Add sunset
+            "সূর্যোদয়": timings["Sunrise"],
+            "সূর্যাস্ত": timings["Sunset"],
           };
         });
 
-        // Find next prayer
+        // পরবর্তী নামাজ খুঁজে বের করা
         findNextPrayer();
 
-        // Save locally
+        // লোকালি সেভ করা
         _saveData();
 
-        // Cancel existing notifications before rescheduling
-        _cancelAllPrayerNotifications(); // আগের নোটিফিকেশন যদি আসে তাহিলে মুছে যাবে এটার জন্য
+        // পুনরায় শিডিউল করার আগে বিদ্যমান নোটিফিকেশন বাতিল করা
+        _cancelAllPrayerNotifications();
 
-        // Schedule notifications
+        // নোটিফিকেশন শিডিউল করা
         final prefs = await SharedPreferences.getInstance();
         for (final entry in prayerTimes.entries) {
           final prayer = entry.key;
@@ -212,15 +212,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           final soundEnabled = prefs.getBool("azan_sound_$prayer") ?? true;
           _schedulePrayerNotification(prayer, time, soundEnabled);
         }
-      } else {
-        print("Failed to load prayer times: ${response.statusCode}");
       }
-    } catch (e, stack) {
+    } catch (e) {
       print("Location fetch error: $e");
-      print(stack);
     }
   }
 
+  // পরবর্তী নামাজ খুঁজে বের করা
   void findNextPrayer() {
     final now = DateTime.now();
     DateTime? nextPrayerTime;
@@ -260,16 +258,17 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
+  // আজান সক্ষম/অক্ষম সেট করা
   Future<void> _setAzanEnabled(String prayerName, bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool("azan_sound_$prayerName", enabled);
 
-    // Cancel previous mp3 timer if disabled
+    // যদি অক্ষম করা হয় তবে পূর্ববর্তী mp3 টাইমার বাতিল করুন
     if (!enabled) {
       _mp3Timers[prayerName]?.cancel();
       _mp3Timers.remove(prayerName);
     } else {
-      // Re-schedule mp3 if enabled
+      // যদি সক্ষম করা হয় তবে mp3 পুনরায় শিডিউল করুন
       if (prayerTimes[prayerName] != null) {
         _scheduleMp3ForPrayer(prayerName, prayerTimes[prayerName]!);
       }
@@ -278,13 +277,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     setState(() {});
   }
 
-  // ---------- Schedule MP3 for Prayer (only if enabled) ----------
+  // নামাজের জন্য MP3 শিডিউল করা (শুধুমাত্র সক্ষম থাকলে)
   Future<void> _scheduleMp3ForPrayer(String prayerName, String time) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       bool soundEnabled = prefs.getBool("azan_sound_$prayerName") ?? true;
 
-      if (!soundEnabled) return; // Skip if disabled
+      if (!soundEnabled) return; // যদি অক্ষম থাকে তবে স্কিপ করুন
 
       final now = DateTime.now();
       final parts = time.split(":");
@@ -297,15 +296,15 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         int.parse(parts[1]),
       );
 
-      // যদি সময় already passed হয়ে যায়, তাহলে আগামীকালের জন্য
+      // যদি সময় ইতিমধ্যেই পাস হয়ে যায়, তাহলে আগামীকালের জন্য
       if (prayerDate.isBefore(now)) {
         prayerDate = prayerDate.add(const Duration(days: 1));
       }
 
-      // ৫ মিনিট আগে mp3 play
+      // ৫ মিনিট আগে mp3 প্লে
       final mp3Time = prayerDate.subtract(const Duration(minutes: 5));
       if (mp3Time.isAfter(now)) {
-        _mp3Timers[prayerName]?.cancel(); // Cancel existing timer
+        _mp3Timers[prayerName]?.cancel(); // বিদ্যমান টাইমার বাতিল করুন
 
         _mp3Timers[prayerName] = Timer(mp3Time.difference(now), () async {
           await _audioPlayer.play(AssetSource('assets/sounds/azan.mp3'));
@@ -321,14 +320,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
-  // ---------- Schedule Prayer Notification (always) ----------
+  // নামাজের নোটিফিকেশন শিডিউল করা (সর্বদা)
   Future<void> _schedulePrayerNotification(
     String prayerName,
     String time,
     bool soundEnabled,
   ) async {
     try {
-      // Cancel any existing notification for this prayer
+      // এই নামাজের জন্য বিদ্যমান কোনো নোটিফিকেশন বাতিল করুন
       await AwesomeNotifications().cancel(prayerName.hashCode);
 
       final now = DateTime.now();
@@ -342,12 +341,12 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         int.parse(parts[1]),
       );
 
-      // যদি সময় already passed হয়ে যায়, তাহলে আগামীকালের জন্য
+      // যদি সময় ইতিমধ্যেই পাস হয়ে যায়, তাহলে আগামীকালের জন্য
       if (prayerDate.isBefore(now)) {
         prayerDate = prayerDate.add(const Duration(days: 1));
       }
 
-      // ১০ মিনিট আগে notification (always schedule)
+      // ১০ মিনিট আগে নোটিফিকেশন (সর্বদা শিডিউল করুন)
       final notificationTime = prayerDate.subtract(const Duration(minutes: 10));
       if (notificationTime.isAfter(now)) {
         await AwesomeNotifications().createNotification(
@@ -362,12 +361,12 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             hour: notificationTime.hour,
             minute: notificationTime.minute,
             second: 0,
-            repeats: true, // Daily repeat
+            repeats: true, // দৈনিক পুনরাবৃত্তি
           ),
         );
       }
 
-      // Also schedule MP3 if enabled
+      // সক্ষম থাকলে MP3 ও শিডিউল করুন
       if (soundEnabled) {
         _scheduleMp3ForPrayer(prayerName, time);
       }
@@ -376,6 +375,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
+  // নামাজের সারি উইজেট
   Widget prayerRow(String prayerName, String time) {
     return FutureBuilder<bool>(
       future: SharedPreferences.getInstance().then(
@@ -392,44 +392,38 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         final subtitleColor = isDark ? Colors.grey[400] : Colors.grey[700];
 
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-          // Reduced vertical margin
+          margin: const EdgeInsets.symmetric(vertical: 3, horizontal: 6),
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: isDark
                 ? null
                 : [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+                      blurRadius: 3,
+                      offset: const Offset(0, 1),
                     ),
                   ],
           ),
           child: ListTile(
             dense: true,
-            // This makes the ListTile more compact
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 4, // Reduced vertical padding
+              horizontal: 10,
+              vertical: 2,
             ),
             leading: Container(
-              padding: const EdgeInsets.all(6), // Reduced padding
+              padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                 color: prayerColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                prayerIcon,
-                color: prayerColor,
-                size: 18, // Reduced icon size
-              ),
+              child: Icon(prayerIcon, color: prayerColor, size: 16),
             ),
             title: Text(
               prayerName,
               style: TextStyle(
-                fontSize: 15, // Slightly reduced font size
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: textColor,
               ),
@@ -437,17 +431,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             subtitle: Text(
               formatTimeTo12Hour(time),
               style: TextStyle(
-                fontSize: 13, // Slightly reduced font size
+                fontSize: 12,
                 color: subtitleColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
             trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              // Reduced padding
+              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
               decoration: BoxDecoration(
                 color: prayerColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -455,14 +448,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   Text(
                     "আজান",
                     style: TextStyle(
-                      fontSize: 11, // Reduced font size
+                      fontSize: 10,
                       color: prayerColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(width: 2), // Reduced spacing
+                  const SizedBox(width: 2),
                   Transform.scale(
-                    scale: 0.6, // Further reduced switch size
+                    scale: 0.55,
                     child: Switch(
                       value: enabled,
                       activeColor: prayerColor,
@@ -480,6 +473,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     );
   }
 
+  // নামাজের রং পাওয়া
   Color getPrayerColor(String prayerName) {
     switch (prayerName) {
       case "ফজর":
@@ -497,6 +491,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
+  // নামাজের আইকন পাওয়া
   IconData getPrayerIcon(String prayerName) {
     switch (prayerName) {
       case "ফজর":
@@ -514,14 +509,17 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
+  // নামাজ ট্যাব বিল্ড করা
   Widget _buildPrayerTab() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
 
     return Column(
       children: [
-        // Header with location and refresh button
+        // হেডার - লোকেশন এবং রিফ্রেশ বাটন
         Container(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          padding: EdgeInsets.fromLTRB(14, isSmallScreen ? 12 : 14, 14, 10),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: isDark
@@ -540,23 +538,23 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
               stops: const [0.0, 0.6, 1.0],
             ),
             borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
             ),
             boxShadow: [
               BoxShadow(
                 color: isDark
-                    ? Colors.black.withOpacity(0.5)
-                    : Colors.green.shade800.withOpacity(0.3),
-                blurRadius: 8,
+                    ? Colors.black.withOpacity(0.4)
+                    : Colors.green.shade800.withOpacity(0.2),
+                blurRadius: 6,
                 spreadRadius: 1,
-                offset: const Offset(0, 3),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: Column(
             children: [
-              // Location and refresh button
+              // লোকেশন এবং রিফ্রেশ বাটন
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -566,25 +564,25 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                            horizontal: 6,
+                            vertical: 3,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
                             Icons.location_on,
-                            size: 12,
+                            size: 11,
                             color: Colors.white.withOpacity(0.9),
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 5),
                         Flexible(
                           child: Text(
                             "$cityName, $countryName",
-                            style: const TextStyle(
-                              fontSize: 16,
+                            style: TextStyle(
+                              fontSize: isSmallScreen ? 14 : 15,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
@@ -605,26 +603,26 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       icon: const Icon(
                         Icons.refresh,
                         color: Colors.white,
-                        size: 18,
+                        size: 16,
                       ),
-                      iconSize: 18,
-                      padding: const EdgeInsets.all(5),
+                      iconSize: 16,
+                      padding: const EdgeInsets.all(4),
                       tooltip: "রিফ্রেশ করুন",
                     ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
 
-              // Next prayer and sunrise/sunset section
+              // পরবর্তী নামাজ এবং সূর্যোদয়/সূর্যাস্ত সেকশন
               Row(
                 children: [
-                  // Left side - Next prayer countdown (60%)
+                  // বাম পাশ - পরবর্তী নামাজ কাউন্টডাউন
                   Expanded(
                     flex: 6,
                     child: Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -634,7 +632,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.2),
                           width: 1,
@@ -645,29 +643,29 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                           Text(
                             "পরবর্তী ওয়াক্ত",
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: Colors.white.withOpacity(0.8),
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 3),
                           Text(
                             nextPrayer.isNotEmpty ? nextPrayer : "লোড হচ্ছে...",
-                            style: const TextStyle(
-                              fontSize: 14,
+                            style: TextStyle(
+                              fontSize: isSmallScreen ? 12 : 13,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
+                              horizontal: 6,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: Colors.white.withOpacity(0.15),
                                 width: 1,
@@ -695,13 +693,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                     ),
                   ),
 
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
 
-                  // Right side - Sunrise/Sunset (40%)
+                  // ডান পাশ - সূর্যোদয়/সূর্যাস্ত
                   Expanded(
                     flex: 4,
                     child: Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -711,7 +709,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: Colors.orange.withOpacity(0.3),
                           width: 1,
@@ -720,15 +718,15 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Sunrise - Top section with orange background
+                          // সূর্যোদয়
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
+                              horizontal: 6,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.orange.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                             child: Column(
                               children: [
@@ -738,20 +736,20 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                                     Icon(
                                       Icons.wb_sunny,
                                       color: Colors.yellow.shade200,
-                                      size: 16,
+                                      size: 14,
                                     ),
-                                    const SizedBox(width: 4),
+                                    const SizedBox(width: 3),
                                     Text(
                                       "সূর্যোদয়",
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 10,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.white,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 3),
                                 Text(
                                   prayerTimes.containsKey("সূর্যোদয়")
                                       ? formatTimeTo12Hour(
@@ -759,7 +757,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                                         )
                                       : "--:--",
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
@@ -768,32 +766,32 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                             ),
                           ),
 
-                          // Divider with sun icon
+                          // ডিভাইডার
                           Container(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            padding: const EdgeInsets.symmetric(vertical: 2),
                             child: Column(
                               children: [
                                 Container(
-                                  width: 30,
+                                  width: 25,
                                   height: 1,
                                   color: Colors.white.withOpacity(0.5),
                                   margin: const EdgeInsets.symmetric(
-                                    vertical: 2,
+                                    vertical: 1,
                                   ),
                                 ),
                               ],
                             ),
                           ),
 
-                          // Sunset - Bottom section with deep orange background
+                          // সূর্যাস্ত
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
+                              horizontal: 6,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.deepOrange.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                             child: Column(
                               children: [
@@ -803,20 +801,20 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                                     Icon(
                                       Icons.nightlight_round,
                                       color: Colors.orange.shade200,
-                                      size: 16,
+                                      size: 14,
                                     ),
-                                    const SizedBox(width: 4),
+                                    const SizedBox(width: 3),
                                     Text(
                                       "সূর্যাস্ত",
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 10,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.white,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 3),
                                 Text(
                                   prayerTimes.containsKey("সূর্যাস্ত")
                                       ? formatTimeTo12Hour(
@@ -824,7 +822,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                                         )
                                       : "--:--",
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
@@ -835,21 +833,21 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                         ],
                       ),
                     ),
-                  ), //-----------
+                  ),
                 ],
               ),
             ],
           ),
         ),
 
-        // Prayer times list section - এই অংশটি যোগ করুন
+        // নামাজের সময় তালিকা সেকশন
         Expanded(
           child: Container(
             color: isDark ? Colors.grey[900] : Colors.grey.shade50,
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
                   child: Row(
                     children: [
                       Icon(
@@ -857,13 +855,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                         color: isDark
                             ? Colors.green.shade400
                             : Colors.green.shade700,
-                        size: 18,
+                        size: 16,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 5),
                       Text(
                         "নামাজের সময়সমূহ",
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: isDark
                               ? Colors.grey.shade300
@@ -875,7 +873,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                 ),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+                    padding: const EdgeInsets.fromLTRB(6, 0, 6, 8),
                     children: [
                       // শুধুমাত্র নামাজের সময়গুলো দেখাবে (সূর্যোদয়/সূর্যাস্ত নয়)
                       if (prayerTimes.isNotEmpty)
@@ -894,25 +892,24 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           ),
         ),
 
-        // সালাতের নিষিদ্ধ সময় সেকশন
-        // সালাতের নিষিদ্ধ সময় সেকশন
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // বামে - নিষিদ্ধ সময় (প্রফেশনাল লুক)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12), // চারপাশে ফাঁকা জায়গা
+        // সালাতের নিষিদ্ধ সময় এবং তথ্য সেকশন
+        Container(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // নিষিদ্ধ সময় কার্ড
+              Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isDark ? Colors.grey[850] : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.05),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -926,7 +923,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                           Text(
                             "নিষিদ্ধ সময়",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: isDark ? Colors.white : Colors.black87,
                             ),
@@ -948,35 +945,35 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                               color: isDark
                                   ? Colors.blue[200]
                                   : Colors.blue[700],
-                              size: 18,
+                              size: 16,
                             ),
                           ),
                         ],
                       ),
 
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
 
-                      // টাইম লিস্ট
+                      // সময়ের তালিকা
                       Text(
                         "ভোর:  ${_calculateSunriseProhibitedTime()}",
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           color: isDark ? Colors.grey[300] : Colors.grey[700],
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       Text(
                         "দুপুর:  ${_calculateDhuhrProhibitedTime()}",
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           color: isDark ? Colors.grey[300] : Colors.grey[700],
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       Text(
                         "সন্ধ্যা:  ${_calculateSunsetProhibitedTime()}",
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           color: isDark ? Colors.grey[300] : Colors.grey[700],
                         ),
                       ),
@@ -984,23 +981,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   ),
                 ),
               ),
-            ),
 
-            // const SizedBox(width: 4),
+              const SizedBox(width: 8),
 
-            // ডান পাশে ২ ভাগে ভাগ করা কলাম (নফল + বিশেষ ফ্যাক্ট)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  top: 12,
-                  right: 12,
-                  bottom: 12,
-                  // left নেই
-                ), // left বাদ // উপরে ফাঁকা
+              // নফল সালাত এবং বিশেষ ফ্যাক্ট কার্ড
+              Expanded(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // উপরে - নফল সালাত
+                    // নফল সালাত
                     GestureDetector(
                       onTap: () {
                         _showFloatingInfo(
@@ -1016,15 +1004,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                         );
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.only(bottom: 6),
                         decoration: BoxDecoration(
                           color: isDark ? Colors.grey[800] : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 3,
+                              offset: const Offset(0, 1),
                             ),
                           ],
                         ),
@@ -1033,14 +1022,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                             Icon(
                               Icons.keyboard_arrow_up,
                               color: Colors.blue,
-                              size: 18,
+                              size: 16,
                             ),
-                            const SizedBox(width: 2),
+                            const SizedBox(width: 4),
                             Flexible(
                               child: Text(
-                                "নফল সালাতের ওয়াক্ত",
+                                "নফল সালাত",
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? Colors.white : Colors.black87,
                                 ),
@@ -1051,9 +1040,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       ),
                     ),
 
-                    const SizedBox(height: 6),
-                    //নফল সালাতের ওয়াক্ত আর বিশেষ ফ্যাক্ট—এই দুইটা কার্ড/সেকশনের মাঝের gap
-                    // নিচে - বিশেষ ফ্যাক্ট
+                    // বিশেষ ফ্যাক্ট
                     GestureDetector(
                       onTap: () {
                         _showFloatingInfo(
@@ -1070,15 +1057,15 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                         );
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: isDark ? Colors.grey[800] : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 3,
+                              offset: const Offset(0, 1),
                             ),
                           ],
                         ),
@@ -1087,14 +1074,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                             Icon(
                               Icons.keyboard_arrow_up,
                               color: Colors.orange,
-                              size: 18,
+                              size: 16,
                             ),
-                            const SizedBox(width: 2),
+                            const SizedBox(width: 4),
                             Flexible(
                               child: Text(
                                 "বিশেষ ফ্যাক্ট",
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? Colors.white : Colors.black87,
                                 ),
@@ -1107,80 +1094,46 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   ],
                 ),
               ),
-            ),
-          ],
-        ), //-------
+            ],
+          ),
+        ),
       ],
     );
   }
 
-  // ... rest of the existing code ...
-
-  // Next prayer countdown
-
-  // Helper method for time units
+  // সময় ইউনিট বিল্ড করার হেল্পার মেথড
   Widget _buildTimeUnit(String label, int value) {
     return Column(
       children: [
         Text(
           value.toString().padLeft(2, '0'),
-          style: const TextStyle(
-            fontSize: 22,
+          style: TextStyle(
+            fontSize: MediaQuery.of(context).size.height < 700 ? 18 : 20,
             fontWeight: FontWeight.w800,
             color: Colors.white,
             fontFeatures: [FontFeature.tabularFigures()],
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 1),
         Text(
           label,
-          style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.7)),
+          style: TextStyle(fontSize: 9, color: Colors.white.withOpacity(0.7)),
         ),
       ],
     );
   }
 
-  // Helper method for divider
+  // ডিভাইডার বিল্ড করার হেল্পার মেথড
   Widget _buildDivider() {
     return Container(
       width: 1,
-      height: 24,
+      height: 20,
       color: Colors.white.withOpacity(0.3),
-      margin: const EdgeInsets.symmetric(horizontal: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 
-  // নিষিদ্ধ সময়ের row widget
-  Widget _buildProhibitedTimeRow(String title, String time, bool isDark) {
-    return Row(
-      children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          "$title: ",
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
-          ),
-        ),
-        Text(
-          time,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.red,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // সূর্যোদয় নিষিদ্ধ সময় calculation মেথডটি পরিবর্তন করুন
+  // সূর্যোদয় নিষিদ্ধ সময় ক্যালকুলেশন
   String _calculateSunriseProhibitedTime() {
     if (prayerTimes.containsKey("সূর্যোদয়")) {
       final sunriseTime = prayerTimes["সূর্যোদয়"]!;
@@ -1190,7 +1143,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
       final startTime = TimeOfDay(hour: hour, minute: minute);
 
-      // Calculate end time (15 minutes after sunrise)
+      // শেষ সময় গণনা করুন (সূর্যোদয়ের 15 মিনিট পর)
       int endMinute = minute + 15;
       int endHour = hour;
       if (endMinute >= 60) {
@@ -1204,7 +1157,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     return "--:-- - --:--";
   }
 
-  // জোহর নিষিদ্ধ সময় calculation মেথডটি পরিবর্তন করুন
+  // যোহর নিষিদ্ধ সময় ক্যালকুলেশন
   String _calculateDhuhrProhibitedTime() {
     if (prayerTimes.containsKey("যোহর")) {
       final dhuhrTime = prayerTimes["যোহর"]!;
@@ -1212,7 +1165,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       final hour = int.parse(parts[0]);
       final minute = int.parse(parts[1]);
 
-      // Calculate start time (6 minutes before dhuhr)
+      // শুরু সময় গণনা করুন (যোহরের 6 মিনিট আগে)
       int startMinute = minute - 6;
       int startHour = hour;
       if (startMinute < 0) {
@@ -1228,7 +1181,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     return "--:-- - --:--";
   }
 
-  // সূর্যাস্ত নিষিদ্ধ সময় calculation মেথডটি পরিবর্তন করুন
+  // সূর্যাস্ত নিষিদ্ধ সময় ক্যালকুলেশন
   String _calculateSunsetProhibitedTime() {
     if (prayerTimes.containsKey("সূর্যাস্ত")) {
       final sunsetTime = prayerTimes["সূর্যাস্ত"]!;
@@ -1236,7 +1189,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       final hour = int.parse(parts[0]);
       final minute = int.parse(parts[1]);
 
-      // Calculate start time (15 minutes before sunset)
+      // শুরু সময় গণনা করুন (সূর্যাস্তের 15 মিনিট আগে)
       int startMinute = minute - 15;
       int startHour = hour;
       if (startMinute < 0) {
@@ -1252,7 +1205,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     return "--:-- - --:--";
   }
 
-  // TimeOfDay কে string format এ convert করার helper method
+  // TimeOfDay কে স্ট্রিং ফরম্যাটে কনভার্ট করার হেল্পার মেথড
   String _formatTimeOfDay(TimeOfDay time) {
     final now = DateTime.now();
     final dateTime = DateTime(
@@ -1272,7 +1225,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       isScrollControlled: true,
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1283,7 +1236,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1293,9 +1246,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+              Text(message, style: const TextStyle(fontSize: 14, height: 1.4)),
               const SizedBox(height: 16),
-              Text(message, style: const TextStyle(fontSize: 16, height: 1.5)),
-              const SizedBox(height: 20),
             ],
           ),
         );
@@ -1313,7 +1266,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           "আজকের নামাজের সময়",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 17,
             color: Colors.white,
           ),
         ),
