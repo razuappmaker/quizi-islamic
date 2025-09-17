@@ -1,8 +1,6 @@
-// lib/widgets/responsive_widgets.dart
 import 'package:flutter/material.dart';
 import '../utils/size_config.dart';
 
-// রেসপনসিভ টেক্সট উইজেট
 class ResponsiveText extends StatelessWidget {
   final String text;
   final double fontSize;
@@ -11,6 +9,7 @@ class ResponsiveText extends StatelessWidget {
   final TextAlign? textAlign;
   final int? maxLines;
   final TextOverflow? overflow;
+  final String? semanticsLabel;
 
   const ResponsiveText(
     this.text, {
@@ -21,43 +20,55 @@ class ResponsiveText extends StatelessWidget {
     this.textAlign,
     this.maxLines,
     this.overflow,
+    this.semanticsLabel,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final sizeConfig = SizeConfig.of(context);
-    return Text(
-      text,
-      textAlign: textAlign,
-      maxLines: maxLines,
-      overflow: overflow,
-      style: TextStyle(
-        fontSize: SizeConfig.proportionalFontSize(fontSize),
-        fontWeight: fontWeight,
-        color: color,
+    return Semantics(
+      label: semanticsLabel ?? text,
+      child: Text(
+        text,
+        textAlign: textAlign,
+        maxLines: maxLines,
+        overflow: overflow,
+        style: TextStyle(
+          fontSize: SizeConfig.proportionalFontSize(fontSize),
+          fontWeight: fontWeight,
+          color: color,
+        ),
       ),
     );
   }
 }
 
-// রেসপনসিভ প্যাডিং উইজেট
 class ResponsivePadding extends StatelessWidget {
   final Widget child;
-  final double padding;
+  final double? all;
+  final double? horizontal;
+  final double? vertical;
 
-  const ResponsivePadding({Key? key, required this.child, this.padding = 8.0})
-    : super(key: key);
+  const ResponsivePadding({
+    Key? key,
+    required this.child,
+    this.all,
+    this.horizontal,
+    this.vertical,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(SizeConfig.proportionalWidth(padding)),
+      padding: EdgeInsets.symmetric(
+        horizontal: SizeConfig.proportionalWidth(horizontal ?? all ?? 8.0),
+        vertical: SizeConfig.proportionalHeight(vertical ?? all ?? 8.0),
+      ),
       child: child,
     );
   }
 }
 
-// রেসপনসিভ SizedBox উইজেট
 class ResponsiveSizedBox extends StatelessWidget {
   final double? height;
   final double? width;
@@ -74,12 +85,12 @@ class ResponsiveSizedBox extends StatelessWidget {
   }
 }
 
-// রেসপনসিভ আইকন বাটন
 class ResponsiveIconButton extends StatelessWidget {
   final IconData icon;
   final double iconSize;
   final VoidCallback onPressed;
   final Color? color;
+  final String? semanticsLabel;
 
   const ResponsiveIconButton({
     Key? key,
@@ -87,15 +98,20 @@ class ResponsiveIconButton extends StatelessWidget {
     required this.iconSize,
     required this.onPressed,
     this.color,
+    this.semanticsLabel,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(icon),
-      iconSize: SizeConfig.proportionalFontSize(iconSize),
-      onPressed: onPressed,
-      color: color,
+    return Semantics(
+      label: semanticsLabel,
+      button: true,
+      child: IconButton(
+        icon: Icon(icon),
+        iconSize: SizeConfig.proportionalFontSize(iconSize),
+        onPressed: onPressed,
+        color: color,
+      ),
     );
   }
 }

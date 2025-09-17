@@ -1,4 +1,3 @@
-// Main.dart Final
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -32,7 +31,12 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
-      child: const MyApp(),
+      child: Builder(
+        builder: (context) {
+          SizeConfig.init(context);
+          return const MyApp();
+        },
+      ),
     ),
   );
 }
@@ -52,11 +56,16 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.green,
             brightness: Brightness.light,
             fontFamily: 'HindSiliguri',
-            textTheme: const TextTheme(
-              bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              bodyMedium: TextStyle(fontSize: 14),
+            textTheme: TextTheme(
+              bodyLarge: TextStyle(
+                fontSize: SizeConfig.proportionalFontSize(16),
+                fontWeight: FontWeight.w500,
+              ),
+              bodyMedium: TextStyle(
+                fontSize: SizeConfig.proportionalFontSize(14),
+              ),
               headlineSmall: TextStyle(
-                fontSize: 20,
+                fontSize: SizeConfig.proportionalFontSize(20),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -65,12 +74,14 @@ class MyApp extends StatelessWidget {
                 backgroundColor: Colors.green[700],
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(
+                    SizeConfig.proportionalWidth(12),
+                  ),
                 ),
                 elevation: 3,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 16,
+                padding: EdgeInsets.symmetric(
+                  vertical: SizeConfig.proportionalHeight(12),
+                  horizontal: SizeConfig.proportionalWidth(16),
                 ),
               ),
             ),
@@ -81,11 +92,16 @@ class MyApp extends StatelessWidget {
             fontFamily: 'HindSiliguri',
             scaffoldBackgroundColor: Colors.grey[900],
             appBarTheme: AppBarTheme(backgroundColor: Colors.green[900]),
-            textTheme: const TextTheme(
-              bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              bodyMedium: TextStyle(fontSize: 14),
+            textTheme: TextTheme(
+              bodyLarge: TextStyle(
+                fontSize: SizeConfig.proportionalFontSize(16),
+                fontWeight: FontWeight.w500,
+              ),
+              bodyMedium: TextStyle(
+                fontSize: SizeConfig.proportionalFontSize(14),
+              ),
               headlineSmall: TextStyle(
-                fontSize: 20,
+                fontSize: SizeConfig.proportionalFontSize(20),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -94,22 +110,19 @@ class MyApp extends StatelessWidget {
                 backgroundColor: Colors.green[700],
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(
+                    SizeConfig.proportionalWidth(12),
+                  ),
                 ),
                 elevation: 3,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 16,
+                padding: EdgeInsets.symmetric(
+                  vertical: SizeConfig.proportionalHeight(12),
+                  horizontal: SizeConfig.proportionalWidth(16),
                 ),
               ),
             ),
           ),
-          home: Builder(
-            builder: (context) {
-              SizeConfig.init(context);
-              return SplashScreen();
-            },
-          ),
+          home: SplashScreen(),
         );
       },
     );
@@ -172,7 +185,6 @@ class _HomePageState extends State<HomePage>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        SizeConfig.init(context);
         _checkConnectivity();
         _loadBannerAd();
         AdHelper.loadInterstitialAd();
@@ -199,7 +211,11 @@ class _HomePageState extends State<HomePage>
     final canShow = await AdHelper.canShowBannerAd();
     if (!canShow) return;
 
-    final banner = await AdHelper.createAdaptiveBannerAdWithFallback(context);
+    final bannerWidth = SizeConfig.screenWidth! * 0.9;
+    final banner = await AdHelper.createAdaptiveBannerAdWithFallback(
+      context,
+      width: bannerWidth.toInt(),
+    );
     await banner.load();
     if (mounted) {
       setState(() {
@@ -224,6 +240,7 @@ class _HomePageState extends State<HomePage>
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            semanticsLabel: 'ইসলামিক কুইজ অনলাইন',
           ),
           centerTitle: true,
           backgroundColor: isDarkMode ? Colors.green[900] : Colors.green[800],
@@ -231,12 +248,15 @@ class _HomePageState extends State<HomePage>
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
           ),
-          leading: ResponsiveIconButton(
-            icon: Icons.menu,
-            iconSize: 28,
-            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-            color: Colors.white,
-          ),
+          leading: SizeConfig.isTablet
+              ? null
+              : ResponsiveIconButton(
+                  icon: Icons.menu,
+                  iconSize: 28,
+                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                  color: Colors.white,
+                  semanticsLabel: 'মেনু খুলুন',
+                ),
           actions: [
             ResponsiveIconButton(
               icon: isDarkMode ? Icons.brightness_7 : Icons.brightness_4,
@@ -244,51 +264,58 @@ class _HomePageState extends State<HomePage>
               onPressed: () =>
                   themeProvider.toggleTheme(!themeProvider.isDarkMode),
               color: Colors.white,
+              semanticsLabel: isDarkMode ? 'লাইট মোড' : 'ডার্ক মোড',
             ),
           ],
         ),
-        drawer: _buildDrawer(themeProvider),
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: isDarkMode
-                  ? [Colors.green[900]!, Colors.green[800]!]
-                  : [Colors.green[50]!, Colors.green[100]!],
-            ),
-          ),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.only(
-                    bottom: SizeConfig.proportionalHeight(10),
+        drawer: SizeConfig.isTablet ? null : _buildDrawer(themeProvider),
+        body: Row(
+          children: [
+            if (SizeConfig.isTablet) _buildNavigationRail(themeProvider),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: isDarkMode
+                        ? [Colors.green[900]!, Colors.green[800]!]
+                        : [Colors.green[50]!, Colors.green[100]!],
                   ),
-                  child: Column(
-                    children: [
-                      _buildImageSlider(isDarkMode),
-                      ResponsiveSizedBox(height: 8),
-                      _buildCategorySelector(isDarkMode),
-                      ResponsiveSizedBox(height: 8),
-                      _buildQuickAccess(isDarkMode),
-                      ResponsiveSizedBox(height: 8),
-                      _buildAdditionalFeatures(isDarkMode),
-                      ResponsiveSizedBox(height: 8),
-                    ],
-                  ),
+                ),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.only(
+                          bottom: SizeConfig.proportionalHeight(10),
+                        ),
+                        child: Column(
+                          children: [
+                            _buildImageSlider(isDarkMode),
+                            ResponsiveSizedBox(height: 8),
+                            _buildCategorySelector(isDarkMode),
+                            ResponsiveSizedBox(height: 8),
+                            _buildQuickAccess(isDarkMode),
+                            ResponsiveSizedBox(height: 8),
+                            _buildAdditionalFeatures(isDarkMode),
+                            ResponsiveSizedBox(height: 8),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_bannerAd != null)
+                      Container(
+                        alignment: Alignment.center,
+                        width: _bannerAd!.size.width.toDouble(),
+                        height: _bannerAd!.size.height.toDouble(),
+                        child: AdWidget(ad: _bannerAd!),
+                      ),
+                  ],
                 ),
               ),
-              // Fixed banner ad at the bottom (outside the scroll view)
-              if (_bannerAd != null)
-                Container(
-                  alignment: Alignment.center,
-                  width: _bannerAd!.size.width.toDouble(),
-                  height: _bannerAd!.size.height.toDouble(),
-                  child: AdWidget(ad: _bannerAd!),
-                ),
-            ],
-          ),
+            ),
+          ],
         ),
         bottomNavigationBar: _buildBottomNavBar(context, isDarkMode),
       ),
@@ -299,22 +326,21 @@ class _HomePageState extends State<HomePage>
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: SizeConfig.proportionalWidth(8),
-        vertical: SizeConfig.proportionalHeight(8), // উপরে-নিচে কিছু spacing
+        vertical: SizeConfig.proportionalHeight(8),
       ),
       child: CarouselSlider(
         options: CarouselOptions(
-          height: SizeConfig.proportionalHeight(150),
-          // height কিছু বাড়ানো
-          aspectRatio: 16 / 9,
-          // স্ক্রিনের image এর width বাড়ানো. 0.92 - Standard (balanced)
-          viewportFraction: 0.96,
-          // viewportFraction বাড়ানো
+          height: SizeConfig.isTablet
+              ? SizeConfig.proportionalHeight(200) // Reduced height
+              : SizeConfig.proportionalHeight(150),
+          // Reduced height
+          aspectRatio: SizeConfig.isLandscape ? 21 / 9 : 16 / 9,
+          viewportFraction: SizeConfig.isTablet ? 0.7 : 0.92,
           initialPage: 0,
           enableInfiniteScroll: true,
           autoPlay: true,
           autoPlayInterval: const Duration(seconds: 3),
           autoPlayAnimationDuration: const Duration(milliseconds: 800),
-          // animation সময় বাড়ানো
           autoPlayCurve: Curves.easeInOut,
           enlargeCenterPage: true,
           scrollDirection: Axis.horizontal,
@@ -329,12 +355,12 @@ class _HomePageState extends State<HomePage>
             ].map((imagePath) {
               return Container(
                 margin: EdgeInsets.symmetric(
-                  horizontal: SizeConfig.proportionalWidth(2), // margin কমানো
+                  horizontal: SizeConfig.proportionalWidth(2),
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(
-                    16,
-                  ), // borderRadius বাড়ানো
+                    SizeConfig.proportionalWidth(16),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.2),
@@ -344,25 +370,32 @@ class _HomePageState extends State<HomePage>
                     ),
                   ],
                 ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Image.asset(
-                      imagePath,
-                      fit: BoxFit.fill, // BoxFit.fill ব্যবহার করুন
-                      width: constraints.maxWidth,
-                      height: constraints.maxHeight,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
-                        child: Center(
-                          child: Icon(
-                            Icons.error_outline,
-                            color: Colors.red,
-                            size: 40,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(
+                    SizeConfig.proportionalWidth(16),
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Image.asset(
+                        imagePath,
+                        fit: BoxFit.cover,
+                        width: constraints.maxWidth,
+                        height: constraints.maxHeight,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: isDarkMode
+                              ? Colors.grey[800]
+                              : Colors.grey[300],
+                          child: Center(
+                            child: Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: SizeConfig.proportionalWidth(40),
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               );
             }).toList(),
@@ -372,52 +405,64 @@ class _HomePageState extends State<HomePage>
 
   Widget _buildCategorySelector(bool isDarkMode) {
     return ResponsivePadding(
-      padding: 12,
+      horizontal: SizeConfig.isTablet ? 16 : 12,
       child: Card(
         child: Padding(
-          padding: EdgeInsets.all(SizeConfig.proportionalWidth(12)),
+          padding: EdgeInsets.all(SizeConfig.proportionalWidth(10)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ResponsiveText(
                 'কুইজ বিষয় নির্বাচন',
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: isDarkMode ? Colors.white : Colors.green[800],
                 textAlign: TextAlign.center,
+                semanticsLabel: 'কুইজ বিষয় নির্বাচন',
               ),
-              ResponsiveSizedBox(height: 8),
+              ResponsiveSizedBox(height: 6),
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: SizeConfig.proportionalWidth(12),
+                  horizontal: SizeConfig.proportionalWidth(10),
+                  vertical: SizeConfig.proportionalHeight(6),
                 ),
                 decoration: BoxDecoration(
                   color: isDarkMode ? Colors.green[800] : Colors.green[50],
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.green[600]!, width: 1),
+                  borderRadius: BorderRadius.circular(
+                    SizeConfig.proportionalWidth(10),
+                  ),
+                  border: Border.all(
+                    color: Colors.green[600]!,
+                    width: SizeConfig.proportionalWidth(1),
+                  ),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: selectedCategory,
                     hint: Row(
                       children: [
-                        Icon(Icons.search, size: 18, color: Colors.green[700]),
-                        SizedBox(width: SizeConfig.proportionalWidth(8)),
+                        Icon(
+                          Icons.search,
+                          size: SizeConfig.proportionalWidth(16),
+                          color: Colors.green[700],
+                        ),
+                        SizedBox(width: SizeConfig.proportionalWidth(6)),
                         ResponsiveText(
                           'বিষয় বেছে নিন',
-                          fontSize: 13,
+                          fontSize: 12,
                           color: isDarkMode ? Colors.white70 : Colors.black54,
+                          semanticsLabel: 'বিষয় বেছে নিন',
                         ),
                       ],
                     ),
                     style: TextStyle(
-                      fontSize: SizeConfig.proportionalFontSize(13),
+                      fontSize: SizeConfig.proportionalFontSize(12),
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                     icon: Icon(
                       Icons.arrow_drop_down,
                       color: Colors.green[700],
-                      size: 22,
+                      size: SizeConfig.proportionalWidth(20),
                     ),
                     isExpanded: true,
                     dropdownColor: isDarkMode
@@ -435,15 +480,16 @@ class _HomePageState extends State<HomePage>
                           children: [
                             Icon(
                               Icons.bookmark_border,
-                              size: 16,
+                              size: SizeConfig.proportionalWidth(14),
                               color: Colors.green[700],
                             ),
-                            SizedBox(width: SizeConfig.proportionalWidth(8)),
+                            SizedBox(width: SizeConfig.proportionalWidth(6)),
                             Expanded(
                               child: ResponsiveText(
                                 category,
-                                fontSize: 13,
+                                fontSize: 12,
                                 overflow: TextOverflow.ellipsis,
+                                semanticsLabel: category,
                               ),
                             ),
                           ],
@@ -453,10 +499,9 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
               ),
-              ResponsiveSizedBox(height: 10),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                height: SizeConfig.proportionalHeight(44),
+              ResponsiveSizedBox(height: 8),
+              Container(
+                height: SizeConfig.proportionalHeight(42),
                 child: ElevatedButton.icon(
                   onPressed: selectedCategory == null
                       ? null
@@ -469,18 +514,24 @@ class _HomePageState extends State<HomePage>
                             ),
                           );
                         },
-                  icon: const Icon(Icons.play_circle_filled, size: 20),
-                  label: const ResponsiveText(
+                  icon: Icon(
+                    Icons.play_circle_filled,
+                    size: SizeConfig.proportionalWidth(18),
+                  ),
+                  label: ResponsiveText(
                     'কুইজ শুরু করুন',
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
+                    semanticsLabel: 'কুইজ শুরু করুন',
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[700],
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(
+                        SizeConfig.proportionalWidth(10),
+                      ),
                     ),
                     elevation: 4,
                     shadowColor: Colors.green.withOpacity(0.5),
@@ -504,27 +555,26 @@ class _HomePageState extends State<HomePage>
     final iconColor = isDarkMode ? Colors.green[100]! : Colors.green[700]!;
 
     return ResponsivePadding(
-      padding: 10,
+      horizontal: 10,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ResponsiveText(
             'ইবাদাত ও দোয়া',
-            fontSize: SizeConfig.proportionalFontSize(16), // 18 থেকে 16 করুন
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: isDarkMode ? Colors.white : Colors.green[800],
+            semanticsLabel: 'ইবাদাত ও দোয়া',
           ),
-          ResponsiveSizedBox(height: 6), // 8 থেকে 6 করুন
+          ResponsiveSizedBox(height: 6),
           GridView.count(
-            crossAxisCount: 3,
+            crossAxisCount: SizeConfig.isTablet ? 6 : 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: SizeConfig.proportionalHeight(8),
-            // 10 থেকে 8 করুন
-            crossAxisSpacing: SizeConfig.proportionalWidth(8),
-            // 10 থেকে 8 করুন
-            childAspectRatio: 0.85,
-            // 0.9 থেকে 0.85 করুন
+            mainAxisSpacing: SizeConfig.proportionalHeight(10),
+            crossAxisSpacing: SizeConfig.proportionalWidth(10),
+            childAspectRatio: 1.0,
+            // Changed to make square shape
             children: [
               _buildIslamicKnowledgeCard(
                 'নামাজের সময়',
@@ -535,6 +585,7 @@ class _HomePageState extends State<HomePage>
                 secondaryTextColor,
                 const PrayerTimePage(),
                 isDarkMode,
+                semanticsLabel: 'নামাজের সময়',
               ),
               _buildIslamicKnowledgeCard(
                 'কুরআনের সূরা',
@@ -545,6 +596,7 @@ class _HomePageState extends State<HomePage>
                 secondaryTextColor,
                 const SuraPage(),
                 isDarkMode,
+                semanticsLabel: 'কুরআনের সূরা',
               ),
               _buildIslamicKnowledgeCard(
                 'দৈনন্দিন দোয়া',
@@ -555,6 +607,7 @@ class _HomePageState extends State<HomePage>
                 secondaryTextColor,
                 const DoyaPage(),
                 isDarkMode,
+                semanticsLabel: 'দৈনন্দিন দোয়া',
               ),
               _buildIslamicKnowledgeCard(
                 'তসবিহ',
@@ -565,6 +618,7 @@ class _HomePageState extends State<HomePage>
                 secondaryTextColor,
                 const TasbeehPage(),
                 isDarkMode,
+                semanticsLabel: 'তসবিহ',
               ),
               _buildIslamicKnowledgeCard(
                 'কিবলা',
@@ -575,6 +629,7 @@ class _HomePageState extends State<HomePage>
                 secondaryTextColor,
                 const QiblaPage(),
                 isDarkMode,
+                semanticsLabel: 'কিবলা',
               ),
               _buildIslamicKnowledgeCard(
                 'নামাজ শিক্ষা',
@@ -585,6 +640,7 @@ class _HomePageState extends State<HomePage>
                 secondaryTextColor,
                 const NamajAmol(),
                 isDarkMode,
+                semanticsLabel: 'নামাজ শিক্ষা',
               ),
             ],
           ),
@@ -606,8 +662,8 @@ class _HomePageState extends State<HomePage>
 
     return Container(
       margin: EdgeInsets.symmetric(
-        horizontal: SizeConfig.proportionalWidth(8),
-        vertical: SizeConfig.proportionalHeight(8),
+        horizontal: SizeConfig.proportionalWidth(SizeConfig.isTablet ? 16 : 8),
+        vertical: SizeConfig.proportionalHeight(SizeConfig.isTablet ? 16 : 10),
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -621,11 +677,12 @@ class _HomePageState extends State<HomePage>
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(SizeConfig.proportionalWidth(10)),
+        padding: EdgeInsets.all(
+          SizeConfig.proportionalWidth(SizeConfig.isTablet ? 16 : 12),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with decorative elements
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: SizeConfig.proportionalWidth(6),
@@ -649,9 +706,10 @@ class _HomePageState extends State<HomePage>
                   Expanded(
                     child: ResponsiveText(
                       'ইসলামী জ্ঞান ভান্ডার',
-                      fontSize: SizeConfig.proportionalFontSize(14),
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: textColor,
+                      semanticsLabel: 'ইসলামী জ্ঞান ভান্ডার',
                     ),
                   ),
                   Container(
@@ -671,23 +729,20 @@ class _HomePageState extends State<HomePage>
                     ),
                     child: ResponsiveText(
                       'নতুন',
-                      fontSize: SizeConfig.proportionalFontSize(10),
+                      fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: Colors.green[700]!,
+                      semanticsLabel: 'নতুন',
                     ),
                   ),
                 ],
               ),
             ),
-
             SizedBox(height: SizeConfig.proportionalHeight(12)),
-
-            // Content with decorative cards
             Stack(
               children: [
                 Container(
                   height: SizeConfig.proportionalHeight(150),
-                  // রিস্পন্স কোন সমস্যা হলে ১৪০ দিব
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     controller: ScrollController(),
@@ -703,6 +758,7 @@ class _HomePageState extends State<HomePage>
                         const NameOfAllahPage(),
                         isDarkMode,
                         description: 'আল্লাহর ৯৯টি পবিত্র নাম জানুন ও শিখুন',
+                        semanticsLabel: 'আল্লাহর নামসমূহ',
                       ),
                       SizedBox(width: SizeConfig.proportionalWidth(12)),
                       _buildIslamicKnowledgeCard(
@@ -715,6 +771,7 @@ class _HomePageState extends State<HomePage>
                         const KalemaPage(),
                         isDarkMode,
                         description: 'ইসলামের মূল ভিত্তি ছয় কালিমা',
+                        semanticsLabel: 'কালিমাহ',
                       ),
                       SizedBox(width: SizeConfig.proportionalWidth(12)),
                       _buildIslamicKnowledgeCard(
@@ -755,13 +812,12 @@ class _HomePageState extends State<HomePage>
                           );
                         },
                         description: 'কুরআন তেলাওয়াত ও তাফসীর শিখুন',
+                        semanticsLabel: 'কুরআন শিক্ষা',
                       ),
                       SizedBox(width: SizeConfig.proportionalWidth(4)),
                     ],
                   ),
                 ),
-
-                // Right side scroll indicator
                 Positioned(
                   right: SizeConfig.proportionalWidth(-8),
                   top: 0,
@@ -790,8 +846,6 @@ class _HomePageState extends State<HomePage>
                 ),
               ],
             ),
-
-            // Decorative footer
             SizedBox(height: SizeConfig.proportionalHeight(8)),
             Center(
               child: Container(
@@ -811,7 +865,6 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  // Card design for Islamic knowledge section
   Widget _buildIslamicKnowledgeCard(
     String title,
     IconData icon,
@@ -824,17 +877,23 @@ class _HomePageState extends State<HomePage>
     String? url,
     String? description,
     Function()? onTap,
+    String? semanticsLabel,
   }) {
     return Container(
-      width: SizeConfig.proportionalWidth(150),
+      width: SizeConfig.isTablet
+          ? SizeConfig.proportionalWidth(120)
+          : SizeConfig.proportionalWidth(150),
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(16)),
+          borderRadius: BorderRadius.circular(
+            SizeConfig.proportionalWidth(16),
+          ), // Rounded corners
         ),
         color: cardColor,
         child: InkWell(
           borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(16)),
+          // Rounded corners
           onTap:
               onTap ??
               () async {
@@ -881,22 +940,24 @@ class _HomePageState extends State<HomePage>
                 ResponsiveSizedBox(height: 8),
                 ResponsiveText(
                   title,
-                  fontSize: SizeConfig.proportionalFontSize(12),
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: textColor,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  semanticsLabel: semanticsLabel,
                 ),
                 if (description != null) ...[
                   ResponsiveSizedBox(height: 2),
                   ResponsiveText(
                     description,
-                    fontSize: SizeConfig.proportionalFontSize(10),
+                    fontSize: 10,
                     color: secondaryTextColor,
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                    semanticsLabel: description,
                   ),
                 ],
               ],
@@ -928,11 +989,11 @@ class _HomePageState extends State<HomePage>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(
-                  radius: 30,
+                  radius: SizeConfig.proportionalWidth(30),
                   backgroundColor: Colors.white,
                   child: Icon(
                     Icons.menu_book,
-                    size: 34,
+                    size: SizeConfig.proportionalWidth(34),
                     color: Colors.green[800],
                   ),
                 ),
@@ -942,40 +1003,81 @@ class _HomePageState extends State<HomePage>
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  semanticsLabel: 'ইসলামিক কুইজ অনলাইন',
                 ),
                 const ResponsiveText(
                   'ইসলামের জ্ঞান অর্জন করুন',
                   fontSize: 12,
                   color: Colors.white70,
+                  semanticsLabel: 'ইসলামের জ্ঞান অর্জন করুন',
                 ),
               ],
             ),
           ),
-          _buildDrawerItem(Icons.book, 'দৈনন্দিন দোয়া', const DoyaPage()),
-          _buildDrawerItem(Icons.mosque, 'নামাজের সময়', const PrayerTimePage()),
+          _buildDrawerItem(
+            Icons.book,
+            'দৈনন্দিন দোয়া',
+            const DoyaPage(),
+            semanticsLabel: 'দৈনন্দিন দোয়া',
+          ),
+          _buildDrawerItem(
+            Icons.mosque,
+            'নামাজের সময়',
+            const PrayerTimePage(),
+            semanticsLabel: 'নামাজের সময়',
+          ),
           _buildDrawerItem(
             Icons.mosque,
             'নিকটবর্তী মসজিদ',
             null,
             url: 'https://www.google.com/maps/search/?api=1&query=মসজিদ',
+            semanticsLabel: 'নিকটবর্তী মসজিদ',
           ),
-          _buildDrawerItem(Icons.info, 'আমাদের সম্বন্ধে', const AboutPage()),
-          _buildDrawerItem(Icons.developer_mode, 'ডেভেলপার', DeveloperPage()),
-          _buildDrawerItem(Icons.contact_page, 'যোগাযোগ', const ContactPage()),
+          _buildDrawerItem(
+            Icons.info,
+            'আমাদের সম্বন্ধে',
+            const AboutPage(),
+            semanticsLabel: 'আমাদের সম্বন্ধে',
+          ),
+          _buildDrawerItem(
+            Icons.developer_mode,
+            'ডেভেলপার',
+            DeveloperPage(),
+            semanticsLabel: 'ডেভেলপার',
+          ),
+          _buildDrawerItem(
+            Icons.contact_page,
+            'যোগাযোগ',
+            const ContactPage(),
+            semanticsLabel: 'যোগাযোগ',
+          ),
           _buildDrawerItem(
             Icons.privacy_tip,
             'Privacy Policy',
             null,
             url: 'https://sites.google.com/view/islamicquize/home',
+            semanticsLabel: 'Privacy Policy',
           ),
-          Divider(color: Colors.green.shade200, indent: 16, endIndent: 16),
+          Divider(
+            color: Colors.green.shade200,
+            indent: SizeConfig.proportionalWidth(16),
+            endIndent: SizeConfig.proportionalWidth(16),
+          ),
           ResponsivePadding(
-            padding: 12,
+            horizontal: 12,
             child: Row(
               children: [
-                Icon(Icons.brightness_6, color: Colors.green[700], size: 24),
+                Icon(
+                  Icons.brightness_6,
+                  color: Colors.green[700],
+                  size: SizeConfig.proportionalWidth(24),
+                ),
                 ResponsiveSizedBox(width: 10),
-                const ResponsiveText('ডার্ক মোড', fontSize: 16),
+                const ResponsiveText(
+                  'ডার্ক মোড',
+                  fontSize: 16,
+                  semanticsLabel: 'ডার্ক মোড',
+                ),
                 const Spacer(),
                 Switch(
                   value: themeProvider.isDarkMode,
@@ -991,25 +1093,197 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  Widget _buildNavigationRail(ThemeProvider themeProvider) {
+    final isDarkMode = themeProvider.isDarkMode;
+
+    return NavigationRail(
+      backgroundColor: isDarkMode ? Colors.green[900] : Colors.white,
+      selectedIndex: 0,
+      onDestinationSelected: (index) async {
+        switch (index) {
+          case 0:
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DoyaPage()),
+            );
+            break;
+          case 1:
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PrayerTimePage()),
+            );
+            break;
+          case 2:
+            final Uri uri = Uri.parse(
+              'https://www.google.com/maps/search/?api=1&query=মসজিদ',
+            );
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            }
+            break;
+          case 3:
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AboutPage()),
+            );
+            break;
+          case 4:
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DeveloperPage()),
+            );
+            break;
+          case 5:
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ContactPage()),
+            );
+            break;
+          case 6:
+            final Uri uri = Uri.parse(
+              'https://sites.google.com/view/islamicquize/home',
+            );
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            }
+            break;
+        }
+      },
+      labelType: NavigationRailLabelType.all,
+      destinations: [
+        NavigationRailDestination(
+          icon: Icon(Icons.book, size: SizeConfig.proportionalWidth(24)),
+          selectedIcon: Icon(
+            Icons.book,
+            color: Colors.green[700],
+            size: SizeConfig.proportionalWidth(24),
+          ),
+          label: ResponsiveText(
+            'দৈনন্দিন দোয়া',
+            fontSize: 12,
+            color: isDarkMode ? Colors.white : Colors.black87,
+            semanticsLabel: 'দৈনন্দিন দোয়া',
+          ),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.mosque, size: SizeConfig.proportionalWidth(24)),
+          selectedIcon: Icon(
+            Icons.mosque,
+            color: Colors.green[700],
+            size: SizeConfig.proportionalWidth(24),
+          ),
+          label: ResponsiveText(
+            'নামাজের সময়',
+            fontSize: 12,
+            color: isDarkMode ? Colors.white : Colors.black87,
+            semanticsLabel: 'নামাজের সময়',
+          ),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.mosque, size: SizeConfig.proportionalWidth(24)),
+          selectedIcon: Icon(
+            Icons.mosque,
+            color: Colors.green[700],
+            size: SizeConfig.proportionalWidth(24),
+          ),
+          label: ResponsiveText(
+            'نিকটবর্তী মসজিদ',
+            fontSize: 12,
+            color: isDarkMode ? Colors.white : Colors.black87,
+            semanticsLabel: 'নিকটবর্তী মসজিদ',
+          ),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.info, size: SizeConfig.proportionalWidth(24)),
+          selectedIcon: Icon(
+            Icons.info,
+            color: Colors.green[700],
+            size: SizeConfig.proportionalWidth(24),
+          ),
+          label: ResponsiveText(
+            'আমাদের সম্বন্ধে',
+            fontSize: 12,
+            color: isDarkMode ? Colors.white : Colors.black87,
+            semanticsLabel: 'আমাদের সম্বন্ধে',
+          ),
+        ),
+        NavigationRailDestination(
+          icon: Icon(
+            Icons.developer_mode,
+            size: SizeConfig.proportionalWidth(24),
+          ),
+          selectedIcon: Icon(
+            Icons.developer_mode,
+            color: Colors.green[700],
+            size: SizeConfig.proportionalWidth(24),
+          ),
+          label: ResponsiveText(
+            'ডেভেলপার',
+            fontSize: 12,
+            color: isDarkMode ? Colors.white : Colors.black87,
+            semanticsLabel: 'ডেভেলপар',
+          ),
+        ),
+        NavigationRailDestination(
+          icon: Icon(
+            Icons.contact_page,
+            size: SizeConfig.proportionalWidth(24),
+          ),
+          selectedIcon: Icon(
+            Icons.contact_page,
+            color: Colors.green[700],
+            size: SizeConfig.proportionalWidth(24),
+          ),
+          label: ResponsiveText(
+            'যোগাযোগ',
+            fontSize: 12,
+            color: isDarkMode ? Colors.white : Colors.black87,
+            semanticsLabel: 'যোগাযোগ',
+          ),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.privacy_tip, size: SizeConfig.proportionalWidth(24)),
+          selectedIcon: Icon(
+            Icons.privacy_tip,
+            color: Colors.green[700],
+            size: SizeConfig.proportionalWidth(24),
+          ),
+          label: ResponsiveText(
+            'Privacy Policy',
+            fontSize: 12,
+            color: isDarkMode ? Colors.white : Colors.black87,
+            semanticsLabel: 'Privacy Policy',
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildDrawerItem(
     IconData icon,
     String title,
     Widget? page, {
     String? url,
+    String? semanticsLabel,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListTile(
-      leading: Icon(icon, color: Colors.green[700], size: 24),
+      leading: Icon(
+        icon,
+        color: Colors.green[700],
+        size: SizeConfig.proportionalWidth(24),
+      ),
       title: ResponsiveText(
         title,
         fontSize: 16,
         fontWeight: FontWeight.w500,
         color: isDark ? Colors.white : Colors.black87,
+        semanticsLabel: semanticsLabel,
       ),
       trailing: Icon(
         Icons.arrow_forward_ios,
-        size: 16,
+        size: SizeConfig.proportionalWidth(16),
         color: Colors.green[700],
       ),
       onTap: () async {
@@ -1020,7 +1294,14 @@ class _HomePageState extends State<HomePage>
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Could not open link')),
+              SnackBar(
+                content: Text(
+                  'Could not open link',
+                  style: TextStyle(
+                    fontSize: SizeConfig.proportionalFontSize(14),
+                  ),
+                ),
+              ),
             );
           }
         } else if (page != null) {
@@ -1034,26 +1315,14 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _buildBottomNavBar(BuildContext context, bool isDarkMode) {
-    // Safety check to ensure SizeConfig is initialized
-    if (SizeConfig.screenWidth == null) {
-      SizeConfig.init(context);
-      print(
-        'SizeConfig initialized in _buildBottomNavBar: screenWidth=${SizeConfig.screenWidth}',
-      );
-    }
-
-    // Debug print for proportionalWidth
-    final paddingValue = SizeConfig.proportionalWidth(10);
-    print('Proportional Width for padding: $paddingValue');
-
     return Container(
       margin: EdgeInsets.symmetric(
-        horizontal: SizeConfig.proportionalWidth(16) ?? 16.0,
-        vertical: SizeConfig.proportionalHeight(8) ?? 8.0,
+        horizontal: SizeConfig.proportionalWidth(16),
+        vertical: SizeConfig.proportionalHeight(8),
       ),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.green[900] : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(16)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -1063,7 +1332,7 @@ class _HomePageState extends State<HomePage>
         ],
       ),
       child: ResponsivePadding(
-        // padding: EdgeInsets.all(paddingValue ?? 10.0),
+        horizontal: 10,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -1073,10 +1342,29 @@ class _HomePageState extends State<HomePage>
               0,
               isDarkMode,
               isSelected: true,
+              semanticsLabel: 'হোম',
             ),
-            _buildBottomNavItem(Icons.star, 'রেটিং', 1, isDarkMode),
-            _buildBottomNavItem(Icons.apps, 'অন্যান্য', 2, isDarkMode),
-            _buildBottomNavItem(Icons.share, 'শেয়ার', 3, isDarkMode),
+            _buildBottomNavItem(
+              Icons.star,
+              'রেটিং',
+              1,
+              isDarkMode,
+              semanticsLabel: 'রেটিং',
+            ),
+            _buildBottomNavItem(
+              Icons.apps,
+              'অন্যান্য',
+              2,
+              isDarkMode,
+              semanticsLabel: 'অন্যান্য',
+            ),
+            _buildBottomNavItem(
+              Icons.share,
+              'শেয়ার',
+              3,
+              isDarkMode,
+              semanticsLabel: 'শেয়ার',
+            ),
           ],
         ),
       ),
@@ -1089,46 +1377,52 @@ class _HomePageState extends State<HomePage>
     int index,
     bool isDarkMode, {
     bool isSelected = false,
+    String? semanticsLabel,
   }) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       padding: EdgeInsets.symmetric(
-        vertical: SizeConfig.proportionalHeight(6) ?? 6.0,
-        horizontal: SizeConfig.proportionalWidth(12) ?? 12.0,
+        vertical: SizeConfig.proportionalHeight(6),
+        horizontal: SizeConfig.proportionalWidth(12),
       ),
       decoration: BoxDecoration(
         color: isSelected
             ? Colors.green[700]!.withOpacity(0.2)
             : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(12)),
       ),
       child: InkWell(
         onTap: () => _onBottomNavItemTapped(index),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: isSelected
-                  ? Colors.green[700]
-                  : (isDarkMode ? Colors.green[800] : Colors.green[200]),
-              child: Icon(
-                icon,
-                size: 20,
-                color: isSelected
-                    ? Colors.white
-                    : (isDarkMode ? Colors.white : Colors.green[700]),
+        child: Semantics(
+          label: semanticsLabel,
+          button: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: SizeConfig.proportionalWidth(16),
+                backgroundColor: isSelected
+                    ? Colors.green[700]
+                    : (isDarkMode ? Colors.green[800] : Colors.green[200]),
+                child: Icon(
+                  icon,
+                  size: SizeConfig.proportionalWidth(20),
+                  color: isSelected
+                      ? Colors.white
+                      : (isDarkMode ? Colors.white : Colors.green[700]),
+                ),
               ),
-            ),
-            ResponsiveSizedBox(height: 4),
-            ResponsiveText(
-              label,
-              fontSize: 11,
-              color: isSelected
-                  ? Colors.green[700]
-                  : (isDarkMode ? Colors.white : Colors.green[700]),
-            ),
-          ],
+              ResponsiveSizedBox(height: 4),
+              ResponsiveText(
+                label,
+                fontSize: 11,
+                color: isSelected
+                    ? Colors.green[700]
+                    : (isDarkMode ? Colors.white : Colors.green[700]),
+                semanticsLabel: label,
+              ),
+            ],
+          ),
         ),
       ),
     );

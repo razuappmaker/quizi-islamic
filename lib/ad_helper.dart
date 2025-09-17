@@ -58,6 +58,7 @@ class AdHelper {
   // Create adaptive banner ad with fallback mechanism - Version 6.0.0 compatible
   static Future<BannerAd> createAdaptiveBannerAdWithFallback(
     BuildContext context, {
+    int? width, // যদি এই parameter না থাকে
     BannerAdListener? listener,
     Orientation orientation = Orientation.portrait,
   }) async {
