@@ -1,4 +1,3 @@
-// lib/utils/size_config.dart
 import 'package:flutter/widgets.dart';
 
 class SizeConfig {
@@ -27,20 +26,23 @@ class SizeConfig {
     safeBlockVertical = (screenHeight - _safeAreaVertical) / 100;
   }
 
-  // সহায়ক মেথড
+  /// ---- Compact scaling ----
+  /// baseline width = 360, baseline height = 800 (আগে 640 ছিল)
+  /// height এখন অটোমেটিক ছোট দেখাবে
+
   static double proportionalWidth(double width) {
-    return screenWidth * (width / 360); // 360 হলো baseline width
+    return screenWidth * (width / 360);
   }
 
   static double proportionalHeight(double height) {
-    return screenHeight * (height / 640); // 640 হলো baseline height
+    return screenHeight * (height / 800); // Compact look
   }
 
   static double proportionalFontSize(double size) {
-    return (screenWidth / 360) * size; // 360 হলো baseline width
+    return (screenWidth / 360) * size * 0.92;
+    // 0.92 দিয়ে font সামান্য ছোট করা হলো
   }
 
-  // নতুন মেথড যোগ করুন
   static SizeConfig of(BuildContext context) {
     init(context);
     return SizeConfig();
