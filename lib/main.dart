@@ -297,17 +297,24 @@ class _HomePageState extends State<HomePage>
 
   Widget _buildImageSlider(bool isDarkMode) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: SizeConfig.proportionalWidth(8)),
+      margin: EdgeInsets.symmetric(
+        horizontal: SizeConfig.proportionalWidth(8),
+        vertical: SizeConfig.proportionalHeight(8), // উপরে-নিচে কিছু spacing
+      ),
       child: CarouselSlider(
         options: CarouselOptions(
-          height: SizeConfig.proportionalHeight(130),
+          height: SizeConfig.proportionalHeight(150),
+          // height কিছু বাড়ানো
           aspectRatio: 16 / 9,
-          viewportFraction: 0.9,
+          // স্ক্রিনের image এর width বাড়ানো. 0.92 - Standard (balanced)
+          viewportFraction: 0.96,
+          // viewportFraction বাড়ানো
           initialPage: 0,
           enableInfiniteScroll: true,
           autoPlay: true,
           autoPlayInterval: const Duration(seconds: 3),
-          autoPlayAnimationDuration: const Duration(milliseconds: 600),
+          autoPlayAnimationDuration: const Duration(milliseconds: 800),
+          // animation সময় বাড়ানো
           autoPlayCurve: Curves.easeInOut,
           enlargeCenterPage: true,
           scrollDirection: Axis.horizontal,
@@ -322,28 +329,40 @@ class _HomePageState extends State<HomePage>
             ].map((imagePath) {
               return Container(
                 margin: EdgeInsets.symmetric(
-                  horizontal: SizeConfig.proportionalWidth(4),
+                  horizontal: SizeConfig.proportionalWidth(2), // margin কমানো
                 ),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(
+                    16,
+                  ), // borderRadius বাড়ানো
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                      spreadRadius: 1,
                     ),
                   ],
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.error, color: Colors.red),
-                    ),
-                  ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Image.asset(
+                      imagePath,
+                      fit: BoxFit.fill, // BoxFit.fill ব্যবহার করুন
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                        child: Center(
+                          child: Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 40,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               );
             }).toList(),
@@ -491,18 +510,21 @@ class _HomePageState extends State<HomePage>
         children: [
           ResponsiveText(
             'ইবাদাত ও দোয়া',
-            fontSize: 18,
+            fontSize: SizeConfig.proportionalFontSize(16), // 18 থেকে 16 করুন
             fontWeight: FontWeight.bold,
             color: isDarkMode ? Colors.white : Colors.green[800],
           ),
-          ResponsiveSizedBox(height: 8),
+          ResponsiveSizedBox(height: 6), // 8 থেকে 6 করুন
           GridView.count(
             crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: SizeConfig.proportionalHeight(10),
-            crossAxisSpacing: SizeConfig.proportionalWidth(10),
-            childAspectRatio: 0.9,
+            mainAxisSpacing: SizeConfig.proportionalHeight(8),
+            // 10 থেকে 8 করুন
+            crossAxisSpacing: SizeConfig.proportionalWidth(8),
+            // 10 থেকে 8 করুন
+            childAspectRatio: 0.85,
+            // 0.9 থেকে 0.85 করুন
             children: [
               _buildIslamicKnowledgeCard(
                 'নামাজের সময়',
@@ -585,11 +607,11 @@ class _HomePageState extends State<HomePage>
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: SizeConfig.proportionalWidth(8),
-        vertical: SizeConfig.proportionalHeight(12),
+        vertical: SizeConfig.proportionalHeight(8),
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(20)),
         boxShadow: [
           BoxShadow(
             color: isDarkMode ? Colors.black54 : Colors.green.withOpacity(0.1),
@@ -599,19 +621,21 @@ class _HomePageState extends State<HomePage>
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(SizeConfig.proportionalWidth(12)),
+        padding: EdgeInsets.all(SizeConfig.proportionalWidth(10)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header with decorative elements
             Container(
               padding: EdgeInsets.symmetric(
-                horizontal: SizeConfig.proportionalWidth(8),
-                vertical: SizeConfig.proportionalHeight(6),
+                horizontal: SizeConfig.proportionalWidth(6),
+                vertical: SizeConfig.proportionalHeight(4),
               ),
               decoration: BoxDecoration(
                 color: primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(
+                  SizeConfig.proportionalWidth(12),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -619,65 +643,51 @@ class _HomePageState extends State<HomePage>
                   Icon(
                     Icons.lightbulb_outline_rounded,
                     color: accentColor,
-                    size: 28,
+                    size: SizeConfig.proportionalWidth(24),
                   ),
-                  SizedBox(width: SizeConfig.proportionalWidth(10)),
+                  SizedBox(width: SizeConfig.proportionalWidth(8)),
                   Expanded(
                     child: ResponsiveText(
                       'ইসলামী জ্ঞান ভান্ডার',
-                      fontSize: 16,
+                      fontSize: SizeConfig.proportionalFontSize(14),
                       fontWeight: FontWeight.bold,
                       color: textColor,
                     ),
                   ),
-                  // বিকল্প ৩: বৃত্তাকার ডিজাইন
-                  // বিকল্প ২: আউটলাইন স্টাইল
                   Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: SizeConfig.proportionalWidth(10),
-                      vertical: SizeConfig.proportionalHeight(3),
+                      horizontal: SizeConfig.proportionalWidth(8),
+                      vertical: SizeConfig.proportionalHeight(2),
                     ),
                     decoration: BoxDecoration(
                       color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.green[700]!, width: 1.5),
+                      borderRadius: BorderRadius.circular(
+                        SizeConfig.proportionalWidth(8),
+                      ),
+                      border: Border.all(
+                        color: Colors.green[700]!,
+                        width: SizeConfig.proportionalWidth(1.5),
+                      ),
                     ),
                     child: ResponsiveText(
                       'নতুন',
-                      fontSize: 11,
+                      fontSize: SizeConfig.proportionalFontSize(10),
                       fontWeight: FontWeight.bold,
                       color: Colors.green[700]!,
                     ),
                   ),
-
-                  /*Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: SizeConfig.proportionalWidth(8),
-                      vertical: SizeConfig.proportionalHeight(4),
-                    ),
-                    decoration: BoxDecoration(
-                      color: primaryColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ResponsiveText(
-                      'নতুন',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),*/
                 ],
               ),
             ),
 
-            SizedBox(height: SizeConfig.proportionalHeight(16)),
+            SizedBox(height: SizeConfig.proportionalHeight(12)),
 
             // Content with decorative cards
-            // Single row with two visible items and scroll indicator
             Stack(
               children: [
                 Container(
-                  height: SizeConfig.proportionalHeight(160),
+                  height: SizeConfig.proportionalHeight(150),
+                  // রিস্পন্স কোন সমস্যা হলে ১৪০ দিব
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     controller: ScrollController(),
@@ -721,9 +731,22 @@ class _HomePageState extends State<HomePage>
                             SnackBar(
                               content: Row(
                                 children: [
-                                  Icon(Icons.info_outline, color: Colors.white),
-                                  SizedBox(width: 8),
-                                  Text('কুরআন শিক্ষা বিভাগ শীঘ্রই আসছে'),
+                                  Icon(
+                                    Icons.info_outline,
+                                    color: Colors.white,
+                                    size: SizeConfig.proportionalWidth(20),
+                                  ),
+                                  SizedBox(
+                                    width: SizeConfig.proportionalWidth(8),
+                                  ),
+                                  Text(
+                                    'কুরআন শিক্ষা বিভাগ শীঘ্রই আসছে',
+                                    style: TextStyle(
+                                      fontSize: SizeConfig.proportionalFontSize(
+                                        14,
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                               backgroundColor: primaryColor,
@@ -738,16 +761,16 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
 
-                // Right side scroll indicator - কার্ডের বাইরে ডান দিকে
+                // Right side scroll indicator
                 Positioned(
-                  right: -8, // সামান্য বাইরে
+                  right: SizeConfig.proportionalWidth(-8),
                   top: 0,
                   bottom: 0,
                   child: Center(
                     child: ClipRect(
                       child: Align(
                         alignment: Alignment.centerRight,
-                        widthFactor: 0.5, // অর্ধেক দেখাবে
+                        widthFactor: 0.5,
                         child: Container(
                           width: SizeConfig.proportionalWidth(28),
                           height: SizeConfig.proportionalWidth(28),
@@ -758,7 +781,7 @@ class _HomePageState extends State<HomePage>
                           child: Icon(
                             Icons.more_horiz,
                             color: Colors.white,
-                            size: 20,
+                            size: SizeConfig.proportionalWidth(20),
                           ),
                         ),
                       ),
@@ -769,14 +792,16 @@ class _HomePageState extends State<HomePage>
             ),
 
             // Decorative footer
-            SizedBox(height: SizeConfig.proportionalHeight(12)),
+            SizedBox(height: SizeConfig.proportionalHeight(8)),
             Center(
               child: Container(
                 width: SizeConfig.proportionalWidth(40),
-                height: 4,
+                height: SizeConfig.proportionalHeight(4),
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(
+                    SizeConfig.proportionalWidth(2),
+                  ),
                 ),
               ),
             ),
@@ -804,10 +829,12 @@ class _HomePageState extends State<HomePage>
       width: SizeConfig.proportionalWidth(150),
       child: Card(
         elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(16)),
+        ),
         color: cardColor,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(SizeConfig.proportionalWidth(16)),
           onTap:
               onTap ??
               () async {
@@ -817,7 +844,14 @@ class _HomePageState extends State<HomePage>
                     await launchUrl(uri, mode: LaunchMode.externalApplication);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('লিঙ্ক খোলা যায়নি')),
+                      SnackBar(
+                        content: Text(
+                          'লিঙ্ক খোলা যায়নি',
+                          style: TextStyle(
+                            fontSize: SizeConfig.proportionalFontSize(14),
+                          ),
+                        ),
+                      ),
                     );
                   }
                 } else if (page != null) {
@@ -828,22 +862,26 @@ class _HomePageState extends State<HomePage>
                 }
               },
           child: Container(
-            padding: EdgeInsets.all(SizeConfig.proportionalWidth(12)),
+            padding: EdgeInsets.all(SizeConfig.proportionalWidth(10)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: EdgeInsets.all(SizeConfig.proportionalWidth(10)),
+                  padding: EdgeInsets.all(SizeConfig.proportionalWidth(8)),
                   decoration: BoxDecoration(
                     color: iconColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, size: 28, color: iconColor),
+                  child: Icon(
+                    icon,
+                    size: SizeConfig.proportionalWidth(24),
+                    color: iconColor,
+                  ),
                 ),
-                ResponsiveSizedBox(height: 12),
+                ResponsiveSizedBox(height: 8),
                 ResponsiveText(
                   title,
-                  fontSize: 12,
+                  fontSize: SizeConfig.proportionalFontSize(12),
                   fontWeight: FontWeight.bold,
                   color: textColor,
                   textAlign: TextAlign.center,
@@ -851,10 +889,10 @@ class _HomePageState extends State<HomePage>
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (description != null) ...[
-                  ResponsiveSizedBox(height: 4),
+                  ResponsiveSizedBox(height: 2),
                   ResponsiveText(
                     description,
-                    fontSize: 11,
+                    fontSize: SizeConfig.proportionalFontSize(10),
                     color: secondaryTextColor,
                     textAlign: TextAlign.center,
                     maxLines: 2,
