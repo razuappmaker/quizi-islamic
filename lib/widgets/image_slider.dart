@@ -18,18 +18,13 @@ class ImageSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: responsiveValue(context, 4), // margin কমিয়েছেন
-        vertical: responsiveValue(context, 8),
-      ),
+      margin: EdgeInsets.symmetric(vertical: responsiveValue(context, 8)),
       child: CarouselSlider(
         options: CarouselOptions(
-          height: isTablet
-              ? responsiveValue(context, 200)
-              : responsiveValue(context, 150),
-          aspectRatio: isLandscape ? 21 / 9 : 16 / 9,
-          viewportFraction: 1.0,
-          // সম্পূর্ণ width নেবে
+          height: _getSliderHeight(context),
+          aspectRatio: _getAspectRatio(),
+          viewportFraction: 0.95,
+          // 1.0 থেকে 0.95 এ কমিয়ে আনুন
           initialPage: 0,
           enableInfiniteScroll: true,
           autoPlay: true,
@@ -41,23 +36,20 @@ class ImageSlider extends StatelessWidget {
         ),
         items:
             [
-              'assets/images/slider1.png',
-              'assets/images/slider2.png',
-              'assets/images/slider3.png',
-              'assets/images/slider4.png',
-              'assets/images/slider5.png',
-            ].map((imagePath) {
+              'slider1.webp',
+              'slider2.webp',
+              'slider3.webp',
+              'slider4.webp',
+              'slider5.webp',
+            ].map((baseName) {
+              final imagePath = _getImagePath(baseName);
               return Container(
                 margin: EdgeInsets.symmetric(
-                  horizontal: responsiveValue(
-                    context,
-                    2,
-                  ), // margin আরও কমিয়েছেন
+                  horizontal: responsiveValue(context, 8),
                 ),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                    responsiveValue(context, 16),
-                  ),
+                  color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.2),
@@ -68,27 +60,115 @@ class ImageSlider extends StatelessWidget {
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                    responsiveValue(context, 16),
-                  ),
+                  borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
                     imagePath,
-                    fit: BoxFit.fill, // BoxFit.fill ব্যবহার করুন
-                    width: double.infinity, // সম্পূর্ণ width নেবে
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
-                      child: Center(
-                        child: Icon(
-                          Icons.error_outline,
-                          color: Colors.red,
-                          size: responsiveValue(context, 40),
-                        ),
-                      ),
-                    ),
+                    fit: BoxFit.contain, // BoxFit.contain ব্যবহার করুন
+                    width: double.infinity,
+                    height: double.infinity,
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildErrorPlaceholder(context, isDarkMode, imagePath),
                   ),
                 ),
               );
             }).toList(),
+      ),
+    );
+  }
+
+  String _getImagePath(String baseName) {
+    // প্রথমে আলাদা ফোল্ডার থেকে চেষ্টা করুন, না থাকলে সাধারণ ফোল্ডার থেকে নিন
+    final String specificPath;
+
+    if (isTablet) {
+      specificPath = isLandscape
+          ? 'assets/images/slider/tablet_landscape/$baseName'
+          : 'assets/images/slider/tablet_portrait/$baseName';
+    } else {
+      specificPath = isLandscape
+          ? 'assets/images/slider/mobile_landscape/$baseName'
+          : 'assets/images/slider/mobile_portrait/$baseName';
+    }
+
+    // Fallback mechanism: যদি specific image না থাকে তবে সাধারণ ফোল্ডার থেকে নিন
+    return specificPath;
+  }
+
+  double _getSliderHeight(BuildContext context) {
+    // Height সামঞ্জস্য করুন
+    if (isTablet) {
+      return isLandscape
+          ? responsiveValue(context, 220) // বাড়িয়ে 220
+          : responsiveValue(context, 280); // বাড়িয়ে 280
+    } else {
+      return isLandscape
+          ? responsiveValue(context, 160) // বাড়িয়ে 160
+          : responsiveValue(context, 200); // বাড়িয়ে 200
+    }
+  }
+
+  double _getAspectRatio() {
+    // Fixed aspect ratio ব্যবহার করুন
+    return 16 / 9; // স্ট্যান্ডার্ড aspect ratio
+  }
+
+  Widget _buildErrorPlaceholder(
+    BuildContext context,
+    bool isDarkMode,
+    String imagePath,
+  ) {
+    // Error message improve করুন
+    print('Error loading image: $imagePath');
+
+    // Fallback: সাধারণ ফোল্ডার থেকে ছবি লোড করার চেষ্টা করুন
+    final fallbackPath = imagePath
+        .replaceAll('slider/tablet_', 'slider/')
+        .replaceAll('slider/mobile_', 'slider/')
+        .replaceAll('_landscape/', '/')
+        .replaceAll('_portrait/', '/');
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.image_not_supported,
+              color: Colors.red,
+              size: responsiveValue(context, 40),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'ছবি লোড হয়নি',
+              style: TextStyle(
+                fontSize: responsiveValue(context, 12),
+                color: Colors.red,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Path: ${imagePath.split('/').last}',
+              style: TextStyle(
+                fontSize: responsiveValue(context, 10),
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 8),
+            // Fallback image লোড করার চেষ্টা করুন
+            Image.asset(
+              'assets/images/slider/$fallbackPath',
+              fit: BoxFit.contain,
+              width: 100,
+              height: 60,
+              errorBuilder: (context, error, stackTrace) => SizedBox(),
+            ),
+          ],
+        ),
       ),
     );
   }

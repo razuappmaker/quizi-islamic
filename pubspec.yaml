@@ -101,14 +101,13 @@ flutter:
     - assets/sounds/wrong.mp3
     - assets/images/logo.png
     - assets/images/razu.jpg
-    - assets/images/slider1.png
-    - assets/images/slider2.png
-    - assets/images/slider3.png
-    - assets/images/slider4.png
-    - assets/images/slider5.png
     - assets/images/compass.png
     - assets/pdf/umrah_guide.pdf
     - assets/pdf/namaj_amol.pdf
+    - assets/images/slider/mobile_portrait/
+    - assets/images/slider/mobile_landscape/
+    - assets/images/slider/tablet_portrait/
+    - assets/images/slider/tablet_landscape/
 
 
 
