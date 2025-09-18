@@ -633,7 +633,8 @@ class _HomePageState extends State<HomePage>
 
     return Container(
       margin: EdgeInsets.symmetric(
-        horizontal: responsiveValue(context, isTablet ? 16 : 8),
+        horizontal: responsiveValue(context, isTablet ? 0 : 8),
+        // ট্যাবলেটে horizontal margin 0
         vertical: responsiveValue(context, isTablet ? 16 : 10),
       ),
       decoration: BoxDecoration(
@@ -708,117 +709,28 @@ class _HomePageState extends State<HomePage>
               ),
             ),
             ResponsiveSizedBox(height: responsiveValue(context, 12)),
-            Stack(
-              children: [
-                Container(
-                  height: responsiveValue(context, 150),
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    controller: ScrollController(),
-                    children: [
-                      ResponsiveSizedBox(width: responsiveValue(context, 4)),
-                      // আল্লাহর নাম কার্ড
-                      _buildIslamicKnowledgeCard(
-                        context,
-                        'আল্লাহর নামসমূহ',
-                        Icons.auto_awesome_rounded,
-                        iconColor,
-                        cardColor,
-                        textColor,
-                        isDarkMode ? Colors.white : Colors.green[600]!,
-                        // হালকা সাদা
-                        const NameOfAllahPage(),
-                        isDarkMode,
-                        description: 'আল্লাহর ৯৯টি পবিত্র নাম জানুন ও শিখুন',
-                        semanticsLabel: 'আল্লাহর নামসমূহ',
-                      ),
-                      ResponsiveSizedBox(width: responsiveValue(context, 12)),
-                      // কালিমাহ কার্ড
-                      _buildIslamicKnowledgeCard(
-                        context,
-                        'কালিমাহ',
-                        Icons.book_rounded,
-                        iconColor,
-                        cardColor,
-                        textColor,
-                        isDarkMode ? Colors.white : Colors.green[600]!,
-                        // হালকা সাদা
-                        const KalemaPage(),
-                        isDarkMode,
-                        description: 'ইসলামের মূল ভিত্তি ছয় কালিমা',
-                        semanticsLabel: 'কালিমাহ',
-                      ),
-                      ResponsiveSizedBox(width: responsiveValue(context, 12)),
-                      _buildIslamicKnowledgeCard(
-                        context,
-                        'কুরআন শিক্ষা',
-                        Icons.menu_book_rounded,
-                        iconColor,
-                        cardColor,
-                        textColor,
-                        secondaryTextColor,
-                        null,
-                        isDarkMode,
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(
-                                    Icons.info_outline,
-                                    color: Colors.white,
-                                    size: responsiveValue(context, 20),
-                                  ),
-                                  ResponsiveSizedBox(
-                                    width: responsiveValue(context, 8),
-                                  ),
-                                  ResponsiveText(
-                                    'কুরআন শিক্ষা বিভাগ শীঘ্রই আসছে',
-                                    fontSize: responsiveValue(context, 14),
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
-                              backgroundColor: primaryColor,
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                        description: 'কুরআন তেলাওয়াত ও তাফসীর শিখুন',
-                        semanticsLabel: 'কুরআন শিক্ষা',
-                      ),
-                      ResponsiveSizedBox(width: responsiveValue(context, 4)),
-                    ],
+
+            // ট্যাবলেট মোডে Row ব্যবহার করে আড়াআড়ি সাজানো
+            isTablet
+                ? _buildTabletHorizontalLayout(
+                    context,
+                    iconColor,
+                    cardColor,
+                    textColor,
+                    secondaryTextColor,
+                    isDarkMode,
+                    primaryColor,
+                  )
+                : _buildMobileVerticalLayout(
+                    context,
+                    iconColor,
+                    cardColor,
+                    textColor,
+                    secondaryTextColor,
+                    isDarkMode,
+                    primaryColor,
                   ),
-                ),
-                Positioned(
-                  right: -responsiveValue(context, 8),
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: ClipRect(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        widthFactor: 0.5,
-                        child: Container(
-                          width: responsiveValue(context, 28),
-                          height: responsiveValue(context, 28),
-                          decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.6),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.more_horiz,
-                            color: Colors.white,
-                            size: responsiveValue(context, 20),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+
             ResponsiveSizedBox(height: responsiveValue(context, 8)),
             Center(
               child: Container(
@@ -835,6 +747,211 @@ class _HomePageState extends State<HomePage>
           ],
         ),
       ),
+    );
+  }
+
+  // ট্যাবলেটের জন্য আড়াআড়ি লেআউট
+  Widget _buildTabletHorizontalLayout(
+    BuildContext context,
+    Color iconColor,
+    Color cardColor,
+    Color textColor,
+    Color secondaryTextColor,
+    bool isDarkMode,
+    Color primaryColor,
+  ) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildIslamicKnowledgeCard(
+            context,
+            'আল্লাহর নামসমূহ',
+            Icons.auto_awesome_rounded,
+            iconColor,
+            cardColor,
+            textColor,
+            secondaryTextColor,
+            const NameOfAllahPage(),
+            isDarkMode,
+            description: 'আল্লাহর ৯৯টি পবিত্র নাম জানুন ও শিখুন',
+            semanticsLabel: 'আল্লাহর নামসমূহ',
+          ),
+        ),
+        ResponsiveSizedBox(width: responsiveValue(context, 16)),
+        Expanded(
+          child: _buildIslamicKnowledgeCard(
+            context,
+            'কালিমাহ',
+            Icons.book_rounded,
+            iconColor,
+            cardColor,
+            textColor,
+            secondaryTextColor,
+            const KalemaPage(),
+            isDarkMode,
+            description: 'ইসলামের মূল ভিত্তি ছয় কালিমা',
+            semanticsLabel: 'কালিমাহ',
+          ),
+        ),
+        ResponsiveSizedBox(width: responsiveValue(context, 16)),
+        Expanded(
+          child: _buildIslamicKnowledgeCard(
+            context,
+            'কুরআন শিক্ষা',
+            Icons.menu_book_rounded,
+            iconColor,
+            cardColor,
+            textColor,
+            secondaryTextColor,
+            null,
+            isDarkMode,
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: Colors.white,
+                        size: responsiveValue(context, 20),
+                      ),
+                      ResponsiveSizedBox(width: responsiveValue(context, 8)),
+                      ResponsiveText(
+                        'কুরআন শিক্ষা বিভাগ শীঘ্রই আসছে',
+                        fontSize: responsiveValue(context, 14),
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                  backgroundColor: primaryColor,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
+            description: 'কুরআন তেলাওয়াত ও তাফসীর শিখুন',
+            semanticsLabel: 'কুরআন শিক্ষা',
+          ),
+        ),
+      ],
+    );
+  }
+
+  // মোবাইলের জন্য উলম্ব লেআউট
+  Widget _buildMobileVerticalLayout(
+    BuildContext context,
+    Color iconColor,
+    Color cardColor,
+    Color textColor,
+    Color secondaryTextColor,
+    bool isDarkMode,
+    Color primaryColor,
+  ) {
+    return Stack(
+      children: [
+        Container(
+          height: responsiveValue(context, 150),
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            controller: ScrollController(),
+            children: [
+              ResponsiveSizedBox(width: responsiveValue(context, 4)),
+              _buildIslamicKnowledgeCard(
+                context,
+                'আল্লাহর নামসমূহ',
+                Icons.auto_awesome_rounded,
+                iconColor,
+                cardColor,
+                textColor,
+                secondaryTextColor,
+                const NameOfAllahPage(),
+                isDarkMode,
+                description: 'আল্লাহর ৯৯টি পবিত্র নাম জানুন ও শিখুন',
+                semanticsLabel: 'আল্লাহর নামসমূহ',
+              ),
+              ResponsiveSizedBox(width: responsiveValue(context, 12)),
+              _buildIslamicKnowledgeCard(
+                context,
+                'কালিমাহ',
+                Icons.book_rounded,
+                iconColor,
+                cardColor,
+                textColor,
+                secondaryTextColor,
+                const KalemaPage(),
+                isDarkMode,
+                description: 'ইসলামের মূল ভিত্তি ছয় কালিমা',
+                semanticsLabel: 'কালিমাহ',
+              ),
+              ResponsiveSizedBox(width: responsiveValue(context, 12)),
+              _buildIslamicKnowledgeCard(
+                context,
+                'কুরআন শিক্ষা',
+                Icons.menu_book_rounded,
+                iconColor,
+                cardColor,
+                textColor,
+                secondaryTextColor,
+                null,
+                isDarkMode,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.white,
+                            size: responsiveValue(context, 20),
+                          ),
+                          ResponsiveSizedBox(
+                            width: responsiveValue(context, 8),
+                          ),
+                          ResponsiveText(
+                            'কুরআন শিক্ষা বিভাগ শীঘ্রই আসছে',
+                            fontSize: responsiveValue(context, 14),
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                      backgroundColor: primaryColor,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
+                description: 'কুরআন তেলাওয়াত ও তাফসীর শিখুন',
+                semanticsLabel: 'কুরআন শিক্ষা',
+              ),
+              ResponsiveSizedBox(width: responsiveValue(context, 4)),
+            ],
+          ),
+        ),
+        Positioned(
+          right: -responsiveValue(context, 8),
+          top: 0,
+          bottom: 0,
+          child: Center(
+            child: ClipRect(
+              child: Align(
+                alignment: Alignment.centerRight,
+                widthFactor: 0.5,
+                child: Container(
+                  width: responsiveValue(context, 28),
+                  height: responsiveValue(context, 28),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.more_horiz,
+                    color: Colors.white,
+                    size: responsiveValue(context, 20),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -893,26 +1010,27 @@ class _HomePageState extends State<HomePage>
                 }
               },
           child: Container(
-            padding: EdgeInsets.all(responsiveValue(context, 10)),
+            padding: EdgeInsets.all(responsiveValue(context, 6)), //10
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: EdgeInsets.all(responsiveValue(context, 8)),
+                  padding: EdgeInsets.all(responsiveValue(context, 6)), // 8
                   decoration: BoxDecoration(
                     color: iconColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     icon,
-                    size: responsiveValue(context, 24),
+                    size: responsiveValue(context, 20), // 24
                     color: iconColor,
                   ),
                 ),
-                ResponsiveSizedBox(height: 8),
+                ResponsiveSizedBox(height: 6), //8
                 ResponsiveText(
                   title,
-                  fontSize: 12,
+                  fontSize: 11,
+                  //12
                   fontWeight: FontWeight.bold,
                   color: textColor,
                   textAlign: TextAlign.center,
@@ -924,7 +1042,8 @@ class _HomePageState extends State<HomePage>
                   ResponsiveSizedBox(height: 2),
                   ResponsiveText(
                     description,
-                    fontSize: 10,
+                    fontSize: 9,
+                    //10
                     color: secondaryTextColor,
                     textAlign: TextAlign.center,
                     maxLines: 2,
