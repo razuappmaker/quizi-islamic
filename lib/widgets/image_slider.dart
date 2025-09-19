@@ -1,4 +1,5 @@
 // lib/widgets/image_slider.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import '../utils/responsive_utils.dart';
@@ -17,14 +18,43 @@ class ImageSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (kDebugMode) {
+      print(
+        "📱 Device: ${isTablet ? "Tablet" : "Mobile"} | "
+        "Orientation: ${isLandscape ? "Landscape" : "Portrait"}",
+      );
+    }
+
+    // Use full screen width for all devices
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    // Calculate height based on device type and image aspect ratio
+    double sliderHeight;
+
+    if (isTablet) {
+      // Tablet dimensions
+      if (isLandscape) {
+        // For tablet landscape (1600x1200 = 4:3 aspect ratio)
+        // Height = Width × (3/4) to maintain 4:3 aspect ratio
+        sliderHeight = screenWidth * (3 / 4);
+      } else {
+        // For tablet portrait (1200x1600 = 3:4 aspect ratio)
+        // Height = Width × (4/3) to maintain 3:4 aspect ratio
+        sliderHeight = screenWidth * (4 / 3);
+      }
+    } else {
+      // Mobile dimensions (1920x1080 = 16:9 aspect ratio)
+      // Height = Width × (9/16) to maintain 16:9 aspect ratio
+      sliderHeight = screenWidth * (9 / 16);
+    }
+
     return Container(
+      width: screenWidth,
       margin: EdgeInsets.symmetric(vertical: responsiveValue(context, 8)),
       child: CarouselSlider(
         options: CarouselOptions(
-          height: _getSliderHeight(context),
-          aspectRatio: _getAspectRatio(),
-          viewportFraction: 0.95,
-          // 1.0 থেকে 0.95 এ কমিয়ে আনুন
+          height: sliderHeight,
+          viewportFraction: 1.0,
           initialPage: 0,
           enableInfiniteScroll: true,
           autoPlay: true,
@@ -43,32 +73,24 @@ class ImageSlider extends StatelessWidget {
               'slider5.webp',
             ].map((baseName) {
               final imagePath = _getImagePath(baseName);
-              return Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: responsiveValue(context, 8),
-                ),
-                decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.2),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.contain, // BoxFit.contain ব্যবহার করুন
-                    width: double.infinity,
-                    height: double.infinity,
-                    errorBuilder: (context, error, stackTrace) =>
-                        _buildErrorPlaceholder(context, isDarkMode, imagePath),
-                  ),
+
+              if (kDebugMode) print("➡️ Trying: $imagePath");
+
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  imagePath,
+                  width: screenWidth,
+                  height: sliderHeight,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildErrorPlaceholder(
+                        context,
+                        isDarkMode,
+                        imagePath,
+                        screenWidth,
+                        sliderHeight,
+                      ),
                 ),
               );
             }).toList(),
@@ -77,57 +99,32 @@ class ImageSlider extends StatelessWidget {
   }
 
   String _getImagePath(String baseName) {
-    // প্রথমে আলাদা ফোল্ডার থেকে চেষ্টা করুন, না থাকলে সাধারণ ফোল্ডার থেকে নিন
-    final String specificPath;
-
     if (isTablet) {
-      specificPath = isLandscape
+      return isLandscape
           ? 'assets/images/slider/tablet_landscape/$baseName'
           : 'assets/images/slider/tablet_portrait/$baseName';
     } else {
-      specificPath = isLandscape
+      return isLandscape
           ? 'assets/images/slider/mobile_landscape/$baseName'
           : 'assets/images/slider/mobile_portrait/$baseName';
     }
-
-    // Fallback mechanism: যদি specific image না থাকে তবে সাধারণ ফোল্ডার থেকে নিন
-    return specificPath;
-  }
-
-  double _getSliderHeight(BuildContext context) {
-    // Height সামঞ্জস্য করুন
-    if (isTablet) {
-      return isLandscape
-          ? responsiveValue(context, 220) // বাড়িয়ে 220
-          : responsiveValue(context, 280); // বাড়িয়ে 280
-    } else {
-      return isLandscape
-          ? responsiveValue(context, 160) // বাড়িয়ে 160
-          : responsiveValue(context, 200); // বাড়িয়ে 200
-    }
-  }
-
-  double _getAspectRatio() {
-    // Fixed aspect ratio ব্যবহার করুন
-    return 16 / 9; // স্ট্যান্ডার্ড aspect ratio
   }
 
   Widget _buildErrorPlaceholder(
     BuildContext context,
     bool isDarkMode,
     String imagePath,
+    double width,
+    double height,
   ) {
-    // Error message improve করুন
-    print('Error loading image: $imagePath');
+    if (kDebugMode) print('❌ Error loading image: $imagePath');
 
-    // Fallback: সাধারণ ফোল্ডার থেকে ছবি লোড করার চেষ্টা করুন
-    final fallbackPath = imagePath
-        .replaceAll('slider/tablet_', 'slider/')
-        .replaceAll('slider/mobile_', 'slider/')
-        .replaceAll('_landscape/', '/')
-        .replaceAll('_portrait/', '/');
+    final fallbackPath = 'assets/images/slider/${imagePath.split('/').last}';
+    if (kDebugMode) print('🔄 Fallback to: $fallbackPath');
 
     return Container(
+      width: width,
+      height: height,
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
         borderRadius: BorderRadius.circular(16),
@@ -141,7 +138,7 @@ class ImageSlider extends StatelessWidget {
               color: Colors.red,
               size: responsiveValue(context, 40),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'ছবি লোড হয়নি',
               style: TextStyle(
@@ -149,7 +146,7 @@ class ImageSlider extends StatelessWidget {
                 color: Colors.red,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               'Path: ${imagePath.split('/').last}',
               style: TextStyle(
@@ -158,14 +155,13 @@ class ImageSlider extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 8),
-            // Fallback image লোড করার চেষ্টা করুন
+            const SizedBox(height: 8),
             Image.asset(
-              'assets/images/slider/$fallbackPath',
+              fallbackPath,
               fit: BoxFit.contain,
               width: 100,
               height: 60,
-              errorBuilder: (context, error, stackTrace) => SizedBox(),
+              errorBuilder: (context, error, stackTrace) => const SizedBox(),
             ),
           ],
         ),

@@ -104,12 +104,11 @@ flutter:
     - assets/images/compass.png
     - assets/pdf/umrah_guide.pdf
     - assets/pdf/namaj_amol.pdf
+    - assets/images/slider/
     - assets/images/slider/mobile_portrait/
     - assets/images/slider/mobile_landscape/
     - assets/images/slider/tablet_portrait/
     - assets/images/slider/tablet_landscape/
-
-
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
