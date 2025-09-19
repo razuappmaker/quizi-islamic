@@ -770,7 +770,8 @@ class _HomePageState extends State<HomePage>
             iconColor,
             cardColor,
             textColor,
-            secondaryTextColor,
+            isDarkMode ? Colors.white : secondaryTextColor,
+            // Pass white for dark mode
             const NameOfAllahPage(),
             isDarkMode,
             description: 'আল্লাহর ৯৯টি পবিত্র নাম জানুন ও শিখুন',
@@ -786,7 +787,8 @@ class _HomePageState extends State<HomePage>
             iconColor,
             cardColor,
             textColor,
-            secondaryTextColor,
+            isDarkMode ? Colors.white : secondaryTextColor,
+            // Pass white for dark mode
             const KalemaPage(),
             isDarkMode,
             description: 'ইসলামের মূল ভিত্তি ছয় কালিমা',
@@ -802,34 +804,11 @@ class _HomePageState extends State<HomePage>
             iconColor,
             cardColor,
             textColor,
-            secondaryTextColor,
-            null,
+            isDarkMode ? Colors.white : secondaryTextColor,
+            const NamajAmol(),
             isDarkMode,
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        color: Colors.white,
-                        size: responsiveValue(context, 20),
-                      ),
-                      ResponsiveSizedBox(width: responsiveValue(context, 8)),
-                      ResponsiveText(
-                        'কুরআন শিক্ষা বিভাগ শীঘ্রই আসছে',
-                        fontSize: responsiveValue(context, 14),
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                  backgroundColor: primaryColor,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            },
             description: 'কুরআন তেলাওয়াত ও তাফসীর শিখুন',
-            semanticsLabel: 'কুরআন শিক্ষা',
+            semanticsLabel: 'কুরআন শিক্ষ',
           ),
         ),
       ],
@@ -862,12 +841,14 @@ class _HomePageState extends State<HomePage>
                 iconColor,
                 cardColor,
                 textColor,
-                secondaryTextColor,
+                isDarkMode ? Colors.white : secondaryTextColor,
+
                 const NameOfAllahPage(),
                 isDarkMode,
                 description: 'আল্লাহর ৯৯টি পবিত্র নাম জানুন ও শিখুন',
                 semanticsLabel: 'আল্লাহর নামসমূহ',
               ),
+
               ResponsiveSizedBox(width: responsiveValue(context, 12)),
               _buildIslamicKnowledgeCard(
                 context,
@@ -876,7 +857,7 @@ class _HomePageState extends State<HomePage>
                 iconColor,
                 cardColor,
                 textColor,
-                secondaryTextColor,
+                isDarkMode ? Colors.white : secondaryTextColor,
                 const KalemaPage(),
                 isDarkMode,
                 description: 'ইসলামের মূল ভিত্তি ছয় কালিমা',
@@ -890,35 +871,10 @@ class _HomePageState extends State<HomePage>
                 iconColor,
                 cardColor,
                 textColor,
-                secondaryTextColor,
-                null,
+                isDarkMode ? Colors.white : secondaryTextColor,
+                const NamajAmol(),
                 isDarkMode,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            color: Colors.white,
-                            size: responsiveValue(context, 20),
-                          ),
-                          ResponsiveSizedBox(
-                            width: responsiveValue(context, 8),
-                          ),
-                          ResponsiveText(
-                            'কুরআন শিক্ষা বিভাগ শীঘ্রই আসছে',
-                            fontSize: responsiveValue(context, 14),
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                      backgroundColor: primaryColor,
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
-                description: 'কুরআন তেলাওয়াত ও তাফসীর শিখুন',
+                description: 'কুরআন তেলাওয়াত ও তাফসীর শিখুনা',
                 semanticsLabel: 'কুরআন শিক্ষা',
               ),
               ResponsiveSizedBox(width: responsiveValue(context, 4)),
@@ -1347,7 +1303,8 @@ class _HomePageState extends State<HomePage>
     return ListTile(
       leading: Icon(
         icon,
-        color: Colors.green[700],
+        color: isDark ? Colors.white70 : Colors.green[700],
+        //color: Colors.green[700],
         size: responsiveValue(context, 24),
       ),
       title: ResponsiveText(
