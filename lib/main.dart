@@ -8,6 +8,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
 import 'mcq_page.dart';
+import 'islamic_history_page.dart';
+import 'prophet_biography_page.dart';
 import 'prayer_time_page.dart';
 import 'doya_page.dart';
 import 'namaj_amol.dart';
@@ -502,6 +504,167 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  //===============
+  Widget _buildQuickAccess(
+    BuildContext context,
+    bool isDarkMode,
+    bool isTablet,
+  ) {
+    final primaryColor = isDarkMode ? Colors.green[400]! : Colors.green[700]!;
+    final cardColor = isDarkMode
+        ? Colors.green[700]!
+        : Colors.white; // ডার্ক মুডে green[700]
+    final textColor = isDarkMode
+        ? Colors.white
+        : Colors.green[900]!; // ডার্ক মুডে সাদা
+    final secondaryTextColor = isDarkMode
+        ? Colors.white70
+        : Colors.green[600]!; // ডার্ক মুডে সাদা
+    final iconColor = isDarkMode
+        ? Colors.white
+        : Colors.green[700]!; // ডার্ক মুডে সাদা
+    final backgroundColor = isDarkMode
+        ? Colors.grey[900]!
+        : Colors.green[100]!; // কন্টেইনার ব্যাকগ্রাউন্ড
+
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: responsiveValue(context, 10),
+        vertical: responsiveValue(context, 8),
+      ),
+      padding: EdgeInsets.all(responsiveValue(context, 12)),
+      decoration: BoxDecoration(
+        color: backgroundColor, // ডার্ক মুডে grey[900], লাইট মুডে green[50]
+        borderRadius: BorderRadius.circular(responsiveValue(context, 16)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'ইবাদাত ও দোয়া',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode
+                  ? Colors.white
+                  : Colors.green[800]!, // ডার্ক মুডে সাদা
+            ),
+            semanticsLabel: 'ইবাদাত ও দোয়া',
+          ),
+          SizedBox(height: responsiveValue(context, 6)),
+          GridView.count(
+            crossAxisCount: isTablet ? 6 : 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: responsiveValue(context, 10),
+            crossAxisSpacing: responsiveValue(context, 10),
+            childAspectRatio: 1.0,
+            children: [
+              _buildIslamicKnowledgeCard(
+                context,
+                'নামাজের সময়',
+                Icons.access_time_rounded,
+                iconColor,
+                // ডার্ক মুডে সাদা
+                cardColor,
+                // ডার্ক মুডে green[700]
+                textColor,
+                // ডার্ক মুডে সাদা
+                secondaryTextColor,
+                // ডার্ক মুডে সাদা
+                const PrayerTimePage(),
+                isDarkMode,
+                semanticsLabel: 'নামাজের সময়',
+              ),
+              _buildIslamicKnowledgeCard(
+                context,
+                'সেহেরী ও ইফতার',
+                Icons.time_to_leave,
+                iconColor,
+                // ডার্ক মুডে সাদা
+                cardColor,
+                // ডার্ক মুডে green[700]
+                textColor,
+                // ডার্ক মুডে সাদা
+                secondaryTextColor,
+                // ডার্ক মুডে সাদা
+                const IfterTimePage(),
+                isDarkMode,
+                semanticsLabel: 'সেহেরী ও ইফতার',
+              ),
+              _buildIslamicKnowledgeCard(
+                context,
+                'ছোট সূরাসমুহ',
+                Icons.menu_book_rounded,
+                iconColor,
+                // ডার্ক মুডে সাদা
+                cardColor,
+                // ডার্ক মুডে green[700]
+                textColor,
+                // ডার্ক মুডে সাদা
+                secondaryTextColor,
+                // डार्क মুডে সাদা
+                const SuraPage(),
+                isDarkMode,
+                semanticsLabel: 'ছোট সুরাসমুহ',
+              ),
+              _buildIslamicKnowledgeCard(
+                context,
+                'দৈনন্দিন দোয়া',
+                Icons.lightbulb_outline_rounded,
+                iconColor,
+                // ডার্ক মুডে সাদা
+                cardColor,
+                // ডার্ক মুডে green[700]
+                textColor,
+                // ডার্ক মুডে সাদা
+                secondaryTextColor,
+                // ডার্ক মুডে সাদা
+                const DoyaCategoryPage(),
+                isDarkMode,
+                semanticsLabel: 'দৈনন্দিন দোয়া',
+              ),
+              _buildIslamicKnowledgeCard(
+                context,
+                'তসবিহ',
+                Icons.fingerprint_rounded,
+                iconColor,
+                // ডার্ক মুডে সাদা
+                cardColor,
+                // ডার্ক মুডে green[700]
+                textColor,
+                // ডার্ক মুডে সাদা
+                secondaryTextColor,
+                // ডার্ক মুডে সাদা
+                const TasbeehPage(),
+                isDarkMode,
+                semanticsLabel: 'তসবিহ',
+              ),
+              _buildIslamicKnowledgeCard(
+                context,
+                'কিবলা',
+                Icons.explore_rounded,
+                iconColor,
+                // ডার্ক মুডে সাদা
+                cardColor,
+                // ডার্ক মুডে green[700]
+                textColor,
+                // ডার্ক মুডে সাদা
+                secondaryTextColor,
+                // ডার্ক মুডে সাদা
+                const QiblaPage(),
+                isDarkMode,
+                semanticsLabel: 'কিবলা',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  //=======================
+  /*
   Widget _buildQuickAccess(
     BuildContext context,
     bool isDarkMode,
@@ -615,8 +778,9 @@ class _HomePageState extends State<HomePage>
         ],
       ),
     );
-  }
+  }*/
 
+  // ===================================
   Widget _buildAdditionalFeatures(
     BuildContext context,
     bool isDarkMode,
@@ -625,7 +789,6 @@ class _HomePageState extends State<HomePage>
     final primaryColor = isDarkMode ? Colors.green[400]! : Colors.green[700]!;
     final accentColor = isDarkMode ? Colors.amber[300]! : Colors.amber[700]!;
     final backgroundColor = isDarkMode ? Colors.grey[900]! : Colors.green[50]!;
-    final cardColor = isDarkMode ? Colors.green[800]! : Colors.white;
     final textColor = isDarkMode ? Colors.white : Colors.green[900]!;
     final secondaryTextColor = isDarkMode
         ? Colors.green[200]!
@@ -634,116 +797,47 @@ class _HomePageState extends State<HomePage>
 
     return Container(
       margin: EdgeInsets.symmetric(
-        horizontal: responsiveValue(context, isTablet ? 0 : 8),
-        // ট্যাবলেটে horizontal margin 0
-        vertical: responsiveValue(context, isTablet ? 16 : 10),
+        horizontal: isTablet
+            ? MediaQuery.of(context).size.width * 0.025
+            : MediaQuery.of(context).size.width * 0.04,
+        vertical: MediaQuery.of(context).size.height * 0.015,
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(responsiveValue(context, 20)),
-        boxShadow: [
-          BoxShadow(
-            color: isDarkMode ? Colors.black54 : Colors.green.withOpacity(0.1),
-            blurRadius: responsiveValue(context, 10),
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Padding(
-        padding: EdgeInsets.all(responsiveValue(context, isTablet ? 16 : 12)),
+        padding: EdgeInsets.all(
+          isTablet
+              ? MediaQuery.of(context).size.width * 0.018
+              : MediaQuery.of(context).size.width * 0.025,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: responsiveValue(context, 6),
-                vertical: responsiveValue(context, 4),
-              ),
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  responsiveValue(context, 12),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.lightbulb_outline_rounded,
-                    color: accentColor,
-                    size: responsiveValue(context, 24),
-                  ),
-                  ResponsiveSizedBox(width: responsiveValue(context, 8)),
-                  Expanded(
-                    child: ResponsiveText(
-                      'ইসলামী জ্ঞান ভান্ডার',
-                      fontSize: responsiveValue(context, 14),
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                      semanticsLabel: 'ইসলামী জ্ঞান ভান্ডার',
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: responsiveValue(context, 8),
-                      vertical: responsiveValue(context, 2),
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(
-                        responsiveValue(context, 8),
-                      ),
-                      border: Border.all(
-                        color: Colors.green[700]!,
-                        width: responsiveValue(context, 1.5),
-                      ),
-                    ),
-                    child: ResponsiveText(
-                      'নতুন',
-                      fontSize: responsiveValue(context, 10),
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green[700]!,
-                      semanticsLabel: 'নতুন',
-                    ),
-                  ),
-                ],
-              ),
+            // হেডার সেকশন
+            _buildCompactHeader(
+              context,
+              isDarkMode,
+              primaryColor,
+              accentColor,
+              textColor,
+              isTablet,
             ),
-            ResponsiveSizedBox(height: responsiveValue(context, 12)),
+            SizedBox(
+              height: isTablet
+                  ? MediaQuery.of(context).size.height * 0.012
+                  : MediaQuery.of(context).size.height * 0.012,
+            ),
 
-            // ট্যাবলেট মোডে Row ব্যবহার করে আড়াআড়ি সাজানো
-            isTablet
-                ? _buildTabletHorizontalLayout(
-                    context,
-                    iconColor,
-                    cardColor,
-                    textColor,
-                    secondaryTextColor,
-                    isDarkMode,
-                    primaryColor,
-                  )
-                : _buildMobileVerticalLayout(
-                    context,
-                    iconColor,
-                    cardColor,
-                    textColor,
-                    secondaryTextColor,
-                    isDarkMode,
-                    primaryColor,
-                  ),
-
-            ResponsiveSizedBox(height: responsiveValue(context, 8)),
-            Center(
-              child: Container(
-                width: responsiveValue(context, 40),
-                height: responsiveValue(context, 4),
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(
-                    responsiveValue(context, 2),
-                  ),
-                ),
-              ),
+            // ৪টি চ্যাপ্টা কার্ড গ্রিড
+            _buildCompactCardGrid(
+              context,
+              iconColor,
+              textColor,
+              secondaryTextColor,
+              isDarkMode,
+              isTablet,
             ),
           ],
         ),
@@ -751,165 +845,398 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  // ট্যাবলেটের জন্য আড়াআড়ি লেআউট
-  Widget _buildTabletHorizontalLayout(
+  // কমপ্যাক্ট হেডার
+  Widget _buildCompactHeader(
     BuildContext context,
-    Color iconColor,
-    Color cardColor,
-    Color textColor,
-    Color secondaryTextColor,
     bool isDarkMode,
     Color primaryColor,
+    Color accentColor,
+    Color textColor,
+    bool isTablet,
   ) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
-          child: _buildIslamicKnowledgeCard(
-            context,
-            'আল্লাহর নামসমূহ',
-            Icons.auto_awesome_rounded,
-            iconColor,
-            cardColor,
-            textColor,
-            isDarkMode ? Colors.white : secondaryTextColor,
-            // Pass white for dark mode
-            const NameOfAllahPage(),
-            isDarkMode,
-            description: 'আল্লাহর ৯৯টি পবিত্র নাম জানুন ও শিখুন',
-            semanticsLabel: 'আল্লাহর নামসমূহ',
+        Container(
+          padding: EdgeInsets.all(
+            isTablet
+                ? MediaQuery.of(context).size.width * 0.018
+                : MediaQuery.of(context).size.width * 0.014,
+          ),
+          decoration: BoxDecoration(
+            color: primaryColor.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.lightbulb_outline_rounded,
+            color: accentColor,
+            size: isTablet
+                ? MediaQuery.of(context).size.width * 0.035
+                : MediaQuery.of(context).size.width * 0.045,
           ),
         ),
-        ResponsiveSizedBox(width: responsiveValue(context, 16)),
-        Expanded(
-          child: _buildIslamicKnowledgeCard(
-            context,
-            'কালিমাহ',
-            Icons.book_rounded,
-            iconColor,
-            cardColor,
-            textColor,
-            isDarkMode ? Colors.white : secondaryTextColor,
-            // Pass white for dark mode
-            const KalemaPage(),
-            isDarkMode,
-            description: 'ইসলামের মূল ভিত্তি ছয় কালিমা',
-            semanticsLabel: 'কালিমাহ',
-          ),
+        SizedBox(
+          width: isTablet
+              ? MediaQuery.of(context).size.width * 0.012
+              : MediaQuery.of(context).size.width * 0.018,
         ),
-        ResponsiveSizedBox(width: responsiveValue(context, 16)),
         Expanded(
-          child: _buildIslamicKnowledgeCard(
-            context,
-            'নাদিয়াতুল কোরান',
-            Icons.menu_book_rounded,
-            iconColor,
-            cardColor,
-            textColor,
-            isDarkMode ? Colors.white : secondaryTextColor,
-            const NamajAmol(),
-            isDarkMode,
-            description: 'সম্পূর্ণ নতুনদের জন্য সেরা গাইড',
-            semanticsLabel: 'নাদিয়াতুল কোরান',
+          child: Text(
+            'ইসলামী জ্ঞান ভাণ্ডার',
+            style: TextStyle(
+              fontSize: isTablet
+                  ? MediaQuery.of(context).size.width * 0.022
+                  : MediaQuery.of(context).size.width * 0.032,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
           ),
         ),
       ],
     );
   }
 
-  // মোবাইলের জন্য উলম্ব লেআউট
-  Widget _buildMobileVerticalLayout(
+  // কমপ্যাক্ট কার্ড গ্রিড
+  Widget _buildCompactCardGrid(
     BuildContext context,
     Color iconColor,
-    Color cardColor,
     Color textColor,
     Color secondaryTextColor,
     bool isDarkMode,
-    Color primaryColor,
+    bool isTablet,
   ) {
-    return Stack(
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: isTablet ? screenWidth * 0.018 : screenWidth * 0.018,
+      mainAxisSpacing: isTablet ? screenHeight * 0.008 : screenHeight * 0.008,
+      childAspectRatio: isTablet ? 3.2 : 1.8,
+      // ট্যাবলেটে কার্ডগুলো আরও চ্যাপ্টা করা হয়েছে
       children: [
-        Container(
-          height: responsiveValue(context, 150),
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            controller: ScrollController(),
+        _buildUltraCompactIslamicCard(
+          context,
+          'আল্লাহর নামসমূহ',
+          Icons.auto_awesome_rounded,
+          iconColor,
+          isDarkMode ? Colors.blue[900]! : Colors.blue[50]!,
+          isDarkMode ? Colors.blue[200]! : Colors.blue[600]!,
+          textColor,
+          secondaryTextColor,
+          const NameOfAllahPage(),
+          isDarkMode,
+          isTablet,
+          description: '৯৯টি পবিত্র নাম',
+        ),
+
+        _buildUltraCompactIslamicCard(
+          context,
+          'কালিমাহ',
+          Icons.book_rounded,
+          iconColor,
+          isDarkMode ? Colors.green[900]! : Colors.green[50]!,
+          isDarkMode ? Colors.green[200]! : Colors.green[600]!,
+          textColor,
+          secondaryTextColor,
+          const KalemaPage(),
+          isDarkMode,
+          isTablet,
+          description: 'ছয়টি মূল কালিমা',
+        ),
+
+        _buildUltraCompactIslamicCard(
+          context,
+          'কোরআন শিক্ষা',
+          Icons.menu_book_rounded,
+          iconColor,
+          isDarkMode ? Colors.purple[900]! : Colors.purple[50]!,
+          isDarkMode ? Colors.purple[200]! : Colors.purple[600]!,
+          textColor,
+          secondaryTextColor,
+          const NamajAmol(),
+          isDarkMode,
+          isTablet,
+          description: 'নাদিয়াতুল কুরআন',
+        ),
+
+        _buildUltraCompactIslamicCard(
+          context,
+          'অন্যান্য',
+          Icons.more_horiz_rounded,
+          iconColor,
+          isDarkMode ? Colors.orange[900]! : Colors.orange[50]!,
+          isDarkMode ? Colors.orange[200]! : Colors.orange[600]!,
+          textColor,
+          secondaryTextColor,
+          null,
+          isDarkMode,
+          isTablet,
+          description: 'আরও জ্ঞান',
+          onTap: () {
+            _showMoreOptions(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  // আল্ট্রা কমপ্যাক্ট ইসলামী কার্ড (ট্যাবলেটের জন্য অপ্টিমাইজড)
+  Widget _buildUltraCompactIslamicCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color iconColor,
+    Color backgroundColor,
+    Color borderColor,
+    Color textColor,
+    Color secondaryTextColor,
+    Widget? page,
+    bool isDarkMode,
+    bool isTablet, {
+    String? description,
+    Function()? onTap,
+  }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Card(
+      elevation: isTablet ? 0.8 : 1.5,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(
+          color: borderColor.withOpacity(isTablet ? 0.2 : 0.3),
+          width: isTablet ? 0.8 : 1.2,
+        ),
+      ),
+      color: backgroundColor,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap:
+            onTap ??
+            () {
+              if (page != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => page),
+                );
+              }
+            },
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: isTablet ? screenWidth * 0.02 : screenWidth * 0.025,
+            vertical: isTablet
+                ? screenHeight * 0.008
+                : screenHeight *
+                      0.015, // ভার্টিক্যাল প্যাডিং কমিয়ে চ্যাপ্টা করা
+          ),
+          constraints: BoxConstraints(
+            minHeight: isTablet
+                ? screenHeight * 0.05
+                : screenHeight *
+                      0.075, // ট্যাবলেটে উচ্চতা আরও কমিয়ে চ্যাপ্টা করা হয়েছে
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ResponsiveSizedBox(width: responsiveValue(context, 4)),
-              _buildIslamicKnowledgeCard(
-                context,
-                'আল্লাহর নামসমূহ',
-                Icons.auto_awesome_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                isDarkMode ? Colors.white : secondaryTextColor,
-
-                const NameOfAllahPage(),
-                isDarkMode,
-                description: 'আল্লাহর ৯৯টি পবিত্র নাম জানুন ও শিখুন',
-                semanticsLabel: 'আল্লাহর নামসমূহ',
+              // আইকন - ট্যাবলেটে ছোট
+              Container(
+                padding: EdgeInsets.all(
+                  isTablet ? screenWidth * 0.01 : screenWidth * 0.018,
+                ),
+                // প্যাডিং কমিয়ে চ্যাপ্টা করা
+                decoration: BoxDecoration(
+                  color: iconColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: iconColor.withOpacity(isTablet ? 0.15 : 0.2),
+                    width: isTablet
+                        ? 0.8
+                        : 1.2, // বর্ডার থিকনেস কমিয়ে চ্যাপ্টা করা
+                  ),
+                ),
+                child: Icon(
+                  icon,
+                  size: isTablet ? screenWidth * 0.028 : screenWidth * 0.04,
+                  // আইকন সাইজ সামান্য কমিয়ে চ্যাপ্টা করা
+                  color: iconColor,
+                ),
               ),
 
-              ResponsiveSizedBox(width: responsiveValue(context, 12)),
-              _buildIslamicKnowledgeCard(
-                context,
-                'কালিমাহ',
-                Icons.book_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                isDarkMode ? Colors.white : secondaryTextColor,
-                const KalemaPage(),
-                isDarkMode,
-                description: 'ইসলামের মূল ভিত্তি ছয় কালিমা',
-                semanticsLabel: 'কালিমাহ',
+              SizedBox(
+                width: isTablet ? screenWidth * 0.018 : screenWidth * 0.02,
               ),
-              ResponsiveSizedBox(width: responsiveValue(context, 12)),
-              _buildIslamicKnowledgeCard(
-                context,
-                'নাদিয়াতুল কোরআন',
-                Icons.menu_book_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                isDarkMode ? Colors.white : secondaryTextColor,
-                const NamajAmol(),
-                // নাদিয়াতুল কুরআন
-                isDarkMode,
-                description: 'নতুনদের জন্য সেরা গাইড',
-                semanticsLabel: 'নাদিয়াতুল কুরআন',
+
+              // কন্টেন্ট - ট্যাবলেটে কমপ্যাক্ট
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // শিরোনাম
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: isTablet
+                            ? screenWidth * 0.02
+                            : screenWidth *
+                                  0.03, // ফন্ট সাইজ সামান্য কমিয়ে চ্যাপ্টা করা
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    if (description != null) ...[
+                      SizedBox(
+                        height: isTablet
+                            ? screenHeight * 0.002
+                            : screenHeight * 0.004,
+                      ), // স্পেস কমিয়ে চ্যাপ্টা করা
+                      // বর্ণনা
+                      Text(
+                        description,
+                        style: TextStyle(
+                          fontSize: isTablet
+                              ? screenWidth * 0.015
+                              : screenWidth * 0.026,
+                          // ফন্ট সাইজ সামান্য কমিয়ে চ্যাপ্টা করা
+                          color: secondaryTextColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
               ),
-              ResponsiveSizedBox(width: responsiveValue(context, 4)),
+
+              // অ্যারো আইকন - ট্যাবলেটে ছোট
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: isTablet ? screenWidth * 0.02 : screenWidth * 0.03,
+                // আইকন সাইজ সামান্য কমিয়ে চ্যাপ্টা করা
+                color: secondaryTextColor,
+              ),
             ],
           ),
         ),
-        Positioned(
-          right: -responsiveValue(context, 8),
-          top: 0,
-          bottom: 0,
-          child: Center(
-            child: ClipRect(
-              child: Align(
-                alignment: Alignment.centerRight,
-                widthFactor: 0.5,
+      ),
+    );
+  }
+
+  // অন্যান্য options ডায়ালগ
+  // অন্যান্য options ডায়ালগ
+  void _showMoreOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
                 child: Container(
-                  width: responsiveValue(context, 28),
-                  height: responsiveValue(context, 28),
+                  width: 40,
+                  height: 4,
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.more_horiz,
-                    color: Colors.white,
-                    size: responsiveValue(context, 20),
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
-            ),
+              const SizedBox(height: 16),
+
+              Text(
+                'আরও ইসলামী জ্ঞান',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[700],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              _buildCompactOptionItem(
+                context,
+                Icons.history_rounded,
+                'ইসলামের ইতিহাস',
+                onTap: () {
+                  Navigator.pop(context); // বটম শীট বন্ধ করুন
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const IslamicHistoryPage(),
+                    ),
+                  );
+                },
+              ),
+              _buildCompactOptionItem(
+                context,
+                Icons.person,
+                'হজরত মুহাম্মাদ (সা.)-এর জীবনী',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProphetBiographyPage(),
+                    ),
+                  );
+                },
+              ),
+              /*_buildCompactOptionItem(
+                context,
+                Icons.auto_awesome_motion_rounded,
+                'প্রথম খলিফা হযরত আবু বকর সিদ্দিক (রা.)',
+                onTap: () {
+                  Navigator.pop(context);
+                  // হাদিস সংকলন পেইজে নেভিগেট করুন
+                },
+              ),*/
+              const SizedBox(height: 8),
+            ],
           ),
-        ),
-      ],
+        );
+      },
+    );
+  }
+
+  // কমপ্যাক্ট option আইটেম (আপডেটেড ভার্সন)
+  Widget _buildCompactOptionItem(
+    BuildContext context,
+    IconData icon,
+    String title, {
+    Function()? onTap,
+  }) {
+    return ListTile(
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+      leading: Icon(icon, size: 20, color: Colors.green[700]),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      ),
+      trailing: Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 14,
+        color: Colors.grey[500],
+      ),
+      onTap:
+          onTap ??
+          () => Navigator.pop(context), // ডিফল্টভাবে শুধু বটম শীট বন্ধ করবে
     );
   }
 
@@ -1068,7 +1395,7 @@ class _HomePageState extends State<HomePage>
             context,
             Icons.book,
             'দৈনন্দিন দোয়া',
-            const DoyaPage(),
+            const DoyaCategoryPage(),
             semanticsLabel: 'দৈনন্দিন দোয়া',
           ),
           _buildDrawerItem(
@@ -1218,7 +1545,7 @@ class _HomePageState extends State<HomePage>
             context,
             Icons.book,
             'দৈনন্দিন দোয়া',
-            const DoyaPage(),
+            const DoyaCategoryPage(),
             semanticsLabel: 'দৈনন্দিন দোয়া',
           ),
           _buildDrawerItem(
@@ -1363,44 +1690,6 @@ class _HomePageState extends State<HomePage>
       },
     );
   }
-
-  /*Widget _buildNavigationRail(ThemeProvider themeProvider) {
-    final isDarkMode = themeProvider.isDarkMode;
-
-    return NavigationRail(
-      backgroundColor: isDarkMode ? Colors.green[900] : Colors.white,
-      selectedIndex: _currentBottomNavIndex,
-      onDestinationSelected: (int index) {
-        setState(() {
-          _currentBottomNavIndex = index;
-        });
-        CustomBottomNavBar.handleBottomNavItemTap(context, index);
-      },
-      labelType: NavigationRailLabelType.selected,
-      destinations: const [
-        NavigationRailDestination(
-          icon: Icon(Icons.home),
-          selectedIcon: Icon(Icons.home_filled),
-          label: Text('হোম'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.star),
-          selectedIcon: Icon(Icons.star_rate),
-          label: Text('রেটিং'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.apps),
-          selectedIcon: Icon(Icons.apps),
-          label: Text('অন্যান্য'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.share),
-          selectedIcon: Icon(Icons.share),
-          label: Text('শেয়ার'),
-        ),
-      ],
-    );
-  }*/
 
   /// Snackbar helper
   void _showSnackBar(String message) {

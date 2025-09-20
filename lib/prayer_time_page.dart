@@ -10,6 +10,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/services.dart';
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -691,289 +692,360 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           ),
           child: Column(
             children: [
-              // লোকেশন এবং রিফ্রেশ বাটন
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            Icons.location_on,
-                            size: 11,
-                            color: Colors.white.withOpacity(0.9),
-                          ),
+              // লোকেশন এবং রিফ্রেশ বাটন - আলাদা করা হয়েছে
+              Container(
+                margin: const EdgeInsets.only(bottom: 4),
+                // নিচের মার্জিন কমালাম
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.green[900]!.withOpacity(0.3)
+                      : Colors.grey[100]!,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                // ভার্টিক্যাল প্যাডিং কমালাম
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
                         ),
-                        const SizedBox(width: 5),
-                        Flexible(
-                          child: Text(
-                            "$cityName, $countryName",
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 14 : 15,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
+                        // ভার্টিক্যাল প্যাডিং কমালাম
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? Colors.green[800]!.withOpacity(0.2)
+                              : Colors.green[50]!,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      final hasInternet = await _checkInternetConnection();
-                      if (!hasInternet) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "ইন্টারনেট সংযোগ নেই। রিফ্রেশ করা যাচ্ছে না।",
-                            ),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        return;
-                      }
-                      fetchLocationAndPrayerTimes();
-                    },
-                    icon: Icon(Icons.refresh, color: Colors.white, size: 16),
-                    iconSize: 16,
-                    padding: EdgeInsets.all(4),
-                    tooltip: "রিফ্রেশ করুন",
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 6),
-
-              // পরবর্তী নামাজ এবং সূর্যোদয়/সূর্যাস্ত সেকশন
-              Row(
-                children: [
-                  // বাম পাশ - পরবর্তী নামাজ কাউন্টডাউন
-                  Expanded(
-                    flex: 6,
-                    child: Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.15),
-                            Colors.white.withOpacity(0.08),
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 1,
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            "পরবর্তী ওয়াক্ত",
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white.withOpacity(0.8),
-                            ),
-                          ),
-                          SizedBox(height: 3),
-                          Text(
-                            nextPrayer.isNotEmpty ? nextPrayer : "লোড হচ্ছে...",
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 12 : 13,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.15),
-                                width: 1,
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              // প্যাডিং কমালাম
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.green[700]!.withOpacity(0.3)
+                                    : Colors.green[700]!.withOpacity(0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.location_on,
+                                size: 12, // আইকন সাইজ কমালাম
+                                color: isDark
+                                    ? Colors.green[100]!
+                                    : Colors.green[700]!,
                               ),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _buildTimeUnit("ঘণ্টা", countdown.inHours),
-                                _buildDivider(),
-                                _buildTimeUnit(
-                                  "মিনিট",
-                                  countdown.inMinutes % 60,
+
+                            const SizedBox(width: 6), // স্পেস কমালাম
+
+                            Expanded(
+                              child: Text(
+                                "$cityName, $countryName",
+                                style: TextStyle(
+                                  fontSize: 13, // ফন্ট সাইজ কমালাম
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark
+                                      ? Colors.green[100]!
+                                      : Colors.green[800]!,
                                 ),
-                                _buildDivider(),
-                                _buildTimeUnit(
-                                  "সেকেন্ড",
-                                  countdown.inSeconds % 60,
-                                ),
-                              ],
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(width: 8),
-
-                  // ডান পাশ - সূর্যোদয়/সূর্যাস্ত
-                  Expanded(
-                    flex: 4,
-                    child: Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.orange.withOpacity(0.3),
-                            Colors.deepOrange.withOpacity(0.2),
                           ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
                         ),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Colors.orange.withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // সূর্যোদয়
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.wb_sunny,
-                                      color: Colors.yellow.shade200,
-                                      size: 14,
-                                    ),
-                                    SizedBox(width: 3),
-                                    Text(
-                                      "সূর্যোদয়",
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 3),
-                                Text(
-                                  prayerTimes.containsKey("সূর্যোদয়")
-                                      ? formatTimeTo12Hour(
-                                          prayerTimes["সূর্যোদয়"]!,
-                                        )
-                                      : "--:--",
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // ডিভাইডার
-                          Container(
-                            padding: EdgeInsets.symmetric(vertical: 2),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 25,
-                                  height: 1,
-                                  color: Colors.white.withOpacity(0.5),
-                                  margin: EdgeInsets.symmetric(vertical: 1),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // সূর্যাস্ত
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.deepOrange.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.nightlight_round,
-                                      color: Colors.orange.shade200,
-                                      size: 14,
-                                    ),
-                                    SizedBox(width: 3),
-                                    Text(
-                                      "সূর্যাস্ত",
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 3),
-                                Text(
-                                  prayerTimes.containsKey("সূর্যাস্ত")
-                                      ? formatTimeTo12Hour(
-                                          prayerTimes["সূর্যাস্ত"]!,
-                                        )
-                                      : "--:--",
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
                       ),
                     ),
-                  ),
-                ],
+
+                    const SizedBox(width: 8), // স্পেস কমালাম
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.green[700]!.withOpacity(0.3)
+                            : Colors.green[50]!,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: () async {
+                          final hasInternet = await _checkInternetConnection();
+                          if (!hasInternet) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "ইন্টারনেট সংযোগ নেই। রিফ্রেশ করা যাচ্ছে না।",
+                                  style: TextStyle(
+                                    color: isDark ? Colors.white : Colors.black,
+                                  ),
+                                ),
+                                backgroundColor: isDark
+                                    ? Colors.green[800]!
+                                    : Colors.green[100]!,
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                            return;
+                          }
+
+                          fetchLocationAndPrayerTimes();
+
+                          try {
+                            await HapticFeedback.lightImpact();
+                          } catch (e) {
+                            print('Haptic feedback error: $e');
+                          }
+                        },
+                        icon: Icon(
+                          Icons.refresh_rounded,
+                          color: isDark
+                              ? Colors.green[100]!
+                              : Colors.green[700]!,
+                          size: 16, // আইকন সাইজ কমালাম
+                        ),
+                        iconSize: 16,
+                        padding: const EdgeInsets.all(5),
+                        // প্যাডিং কমালাম
+                        tooltip: "রিফ্রেশ করুন",
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              //SizedBox(height: 6),
+
+              // পরবর্তী নামাজ এবং সূর্যোদয়/সূর্যাস্ত সেকশন
+              Container(
+                margin: const EdgeInsets.only(top: 5), // উপরে ৫ মার্জিন
+                child: Row(
+                  children: [
+                    // বাম পাশ - পরবর্তী নামাজ কাউন্টডাউন
+                    Expanded(
+                      flex: 6,
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withOpacity(0.15),
+                              Colors.white.withOpacity(0.08),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              "পরবর্তী ওয়াক্ত",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                            ),
+                            SizedBox(height: 3),
+                            Text(
+                              nextPrayer.isNotEmpty
+                                  ? nextPrayer
+                                  : "লোড হচ্ছে...",
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 12 : 13,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.15),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  _buildTimeUnit("ঘণ্টা", countdown.inHours),
+                                  _buildDivider(),
+                                  _buildTimeUnit(
+                                    "মিনিট",
+                                    countdown.inMinutes % 60,
+                                  ),
+                                  _buildDivider(),
+                                  _buildTimeUnit(
+                                    "সেকেন্ড",
+                                    countdown.inSeconds % 60,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(width: 8),
+
+                    // ডান পাশ - সূর্যোদয়/সূর্যাস্ত
+                    Expanded(
+                      flex: 4,
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.orange.withOpacity(0.3),
+                              Colors.deepOrange.withOpacity(0.2),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.orange.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // সূর্যোদয়
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.wb_sunny,
+                                        color: Colors.yellow.shade200,
+                                        size: 14,
+                                      ),
+                                      SizedBox(width: 3),
+                                      Text(
+                                        "সূর্যোদয়",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 3),
+                                  Text(
+                                    prayerTimes.containsKey("সূর্যোদয়")
+                                        ? formatTimeTo12Hour(
+                                            prayerTimes["সূর্যোদয়"]!,
+                                          )
+                                        : "--:--",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // ডিভাইডার
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 2),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 25,
+                                    height: 1,
+                                    color: Colors.white.withOpacity(0.5),
+                                    margin: EdgeInsets.symmetric(vertical: 1),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // সূর্যাস্ত
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.deepOrange.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.nightlight_round,
+                                        color: Colors.orange.shade200,
+                                        size: 14,
+                                      ),
+                                      SizedBox(width: 3),
+                                      Text(
+                                        "সূর্যাস্ত",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 3),
+                                  Text(
+                                    prayerTimes.containsKey("সূর্যাস্ত")
+                                        ? formatTimeTo12Hour(
+                                            prayerTimes["সূর্যাস্ত"]!,
+                                          )
+                                        : "--:--",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

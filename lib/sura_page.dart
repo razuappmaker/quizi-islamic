@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'json_loader.dart'; // JsonLoader ইম্পোর্ট করুন
-import 'ad_helper.dart'; // AdHelper ইম্পোর্ট করুন
+import 'json_loader.dart';
+import 'ad_helper.dart';
 
 class SuraPage extends StatefulWidget {
   const SuraPage({Key? key}) : super(key: key);
@@ -14,6 +14,7 @@ class _SuraPageState extends State<SuraPage> {
   List<Map<String, dynamic>> dailySuras = [];
   Set<int> expandedIndices = {};
   bool _isLoading = true;
+  bool _showWarning = true; // সতর্কবার্তা শুরুতে দেখাবে
 
   late BannerAd _bannerAd;
   bool _isBannerAdReady = false;
@@ -24,7 +25,7 @@ class _SuraPageState extends State<SuraPage> {
     _loadSuraData();
 
     _bannerAd = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId, // ad_helper.dart থেকে আইডি নিলো
+      adUnitId: AdHelper.bannerAdUnitId,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -64,12 +65,6 @@ class _SuraPageState extends State<SuraPage> {
                 'transliteration': 'বিসমিল্লাহির রাহমানির রাহিম',
                 'meaning': 'পরম করুণাময়, পরম দয়ালু আল্লাহর নামে।',
               },
-              {
-                'arabic': 'الْحَمْدُ لِلّهِ رَبِّ الْعَالَمِينَ',
-                'transliteration': 'আলহামদু লিল্লাহি রাব্বিল ‘আলামীন',
-                'meaning':
-                    'সমস্ত প্রশংসা আল্লাহর জন্য, যিনি সমস্ত জগতের পালনকর্তা।',
-              },
             ],
             'reference': 'কুরআন, সূরা আল ফাতিহা, আয়াত ১-৭',
           },
@@ -85,6 +80,57 @@ class _SuraPageState extends State<SuraPage> {
     super.dispose();
   }
 
+  // সুন্দর UI সহ সতর্কবার্তা
+  Widget buildWarningBox() {
+    return Dismissible(
+      key: const ValueKey("warning"),
+      direction: DismissDirection.horizontal,
+      onDismissed: (_) {
+        setState(() {
+          _showWarning = false;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.amber.shade100, Colors.orange.shade50],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.orange.shade200),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.info_outline, color: Colors.orange, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                "আরবি আয়াত বাংলায় সম্পূর্ণ সুদ্ধভাবে প্রকাশ করা যায় না। বাংলা উচ্চারণ সহায়ক মাত্র, সঠিক তিলাওয়াতের জন্য আরবিতেই পড়ুন।",
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  height: 1.3,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showWarning = false;
+                });
+              },
+              child: const Icon(Icons.close, size: 18, color: Colors.black54),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget buildSura(Map<String, dynamic> sura, int index) {
     final bool isExpanded = expandedIndices.contains(index);
 
@@ -92,10 +138,8 @@ class _SuraPageState extends State<SuraPage> {
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
       child: Material(
         borderRadius: BorderRadius.circular(16),
-        elevation: 10,
-        shadowColor: Theme.of(context).brightness == Brightness.dark
-            ? Colors.greenAccent.withOpacity(0.6)
-            : Colors.green.withOpacity(0.5),
+        elevation: 6,
+        shadowColor: Colors.green.withOpacity(0.3),
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
@@ -117,7 +161,7 @@ class _SuraPageState extends State<SuraPage> {
                 title: Text(
                   sura['title'] ?? '',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).brightness == Brightness.dark
                         ? Colors.white
@@ -146,10 +190,7 @@ class _SuraPageState extends State<SuraPage> {
                 child: isExpanded
                     ? Padding(
                         key: ValueKey('expanded_$index'),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
+                        padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -164,15 +205,15 @@ class _SuraPageState extends State<SuraPage> {
                                       child: SelectableText(
                                         ay['arabic'] ?? '',
                                         style: TextStyle(
-                                          fontSize: 28,
+                                          fontSize: 26,
                                           fontFamily: 'Amiri',
-                                          fontWeight: FontWeight.w700,
+                                          fontWeight: FontWeight.bold,
                                           color:
                                               Theme.of(context).brightness ==
                                                   Brightness.dark
                                               ? Colors.white
                                               : Colors.black87,
-                                          height: 1.5,
+                                          height: 1.6,
                                         ),
                                         textAlign: TextAlign.right,
                                       ),
@@ -181,7 +222,7 @@ class _SuraPageState extends State<SuraPage> {
                                     Text(
                                       ay['transliteration'] ?? '',
                                       style: TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 17,
                                         fontStyle: FontStyle.italic,
                                         color:
                                             Theme.of(context).brightness ==
@@ -195,7 +236,7 @@ class _SuraPageState extends State<SuraPage> {
                                     Text(
                                       'অর্থ: ${ay['meaning'] ?? ''}',
                                       style: TextStyle(
-                                        fontSize: 17,
+                                        fontSize: 16,
                                         color:
                                             Theme.of(context).brightness ==
                                                 Brightness.dark
@@ -213,7 +254,7 @@ class _SuraPageState extends State<SuraPage> {
                               Text(
                                 'সূত্র: ${sura['reference']}',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontStyle: FontStyle.italic,
                                   color:
                                       Theme.of(context).brightness ==
@@ -246,6 +287,7 @@ class _SuraPageState extends State<SuraPage> {
       ),
       body: Column(
         children: [
+          if (_showWarning) buildWarningBox(), // সতর্ক বার্তা
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -259,7 +301,6 @@ class _SuraPageState extends State<SuraPage> {
             SafeArea(
               top: false,
               child: Container(
-                width: double.infinity,
                 alignment: Alignment.center,
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width,
