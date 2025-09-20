@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:islamicquiz/ifter_time_page.dart';
 import 'package:islamicquiz/qiblah_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
@@ -551,7 +552,19 @@ class _HomePageState extends State<HomePage>
               ),
               _buildIslamicKnowledgeCard(
                 context,
-                'কুরআনের সূরা',
+                'সেহেরী ও ইফতার',
+                Icons.time_to_leave,
+                iconColor,
+                cardColor,
+                textColor,
+                secondaryTextColor,
+                const IfterTimePage(),
+                isDarkMode,
+                semanticsLabel: 'সেহেরী ও ইফতার',
+              ),
+              _buildIslamicKnowledgeCard(
+                context,
+                'ছোট সূরাসমুহ',
                 Icons.menu_book_rounded,
                 iconColor,
                 cardColor,
@@ -559,7 +572,7 @@ class _HomePageState extends State<HomePage>
                 secondaryTextColor,
                 const SuraPage(),
                 isDarkMode,
-                semanticsLabel: 'কুরআনের সূরা',
+                semanticsLabel: 'ছোট সুরাসমুহ',
               ),
               _buildIslamicKnowledgeCard(
                 context,
@@ -596,18 +609,6 @@ class _HomePageState extends State<HomePage>
                 const QiblaPage(),
                 isDarkMode,
                 semanticsLabel: 'কিবলা',
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                'নামাজ শিক্ষা',
-                Icons.picture_as_pdf_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const NamajAmol(),
-                isDarkMode,
-                semanticsLabel: 'নামাজ শিক্ষা',
               ),
             ],
           ),
@@ -799,7 +800,7 @@ class _HomePageState extends State<HomePage>
         Expanded(
           child: _buildIslamicKnowledgeCard(
             context,
-            'কুরআন শিক্ষা',
+            'নাদিয়াতুল কোরান',
             Icons.menu_book_rounded,
             iconColor,
             cardColor,
@@ -807,8 +808,8 @@ class _HomePageState extends State<HomePage>
             isDarkMode ? Colors.white : secondaryTextColor,
             const NamajAmol(),
             isDarkMode,
-            description: 'কুরআন তেলাওয়াত ও তাফসীর শিখুন',
-            semanticsLabel: 'কুরআন শিক্ষ',
+            description: 'সম্পূর্ণ নতুনদের জন্য সেরা গাইড',
+            semanticsLabel: 'নাদিয়াতুল কোরান',
           ),
         ),
       ],
@@ -866,16 +867,17 @@ class _HomePageState extends State<HomePage>
               ResponsiveSizedBox(width: responsiveValue(context, 12)),
               _buildIslamicKnowledgeCard(
                 context,
-                'কুরআন শিক্ষা',
+                'নাদিয়াতুল কোরআন',
                 Icons.menu_book_rounded,
                 iconColor,
                 cardColor,
                 textColor,
                 isDarkMode ? Colors.white : secondaryTextColor,
                 const NamajAmol(),
+                // নাদিয়াতুল কুরআন
                 isDarkMode,
-                description: 'কুরআন তেলাওয়াত ও তাফসীর শিখুনা',
-                semanticsLabel: 'কুরআন শিক্ষা',
+                description: 'নতুনদের জন্য সেরা গাইড',
+                semanticsLabel: 'নাদিয়াতুল কুরআন',
               ),
               ResponsiveSizedBox(width: responsiveValue(context, 4)),
             ],
@@ -1084,6 +1086,14 @@ class _HomePageState extends State<HomePage>
             url: 'https://www.google.com/maps/search/?api=1&query=মসজিদ',
             semanticsLabel: 'নিকটবর্তী মসজিদ',
           ),
+          /*_buildDrawerItem(
+            // New add
+            context,
+            Icons.book,
+            'নামাজের সময়',
+            const ArabiLearningPage(),
+            semanticsLabel: 'কুরআন শিক্ষা',
+          ),*/
           _buildDrawerItem(
             context,
             Icons.info,
@@ -1218,6 +1228,14 @@ class _HomePageState extends State<HomePage>
             const PrayerTimePage(),
             semanticsLabel: 'নামাজের সময়',
           ),
+          // ড্রয়ারে এটা দেখাতে চাইলে কমেন্ট উঠিয়ে দাও
+          /*_buildDrawerItem(
+            context,
+            Icons.menu_book, // Quran icon
+            'নাদিয়াতুল কুরআন',
+            const NamajAmol(),
+            semanticsLabel: 'নাদিয়াতুল কুরআন',
+          ),*/
           _buildDrawerItem(
             context,
             Icons.mosque,
