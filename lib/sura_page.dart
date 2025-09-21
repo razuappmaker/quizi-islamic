@@ -17,6 +17,10 @@ class _SuraPageState extends State<SuraPage> {
   bool _isLoading = true;
   Map<int, bool> _showFullWarning =
       {}; // Track full warning state for each sura
+  double _fontSize = 16.0; // Default font size
+  final double _minFontSize = 12.0;
+  final double _maxFontSize = 28.0;
+  final double _fontSizeStep = 2.0;
 
   late BannerAd _bannerAd;
   bool _isBannerAdReady = false;
@@ -73,6 +77,28 @@ class _SuraPageState extends State<SuraPage> {
         ];
       });
     }
+  }
+
+  void _increaseFontSize() {
+    setState(() {
+      if (_fontSize < _maxFontSize) {
+        _fontSize += _fontSizeStep;
+      }
+    });
+  }
+
+  void _decreaseFontSize() {
+    setState(() {
+      if (_fontSize > _minFontSize) {
+        _fontSize -= _fontSizeStep;
+      }
+    });
+  }
+
+  void _resetFontSize() {
+    setState(() {
+      _fontSize = 16.0;
+    });
   }
 
   @override
@@ -357,64 +383,152 @@ class _SuraPageState extends State<SuraPage> {
                             // Warning message inside expanded sura
                             _buildWarningWidget(index),
 
-                            ...List<Widget>.from(
-                              (sura['ayat'] as List<dynamic>).map(
-                                (ay) => Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Directionality(
-                                      textDirection: TextDirection.rtl,
-                                      child: SelectableText(
-                                        ay['arabic'] ?? '',
-                                        style: TextStyle(
-                                          fontSize: 26,
-                                          fontFamily: 'Amiri',
-                                          fontWeight: FontWeight.bold,
+                            // Font size controls
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 12,
+                              ),
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey[800]
+                                    : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'ফন্ট সাইজ:',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white70
+                                          : Colors.black87,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.zoom_out, size: 20),
+                                        onPressed: _decreaseFontSize,
+                                        tooltip: 'ফন্ট ছোট করুন',
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
                                           color:
                                               Theme.of(context).brightness ==
                                                   Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black87,
-                                          height: 1.6,
+                                              ? Colors.grey[700]
+                                              : Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
-                                        textAlign: TextAlign.right,
+                                        child: Text(
+                                          '${_fontSize.toInt()}',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      ay['transliteration'] ?? '',
-                                      style: TextStyle(
-                                        fontSize: 17,
-                                        fontStyle: FontStyle.italic,
-                                        color:
-                                            Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.green[200]
-                                            : Colors.green[900],
-                                        height: 1.4,
+                                      IconButton(
+                                        icon: Icon(Icons.zoom_in, size: 20),
+                                        onPressed: _increaseFontSize,
+                                        tooltip: 'ফন্ট বড় করুন',
                                       ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      'অর্থ: ${ay['meaning'] ?? ''}',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color:
-                                            Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.grey[300]
-                                            : Colors.black87,
-                                        height: 1.4,
+                                      IconButton(
+                                        icon: Icon(Icons.restart_alt, size: 20),
+                                        onPressed: _resetFontSize,
+                                        tooltip: 'ডিফল্ট ফন্ট সাইজ',
                                       ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                  ],
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            ...List<Widget>.from(
+                              (sura['ayat'] as List<dynamic>).map(
+                                (ay) => InteractiveViewer(
+                                  boundaryMargin: EdgeInsets.all(20),
+                                  minScale: 0.5,
+                                  maxScale: 4.0,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: SelectableText(
+                                          ay['arabic'] ?? '',
+                                          style: TextStyle(
+                                            fontSize: 26,
+                                            fontFamily: 'ScheherazadeNew',
+                                            fontWeight: FontWeight.bold,
+                                            wordSpacing: 2.5,
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.white
+                                                : Colors.black87,
+                                            height: 1.6,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      SelectableText(
+                                        ay['transliteration'] ?? '',
+                                        style: TextStyle(
+                                          fontSize: _fontSize,
+                                          fontStyle: FontStyle.italic,
+                                          color:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.green[200]
+                                              : Colors.green[900],
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      SelectableText(
+                                        'অর্থ: ${ay['meaning'] ?? ''}',
+                                        style: TextStyle(
+                                          fontSize: _fontSize,
+                                          color:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.grey[300]
+                                              : Colors.black87,
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                             if ((sura['reference'] ?? '').isNotEmpty)
-                              Text(
+                              SelectableText(
                                 'সূত্র: ${sura['reference']}',
                                 style: TextStyle(
                                   fontSize: 13,
@@ -448,16 +562,54 @@ class _SuraPageState extends State<SuraPage> {
           'আরবি, বাংলা ও অর্থসহ',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          // Font size control in app bar
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.text_fields, color: Colors.white),
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem(
+                value: 'increase',
+                child: ListTile(
+                  leading: const Icon(Icons.zoom_in),
+                  title: const Text('ফন্ট বড় করুন'),
+                  onTap: _increaseFontSize,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'decrease',
+                child: ListTile(
+                  leading: const Icon(Icons.zoom_out),
+                  title: const Text('ফন্ট ছোট করুন'),
+                  onTap: _decreaseFontSize,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'reset',
+                child: ListTile(
+                  leading: const Icon(Icons.restart_alt),
+                  title: const Text('ডিফল্ট ফন্ট সাইজ'),
+                  onTap: _resetFontSize,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Column(
         children: [
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: dailySuras.length,
-                    itemBuilder: (context, index) =>
-                        buildSura(dailySuras[index], index),
+                : InteractiveViewer(
+                    boundaryMargin: EdgeInsets.all(20),
+                    minScale: 0.5,
+                    maxScale: 4.0,
+                    child: ListView.builder(
+                      itemCount: dailySuras.length,
+                      itemBuilder: (context, index) =>
+                          buildSura(dailySuras[index], index),
+                    ),
                   ),
           ),
           if (_isBannerAdReady)

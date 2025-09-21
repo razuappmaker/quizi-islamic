@@ -15,13 +15,18 @@ class IfterTimePage extends StatefulWidget {
   State<IfterTimePage> createState() => _IfterTimePageState();
 }
 
-class _IfterTimePageState extends State<IfterTimePage> {
+class _IfterTimePageState extends State<IfterTimePage>
+    with SingleTickerProviderStateMixin {
   // ---------- Prayer Times from SharedPreferences ----------
   String? cityName = "Loading...";
   String? countryName = "Loading...";
   Map<String, String> prayerTimes = {};
   Duration iftarCountdown = Duration.zero;
   Timer? iftarTimer;
+
+  // Animation controller for countdown pulse effect
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   // ---------- Banner Ad ----------
   late BannerAd _bannerAd;
@@ -45,12 +50,23 @@ class _IfterTimePageState extends State<IfterTimePage> {
     _loadAd();
     _loadSavedData();
     _selectRandomHadith();
+
+    // Initialize animation controller
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+
+    _animation = Tween<double>(begin: 0.97, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void dispose() {
     iftarTimer?.cancel();
     _bannerAd.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -178,37 +194,66 @@ class _IfterTimePageState extends State<IfterTimePage> {
   }
 
   // সময় ইউনিট বিল্ড করার হেল্পার মেথড
-  Widget _buildTimeUnit(String label, int value) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    final isDarkMode = themeProvider.isDarkMode;
 
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: isDarkMode ? Colors.green[800] : Colors.green[500],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            value.toString().padLeft(2, '0'),
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+  Widget _buildTimeUnit(String label, int value, bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      // Add horizontal spacing
+      child: Column(
+        children: [
+          // Time value container
+          Container(
+            width: 64,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? Colors.black.withOpacity(0.3)
+                  : Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              value.toString().padLeft(2, '0'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                letterSpacing: 1,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-            fontWeight: FontWeight.w500,
+          const SizedBox(height: 8),
+          // Label
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white.withOpacity(0.9),
+              fontWeight: FontWeight.w500,
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  // Helper widget for colon separator
+  Widget _buildColon() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Text(
+        ":",
+        style: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: Colors.white.withOpacity(0.8),
         ),
-      ],
+      ),
     );
   }
 
@@ -275,50 +320,110 @@ class _IfterTimePageState extends State<IfterTimePage> {
 
             const SizedBox(height: 24),
 
-            // ইফতার কাউন্টডাউন সেকশন
+            // ইফতার কাউন্টডাউন সেকশন - UPDATED
+            // Replace the ScaleTransition section with this updated code:
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.green[800] : Colors.green[500],
-                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDarkMode
+                      ? [Colors.green[900]!, Colors.green[700]!]
+                      : [Colors.green[600]!, Colors.green[400]!],
+                ),
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
               child: Column(
                 children: [
-                  Text(
-                    "ইফতারের সময় বাকি",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // কাউন্টডাউন টাইমার
+                  // Header with icon
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildTimeUnit("ঘণ্টা", iftarCountdown.inHours),
-                      _buildTimeUnit("মিনিট", iftarCountdown.inMinutes % 60),
-                      _buildTimeUnit("সেকেন্ড", iftarCountdown.inSeconds % 60),
+                      Icon(
+                        Icons.nightlight_round,
+                        color: Colors.white.withOpacity(0.9),
+                        size: 22,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "ইফতারের সময় বাকি",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Countdown timer with improved design
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildTimeUnit(
+                        "ঘণ্টা",
+                        iftarCountdown.inHours,
+                        isDarkMode,
+                      ),
+                      const SizedBox(width: 12), // Add space after hours
+                      _buildColon(),
+                      const SizedBox(width: 12), // Add space after first colon
+                      _buildTimeUnit(
+                        "মিনিট",
+                        iftarCountdown.inMinutes % 60,
+                        isDarkMode,
+                      ),
+                      const SizedBox(width: 12), // Add space after minutes
+                      _buildColon(),
+                      const SizedBox(width: 12), // Add space after second colon
+                      _buildTimeUnit(
+                        "সেকেন্ড",
+                        iftarCountdown.inSeconds % 60,
+                        isDarkMode,
+                      ),
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  Text(
-                    "ইফতারের সময়: ${_getIftarTime()}",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
+                  // Iftar time with improved styling
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          color: Colors.white.withOpacity(0.9),
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "ইফতারের সময়: ${_getIftarTime()}",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -334,7 +439,6 @@ class _IfterTimePageState extends State<IfterTimePage> {
                 color: isDarkMode ? Colors.blue[900] : Colors.blue[50],
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  //color: isDarkMode ? Colors.blue[700] : Colors.blue[200],
                   color: isDarkMode ? Colors.blue[700]! : Colors.blue[200]!,
                 ),
               ),

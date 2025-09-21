@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter/services.dart'; // Clipboard এর জন্য
 import 'ad_helper.dart';
 import 'json_loader.dart';
 
@@ -419,6 +420,13 @@ class _DoyaListPageState extends State<DoyaListPage> {
   int? _expandedDoyaIndex;
   bool _showFullWarning = false;
 
+  // Font size control
+  double _arabicFontSize = 26.0;
+  double _textFontSize = 16.0;
+  final double _minFontSize = 12.0;
+  final double _maxFontSize = 32.0;
+  final double _fontSizeStep = 2.0;
+
   // Bottom Banner
   late BannerAd _bottomBannerAd;
   bool _isBottomBannerAdReady = false;
@@ -449,12 +457,10 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
   Future<void> _loadDoyaData() async {
     try {
-      print('Loading doya data from: ${widget.jsonFile}'); // Debug
       final loadedData = await JsonLoader.loadJsonList(widget.jsonFile);
 
       final List<Map<String, String>> convertedData = loadedData
           .map<Map<String, String>>((item) {
-            print('Processing item: $item'); // Debug
             final Map<String, dynamic> dynamicItem = Map<String, dynamic>.from(
               item,
             );
@@ -464,15 +470,12 @@ class _DoyaListPageState extends State<DoyaListPage> {
           })
           .toList();
 
-      print('Successfully converted ${convertedData.length} items'); // Debug
-
       setState(() {
         doyas = convertedData;
         filteredDoyas = convertedData;
         _isLoading = false;
       });
     } catch (e) {
-      print('Error in _loadDoyaData: $e'); // Debug
       setState(() => _isLoading = false);
 
       // Fallback data with more details
@@ -520,6 +523,54 @@ class _DoyaListPageState extends State<DoyaListPage> {
     }).toList();
 
     setState(() => filteredDoyas = results);
+  }
+
+  void _increaseFontSize() {
+    setState(() {
+      if (_arabicFontSize < _maxFontSize && _textFontSize < _maxFontSize) {
+        _arabicFontSize += _fontSizeStep;
+        _textFontSize += _fontSizeStep;
+      }
+    });
+  }
+
+  void _decreaseFontSize() {
+    setState(() {
+      if (_arabicFontSize > _minFontSize && _textFontSize > _minFontSize) {
+        _arabicFontSize -= _fontSizeStep;
+        _textFontSize -= _fontSizeStep;
+      }
+    });
+  }
+
+  void _resetFontSize() {
+    setState(() {
+      _arabicFontSize = 26.0;
+      _textFontSize = 16.0;
+    });
+  }
+
+  // Copy to clipboard function
+  Future<void> _copyToClipboard(Map<String, String> doya) async {
+    final String duaTitle = doya['title'] ?? '';
+    final String duaArabic = doya['arabic'] ?? '';
+    final String duaTransliteration = doya['transliteration'] ?? '';
+    final String duaMeaning = doya['meaning'] ?? '';
+    final String duaReference = doya['reference'] ?? '';
+
+    final String copyText =
+        '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\nঅর্থ: $duaMeaning${duaReference.isNotEmpty ? '\n\nরেফারেন্স: $duaReference' : ''}';
+
+    await Clipboard.setData(ClipboardData(text: copyText));
+
+    // Show snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('"$duaTitle" কপি করা হয়েছে'),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   //===================
@@ -654,21 +705,6 @@ class _DoyaListPageState extends State<DoyaListPage> {
           );
   }
 
-  // Helper method for consistent paragraph styling
-  Widget _buildWarningParagraph(String text) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 14.5,
-        height: 1.7,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white70
-            : Colors.black87,
-      ),
-      textAlign: TextAlign.justify,
-    );
-  }
-
   void _showDoyaDetails(Map<String, String> doya, int index) {
     setState(() {
       if (_expandedDoyaIndex == index) {
@@ -756,8 +792,11 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 SelectableText(
                   duaArabic,
                   style: TextStyle(
-                    fontSize: 26,
-                    fontFamily: 'Amiri',
+                    fontSize: _arabicFontSize,
+                    fontFamily: 'ScheherazadeNew',
+                    fontWeight: FontWeight.bold,
+                    height: 2.0,
+                    wordSpacing: 2.5,
                     color: isDark ? Colors.white : Colors.black,
                   ),
                   textAlign: TextAlign.right,
@@ -765,10 +804,10 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 const SizedBox(height: 15),
 
                 // Transliteration
-                Text(
+                SelectableText(
                   duaTransliteration,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: _textFontSize,
                     fontStyle: FontStyle.italic,
                     color: isDark ? Colors.white70 : Colors.grey[700],
                   ),
@@ -783,10 +822,10 @@ class _DoyaListPageState extends State<DoyaListPage> {
                     color: widget.categoryColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
+                  child: SelectableText(
                     "অর্থ: $duaMeaning",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: _textFontSize,
                       color: isDark ? Colors.white : Colors.black,
                     ),
                     textAlign: TextAlign.center,
@@ -796,7 +835,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
                 // Reference
                 if (duaReference.isNotEmpty)
-                  Text(
+                  SelectableText(
                     "রেফারেন্স: $duaReference",
                     style: TextStyle(
                       fontSize: 14,
@@ -808,21 +847,51 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
                 const SizedBox(height: 16),
 
-                // Share button
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton.icon(
-                    onPressed: () {
-                      Share.share(
-                        '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\nঅর্থ: $duaMeaning\n\nরেফারেন্স: $duaReference',
-                      );
-                    },
-                    icon: Icon(Icons.share, color: widget.categoryColor),
-                    label: Text(
-                      'শেয়ার করুন',
-                      style: TextStyle(color: widget.categoryColor),
+                // Copy and Share buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // Copy button
+                    ElevatedButton.icon(
+                      onPressed: () => _copyToClipboard(doya),
+                      icon: const Icon(Icons.copy, size: 18),
+                      label: const Text('কপি'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue[700],
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+
+                    // Share button
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Share.share(
+                          '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\nঅর্থ: $duaMeaning\n\nরেফারেন্স: $duaReference',
+                        );
+                      },
+                      icon: const Icon(Icons.share, size: 18),
+                      label: const Text('শেয়ার'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: widget.categoryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ],
@@ -877,6 +946,38 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 onChanged: _searchDoya,
               ),
         actions: [
+          // Font size control in app bar
+          if (!_isSearching)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.text_fields, color: Colors.white),
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem(
+                  value: 'increase',
+                  child: ListTile(
+                    leading: const Icon(Icons.zoom_in),
+                    title: const Text('ফন্ট বড় করুন'),
+                    onTap: _increaseFontSize,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'decrease',
+                  child: ListTile(
+                    leading: const Icon(Icons.zoom_out),
+                    title: const Text('ফন্ট ছোট করুন'),
+                    onTap: _decreaseFontSize,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'reset',
+                  child: ListTile(
+                    leading: const Icon(Icons.restart_alt),
+                    title: const Text('ডিফল্ট ফন্ট সাইজ'),
+                    onTap: _resetFontSize,
+                  ),
+                ),
+              ],
+            ),
+          const SizedBox(width: 8),
           !_isSearching
               ? IconButton(
                   icon: const Icon(Icons.search, color: Colors.white),

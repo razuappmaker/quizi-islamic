@@ -594,7 +594,7 @@ class _HomePageState extends State<HomePage>
               ),
               _buildIslamicKnowledgeCard(
                 context,
-                'ছোট সূরাসমুহ',
+                'ছোট সূরা',
                 Icons.menu_book_rounded,
                 iconColor,
                 // ডার্ক মুডে সাদা
@@ -606,11 +606,11 @@ class _HomePageState extends State<HomePage>
                 // डार्क মুডে সাদা
                 const SuraPage(),
                 isDarkMode,
-                semanticsLabel: 'ছোট সুরাসমুহ',
+                semanticsLabel: 'ছোট সুরা',
               ),
               _buildIslamicKnowledgeCard(
                 context,
-                'দৈনন্দিন দোয়া',
+                'দুআ',
                 Icons.lightbulb_outline_rounded,
                 iconColor,
                 // ডার্ক মুডে সাদা
@@ -622,7 +622,7 @@ class _HomePageState extends State<HomePage>
                 // ডার্ক মুডে সাদা
                 const DoyaCategoryPage(),
                 isDarkMode,
-                semanticsLabel: 'দৈনন্দিন দোয়া',
+                semanticsLabel: 'দুআ',
               ),
               _buildIslamicKnowledgeCard(
                 context,
@@ -663,124 +663,6 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  //=======================
-  /*
-  Widget _buildQuickAccess(
-    BuildContext context,
-    bool isDarkMode,
-    bool isTablet,
-  ) {
-    final primaryColor = isDarkMode ? Colors.green[400]! : Colors.green[700]!;
-    final cardColor = isDarkMode ? Colors.green[800]! : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.green[900]!;
-    final secondaryTextColor = isDarkMode
-        ? Colors.green[200]!
-        : Colors.green[600]!;
-    final iconColor = isDarkMode ? Colors.green[100]! : Colors.green[700]!;
-    final mediaQuery = MediaQuery.of(context); // ✅ define it here
-
-    return ResponsivePadding(
-      horizontal: responsiveValue(context, 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ResponsiveText(
-            'ইবাদাত ও দোয়া',
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: (isDarkMode ? Colors.white : Colors.green[800]!),
-            semanticsLabel: 'ইবাদাত ও দোয়া',
-          ),
-          ResponsiveSizedBox(height: 6),
-          GridView.count(
-            crossAxisCount: isTablet ? 6 : 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: responsiveValue(context, 10),
-            crossAxisSpacing: responsiveValue(context, 10),
-            childAspectRatio: 1.0,
-            // Square shape
-            children: [
-              _buildIslamicKnowledgeCard(
-                context,
-                'নামাজের সময়',
-                Icons.access_time_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const PrayerTimePage(),
-                isDarkMode,
-                semanticsLabel: 'নামাজের সময়',
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                'সেহেরী ও ইফতার',
-                Icons.time_to_leave,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const IfterTimePage(),
-                isDarkMode,
-                semanticsLabel: 'সেহেরী ও ইফতার',
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                'ছোট সূরাসমুহ',
-                Icons.menu_book_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const SuraPage(),
-                isDarkMode,
-                semanticsLabel: 'ছোট সুরাসমুহ',
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                'দৈনন্দিন দোয়া',
-                Icons.lightbulb_outline_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const DoyaPage(),
-                isDarkMode,
-                semanticsLabel: 'দৈনন্দিন দোয়া',
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                'তসবিহ',
-                Icons.fingerprint_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const TasbeehPage(),
-                isDarkMode,
-                semanticsLabel: 'তসবিহ',
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                'কিবলা',
-                Icons.explore_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const QiblaPage(),
-                isDarkMode,
-                semanticsLabel: 'কিবলা',
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }*/
-
-  // ===================================
   Widget _buildAdditionalFeatures(
     BuildContext context,
     bool isDarkMode,
@@ -1394,9 +1276,9 @@ class _HomePageState extends State<HomePage>
           _buildDrawerItem(
             context,
             Icons.book,
-            'দৈনন্দিন দোয়া',
+            'দুআ',
             const DoyaCategoryPage(),
-            semanticsLabel: 'দৈনন্দিন দোয়া',
+            semanticsLabel: 'দুআ',
           ),
           _buildDrawerItem(
             context,
@@ -1544,9 +1426,9 @@ class _HomePageState extends State<HomePage>
           _buildDrawerItem(
             context,
             Icons.book,
-            'দৈনন্দিন দোয়া',
+            'দুআ',
             const DoyaCategoryPage(),
-            semanticsLabel: 'দৈনন্দিন দোয়া',
+            semanticsLabel: 'দুআ',
           ),
           _buildDrawerItem(
             context,
