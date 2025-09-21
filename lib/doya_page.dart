@@ -1,3 +1,4 @@
+// Doya Page
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -414,6 +415,10 @@ class _DoyaListPageState extends State<DoyaListPage> {
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
 
+  // Track which doya is expanded and warning state
+  int? _expandedDoyaIndex;
+  bool _showFullWarning = false;
+
   // Bottom Banner
   late BannerAd _bottomBannerAd;
   bool _isBottomBannerAdReady = false;
@@ -517,7 +522,169 @@ class _DoyaListPageState extends State<DoyaListPage> {
     setState(() => filteredDoyas = results);
   }
 
-  void _showDoyaDetails(Map<String, String> doya) {
+  //===================
+  Widget _buildWarningWidget() {
+    return _showFullWarning
+        ? Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.orange[900]?.withOpacity(0.1)
+                  : Colors.orange[50],
+              border: Border.all(
+                color: Colors.orange.withOpacity(0.3),
+                width: 1.2,
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Simple header
+                Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      color: Colors.orange[700],
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'সতর্কবার্তা',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.orange[800],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                // Simple content
+                Text(
+                  'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে অনেক সময় অর্থের বিকৃতি ঘটে। '
+                  'তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন। আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি।',
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white70
+                        : Colors.black87,
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+
+                const SizedBox(height: 12),
+
+                // Simple close button
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showFullWarning = false;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.orange.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        'বুঝেছি',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.orange[800],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        : // Simple collapsed state
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _showFullWarning = true;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.orange[900]?.withOpacity(0.1)
+                    : Colors.orange[50],
+                border: Border.all(
+                  color: Colors.orange.withOpacity(0.3),
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: Colors.orange[700],
+                    size: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'বাংলা উচ্চরণ',
+                    style: TextStyle(fontSize: 12, color: Colors.orange[800]),
+                  ),
+                ],
+              ),
+            ),
+          );
+  }
+
+  // Helper method for consistent paragraph styling
+  Widget _buildWarningParagraph(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 14.5,
+        height: 1.7,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white70
+            : Colors.black87,
+      ),
+      textAlign: TextAlign.justify,
+    );
+  }
+
+  void _showDoyaDetails(Map<String, String> doya, int index) {
+    setState(() {
+      if (_expandedDoyaIndex == index) {
+        // If already expanded, collapse it
+        _expandedDoyaIndex = null;
+        _showFullWarning = false;
+      } else {
+        // Expand this doya
+        _expandedDoyaIndex = index;
+        _showFullWarning = false;
+      }
+    });
+  }
+
+  Widget _buildDoyaCard(Map<String, String> doya, int index) {
+    final bool isExpanded = _expandedDoyaIndex == index;
     final String duaTitle = doya['title'] ?? '';
     final String duaArabic = doya['arabic'] ?? '';
     final String duaTransliteration = doya['transliteration'] ?? '';
@@ -525,103 +692,13 @@ class _DoyaListPageState extends State<DoyaListPage> {
     final String duaReference = doya['reference'] ?? '';
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: isDark ? Colors.grey[900] : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          duaTitle,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            color: widget.categoryColor,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SelectableText(
-                duaArabic,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontFamily: 'Amiri',
-                  color: isDark ? Colors.white : Colors.black,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 15),
-              Text(
-                duaTransliteration,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontStyle: FontStyle.italic,
-                  color: isDark ? Colors.white70 : Colors.grey[700],
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 15),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: widget.categoryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  "অর্থ: $duaMeaning",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 15),
-              if (duaReference.isNotEmpty)
-                Text(
-                  "রেফারেন্স: $duaReference",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Colors.green[200] : Colors.green[700],
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton.icon(
-            onPressed: () {
-              Share.share(
-                '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\nঅর্থ: $duaMeaning\n\nরেফারেন্স: $duaReference',
-              );
-            },
-            icon: Icon(Icons.share, color: widget.categoryColor),
-            label: Text('শেয়ার', style: TextStyle(color: widget.categoryColor)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'বন্ধ করুন',
-              style: TextStyle(color: widget.categoryColor),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDoyaCard(Map<String, String> doya) {
     return Card(
       elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => _showDoyaDetails(doya),
+        onTap: () => _showDoyaDetails(doya, index),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -629,41 +706,133 @@ class _DoyaListPageState extends State<DoyaListPage> {
               left: BorderSide(color: widget.categoryColor, width: 4),
             ),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      doya['title'] ?? '',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: widget.categoryColor,
-                      ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          duaTitle,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: widget.categoryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          doya['bangla'] ?? '',
+                          style: const TextStyle(fontSize: 16),
+                          maxLines: isExpanded ? null : 2,
+                          overflow: isExpanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      doya['bangla'] ?? '',
-                      style: const TextStyle(fontSize: 16),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                  ),
+                  Icon(
+                    isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: widget.categoryColor,
+                    size: 24,
+                  ),
+                ],
+              ),
+
+              // Expanded content with warning and details
+              if (isExpanded) ...[
+                const SizedBox(height: 16),
+
+                // Warning message
+                _buildWarningWidget(),
+
+                const SizedBox(height: 16),
+
+                // Arabic text
+                SelectableText(
+                  duaArabic,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontFamily: 'Amiri',
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                  textAlign: TextAlign.right,
                 ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: widget.categoryColor,
-                size: 18,
-              ),
+                const SizedBox(height: 15),
+
+                // Transliteration
+                Text(
+                  duaTransliteration,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontStyle: FontStyle.italic,
+                    color: isDark ? Colors.white70 : Colors.grey[700],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 15),
+
+                // Meaning
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: widget.categoryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "অর্থ: $duaMeaning",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // Reference
+                if (duaReference.isNotEmpty)
+                  Text(
+                    "রেফারেন্স: $duaReference",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark ? Colors.green[200] : Colors.green[700],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                const SizedBox(height: 16),
+
+                // Share button
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () {
+                      Share.share(
+                        '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\nঅর্থ: $duaMeaning\n\nরেফারেন্স: $duaReference',
+                      );
+                    },
+                    icon: Icon(Icons.share, color: widget.categoryColor),
+                    label: Text(
+                      'শেয়ার করুন',
+                      style: TextStyle(color: widget.categoryColor),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
       ),
     );
   }
+
+  //===================
 
   Widget _buildInlineBanner() {
     final BannerAd inlineAd = AdHelper.createBannerAd(
@@ -747,7 +916,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                     itemCount: filteredDoyas.length,
                     itemBuilder: (context, index) {
                       final doya = filteredDoyas[index];
-                      List<Widget> widgets = [_buildDoyaCard(doya)];
+                      List<Widget> widgets = [_buildDoyaCard(doya, index)];
 
                       // প্রতি ৫ টা দোয়ার পর ব্যানার অ্যাড
                       if ((index + 1) % 5 == 0) {

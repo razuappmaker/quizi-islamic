@@ -1,3 +1,4 @@
+// Sura Page
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'json_loader.dart';
@@ -14,7 +15,8 @@ class _SuraPageState extends State<SuraPage> {
   List<Map<String, dynamic>> dailySuras = [];
   Set<int> expandedIndices = {};
   bool _isLoading = true;
-  bool _showWarning = true; // সতর্কবার্তা শুরুতে দেখাবে
+  Map<int, bool> _showFullWarning =
+      {}; // Track full warning state for each sura
 
   late BannerAd _bannerAd;
   bool _isBannerAdReady = false;
@@ -77,60 +79,217 @@ class _SuraPageState extends State<SuraPage> {
   void dispose() {
     _bannerAd.dispose();
     expandedIndices.clear();
+    _showFullWarning.clear();
     super.dispose();
   }
 
-  // সুন্দর UI সহ সতর্কবার্তা
-  Widget buildWarningBox() {
-    return Dismissible(
-      key: const ValueKey("warning"),
-      direction: DismissDirection.horizontal,
-      onDismissed: (_) {
-        setState(() {
-          _showWarning = false;
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.amber.shade100, Colors.orange.shade50],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.orange.shade200),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.info_outline, color: Colors.orange, size: 20),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                "আরবি আয়াত বাংলায় সম্পূর্ণ সুদ্ধভাবে প্রকাশ করা যায় না। বাংলা উচ্চারণ সহায়ক মাত্র, সঠিক তিলাওয়াতের জন্য আরবিতেই পড়ুন।",
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w500,
-                  height: 1.3,
+  ///============
+  // Build the warning widget
+  Widget _buildWarningWidget(int index) {
+    final bool showFull = _showFullWarning[index] ?? false;
+
+    return showFull
+        ? Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.orange[900]?.withOpacity(0.15)
+                  : Colors.orange[50],
+              border: Border.all(
+                color: Colors.orange.withOpacity(0.4),
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with icon and title
+                Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.orange[700],
+                      size: 22,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'গুরুত্বপূর্ণ সতর্কবার্তা',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.orange[100]
+                            : Colors.orange[900],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                // First paragraph
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      height: 1.6,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white70
+                          : Colors.black87,
+                    ),
+                    children: const [
+                      TextSpan(
+                        text:
+                            'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে ',
+                      ),
+                      TextSpan(
+                        text: 'অনেক সময় অর্থের বিকৃতি ঘটে',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      TextSpan(
+                        text:
+                            '। তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন।',
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+
+                const SizedBox(height: 10),
+
+                // Second paragraph with bullet point
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, right: 8),
+                      child: Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                        color: Colors.orange[700],
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি। শুদ্ধ করে কুরআন শিক্ষা করা প্রত্যেক মুসলিমের উপর ফরজ।',
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          height: 1.6,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : Colors.black87,
+                        ),
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 14),
+
+                // Close button
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showFullWarning[index] = false;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.orange[600]!, Colors.orange[800]!],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        'বুঝেছি, ধন্যবাদ',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        : Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showFullWarning[index] = true;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.orange[900]?.withOpacity(0.2)
+                      : Colors.orange[50],
+                  border: Border.all(
+                    color: Colors.orange.withOpacity(0.5),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withOpacity(0.1),
+                      blurRadius: 2,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      color: Colors.orange[700],
+                      size: 18,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'বাংলা উচ্চরণ',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.orange[100]
+                            : Colors.orange[800],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _showWarning = false;
-                });
-              },
-              child: const Icon(Icons.close, size: 18, color: Colors.black54),
-            ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 
+  //=============
   Widget buildSura(Map<String, dynamic> sura, int index) {
     final bool isExpanded = expandedIndices.contains(index);
 
@@ -179,6 +338,7 @@ class _SuraPageState extends State<SuraPage> {
                   setState(() {
                     if (isExpanded) {
                       expandedIndices.remove(index);
+                      _showFullWarning[index] = false;
                     } else {
                       expandedIndices.add(index);
                     }
@@ -194,6 +354,9 @@ class _SuraPageState extends State<SuraPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            // Warning message inside expanded sura
+                            _buildWarningWidget(index),
+
                             ...List<Widget>.from(
                               (sura['ayat'] as List<dynamic>).map(
                                 (ay) => Column(
@@ -275,6 +438,7 @@ class _SuraPageState extends State<SuraPage> {
     );
   }
 
+  //=================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -287,7 +451,6 @@ class _SuraPageState extends State<SuraPage> {
       ),
       body: Column(
         children: [
-          if (_showWarning) buildWarningBox(), // সতর্ক বার্তা
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
