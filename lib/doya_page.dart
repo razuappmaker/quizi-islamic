@@ -26,28 +26,40 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       'jsonFile': 'assets/salat_doyas.json',
     },
     {
+      'title': 'কুরআন থেকে',
+      'icon': Icons.menu_book,
+      'color': Colors.deepPurple,
+      'jsonFile': 'assets/quranic_doyas.json',
+    },
+    {
+      'title': 'দাম্পত্য জীবন',
+      'icon': Icons.family_restroom,
+      'color': Colors.teal,
+      'jsonFile': 'assets/copple_doya.json',
+    },
+    {
+      'title': 'সকাল-সন্ধ্যার জিকির',
+      'icon': Icons.wb_sunny,
+      'color': Colors.orange,
+      'jsonFile': 'assets/morning_evening_doya.json',
+    },
+    {
       'title': 'দৈনন্দিন জীবন',
       'icon': Icons.home,
       'color': Colors.green,
       'jsonFile': 'assets/daily_life_doyas.json',
     },
     {
+      'title': 'ফরজ নামজের পরবর্তী আমল',
+      'icon': Icons.menu_book,
+      'color': Colors.teal,
+      'jsonFile': 'assets/namaj_amol.json',
+    },
+    {
       'title': 'সওম-রোজা',
       'icon': Icons.nightlight_round,
       'color': Colors.purple,
       'jsonFile': 'assets/fasting_doyas.json',
-    },
-    {
-      'title': 'সকাল-সন্ধ্যার জিকির',
-      'icon': Icons.wb_sunny,
-      'color': Colors.orange,
-      'jsonFile': 'assets/azkar_doyas.json',
-    },
-    {
-      'title': 'কুরআন থেকে',
-      'icon': Icons.menu_book,
-      'color': Colors.deepPurple,
-      'jsonFile': 'assets/quranic_doyas.json',
     },
     {
       'title': 'বিবিধ',
@@ -306,10 +318,10 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
                 onChanged: _searchAllDoyas,
               )
             : const Text(
-                'দোয়ার ক্যাটাগরি',
+                'দুআ',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
-        centerTitle: true,
+        centerTitle: false,
         elevation: 0,
         actions: [
           _isSearching
