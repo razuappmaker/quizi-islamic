@@ -1,10 +1,11 @@
-// Doya Page
+// Doya Page - Responsive Version for Mobile & Tablet
+// দোয়া পেইজ - মোবাইল ও ট্যাবলেটের জন্য রেসপনসিভ ভার্সন
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/services.dart'; // Clipboard এর জন্য
 import 'ad_helper.dart';
-import 'json_loader.dart';
+import 'network_json_loader.dart'; // নতুন নেটওয়ার্ক লোডার
 
 class DoyaCategoryPage extends StatefulWidget {
   const DoyaCategoryPage({Key? key}) : super(key: key);
@@ -14,10 +15,11 @@ class DoyaCategoryPage extends StatefulWidget {
 }
 
 class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
-  // Bottom Banner
+  // Bottom Banner Ad ভেরিয়েবল
   late BannerAd _bottomBannerAd;
   bool _isBottomBannerAdReady = false;
 
+  // ক্যাটাগরি তালিকা - final হিসেবে ডিক্লেয়ার করুন
   final List<Map<String, dynamic>> categories = [
     {
       'title': 'সালাত-নামাজ',
@@ -50,10 +52,10 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       'jsonFile': 'assets/daily_life_doyas.json',
     },
     {
-      'title': 'ফরজ নামজের পরবর্তী আমল',
-      'icon': Icons.menu_book,
-      'color': Colors.teal,
-      'jsonFile': 'assets/namaj_amol.json',
+      'title': 'রোগ মুক্তি',
+      'icon': Icons.local_hospital, // আইকন আপডেট
+      'color': Colors.red,
+      'jsonFile': 'assets/rog_mukti_doyas.json',
     },
     {
       'title': 'সওম-রোজা',
@@ -64,17 +66,20 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     {
       'title': 'বিবিধ',
       'icon': Icons.category,
-      'color': Colors.teal,
+      'color': Colors.brown,
       'jsonFile': 'assets/misc_doyas.json',
     },
   ];
 
-  // Global search variables
+  // গ্লোবাল সার্চ ভেরিয়েবল
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, String>> _allDoyas = [];
   List<Map<String, String>> _searchResults = [];
   bool _isLoadingAllDoyas = false;
+
+  // রেসপনসিভ লেআউট ভেরিয়েবল
+  bool _isTablet = false;
 
   @override
   void initState() {
@@ -98,10 +103,22 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       ),
     )..load();
 
-    // Load all doyas for global search
+    // গ্লোবাল সার্চের জন্য সকল দোয়া লোড
     _loadAllDoyas();
   }
 
+  // ডিভাইসের ধরন চেক করার মেথড
+  void _checkDeviceType(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final shortestSide = mediaQuery.size.shortestSide;
+
+    // ট্যাবলেটের থ্রেশহোল্ড: 600dp
+    setState(() {
+      _isTablet = shortestSide >= 600;
+    });
+  }
+
+  // সকল দোয়া লোড করার মেথড
   Future<void> _loadAllDoyas() async {
     setState(() => _isLoadingAllDoyas = true);
 
@@ -110,7 +127,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
       for (var category in categories) {
         try {
-          final loadedData = await JsonLoader.loadJsonList(
+          // NetworkJsonLoader ব্যবহার করুন (নেটওয়ার্ক থেকে প্রথমে, তারপর লোকাল)
+          final loadedData = await NetworkJsonLoader.loadJsonList(
             category['jsonFile'],
           );
           final convertedData = loadedData.map<Map<String, String>>((item) {
@@ -122,7 +140,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
             );
           }).toList();
 
-          // Add category information to each doya
+          // প্রতিটি দোয়ায় ক্যাটাগরি তথ্য যোগ করুন
           for (var doya in convertedData) {
             doya['category'] = category['title'];
             doya['categoryColor'] = category['color'].toString();
@@ -151,8 +169,10 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     super.dispose();
   }
 
+  // সার্চ শুরু করার মেথড
   void _startSearch() => setState(() => _isSearching = true);
 
+  // সার্চ বন্ধ করার মেথড
   void _stopSearch() {
     setState(() {
       _isSearching = false;
@@ -161,6 +181,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     });
   }
 
+  // সকল দোয়ায় সার্চ করার মেথড
   void _searchAllDoyas(String query) {
     if (query.isEmpty) {
       setState(() => _searchResults.clear());
@@ -182,6 +203,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     setState(() => _searchResults = results);
   }
 
+  // ক্যাটাগরি পেইজে নেভিগেট করার মেথড
   void _navigateToCategoryDoyas(
     BuildContext context,
     Map<String, dynamic> category,
@@ -198,8 +220,9 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
+  // সার্চ করা দোয়ায় নেভিগেট করার মেথড
   void _navigateToSearchedDoya(BuildContext context, Map<String, String> doya) {
-    // Find the category for this doya
+    // এই দোয়ার ক্যাটাগরি খুঁজুন
     final category = categories.firstWhere(
       (cat) => cat['title'] == doya['category'],
       orElse: () => categories.last,
@@ -218,16 +241,17 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
+  // ক্যাটাগরি কার্ড বিল্ড করার মেথড - রেসপনসিভ
   Widget _buildCategoryCard(Map<String, dynamic> category) {
     return Card(
       elevation: 4,
-      margin: const EdgeInsets.all(8),
+      margin: EdgeInsets.all(_isTablet ? 12 : 8), // ট্যাবলেটে বেশি margin
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () => _navigateToCategoryDoyas(context, category),
         child: Container(
-          height: 120,
+          height: _isTablet ? 140 : 120, // ট্যাবলেটে উচ্চতা বেশি
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -243,12 +267,16 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(category['icon'], size: 32, color: Colors.white),
+              Icon(
+                category['icon'],
+                size: _isTablet ? 40 : 32, // ট্যাবলেটে বড় আইকন
+                color: Colors.white,
+              ),
               const SizedBox(height: 8),
               Text(
                 category['title'],
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: _isTablet ? 18 : 16, // ট্যাবলেটে বড় ফন্ট
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -263,8 +291,9 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
+  // সার্চ রেজাল্ট কার্ড বিল্ড করার মেথড
   Widget _buildSearchResultCard(Map<String, String> doya) {
-    Color categoryColor = Colors.teal; // Default color
+    Color categoryColor = Colors.teal; // ডিফল্ট কালার
     try {
       categoryColor = Color(int.parse(doya['categoryColor'] ?? '0xFF009688'));
     } catch (e) {
@@ -301,6 +330,11 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    // বিল্ড করার সময় ডিভাইস টাইপ চেক করুন
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkDeviceType(context);
+    });
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[700],
@@ -349,20 +383,29 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
+  // ক্যাটাগরি গ্রিড বিল্ড করার মেথড - রেসপনসিভ
   Widget _buildCategoryGrid() {
+    // ডিভাইস অনুযায়ী কলাম সংখ্যা নির্ধারণ
+    final crossAxisCount = _isTablet
+        ? 4
+        : 2; // ট্যাবলেটে ৪ কলাম, মোবাইলে ২ কলাম
+
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // 2 cards per row
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.9, // Square aspect ratio
+      padding: EdgeInsets.all(_isTablet ? 20 : 16), // ট্যাবলেটে বেশি padding
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: _isTablet ? 16 : 12, // ট্যাবলেটে বেশি spacing
+        mainAxisSpacing: _isTablet ? 16 : 12,
+        childAspectRatio: _isTablet
+            ? 0.8
+            : 0.9, // ট্যাবলেটে aspect ratio adjustment
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) => _buildCategoryCard(categories[index]),
     );
   }
 
+  // সার্চ রেজাল্ট বিল্ড করার মেথড
   Widget _buildSearchResults() {
     if (_isLoadingAllDoyas) {
       return const Center(child: CircularProgressIndicator());
@@ -402,7 +445,6 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   }
 }
 
-// DoyaListPage কে আপডেট করুন initialSearchQuery support করার জন্য
 class DoyaListPage extends StatefulWidget {
   final String categoryTitle;
   final String jsonFile;
@@ -428,24 +470,33 @@ class _DoyaListPageState extends State<DoyaListPage> {
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
 
-  // Track which doya is expanded and warning state
-  int? _expandedDoyaIndex;
-  bool _showFullWarning = false;
+  // একাধিক দোয়া একসাথে expand করার জন্য Set ব্যবহার করুন
+  final Set<int> _expandedDoyaIndices = <int>{};
+  final Map<int, bool> _showFullWarningStates = {};
 
-  // Font size control
+  // ফন্ট সাইজ কন্ট্রোল
   double _arabicFontSize = 26.0;
   double _textFontSize = 16.0;
   final double _minFontSize = 12.0;
   final double _maxFontSize = 32.0;
   final double _fontSizeStep = 2.0;
 
-  // Bottom Banner
+  // Bottom Banner Ad
   late BannerAd _bottomBannerAd;
   bool _isBottomBannerAdReady = false;
+
+  // রেসপনসিভ লেআউট ভেরিয়েবল
+  bool _isTablet = false;
 
   @override
   void initState() {
     super.initState();
+
+    // ডিভাইস টাইপ চেক
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkDeviceType();
+    });
+
     _loadDoyaData();
 
     // AdMob initialize
@@ -465,11 +516,31 @@ class _DoyaListPageState extends State<DoyaListPage> {
         },
       ),
     )..load();
+
+    // initial search query থাকলে সেট করুন
+    if (widget.initialSearchQuery != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _searchController.text = widget.initialSearchQuery!;
+        _searchDoya(widget.initialSearchQuery!);
+      });
+    }
   }
 
+  // ডিভাইস টাইপ চেক করার মেথড
+  void _checkDeviceType() {
+    final mediaQuery = MediaQuery.of(context);
+    final shortestSide = mediaQuery.size.shortestSide;
+
+    setState(() {
+      _isTablet = shortestSide >= 600; // ট্যাবলেটের থ্রেশহোল্ড
+    });
+  }
+
+  // দোয়া ডেটা লোড করার মেথড
   Future<void> _loadDoyaData() async {
     try {
-      final loadedData = await JsonLoader.loadJsonList(widget.jsonFile);
+      // NetworkJsonLoader ব্যবহার করুন (নেটওয়ার্ক থেকে প্রথমে, তারপর লোকাল)
+      final loadedData = await NetworkJsonLoader.loadJsonList(widget.jsonFile);
 
       final List<Map<String, String>> convertedData = loadedData
           .map<Map<String, String>>((item) {
@@ -511,13 +582,18 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
   @override
   void dispose() {
+    // পেইজ বন্ধ হলে সকল expanded state রিসেট করুন
+    _expandedDoyaIndices.clear();
+    _showFullWarningStates.clear();
     _bottomBannerAd.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
+  // সার্চ শুরু করার মেথড
   void _startSearch() => setState(() => _isSearching = true);
 
+  // সার্চ বন্ধ করার মেথড
   void _stopSearch() {
     setState(() {
       _isSearching = false;
@@ -526,6 +602,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
     });
   }
 
+  // দোয়া সার্চ করার মেথড
   void _searchDoya(String query) {
     final results = doyas.where((doya) {
       final titleLower = doya['title']!.toLowerCase();
@@ -537,6 +614,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
     setState(() => filteredDoyas = results);
   }
 
+  // ফন্ট সাইজ বড় করার মেথড
   void _increaseFontSize() {
     setState(() {
       if (_arabicFontSize < _maxFontSize && _textFontSize < _maxFontSize) {
@@ -546,6 +624,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
     });
   }
 
+  // ফন্ট সাইজ ছোট করার মেথড
   void _decreaseFontSize() {
     setState(() {
       if (_arabicFontSize > _minFontSize && _textFontSize > _minFontSize) {
@@ -555,6 +634,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
     });
   }
 
+  // ফন্ট সাইজ রিসেট করার মেথড
   void _resetFontSize() {
     setState(() {
       _arabicFontSize = 26.0;
@@ -562,7 +642,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
     });
   }
 
-  // Copy to clipboard function
+  // ক্লিপবোর্ডে কপি করার মেথড
   Future<void> _copyToClipboard(Map<String, String> doya) async {
     final String duaTitle = doya['title'] ?? '';
     final String duaArabic = doya['arabic'] ?? '';
@@ -575,7 +655,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
     await Clipboard.setData(ClipboardData(text: copyText));
 
-    // Show snackbar
+    // Snackbar দেখান
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('"$duaTitle" কপি করা হয়েছে'),
@@ -585,9 +665,11 @@ class _DoyaListPageState extends State<DoyaListPage> {
     );
   }
 
-  //===================
-  Widget _buildWarningWidget() {
-    return _showFullWarning
+  // সতর্কবার্তা উইজেট বিল্ড করার মেথড
+  Widget _buildWarningWidget(int index) {
+    final showFullWarning = _showFullWarningStates[index] ?? false;
+
+    return showFullWarning
         ? Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -605,7 +687,6 @@ class _DoyaListPageState extends State<DoyaListPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Simple header
                 Row(
                   children: [
                     Icon(
@@ -627,7 +708,6 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
                 const SizedBox(height: 10),
 
-                // Simple content
                 Text(
                   'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে অনেক সময় অর্থের বিকৃতি ঘটে। '
                   'তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন। আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি।',
@@ -643,13 +723,12 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
                 const SizedBox(height: 12),
 
-                // Simple close button
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _showFullWarning = false;
+                        _showFullWarningStates[index] = false;
                       });
                     },
                     child: Container(
@@ -679,11 +758,10 @@ class _DoyaListPageState extends State<DoyaListPage> {
               ],
             ),
           )
-        : // Simple collapsed state
-          GestureDetector(
+        : GestureDetector(
             onTap: () {
               setState(() {
-                _showFullWarning = true;
+                _showFullWarningStates[index] = true;
               });
             },
             child: Container(
@@ -717,22 +795,23 @@ class _DoyaListPageState extends State<DoyaListPage> {
           );
   }
 
-  void _showDoyaDetails(Map<String, String> doya, int index) {
+  // দোয়া এক্সপ্যানশন টগল করার মেথড
+  void _toggleDoyaExpansion(int index) {
     setState(() {
-      if (_expandedDoyaIndex == index) {
-        // If already expanded, collapse it
-        _expandedDoyaIndex = null;
-        _showFullWarning = false;
+      if (_expandedDoyaIndices.contains(index)) {
+        // Collapse this doya
+        _expandedDoyaIndices.remove(index);
+        _showFullWarningStates.remove(index);
       } else {
         // Expand this doya
-        _expandedDoyaIndex = index;
-        _showFullWarning = false;
+        _expandedDoyaIndices.add(index);
       }
     });
   }
 
+  // দোয়া কার্ড বিল্ড করার মেথড - রেসপনসিভ
   Widget _buildDoyaCard(Map<String, String> doya, int index) {
-    final bool isExpanded = _expandedDoyaIndex == index;
+    final bool isExpanded = _expandedDoyaIndices.contains(index);
     final String duaTitle = doya['title'] ?? '';
     final String duaArabic = doya['arabic'] ?? '';
     final String duaTransliteration = doya['transliteration'] ?? '';
@@ -742,13 +821,17 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
     return Card(
       elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      margin: EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: _isTablet ? 16 : 12, // ট্যাবলেটে বেশি horizontal margin
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => _showDoyaDetails(doya, index),
+        onTap: () => _toggleDoyaExpansion(index),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(_isTablet ? 20 : 16),
+          // ট্যাবলেটে বেশি padding
           decoration: BoxDecoration(
             border: Border(
               left: BorderSide(color: widget.categoryColor, width: 4),
@@ -767,14 +850,16 @@ class _DoyaListPageState extends State<DoyaListPage> {
                           duaTitle,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: _isTablet ? 20 : 18, // ট্যাবলেটে বড় ফন্ট
                             color: widget.categoryColor,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           doya['bangla'] ?? '',
-                          style: const TextStyle(fontSize: 16),
+                          style: TextStyle(
+                            fontSize: _isTablet ? 18 : 16, // ট্যাবলেটে বড় ফন্ট
+                          ),
                           maxLines: isExpanded ? null : 2,
                           overflow: isExpanded
                               ? TextOverflow.visible
@@ -796,15 +881,15 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 const SizedBox(height: 16),
 
                 // Warning message
-                _buildWarningWidget(),
+                _buildWarningWidget(index),
 
                 const SizedBox(height: 16),
 
-                // Arabic text
+                // Arabic text - ট্যাবলেটে বড় ফন্ট
                 SelectableText(
                   duaArabic,
                   style: TextStyle(
-                    fontSize: _arabicFontSize,
+                    fontSize: _isTablet ? _arabicFontSize + 2 : _arabicFontSize,
                     fontFamily: 'ScheherazadeNew',
                     fontWeight: FontWeight.bold,
                     height: 2.0,
@@ -871,8 +956,9 @@ class _DoyaListPageState extends State<DoyaListPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue[700],
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: _isTablet ? 20 : 16,
+                          // ট্যাবলেটে বেশি padding
                           vertical: 10,
                         ),
                         shape: RoundedRectangleBorder(
@@ -894,8 +980,9 @@ class _DoyaListPageState extends State<DoyaListPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.categoryColor,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: _isTablet ? 20 : 16,
+                          // ট্যাবলেটে বেশি padding
                           vertical: 10,
                         ),
                         shape: RoundedRectangleBorder(
@@ -913,8 +1000,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
     );
   }
 
-  //===================
-
+  // ইনলাইন ব্যানার বিল্ড করার মেথড
   Widget _buildInlineBanner() {
     final BannerAd inlineAd = AdHelper.createBannerAd(
       AdSize.banner,
@@ -934,15 +1020,20 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
   @override
   Widget build(BuildContext context) {
+    // বিল্ড করার সময় ডিভাইস টাইপ চেক করুন
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkDeviceType();
+    });
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: widget.categoryColor,
         title: !_isSearching
             ? Text(
                 widget.categoryTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                  fontSize: _isTablet ? 22 : 20, // ট্যাবলেটে বড় ফন্ট
                 ),
               )
             : TextField(
@@ -1025,7 +1116,12 @@ class _DoyaListPageState extends State<DoyaListPage> {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: _isTablet
+                          ? 8
+                          : 0, // ট্যাবলেটে horizontal padding
+                    ),
                     itemCount: filteredDoyas.length,
                     itemBuilder: (context, index) {
                       final doya = filteredDoyas[index];

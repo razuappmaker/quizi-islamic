@@ -1,3 +1,4 @@
+// MCQ Page
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'result_page.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'ad_helper.dart';
+import 'network_json_loader.dart'; // নেটওয়ার্ক লোডার import করুন
 
 class MCQPage extends StatefulWidget {
   final String category;
@@ -164,18 +166,102 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     }
   }
 
-  // JSON থেকে প্রশ্ন লোড করুন
+  // ✅ আপডেটেড: JSON থেকে প্রশ্ন লোড করুন (নেটওয়ার্ক → লোকাল → ডিফল্ট)
   Future<void> loadQuestions() async {
-    final String response = await rootBundle.loadString(
-      'assets/questions.json',
-    );
-    final data = json.decode(response);
+    try {
+      print('🔄 প্রশ্ন লোড শুরু: ${widget.category}');
+
+      // ১ম চেষ্টা: নেটওয়ার্ক থেকে সম্পূর্ণ questions.json লোড করুন
+      final List<dynamic> allQuestionsData =
+          await NetworkJsonLoader.loadJsonList(
+            'assets/questions.json', // এই path টি নেটওয়ার্কে থাকতে হবে
+          );
+
+      // নেটওয়ার্ক থেকে পাওয়া ডেটা process করুন
+      if (allQuestionsData is List && allQuestionsData.isNotEmpty) {
+        // যদি নেটওয়ার্ক ডেটা List হিসেবে আসে
+        Map<String, dynamic> questionsMap = {};
+
+        // List কে Map এ convert করুন (যদি প্রয়োজন হয়)
+        for (var item in allQuestionsData) {
+          if (item is Map<String, dynamic>) {
+            questionsMap.addAll(item);
+          }
+        }
+
+        setQuestionsFromMap(questionsMap);
+        print('✅ নেটওয়ার্ক থেকে প্রশ্ন সফলভাবে লোড হয়েছে');
+        return;
+      } else if (allQuestionsData is Map) {
+        // যদি নেটওয়ার্ক ডেটা সরাসরি Map হিসেবে আসে
+        setQuestionsFromMap(allQuestionsData as Map<String, dynamic>);
+        print('✅ নেটওয়ার্ক থেকে প্রশ্ন সফলভাবে লোড হয়েছে');
+        return;
+      }
+    } catch (e) {
+      print('❌ নেটওয়ার্ক থেকে লোড ব্যর্থ: $e');
+    }
+
+    // ২য় চেষ্টা: লোকাল asset থেকে লোড করুন
+    try {
+      print('🔄 লোকাল asset থেকে প্রশ্ন লোড করার চেষ্টা');
+      final String localResponse = await rootBundle.loadString(
+        'assets/questions.json',
+      );
+      final Map<String, dynamic> localData = json.decode(localResponse);
+      setQuestionsFromMap(localData);
+      print('✅ লোকাল asset থেকে প্রশ্ন সফলভাবে লোড হয়েছে');
+    } catch (e) {
+      print('❌ লোকাল asset থেকে লোড ব্যর্থ: $e');
+
+      // ৩য় চেষ্টা: ডিফল্ট প্রশ্ন ব্যবহার করুন
+      setState(() {
+        questions = _getDefaultQuestions();
+        if (questions.isNotEmpty) {
+          startTimer();
+        }
+      });
+      print('⚠️ ডিফল্ট প্রশ্ন ব্যবহার করা হচ্ছে');
+    }
+  }
+
+  // ✅ সহায়ক মেথড: Map থেকে প্রশ্ন সেট করুন
+  void setQuestionsFromMap(Map<String, dynamic> questionsMap) {
     setState(() {
-      questions = data[widget.category] ?? [];
+      questions = questionsMap[widget.category] ?? [];
+      if (questions.isEmpty) {
+        // যদি specific category না পাওয়া যায়, তবে ডিফল্ট প্রশ্ন ব্যবহার করুন
+        questions = _getDefaultQuestions();
+      }
+
       if (questions.isNotEmpty) {
         startTimer();
       }
     });
+  }
+
+  // ✅ ডিফল্ট প্রশ্ন (যদি সবকিছু ব্যর্থ হয়)
+  List<dynamic> _getDefaultQuestions() {
+    return [
+      {
+        'question': 'ইসলামের প্রথম রুকন কী?',
+        'options': ['নামাজ', 'রোজা', 'কালিমা', 'হজ্জ'],
+        'answer': 'কালিমা',
+        'image': null,
+      },
+      {
+        'question': 'দৈনিক কত ওয়াক্ত নামাজ ফরজ?',
+        'options': ['৩ ওয়াক্ত', '৪ ওয়াক্ত', '৫ ওয়াক্ত', '৬ ওয়াক্ত'],
+        'answer': '৫ ওয়াক্ত',
+        'image': null,
+      },
+      {
+        'question': 'কুরআন মজীদে কতটি সূরা আছে?',
+        'options': ['১০০ সূরা', '১১০ সূরা', '১১৪ সূরা', '১২০ সূরা'],
+        'answer': '১১৪ সূরা',
+        'image': null,
+      },
+    ];
   }
 
   void startTimer() {

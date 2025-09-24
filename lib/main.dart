@@ -12,7 +12,7 @@ import 'islamic_history_page.dart';
 import 'prophet_biography_page.dart';
 import 'prayer_time_page.dart';
 import 'doya_page.dart';
-import 'namaj_amol.dart';
+import 'nadiyatul_quran.dart';
 import 'about_page.dart';
 import 'contact_page.dart';
 import 'developer_page.dart';
@@ -372,12 +372,12 @@ class _HomePageState extends State<HomePage>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ResponsiveText(
-                'কুইজ বিষয় নির্বাচন',
+                'ইসলামী মেধাযাচাই: জ্ঞান কুইজ',
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: (isDarkMode ? Colors.white : Colors.green[800]!),
                 textAlign: TextAlign.center,
-                semanticsLabel: 'কুইজ বিষয় নির্বাচন',
+                semanticsLabel: 'ইসলামী মেধাযাচাই: জ্ঞান কুইজ',
               ),
               ResponsiveSizedBox(height: 6),
               Container(
@@ -416,11 +416,11 @@ class _HomePageState extends State<HomePage>
                     ),
                     style: TextStyle(
                       fontSize: responsiveValue(context, 12),
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
                     ),
                     icon: Icon(
                       Icons.arrow_drop_down,
-                      color: Colors.green[700],
+                      color: isDarkMode ? Colors.white70 : Colors.green,
                       size: responsiveValue(context, 20),
                     ),
                     isExpanded: true,
@@ -440,13 +440,24 @@ class _HomePageState extends State<HomePage>
                             Icon(
                               Icons.bookmark_border,
                               size: responsiveValue(context, 14),
-                              color: Colors.green[700],
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors
+                                        .white // ডার্ক মোডে সাদা
+                                  : Colors.green[700], // লাইট মোডে সবুজ
                             ),
                             SizedBox(width: responsiveValue(context, 6)),
                             Expanded(
                               child: ResponsiveText(
                                 category,
                                 fontSize: 12,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors
+                                          .white // ডার্ক মোডে সাদা
+                                    : Colors.black, // লাইট মোডে কালো
                                 overflow: TextOverflow.ellipsis,
                                 semanticsLabel: category,
                               ),
@@ -838,7 +849,7 @@ class _HomePageState extends State<HomePage>
           isDarkMode ? Colors.purple[200]! : Colors.purple[600]!,
           textColor,
           secondaryTextColor,
-          const NamajAmol(),
+          const NadiyatulQuran(),
           isDarkMode,
           isTablet,
           description: 'নাদিয়াতুল কুরআন',

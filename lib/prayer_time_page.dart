@@ -1,3 +1,4 @@
+// prayer Time
 // prayer page
 import 'dart:async';
 import 'dart:convert';
@@ -1058,7 +1059,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             child: Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.fromLTRB(14, 10, 14, 6),
+                  padding: EdgeInsets.fromLTRB(14, 10, 14, 12),
                   child: Row(
                     children: [
                       Icon(
@@ -1132,7 +1133,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
               // নিষিদ্ধ সময় কার্ড
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: isDark ? Colors.grey[850] : Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -1246,7 +1247,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       },
                       child: Container(
                         padding: EdgeInsets.all(12),
-                        margin: EdgeInsets.only(bottom: 6),
+                        margin: EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
                           color: isDark ? Colors.grey[800] : Colors.white,
                           borderRadius: BorderRadius.circular(10),
