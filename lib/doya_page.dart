@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/services.dart'; // Clipboard এর জন্য
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ad_helper.dart';
 import 'network_json_loader.dart'; // নতুন নেটওয়ার্ক লোডার
 
@@ -18,6 +19,11 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   // Bottom Banner Ad ভেরিয়েবল
   late BannerAd _bottomBannerAd;
   bool _isBottomBannerAdReady = false;
+
+  // Interstitial Ad ভেরিয়েবল
+  bool _interstitialAdShownToday = false;
+  bool _showInterstitialAds = true;
+  int _doyaCardOpenCount = 0;
 
   // ক্যাটাগরি তালিকা - final হিসেবে ডিক্লেয়ার করুন
   final List<Map<String, dynamic>> categories = [
@@ -87,6 +93,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
     // AdMob initialize
     AdHelper.initialize();
+    _initializeAds(); // Interstitial অ্যাড ইনিশিয়ালাইজ
 
     // Bottom Banner Ad লোড
     _bottomBannerAd = AdHelper.createBannerAd(
@@ -105,6 +112,115 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
     // গ্লোবাল সার্চের জন্য সকল দোয়া লোড
     _loadAllDoyas();
+  }
+
+  // অ্যাড সিস্টেম ইনিশিয়ালাইজেশন
+  Future<void> _initializeAds() async {
+    try {
+      // সেটিংস লোড করুন
+      final prefs = await SharedPreferences.getInstance();
+
+      // interstitial অ্যাড সেটিংস লোড করুন (ডিফল্ট true)
+      _showInterstitialAds = prefs.getBool('show_interstitial_ads') ?? true;
+
+      // আজকে interstitial অ্যাড দেখানো হয়েছে কিনা চেক করুন
+      final lastShownDate = prefs.getString('last_interstitial_date_doya');
+      final today = DateTime.now().toIso8601String().split('T')[0];
+
+      setState(() {
+        _interstitialAdShownToday = (lastShownDate == today);
+      });
+
+      print(
+        'দোয়া পেজ - অ্যাড সিস্টেম ইনিশিয়ালাইজড: interstitial অ্যাড = $_showInterstitialAds, আজকে দেখানো হয়েছে = $_interstitialAdShownToday',
+      );
+    } catch (e) {
+      print('দোয়া পেজ - অ্যাড ইনিশিয়ালাইজেশনে ত্রুটি: $e');
+    }
+  }
+
+  // Interstitial অ্যাড শো করুন যদি প্রয়োজন হয়
+  Future<void> _showInterstitialAdIfNeeded() async {
+    try {
+      // interstitial অ্যাড বন্ধ থাকলে স্কিপ করুন
+      if (!_showInterstitialAds) {
+        print('দোয়া পেজ - Interstitial অ্যাড ইউজার বন্ধ রেখেছেন');
+        return;
+      }
+
+      // যদি আজকে ইতিমধ্যে interstitial অ্যাড দেখানো হয়ে থাকে তবে স্কিপ করুন
+      if (_interstitialAdShownToday) {
+        print('দোয়া পেজ - ইতিমধ্যে আজ interstitial অ্যাড দেখানো হয়েছে');
+        return;
+      }
+
+      // দোয়া কার্ড ওপেন কাউন্টার চেক (৬টি দোয়া পড়লে)
+      if (_doyaCardOpenCount < 6) {
+        print('দোয়া পেজ - দোয়া কার্ড ওপেন কাউন্ট: $_doyaCardOpenCount/6');
+        return;
+      }
+
+      print('দোয়া পেজ - Interstitial অ্যাড শো করার চেষ্টা করা হচ্ছে...');
+
+      // AdHelper এর মাধ্যমে interstitial অ্যাড শো করুন
+      await AdHelper.showInterstitialAd(
+        onAdShowed: () {
+          print('দোয়া পেজ - Interstitial অ্যাড শো করা হলো');
+          _recordInterstitialShown();
+          _resetDoyaCardCount(); // কাউন্টার রিসেট
+        },
+        onAdDismissed: () {
+          print('দোয়া পেজ - Interstitial অ্যাড ডিসমিস করা হলো');
+        },
+        onAdFailedToShow: () {
+          print('দোয়া পেজ - Interstitial অ্যাড শো করতে ব্যর্থ');
+        },
+        adContext: 'DoyaPage',
+      );
+    } catch (e) {
+      print('দোয়া পেজ - Interstitial অ্যাড শো করতে ত্রুটি: $e');
+    }
+  }
+
+  // Interstitial অ্যাড দেখানো রেকর্ড করুন
+  void _recordInterstitialShown() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+
+      await prefs.setString('last_interstitial_date_doya', today);
+
+      setState(() {
+        _interstitialAdShownToday = true;
+      });
+
+      print(
+        'দোয়া পেজ - আজকের interstitial অ্যাড দেখানো রেকর্ড করা হলো: $today',
+      );
+    } catch (e) {
+      print('দোয়া পেজ - Interstitial অ্যাড রেকর্ড করতে ত্রুটি: $e');
+    }
+  }
+
+  // দোয়া কার্ড কাউন্টার রিসেট করুন
+  void _resetDoyaCardCount() {
+    setState(() {
+      _doyaCardOpenCount = 0;
+    });
+  }
+
+  // দোয়া কার্ড ওপেন কাউন্টার ইনক্রিমেন্ট করুন
+  void _incrementDoyaCardCount() {
+    setState(() {
+      _doyaCardOpenCount++;
+    });
+
+    print('দোয়া পেজ - দোয়া কার্ড ওপেন কাউন্ট: $_doyaCardOpenCount/6');
+
+    // ৬টি দোয়া পড়লে interstitial অ্যাড শো করুন
+    if (_doyaCardOpenCount >= 6) {
+      _showInterstitialAdIfNeeded();
+    }
   }
 
   // ডিভাইসের ধরন চেক করার মেথড
@@ -215,6 +331,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           categoryTitle: category['title'],
           jsonFile: category['jsonFile'],
           categoryColor: category['color'],
+          onDoyaCardOpen:
+              _incrementDoyaCardCount, // কাউন্টার ইনক্রিমেন্ট কলব্যাক
         ),
       ),
     );
@@ -236,6 +354,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           jsonFile: category['jsonFile'],
           categoryColor: category['color'],
           initialSearchQuery: doya['title'],
+          onDoyaCardOpen:
+              _incrementDoyaCardCount, // কাউন্টার ইনক্রিমেন্ট কলব্যাক
         ),
       ),
     );
@@ -450,6 +570,7 @@ class DoyaListPage extends StatefulWidget {
   final String jsonFile;
   final Color categoryColor;
   final String? initialSearchQuery;
+  final VoidCallback? onDoyaCardOpen; // দোয়া কার্ড ওপেন কলব্যাক
 
   const DoyaListPage({
     Key? key,
@@ -457,6 +578,7 @@ class DoyaListPage extends StatefulWidget {
     required this.jsonFile,
     required this.categoryColor,
     this.initialSearchQuery,
+    this.onDoyaCardOpen,
   }) : super(key: key);
 
   @override
@@ -805,6 +927,11 @@ class _DoyaListPageState extends State<DoyaListPage> {
       } else {
         // Expand this doya
         _expandedDoyaIndices.add(index);
+
+        // দোয়া কার্ড ওপেন হলে parent কে নোটিফাই করুন
+        if (widget.onDoyaCardOpen != null) {
+          widget.onDoyaCardOpen!();
+        }
       }
     });
   }

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import 'ad_helper.dart'; // AdHelper ইম্পোর্ট যোগ করুন
 
 class IfterTimePage extends StatefulWidget {
   const IfterTimePage({Key? key}) : super(key: key);
@@ -27,9 +28,14 @@ class _IfterTimePageState extends State<IfterTimePage>
   late AnimationController _animationController;
   late Animation<double> _animation;
 
-  // ---------- Banner Ad ----------
+  // ---------- Ads ----------
   late BannerAd _bannerAd;
   bool _isBannerAdReady = false;
+  Timer? _interstitialTimer; // Interstitial অ্যাডের টাইমার
+  bool _interstitialAdShownToday =
+      false; // আজকে interstitial অ্যাড দেখানো হয়েছে কিনা
+  bool _showInterstitialAds =
+      true; // interstitial অ্যাড দেখানো হবে কিনা (সেটিংস থেকে কন্ট্রোল করা যাবে)
 
   // ---------- Hadith List ----------
   final List<String> _ramadanHadiths = [
@@ -51,6 +57,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     _loadAd();
     _loadSavedData();
     _selectRandomHadith();
+    _initializeAds(); // অ্যাড সিস্টেম ইনিশিয়ালাইজ করুন
 
     // Initialize animation controller
     _animationController = AnimationController(
@@ -66,6 +73,7 @@ class _IfterTimePageState extends State<IfterTimePage>
   @override
   void dispose() {
     iftarTimer?.cancel();
+    _interstitialTimer?.cancel(); // interstitial টাইমার বাতিল করুন
     _bannerAd.dispose();
     _animationController.dispose();
     super.dispose();
@@ -82,6 +90,130 @@ class _IfterTimePageState extends State<IfterTimePage>
         onAdFailedToLoad: (ad, error) => ad.dispose(),
       ),
     )..load();
+  }
+
+  // অ্যাড সিস্টেম ইনিশিয়ালাইজেশন
+  Future<void> _initializeAds() async {
+    try {
+      // AdMob SDK ইনিশিয়ালাইজ করুন
+      await AdHelper.initialize();
+
+      // সেটিংস লোড করুন
+      final prefs = await SharedPreferences.getInstance();
+
+      // interstitial অ্যাড সেটিংস লোড করুন (ডিফল্ট true)
+      _showInterstitialAds = prefs.getBool('show_interstitial_ads') ?? true;
+
+      // আজকে interstitial অ্যাড দেখানো হয়েছে কিনা চেক করুন
+      final lastShownDate = prefs.getString('last_interstitial_date_ifter');
+      final today = DateTime.now().toIso8601String().split('T')[0];
+
+      setState(() {
+        _interstitialAdShownToday = (lastShownDate == today);
+      });
+
+      // ১০ সেকেন্ড পর interstitial অ্যাড শো করার টাইমার সেট করুন
+      _startInterstitialTimer();
+
+      print(
+        'ইফতার পেজ - অ্যাড সিস্টেম ইনিশিয়ালাইজড: interstitial অ্যাড = $_showInterstitialAds, আজকে দেখানো হয়েছে = $_interstitialAdShownToday',
+      );
+    } catch (e) {
+      print('ইফতার পেজ - অ্যাড ইনিশিয়ালাইজেশনে ত্রুটি: $e');
+    }
+  }
+
+  // Interstitial অ্যাড টাইমার শুরু করুন
+  void _startInterstitialTimer() {
+    _interstitialTimer?.cancel(); // বিদ্যমান টাইমার বাতিল করুন
+
+    _interstitialTimer = Timer(Duration(seconds: 10), () {
+      _showInterstitialAdIfNeeded();
+    });
+
+    print(
+      'ইফতার পেজ - Interstitial অ্যাড টাইমার শুরু হয়েছে (১০ সেকেন্ড পর শো হবে)',
+    );
+  }
+
+  // Interstitial অ্যাড শো করুন যদি প্রয়োজন হয়
+  Future<void> _showInterstitialAdIfNeeded() async {
+    try {
+      // interstitial অ্যাড বন্ধ থাকলে স্কিপ করুন
+      if (!_showInterstitialAds) {
+        print('ইফতার পেজ - Interstitial অ্যাড ইউজার বন্ধ রেখেছেন');
+        return;
+      }
+
+      // যদি আজকে ইতিমধ্যে interstitial অ্যাড দেখানো হয়ে থাকে তবে স্কিপ করুন
+      if (_interstitialAdShownToday) {
+        print('ইফতার পেজ - ইতিমধ্যে আজ interstitial অ্যাড দেখানো হয়েছে');
+        return;
+      }
+
+      print('ইফতার পেজ - Interstitial অ্যাড শো করার চেষ্টা করা হচ্ছে...');
+
+      // AdHelper এর মাধ্যমে interstitial অ্যাড শো করুন
+      await AdHelper.showInterstitialAd(
+        onAdShowed: () {
+          print('ইফতার পেজ - Interstitial অ্যাড শো করা হলো');
+          _recordInterstitialShown();
+        },
+        onAdDismissed: () {
+          print('ইফতার পেজ - Interstitial অ্যাড ডিসমিস করা হলো');
+        },
+        onAdFailedToShow: () {
+          print('ইফতার পেজ - Interstitial অ্যাড শো করতে ব্যর্থ');
+        },
+        adContext: 'IfterTimePage',
+      );
+    } catch (e) {
+      print('ইফতার পেজ - Interstitial অ্যাড শো করতে ত্রুটি: $e');
+    }
+  }
+
+  // Interstitial অ্যাড দেখানো রেকর্ড করুন
+  void _recordInterstitialShown() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+
+      await prefs.setString('last_interstitial_date_ifter', today);
+
+      setState(() {
+        _interstitialAdShownToday = true;
+      });
+
+      print(
+        'ইফতার পেজ - আজকের interstitial অ্যাড দেখানো রেকর্ড করা হলো: $today',
+      );
+    } catch (e) {
+      print('ইফতার পেজ - Interstitial অ্যাড রেকর্ড করতে ত্রুটি: $e');
+    }
+  }
+
+  // interstitial অ্যাড সেটিংস টগল করুন (সেটিংস পেজ থেকে কল করতে পারবেন)
+  Future<void> _toggleInterstitialAds(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('show_interstitial_ads', value);
+
+    setState(() {
+      _showInterstitialAds = value;
+    });
+
+    print('ইফতার পেজ - Interstitial অ্যাড সেটিংস পরিবর্তন: $value');
+
+    // স্ন্যাকবারে মেসেজ দেখান
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          value
+              ? 'পূর্ণস্ক্রিন অ্যাড সক্রিয় করা হয়েছে'
+              : 'পূর্ণস্ক্রিন অ্যাড বন্ধ করা হয়েছে',
+        ),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   // SharedPreferences থেকে ডেটা লোড করা
@@ -195,11 +327,9 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // সময় ইউনিট বিল্ড করার হেল্পার মেথড
-
   Widget _buildTimeUnit(String label, int value, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      // Add horizontal spacing
       child: Column(
         children: [
           // Time value container
@@ -258,6 +388,34 @@ class _IfterTimePageState extends State<IfterTimePage>
     );
   }
 
+  // অ্যাড স্ট্যাটাস ইন্ডিকেটর (ডিবাগিং/ইনফোর জন্য)
+  Widget _buildAdStatusIndicator(bool isDarkMode) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: _interstitialAdShownToday ? Colors.green : Colors.orange,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            _interstitialAdShownToday ? Icons.check : Icons.schedule,
+            size: 12,
+            color: Colors.white,
+          ),
+          SizedBox(width: 4),
+          Text(
+            _interstitialAdShownToday
+                ? "আজকের অ্যাড দেখানো হয়েছে"
+                : "অ্যাড প্রস্তুত",
+            style: TextStyle(fontSize: 10, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -278,6 +436,12 @@ class _IfterTimePageState extends State<IfterTimePage>
             color: Colors.white,
           ),
         ),
+        // অ্যাড স্ট্যাটাস ইন্ডিকেটর (অপশনাল - ডিবাগিং এর জন্য)
+        actions: [
+          // এই অংশটি প্রোডাকশনে কমেন্ট আউট করে দিতে পারেন
+          // _buildAdStatusIndicator(isDarkMode),
+          // SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -321,8 +485,7 @@ class _IfterTimePageState extends State<IfterTimePage>
 
             const SizedBox(height: 24),
 
-            // ইফতার কাউন্টডাউন সেকশন - UPDATED
-            // Replace the ScaleTransition section with this updated code:
+            // ইফতার কাউন্টডাউন সেকশন
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -376,17 +539,17 @@ class _IfterTimePageState extends State<IfterTimePage>
                         iftarCountdown.inHours,
                         isDarkMode,
                       ),
-                      const SizedBox(width: 12), // Add space after hours
+                      const SizedBox(width: 12),
                       _buildColon(),
-                      const SizedBox(width: 12), // Add space after first colon
+                      const SizedBox(width: 12),
                       _buildTimeUnit(
                         "মিনিট",
                         iftarCountdown.inMinutes % 60,
                         isDarkMode,
                       ),
-                      const SizedBox(width: 12), // Add space after minutes
+                      const SizedBox(width: 12),
                       _buildColon(),
-                      const SizedBox(width: 12), // Add space after second colon
+                      const SizedBox(width: 12),
                       _buildTimeUnit(
                         "সেকেন্ড",
                         iftarCountdown.inSeconds % 60,
@@ -615,7 +778,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "• 🍽️ ইফতারের দোয়া- আল্লাহুম্মা ইন্নি লাকা সুমতু, ওয়া বিকা আমানতু, ওয়া ‘আলাইকা তাওয়াক্কালতু, ওয়া ‘আলা রিজকিকা আফতারতু।\n"
+                    "• 🍽️ ইফতারের দোয়া- আল্লাহুম্মা ইন্নি লাকা সুমতু, ওয়া বিকা আমানতু, ওয়া 'আলাইকা তাওয়াক্কালতু, ওয়া 'আলা রিজকিকা আফতারতু।\n"
                     "• 👉 রাসূল ﷺ বলেছেন- রোজা রাখার জন্য সাহ্‌রি খাও; নিশ্চয়ই সাহরিতে বরকত আছে। (সহিহ বুখারি 1923, সহিহ মুসলিম 1095)\n"
                     "• 👉 রোজার আদব হলো— শুধু খাবার-পানাহার থেকে বিরত থাকা নয়, বরং চোখ, কান, জিহ্বা ও সব অঙ্গ-প্রত্যঙ্গকে পাপ থেকে সংযত রাখা।\n",
                     style: TextStyle(

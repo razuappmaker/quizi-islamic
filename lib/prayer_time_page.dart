@@ -1,4 +1,3 @@
-// prayer Time
 // prayer page
 import 'dart:async';
 import 'dart:convert';
@@ -12,6 +11,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
+import 'ad_helper.dart'; // AdHelper ইম্পোর্ট যোগ করুন
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -29,9 +29,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   Duration countdown = Duration.zero;
   Timer? timer;
 
-  // ---------- Banner Ad ----------
+  // ---------- Ads ----------
   late BannerAd _bannerAd;
   bool _isBannerAdReady = false;
+  Timer? _interstitialTimer; // Interstitial অ্যাডের টাইমার
+  bool _interstitialAdShownToday =
+      false; // আজকে interstitial অ্যাড দেখানো হয়েছে কিনা
+  bool _showInterstitialAds =
+      true; // interstitial অ্যাড দেখানো হবে কিনা (সেটিংস থেকে কন্ট্রোল করা যাবে)
 
   // ---------- Audio ----------
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -51,11 +56,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     super.initState();
     _initializeData();
     _loadAd();
+    _initializeAds(); // অ্যাড সিস্টেম ইনিশিয়ালাইজ করুন
   }
 
   @override
   void dispose() {
     timer?.cancel();
+    _interstitialTimer?.cancel(); // interstitial টাইমার বাতিল করুন
     _bannerAd.dispose();
     _mp3Timers.forEach((key, t) => t.cancel());
     super.dispose();
@@ -72,6 +79,126 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         onAdFailedToLoad: (ad, error) => ad.dispose(),
       ),
     )..load();
+  }
+
+  // অ্যাড সিস্টেম ইনিশিয়ালাইজেশন
+  Future<void> _initializeAds() async {
+    try {
+      // AdMob SDK ইনিশিয়ালাইজ করুন
+      await AdHelper.initialize();
+
+      // সেটিংস লোড করুন
+      final prefs = await SharedPreferences.getInstance();
+
+      // interstitial অ্যাড সেটিংস লোড করুন (ডিফল্ট true)
+      _showInterstitialAds = prefs.getBool('show_interstitial_ads') ?? true;
+
+      // আজকে interstitial অ্যাড দেখানো হয়েছে কিনা চেক করুন
+      final lastShownDate = prefs.getString('last_interstitial_date');
+      final today = DateTime.now().toIso8601String().split('T')[0];
+
+      setState(() {
+        _interstitialAdShownToday = (lastShownDate == today);
+      });
+
+      // ১০ সেকেন্ড পর interstitial অ্যাড শো করার টাইমার সেট করুন
+      _startInterstitialTimer();
+
+      print(
+        'অ্যাড সিস্টেম ইনিশিয়ালাইজড: interstitial অ্যাড = $_showInterstitialAds, আজকে দেখানো হয়েছে = $_interstitialAdShownToday',
+      );
+    } catch (e) {
+      print('অ্যাড ইনিশিয়ালাইজেশনে ত্রুটি: $e');
+    }
+  }
+
+  // Interstitial অ্যাড টাইমার শুরু করুন
+  void _startInterstitialTimer() {
+    _interstitialTimer?.cancel(); // বিদ্যমান টাইমার বাতিল করুন
+
+    _interstitialTimer = Timer(Duration(seconds: 10), () {
+      _showInterstitialAdIfNeeded();
+    });
+
+    print('Interstitial অ্যাড টাইমার শুরু হয়েছে (১০ সেকেন্ড পর শো হবে)');
+  }
+
+  // Interstitial অ্যাড শো করুন যদি প্রয়োজন হয়
+  Future<void> _showInterstitialAdIfNeeded() async {
+    try {
+      // interstitial অ্যাড বন্ধ থাকলে স্কিপ করুন
+      if (!_showInterstitialAds) {
+        print('Interstitial অ্যাড ইউজার বন্ধ রেখেছেন');
+        return;
+      }
+
+      // যদি আজকে ইতিমধ্যে interstitial অ্যাড দেখানো হয়ে থাকে তবে স্কিপ করুন
+      if (_interstitialAdShownToday) {
+        print('ইতিমধ্যে আজ interstitial অ্যাড দেখানো হয়েছে');
+        return;
+      }
+
+      print('Interstitial অ্যাড শো করার চেষ্টা করা হচ্ছে...');
+
+      // AdHelper এর মাধ্যমে interstitial অ্যাড শো করুন
+      await AdHelper.showInterstitialAd(
+        onAdShowed: () {
+          print('Interstitial অ্যাড শো করা হলো');
+          _recordInterstitialShown();
+        },
+        onAdDismissed: () {
+          print('Interstitial অ্যাড ডিসমিস করা হলো');
+        },
+        onAdFailedToShow: () {
+          print('Interstitial অ্যাড শো করতে ব্যর্থ');
+        },
+        adContext: 'PrayerTimePage',
+      );
+    } catch (e) {
+      print('Interstitial অ্যাড শো করতে ত্রুটি: $e');
+    }
+  }
+
+  // Interstitial অ্যাড দেখানো রেকর্ড করুন
+  void _recordInterstitialShown() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+
+      await prefs.setString('last_interstitial_date', today);
+
+      setState(() {
+        _interstitialAdShownToday = true;
+      });
+
+      print('আজকের interstitial অ্যাড দেখানো রেকর্ড করা হলো: $today');
+    } catch (e) {
+      print('Interstitial অ্যাড রেকর্ড করতে ত্রুটি: $e');
+    }
+  }
+
+  // interstitial অ্যাড সেটিংস টগল করুন (সেটিংস পেজ থেকে কল করতে পারবেন)
+  Future<void> _toggleInterstitialAds(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('show_interstitial_ads', value);
+
+    setState(() {
+      _showInterstitialAds = value;
+    });
+
+    print('Interstitial অ্যাড সেটিংস পরিবর্তন: $value');
+
+    // স্ন্যাকবারে মেসেজ দেখান
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          value
+              ? 'পূর্ণস্ক্রিন অ্যাড সক্রিয় করা হয়েছে'
+              : 'পূর্ণস্ক্রিন অ্যাড বন্ধ করা হয়েছে',
+        ),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   // ডেটা ইনিশিয়ালাইজেশন
@@ -641,6 +768,34 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     );
   }
 
+  // অ্যাড স্ট্যাটাস ইন্ডিকেটর (ডিবাগিং/ইনফোর জন্য)
+  Widget _buildAdStatusIndicator() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: _interstitialAdShownToday ? Colors.green : Colors.orange,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            _interstitialAdShownToday ? Icons.check : Icons.schedule,
+            size: 12,
+            color: Colors.white,
+          ),
+          SizedBox(width: 4),
+          Text(
+            _interstitialAdShownToday
+                ? "আজকের অ্যাড দেখানো হয়েছে"
+                : "অ্যাড প্রস্তুত",
+            style: TextStyle(fontSize: 10, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
   // নামাজ ট্যাব বিল্ড করা
   Widget _buildPrayerTab() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -696,7 +851,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
               // লোকেশন এবং রিফ্রেশ বাটন - আলাদা করা হয়েছে
               Container(
                 margin: const EdgeInsets.only(bottom: 4),
-                // নিচের মার্জিন কমালাম
                 decoration: BoxDecoration(
                   color: isDark
                       ? Colors.green[900]!.withOpacity(0.3)
@@ -707,7 +861,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   horizontal: 10,
                   vertical: 6,
                 ),
-                // ভার্টিক্যাল প্যাডিং কমালাম
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -718,7 +871,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                           horizontal: 8,
                           vertical: 4,
                         ),
-                        // ভার্টিক্যাল প্যাডিং কমালাম
                         decoration: BoxDecoration(
                           color: isDark
                               ? Colors.green[800]!.withOpacity(0.2)
@@ -729,7 +881,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(4),
-                              // প্যাডিং কমালাম
                               decoration: BoxDecoration(
                                 color: isDark
                                     ? Colors.green[700]!.withOpacity(0.3)
@@ -738,20 +889,20 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                               ),
                               child: Icon(
                                 Icons.location_on,
-                                size: 12, // আইকন সাইজ কমালাম
+                                size: 12,
                                 color: isDark
                                     ? Colors.green[100]!
                                     : Colors.green[700]!,
                               ),
                             ),
 
-                            const SizedBox(width: 6), // স্পেস কমালাম
+                            const SizedBox(width: 6),
 
                             Expanded(
                               child: Text(
                                 "$cityName, $countryName",
                                 style: TextStyle(
-                                  fontSize: 13, // ফন্ট সাইজ কমালাম
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   color: isDark
                                       ? Colors.green[100]!
@@ -766,7 +917,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       ),
                     ),
 
-                    const SizedBox(width: 8), // স্পেস কমালাম
+                    const SizedBox(width: 8),
 
                     Container(
                       decoration: BoxDecoration(
@@ -809,11 +960,10 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                           color: isDark
                               ? Colors.green[100]!
                               : Colors.green[700]!,
-                          size: 16, // আইকন সাইজ কমালাম
+                          size: 16,
                         ),
                         iconSize: 16,
                         padding: const EdgeInsets.all(5),
-                        // প্যাডিং কমালাম
                         tooltip: "রিফ্রেশ করুন",
                       ),
                     ),
@@ -821,11 +971,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                 ),
               ),
 
-              //SizedBox(height: 6),
-
               // পরবর্তী নামাজ এবং সূর্যোদয়/সূর্যাস্ত সেকশন
               Container(
-                margin: const EdgeInsets.only(top: 5), // উপরে ৫ মার্জিন
+                margin: const EdgeInsets.only(top: 5),
                 child: Row(
                   children: [
                     // বাম পাশ - পরবর্তী নামাজ কাউন্টডাউন
