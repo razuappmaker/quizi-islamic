@@ -22,26 +22,58 @@ class _SuraPageState extends State<SuraPage> {
   final double _maxFontSize = 28.0;
   final double _fontSizeStep = 2.0;
 
-  late BannerAd _bannerAd;
+  BannerAd? _bannerAd; // ✅ Nullable করুন adaptive banner-এর জন্য
   bool _isBannerAdReady = false;
 
   @override
   void initState() {
     super.initState();
     _loadSuraData();
+    _loadAd(); // ✅ Adaptive banner load
+  }
 
-    _bannerAd = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (_) => setState(() => _isBannerAdReady = true),
-        onAdFailedToLoad: (ad, error) {
-          debugPrint("Banner Ad Failed: $error");
-          ad.dispose();
-        },
-      ),
-    )..load();
+  // ✅ Adaptive Banner Ad লোড করা - অন্যান্য পেইজের মতোই
+  Future<void> _loadAd() async {
+    try {
+      // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
+      bool canShowAd = await AdHelper.canShowBannerAd();
+
+      if (!canShowAd) {
+        print('Banner ad limit reached, not showing ad');
+        return;
+      }
+
+      _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+        context,
+        listener: BannerAdListener(
+          onAdLoaded: (Ad ad) {
+            setState(() => _isBannerAdReady = true);
+            AdHelper.recordBannerAdShown();
+            print('Adaptive Banner ad loaded successfully.');
+          },
+          onAdFailedToLoad: (Ad ad, LoadAdError error) {
+            print('Adaptive Banner ad failed to load: $error');
+            ad.dispose();
+            _isBannerAdReady = false;
+          },
+          onAdOpened: (Ad ad) {
+            AdHelper.canClickAd().then((canClick) {
+              if (canClick) {
+                AdHelper.recordAdClick();
+                print('Adaptive Banner ad clicked.');
+              } else {
+                print('Ad click limit reached');
+              }
+            });
+          },
+        ),
+      );
+
+      await _bannerAd?.load();
+    } catch (e) {
+      print('Error loading adaptive banner ad: $e');
+      _isBannerAdReady = false;
+    }
   }
 
   Future<void> _loadSuraData() async {
@@ -103,7 +135,7 @@ class _SuraPageState extends State<SuraPage> {
 
   @override
   void dispose() {
-    _bannerAd.dispose();
+    _bannerAd?.dispose(); // ✅ Null safety সহ dispose
     expandedIndices.clear();
     _showFullWarning.clear();
     super.dispose();
@@ -467,63 +499,59 @@ class _SuraPageState extends State<SuraPage> {
 
                             ...List<Widget>.from(
                               (sura['ayat'] as List<dynamic>).map(
-                                (ay) => InteractiveViewer(
-                                  boundaryMargin: EdgeInsets.all(20),
-                                  minScale: 0.5,
-                                  maxScale: 4.0,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      Directionality(
-                                        textDirection: TextDirection.rtl,
-                                        child: SelectableText(
-                                          ay['arabic'] ?? '',
-                                          style: TextStyle(
-                                            fontSize: 26,
-                                            fontFamily: 'ScheherazadeNew',
-                                            fontWeight: FontWeight.bold,
-                                            wordSpacing: 2.5,
-                                            color:
-                                                Theme.of(context).brightness ==
-                                                    Brightness.dark
-                                                ? Colors.white
-                                                : Colors.black87,
-                                            height: 1.6,
-                                          ),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      SelectableText(
-                                        ay['transliteration'] ?? '',
+                                (ay) => Column(
+                                  // InteractiveViewer removed - 2 finger zoom disabled
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Directionality(
+                                      textDirection: TextDirection.rtl,
+                                      child: SelectableText(
+                                        ay['arabic'] ?? '',
                                         style: TextStyle(
-                                          fontSize: _fontSize,
-                                          fontStyle: FontStyle.italic,
+                                          fontSize: 26,
+                                          fontFamily: 'ScheherazadeNew',
+                                          fontWeight: FontWeight.bold,
+                                          wordSpacing: 2.5,
                                           color:
                                               Theme.of(context).brightness ==
                                                   Brightness.dark
-                                              ? Colors.green[200]
-                                              : Colors.green[900],
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      SelectableText(
-                                        'অর্থ: ${ay['meaning'] ?? ''}',
-                                        style: TextStyle(
-                                          fontSize: _fontSize,
-                                          color:
-                                              Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.grey[300]
+                                              ? Colors.white
                                               : Colors.black87,
-                                          height: 1.4,
+                                          height: 1.6,
                                         ),
+                                        textAlign: TextAlign.right,
                                       ),
-                                      const SizedBox(height: 12),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    SelectableText(
+                                      ay['transliteration'] ?? '',
+                                      style: TextStyle(
+                                        fontSize: _fontSize,
+                                        fontStyle: FontStyle.italic,
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.green[200]
+                                            : Colors.green[900],
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    SelectableText(
+                                      'অর্থ: ${ay['meaning'] ?? ''}',
+                                      style: TextStyle(
+                                        fontSize: _fontSize,
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey[300]
+                                            : Colors.black87,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                  ],
                                 ),
                               ),
                             ),
@@ -555,6 +583,8 @@ class _SuraPageState extends State<SuraPage> {
   //=================
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[700],
@@ -563,7 +593,6 @@ class _SuraPageState extends State<SuraPage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
-          // Font size control in app bar
           PopupMenuButton<String>(
             icon: const Icon(Icons.text_fields, color: Colors.white),
             itemBuilder: (BuildContext context) => [
@@ -599,31 +628,36 @@ class _SuraPageState extends State<SuraPage> {
       body: Column(
         children: [
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : InteractiveViewer(
-                    boundaryMargin: EdgeInsets.all(20),
-                    minScale: 0.5,
-                    maxScale: 4.0,
-                    child: ListView.builder(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: _isBannerAdReady ? 0 : bottomPadding,
+              ),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      // Main InteractiveViewer removed - 2 finger zoom disabled
                       itemCount: dailySuras.length,
                       itemBuilder: (context, index) =>
                           buildSura(dailySuras[index], index),
                     ),
-                  ),
+            ),
           ),
-          if (_isBannerAdReady)
+          // ✅ Adaptive Banner Ad - অন্যান্য পেইজের মতোই
+          if (_isBannerAdReady && _bannerAd != null)
             SafeArea(
               top: false,
               child: Container(
+                width: double.infinity,
+                height: _bannerAd!.size.height.toDouble(),
                 alignment: Alignment.center,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: _bannerAd.size.height.toDouble(),
-                  child: AdWidget(ad: _bannerAd),
-                ),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
+                child: AdWidget(ad: _bannerAd!),
               ),
-            ),
+            )
+          else
+            const SizedBox.shrink(),
         ],
       ),
     );

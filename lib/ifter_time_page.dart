@@ -29,7 +29,7 @@ class _IfterTimePageState extends State<IfterTimePage>
   late Animation<double> _animation;
 
   // ---------- Ads ----------
-  late BannerAd _bannerAd;
+  BannerAd? _bannerAd; // ✅ Nullable করুন adaptive banner-এর জন্য
   bool _isBannerAdReady = false;
   Timer? _interstitialTimer; // Interstitial অ্যাডের টাইমার
   bool _interstitialAdShownToday =
@@ -54,7 +54,7 @@ class _IfterTimePageState extends State<IfterTimePage>
   @override
   void initState() {
     super.initState();
-    _loadAd();
+    _loadAd(); // ✅ Adaptive banner load
     _loadSavedData();
     _selectRandomHadith();
     _initializeAds(); // অ্যাড সিস্টেম ইনিশিয়ালাইজ করুন
@@ -74,22 +74,53 @@ class _IfterTimePageState extends State<IfterTimePage>
   void dispose() {
     iftarTimer?.cancel();
     _interstitialTimer?.cancel(); // interstitial টাইমার বাতিল করুন
-    _bannerAd.dispose();
+    _bannerAd?.dispose(); // ✅ Null safety সহ dispose
     _animationController.dispose();
     super.dispose();
   }
 
-  // বিজ্ঞাপন লোড করা
-  void _loadAd() {
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (_) => setState(() => _isBannerAdReady = true),
-        onAdFailedToLoad: (ad, error) => ad.dispose(),
-      ),
-    )..load();
+  // ✅ Adaptive Banner Ad লোড করা - অন্যান্য পেইজের মতোই
+  Future<void> _loadAd() async {
+    try {
+      // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
+      bool canShowAd = await AdHelper.canShowBannerAd();
+
+      if (!canShowAd) {
+        print('Banner ad limit reached, not showing ad');
+        return;
+      }
+
+      _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+        context,
+        listener: BannerAdListener(
+          onAdLoaded: (Ad ad) {
+            setState(() => _isBannerAdReady = true);
+            AdHelper.recordBannerAdShown();
+            print('Adaptive Banner ad loaded successfully.');
+          },
+          onAdFailedToLoad: (Ad ad, LoadAdError error) {
+            print('Adaptive Banner ad failed to load: $error');
+            ad.dispose();
+            _isBannerAdReady = false;
+          },
+          onAdOpened: (Ad ad) {
+            AdHelper.canClickAd().then((canClick) {
+              if (canClick) {
+                AdHelper.recordAdClick();
+                print('Adaptive Banner ad clicked.');
+              } else {
+                print('Ad click limit reached');
+              }
+            });
+          },
+        ),
+      );
+
+      await _bannerAd?.load();
+    } catch (e) {
+      print('Error loading adaptive banner ad: $e');
+      _isBannerAdReady = false;
+    }
   }
 
   // অ্যাড সিস্টেম ইনিশিয়ালাইজেশন
@@ -792,15 +823,22 @@ class _IfterTimePageState extends State<IfterTimePage>
           ],
         ),
       ),
-      bottomNavigationBar: _isBannerAdReady
-          ? Container(
-              color: isDarkMode ? Colors.grey[900] : Colors.white,
-              alignment: Alignment.center,
-              width: _bannerAd.size.width.toDouble(),
-              height: _bannerAd.size.height.toDouble(),
-              child: AdWidget(ad: _bannerAd),
+      // ✅ Adaptive Banner Ad - অন্যান্য পেইজের মতোই
+      bottomNavigationBar: _isBannerAdReady && _bannerAd != null
+          ? SafeArea(
+              top: false,
+              child: Container(
+                width: double.infinity,
+                height: _bannerAd!.size.height.toDouble(),
+                alignment: Alignment.center,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
+                child: AdWidget(ad: _bannerAd!),
+              ),
             )
-          : null,
+          : // ব্যানার অ্যাড না থাকলে শুধু সিস্টেম ন্যাভিগেশন বার এর জন্য স্পেস রাখুন
+            SafeArea(child: Container(height: 0)),
     );
   }
 }

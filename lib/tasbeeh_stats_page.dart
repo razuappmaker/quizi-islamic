@@ -236,6 +236,7 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
     final MaterialColor alhamColor = Colors.blue;
     final MaterialColor akbarColor = Colors.orange;
     final screenWidth = MediaQuery.of(context).size.width;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       appBar: AppBar(
@@ -243,119 +244,138 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
         backgroundColor: Colors.green[800],
         centerTitle: true,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.green.shade50, Colors.green.shade100],
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              _buildStatCard(
-                "সুবহানাল্লাহ",
-                subhanallahCount,
-                subColor,
-                context,
-              ),
-              _buildStatCard(
-                "আলহামদুলিল্লাহা",
-                alhamdulillahCount,
-                alhamColor,
-                context,
-              ),
-              _buildStatCard(
-                "আল্লাহু আকবার",
-                allahuakbarCount,
-                akbarColor,
-                context,
-              ),
-
-              const SizedBox(height: 20),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth > 600 ? 24 : 16,
-                ),
-                child: ElevatedButton.icon(
-                  onPressed: _resetAllCounts,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(
-                    "সম্পূর্ণ রিসেট",
-                    style: TextStyle(fontSize: screenWidth > 600 ? 18 : 16),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(
-                      vertical: screenWidth > 600 ? 16 : 14,
-                      horizontal: screenWidth > 600 ? 24 : 20,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    minimumSize: Size(
-                      screenWidth > 600 ? screenWidth * 0.4 : double.infinity,
-                      50,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 30),
-              // Benefits Section
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth > 600 ? 24 : 16,
-                ),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "উপকারিতা",
-                    style: TextStyle(
-                      fontSize: screenWidth > 600 ? 26 : 22,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey
-                          : Colors.green.shade800,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildBenefitCard(
-                "সুবহানাল্লাহ",
-                benefits["সুবহানাল্লাহ"] ?? "",
-                context,
-              ),
-              _buildBenefitCard(
-                "আলহামদুলিল্লাহা",
-                benefits["আলহামদুলিল্লাহা"] ?? "",
-                context,
-              ),
-              _buildBenefitCard(
-                "আল্লাহু আকবার",
-                benefits["আল্লাহু আকবার"] ?? "",
-                context,
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: _isBannerAdReady && _bannerAd != null
-          ? SafeArea(
+      body: SafeArea(
+        bottom: true, // সবসময় bottom safe area maintain করবে
+        child: Column(
+          children: [
+            // Main Content
+            Expanded(
               child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.green.shade50, Colors.green.shade100],
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  // ব্যানার না থাকলে extra bottom padding যোগ করুন
+                  padding: EdgeInsets.only(
+                    bottom: _isBannerAdReady ? 0 : bottomPadding + 20,
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      _buildStatCard(
+                        "সুবহানাল্লাহ",
+                        subhanallahCount,
+                        subColor,
+                        context,
+                      ),
+                      _buildStatCard(
+                        "আলহামদুলিল্লাহা",
+                        alhamdulillahCount,
+                        alhamColor,
+                        context,
+                      ),
+                      _buildStatCard(
+                        "আল্লাহু আকবার",
+                        allahuakbarCount,
+                        akbarColor,
+                        context,
+                      ),
+
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth > 600 ? 24 : 16,
+                        ),
+                        child: ElevatedButton.icon(
+                          onPressed: _resetAllCounts,
+                          icon: const Icon(Icons.refresh),
+                          label: Text(
+                            "সম্পূর্ণ রিসেট",
+                            style: TextStyle(
+                              fontSize: screenWidth > 600 ? 18 : 16,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                              vertical: screenWidth > 600 ? 16 : 14,
+                              horizontal: screenWidth > 600 ? 24 : 20,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            minimumSize: Size(
+                              screenWidth > 600
+                                  ? screenWidth * 0.4
+                                  : double.infinity,
+                              50,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+                      // Benefits Section
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth > 600 ? 24 : 16,
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "উপকারিতা",
+                            style: TextStyle(
+                              fontSize: screenWidth > 600 ? 26 : 22,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.grey
+                                  : Colors.green.shade800,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildBenefitCard(
+                        "সুবহানাল্লাহ",
+                        benefits["সুবহানাল্লাহ"] ?? "",
+                        context,
+                      ),
+                      _buildBenefitCard(
+                        "আলহামদুলিল্লাহা",
+                        benefits["আলহামদুলিল্লাহা"] ?? "",
+                        context,
+                      ),
+                      _buildBenefitCard(
+                        "আল্লাহু আকবার",
+                        benefits["আল্লাহু আকবার"] ?? "",
+                        context,
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Banner Ad (যদি থাকে)
+            if (_isBannerAdReady && _bannerAd != null)
+              Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 alignment: Alignment.center,
                 width: double.infinity,
                 height: _bannerAd!.size.height.toDouble(),
                 child: AdWidget(ad: _bannerAd!),
               ),
-            )
-          : null,
+          ],
+        ),
+      ),
     );
   }
 }

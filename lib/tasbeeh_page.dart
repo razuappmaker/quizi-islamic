@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'tasbeeh_stats_page.dart';
-import 'ad_helper.dart'; // AdHelper import
+import 'ad_helper.dart';
 
 class TasbeehPage extends StatefulWidget {
   const TasbeehPage({Key? key}) : super(key: key);
@@ -29,7 +29,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
         "রাসূলুল্লাহ ﷺ বলেছেন: 'নিশ্চয়ই আল্লাহর স্মরণ (জিকির) হৃদয়কে শান্ত করে।'",
   };
 
-  late BannerAd _bannerAd;
+  BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
 
   @override
@@ -67,24 +67,52 @@ class _TasbeehPageState extends State<TasbeehPage> {
     });
   }
 
-  void _loadBannerAd() {
-    _bannerAd = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (_) => setState(() => _isBannerAdReady = true),
-        onAdFailedToLoad: (ad, error) {
-          debugPrint("Banner Ad Failed: $error");
-          ad.dispose();
-        },
-      ),
-    )..load();
+  Future<void> _loadBannerAd() async {
+    try {
+      // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন - TasbeehStatsPage-এর মতোই
+      bool canShowAd = await AdHelper.canShowBannerAd();
+
+      if (!canShowAd) {
+        print('Banner ad limit reached, not showing ad');
+        return;
+      }
+
+      _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+        context,
+        listener: BannerAdListener(
+          onAdLoaded: (Ad ad) {
+            setState(() => _isBannerAdReady = true);
+            AdHelper.recordBannerAdShown();
+            print('Adaptive Banner ad loaded successfully.');
+          },
+          onAdFailedToLoad: (Ad ad, LoadAdError error) {
+            print('Adaptive Banner ad failed to load: $error');
+            ad.dispose();
+            _isBannerAdReady = false;
+          },
+          onAdOpened: (Ad ad) {
+            AdHelper.canClickAd().then((canClick) {
+              if (canClick) {
+                AdHelper.recordAdClick();
+                print('Adaptive Banner ad clicked.');
+              } else {
+                print('Ad click limit reached');
+              }
+            });
+          },
+        ),
+      );
+
+      await _bannerAd?.load();
+    } catch (e) {
+      print('Error loading adaptive banner ad: $e');
+      _isBannerAdReady = false;
+    }
   }
 
   @override
   void dispose() {
-    _bannerAd.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -137,21 +165,17 @@ class _TasbeehPageState extends State<TasbeehPage> {
     });
   }
 
-  // নতুন মেথড: সম্পূর্ণ রিসেট (UI এবং SharedPreferences)
   Future<void> _resetAllCounts() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      // UI কাউন্ট রিসেট
       uiSubhanallahCount = 0;
       uiAlhamdulillahCount = 0;
       uiAllahuakbarCount = 0;
 
-      // SharedPreferences কাউন্ট রিসেট
       subhanallahCount = 0;
       alhamdulillahCount = 0;
       allahuakbarCount = 0;
 
-      // SharedPreferences-এ সেভ করুন
       prefs.setInt("subhanallahCount", 0);
       prefs.setInt("alhamdulillahCount", 0);
       prefs.setInt("allahuakbarCount", 0);
@@ -161,7 +185,6 @@ class _TasbeehPageState extends State<TasbeehPage> {
     });
   }
 
-  // পুরানো মেথড: শুধু UI রিসেট (নাম পরিবর্তন করে স্পষ্ট করা)
   void _resetUICounts() {
     setState(() {
       uiSubhanallahCount = 0;
@@ -207,8 +230,17 @@ class _TasbeehPageState extends State<TasbeehPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 600;
 
+    // Responsive width calculations
+    final double contentWidth = isSmallScreen
+        ? screenWidth * 0.92
+        : screenWidth * 0.85;
+
+    final double cardWidth = isSmallScreen
+        ? screenWidth * 0.9
+        : screenWidth * 0.75;
+
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // ✅ Disable debug banner
+      debugShowCheckedModeBanner: false,
       theme: _isDarkMode
           ? ThemeData.dark().copyWith(
               primaryColor: Colors.green[800],
@@ -217,10 +249,6 @@ class _TasbeehPageState extends State<TasbeehPage> {
               appBarTheme: AppBarTheme(
                 backgroundColor: Colors.green[800],
                 elevation: 0,
-              ),
-              textTheme: TextTheme(
-                bodyLarge: TextStyle(color: Colors.white),
-                bodyMedium: TextStyle(color: Colors.white70),
               ),
             )
           : ThemeData.light().copyWith(
@@ -235,11 +263,15 @@ class _TasbeehPageState extends State<TasbeehPage> {
         appBar: AppBar(
           title: const Text(
             "ডিজিটাল তসবীহ",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.white,
+            ),
           ),
           backgroundColor: Colors.green[800],
           centerTitle: true,
-          elevation: 0,
+          elevation: 2,
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
@@ -252,19 +284,20 @@ class _TasbeehPageState extends State<TasbeehPage> {
             IconButton(
               icon: Icon(
                 _isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                size: 20,
+                color: Colors.white,
+                size: 22,
               ),
               onPressed: _toggleDarkMode,
               tooltip: _isDarkMode ? "লাইট মোড" : "ডার্ক মোড",
             ),
             PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, size: 20),
+              icon: Icon(Icons.more_vert, color: Colors.white, size: 22),
               itemBuilder: (BuildContext context) => [
                 PopupMenuItem(
                   value: "reset_session",
                   child: Row(
                     children: [
-                      Icon(Icons.refresh, size: 20),
+                      Icon(Icons.refresh, size: 20, color: Colors.green),
                       SizedBox(width: 8),
                       Text("বর্তমান সেশন রিসেট"),
                     ],
@@ -274,7 +307,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                   value: "reset_all",
                   child: Row(
                     children: [
-                      Icon(Icons.delete_forever, size: 20),
+                      Icon(Icons.delete_forever, size: 20, color: Colors.red),
                       SizedBox(width: 8),
                       Text("সম্পূর্ণ রিসেট"),
                     ],
@@ -291,97 +324,104 @@ class _TasbeehPageState extends State<TasbeehPage> {
             ),
           ],
         ),
-        body: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          color: _backgroundColor,
-          child: Column(
-            children: [
-              Expanded(
+        body: Column(
+          children: [
+            // Main Content
+            Expanded(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                color: _backgroundColor,
                 child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      children: [
-                        // Header Card
-                        Card(
-                          elevation: 6,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: (screenWidth - contentWidth) / 2,
+                    vertical: 16,
+                  ),
+                  child: Column(
+                    children: [
+                      // Header Display Card
+                      Container(
+                        width: cardWidth,
+                        margin: EdgeInsets.only(bottom: 20),
+                        child: Card(
+                          elevation: 8,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
                           color: _isDarkMode ? Colors.grey[800] : Colors.white,
-                          child: Container(
-                            width: isSmallScreen
-                                ? MediaQuery.of(context).size.width * 0.9
-                                : MediaQuery.of(context).size.width * 0.7,
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: _isDarkMode
-                                  ? Colors.grey[800]
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
                             child: Column(
                               children: [
                                 Text(
                                   selectedPhrase,
                                   style: TextStyle(
-                                    fontSize: isSmallScreen ? 28 : 32,
+                                    fontSize: isSmallScreen ? 26 : 30,
                                     fontWeight: FontWeight.bold,
                                     color: _isDarkMode
                                         ? Colors.green[300]
-                                        : Colors.green,
-                                    height: 1.5,
+                                        : Colors.green[700],
+                                    height: 1.4,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
-                                const SizedBox(height: 15),
+                                const SizedBox(height: 16),
                                 Text(
                                   _getCurrentCount().toString(),
                                   style: TextStyle(
-                                    fontSize: isSmallScreen ? 48 : 64,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: isSmallScreen ? 52 : 60,
+                                    fontWeight: FontWeight.w800,
                                     color: _isDarkMode
                                         ? Colors.green[300]
-                                        : Colors.green,
+                                        : Colors.green[700],
+                                    letterSpacing: 1.5,
                                   ),
                                 ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  "বর্তমান সেশন",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: _isDarkMode
-                                        ? Colors.grey[400]
-                                        : Colors.grey,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.access_time,
+                                      size: 16,
+                                      color: _isDarkMode
+                                          ? Colors.grey[400]
+                                          : Colors.grey[600],
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      "বর্তমান সেশন",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: _isDarkMode
+                                            ? Colors.grey[400]
+                                            : Colors.grey[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 5),
+                                const SizedBox(height: 6),
                                 Text(
-                                  "মোট: ${_getTotalCount()}",
+                                  "মোট জিকির: ${_getTotalCount()}",
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 15,
                                     color: _isDarkMode
                                         ? Colors.green[300]
-                                        : Colors.green,
-                                    fontWeight: FontWeight.w500,
+                                        : Colors.green[600],
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                      ),
 
-                        // Tasbeeh Buttons
-                        GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount: isSmallScreen ? 1 : 3,
-                          childAspectRatio: isSmallScreen ? 3.5 : 2.0,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          padding: const EdgeInsets.all(8),
+                      // Tasbeeh Buttons
+                      Container(
+                        width: contentWidth,
+                        margin: EdgeInsets.only(bottom: 20),
+                        child: Column(
                           children: tasbeehPhrases.asMap().entries.map((entry) {
                             int index = entry.key;
                             String phrase = entry.value;
@@ -392,137 +432,104 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                 ? Colors.blue[300]!
                                 : Colors.orange[300]!;
 
-                            return Material(
-                              borderRadius: BorderRadius.circular(16),
-                              elevation: 4,
-                              color: _isDarkMode
-                                  ? Colors.grey[800]
-                                  : Colors.white,
-                              child: InkWell(
-                                onTap: () => _incrementCount(phrase),
-                                borderRadius: BorderRadius.circular(16),
-                                child: Container(
-                                  width: isSmallScreen
-                                      ? MediaQuery.of(context).size.width * 0.9
-                                      : MediaQuery.of(context).size.width *
-                                            0.28,
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: _isDarkMode
-                                        ? Colors.grey[800]
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 20,
-                                        backgroundColor: _isDarkMode
-                                            ? darkColor.withOpacity(0.2)
-                                            : color.withOpacity(0.2),
-                                        child: Icon(
-                                          Icons.favorite,
-                                          color: _isDarkMode
-                                              ? darkColor
-                                              : color,
-                                          size: 20,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          phrase,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: isSmallScreen ? 18 : 20,
-                                            fontWeight: FontWeight.w600,
-                                            color: _isDarkMode
-                                                ? darkColor
-                                                : color,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _isDarkMode
-                                              ? darkColor.withOpacity(0.1)
-                                              : color.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          _getCountForPhrase(phrase).toString(),
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: _isDarkMode
-                                                ? darkColor
-                                                : color,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                            return Container(
+                              margin: EdgeInsets.only(bottom: 12),
+                              child: _buildTasbeehButton(
+                                phrase: phrase,
+                                color: color,
+                                darkColor: darkColor,
+                                count: _getCountForPhrase(phrase),
+                                isSelected: selectedPhrase == phrase,
                               ),
                             );
                           }).toList(),
                         ),
+                      ),
 
-                        _buildBenefitCard(
-                          "জিকিরের উপকারিতা",
+                      // Benefits Card
+                      Container(
+                        width: contentWidth,
+                        child: _buildBenefitCard(
+                          "জিকিরের ফজিলত",
                           benefits["সুখ ও মনের প্রশান্তি লাভ"] ?? "",
                           context,
                         ),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+            ),
 
-              // Action Buttons
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                color: Colors.transparent,
-                child: isSmallScreen
-                    ? Column(
-                        children: [
-                          ElevatedButton.icon(
+            // Action Buttons Section
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                horizontal: (screenWidth - contentWidth) / 2,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: _isDarkMode ? Colors.grey[900] : Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: isSmallScreen
+                  ? Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildActionButton(
+                                icon: Icons.refresh,
+                                text: "সেশন রিসেট",
+                                color: Colors.orange,
+                                onPressed: _resetUICounts,
+                                isSmall: true,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: _buildActionButton(
+                                icon: Icons.bar_chart,
+                                text: "লাইফটাইম স্ট্যাটস",
+                                color: Colors.blue,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TasbeehStatsPage(),
+                                    ),
+                                  );
+                                },
+                                isSmall: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: _buildActionButton(
+                            icon: Icons.refresh,
+                            text: "সেশন রিসেট",
+                            color: Colors.orange,
                             onPressed: _resetUICounts,
-                            icon: const Icon(Icons.refresh, size: 20),
-                            label: const Text(
-                              "স্ক্রিন শূন্য (০) করুন",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _isDarkMode
-                                  ? Colors.orange[800]
-                                  : Colors.orangeAccent,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 20,
-                              ),
-                              minimumSize: const Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 3,
-                            ),
+                            isSmall: false,
                           ),
-
-                          const SizedBox(height: 12),
-                          ElevatedButton.icon(
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: _buildActionButton(
+                            icon: Icons.bar_chart,
+                            text: "লাইফটাইম স্ট্যাটস",
+                            color: Colors.blue,
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -531,121 +538,103 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                 ),
                               );
                             },
-                            icon: const Icon(Icons.bar_chart, size: 20),
-                            label: const Text(
-                              "লাইফটাইম স্ট্যাটস",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _isDarkMode
-                                  ? Colors.blue[800]
-                                  : Colors.blueAccent,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              minimumSize: const Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 3,
-                            ),
+                            isSmall: false,
                           ),
-                        ],
-                      )
-                    : Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: _resetUICounts,
-                              icon: const Icon(Icons.refresh, size: 20),
-                              label: const Text(
-                                "সেশন রিসেট",
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _isDarkMode
-                                    ? Colors.orange[800]
-                                    : Colors.orangeAccent,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 3,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed:
-                                  _resetAllCounts, // সম্পূর্ণ রিসেটের জন্য
-                              icon: const Icon(Icons.delete_forever, size: 20),
-                              label: const Text(
-                                "সম্পূর্ণ রিসেট",
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _isDarkMode
-                                    ? Colors.red[800]
-                                    : Colors.redAccent,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 3,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TasbeehStatsPage(),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.bar_chart, size: 20),
-                              label: const Text(
-                                "লাইফটাইম স্ট্যাটস",
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _isDarkMode
-                                    ? Colors.blue[800]
-                                    : Colors.blueAccent,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 3,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-              ),
+                        ),
+                      ],
+                    ),
+            ),
 
-              // Banner Ad at bottom
-              if (_isBannerAdReady)
-                SafeArea(
-                  top: false,
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: _bannerAd.size.height.toDouble(),
-                    child: AdWidget(ad: _bannerAd),
+            // ✅ Adaptive Banner Ad - TasbeehStatsPage-এর মতোই
+            if (_isBannerAdReady && _bannerAd != null)
+              SafeArea(
+                top: false,
+                child: Container(
+                  width: double.infinity,
+                  height: _bannerAd!.size.height.toDouble(),
+                  alignment: Alignment.center,
+                  color: _isDarkMode ? Colors.grey[900] : Colors.white,
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ... বাকি সব মেথড একই থাকবে (_buildTasbeehButton, _buildActionButton, _buildBenefitCard)
+  Widget _buildTasbeehButton({
+    required String phrase,
+    required Color color,
+    required Color darkColor,
+    required int count,
+    required bool isSelected,
+  }) {
+    return Material(
+      borderRadius: BorderRadius.circular(16),
+      elevation: isSelected ? 6 : 4,
+      color: _isDarkMode ? Colors.grey[800] : Colors.white,
+      child: InkWell(
+        onTap: () => _incrementCount(phrase),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: _isDarkMode ? Colors.grey[800] : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: isSelected
+                ? Border.all(color: _isDarkMode ? darkColor : color, width: 2)
+                : null,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: _isDarkMode
+                      ? darkColor.withOpacity(0.15)
+                      : color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.favorite,
+                  color: _isDarkMode ? darkColor : color,
+                  size: 20,
+                ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  phrase,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: _isDarkMode ? darkColor : color,
                   ),
                 ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: _isDarkMode
+                      ? darkColor.withOpacity(0.1)
+                      : color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  count.toString(),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: _isDarkMode ? darkColor : color,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -653,45 +642,97 @@ class _TasbeehPageState extends State<TasbeehPage> {
     );
   }
 
+  Widget _buildActionButton({
+    required IconData icon,
+    required String text,
+    required Color color,
+    required VoidCallback onPressed,
+    required bool isSmall,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 20),
+      label: Text(text, style: TextStyle(fontSize: isSmall ? 14 : 15)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _isDarkMode ? color.withOpacity(0.8) : color,
+        foregroundColor: Colors.white,
+        padding: EdgeInsets.symmetric(vertical: isSmall ? 12 : 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 3,
+        shadowColor: color.withOpacity(0.3),
+      ),
+    );
+  }
+
   Widget _buildBenefitCard(String title, String benefit, BuildContext context) {
     final isDark = _isDarkMode;
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      color: isDark ? Colors.grey[800] : Colors.green.shade50,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.emoji_events,
-                  color: isDark ? Colors.amber : Colors.green.shade700,
-                  size: 18,
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        color: isDark ? Colors.grey[800] : Colors.green.shade50,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Icon Section
+              Container(
+                width: 40,
+                height: 40,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.green[800]!.withOpacity(0.3)
+                      : Colors.green.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.green.shade900,
-                  ),
+                child: Icon(
+                  Icons.emoji_events_rounded,
+                  color: isDark ? Colors.green[300] : Colors.green.shade700,
+                  size: 22,
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              benefit,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? Colors.white70 : Colors.black87,
               ),
-            ),
-          ],
+
+              // Text Section
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? Colors.green[300]
+                            : Colors.green.shade800,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      benefit,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.4,
+                        color: isDark
+                            ? Colors.green[100]
+                            : Colors.green.shade900,
+                      ),
+                      textAlign: TextAlign.left,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

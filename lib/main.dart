@@ -11,7 +11,7 @@ import 'mcq_page.dart';
 import 'islamic_history_page.dart';
 import 'prophet_biography_page.dart';
 import 'prayer_time_page.dart';
-import 'doya_page.dart';
+import 'doya_category_page.dart';
 import 'nadiyatul_quran.dart';
 import 'about_page.dart';
 import 'contact_page.dart';
