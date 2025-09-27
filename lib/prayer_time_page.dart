@@ -1,20 +1,20 @@
-// update Prayer Time page
-// prayer_page.dart - শুধু ইম্পোর্ট অংশ
+// prayer_time_page.dart - Final Version
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:intl/intl.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/services.dart';
 import 'ad_helper.dart';
 import 'prayer_time_service.dart';
 import 'prohibited_time_service.dart';
+import 'widgets/prayer_header_section.dart';
+import 'widgets/prayer_list_section.dart';
+import 'widgets/prohibited_time_section.dart';
+import 'widgets/location_modal.dart';
+import 'widgets/prayer_time_adjustment_modal.dart';
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -37,15 +37,11 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   Timer? timer;
 
   // ---------- Ads ----------
-  BannerAd? _bannerAd; // ✅ Nullable করুন adaptive banner-এর জন্য
+  BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
   Timer? _interstitialTimer;
-  bool _interstitialAdShownToday = false;
+  DateTime? _lastInterstitialShownTime;
   bool _showInterstitialAds = true;
-
-  // ---------- Audio ----------
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  Map<String, Timer> _mp3Timers = {};
 
   // ---------- Permission Status ----------
   bool _locationPermissionGranted = false;
@@ -54,29 +50,250 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   // ---------- Internet Status ----------
   bool _isOnline = true;
 
+  // ---------- Manual Location ----------
+  bool _useManualLocation = false;
+  double? _manualLatitude;
+  double? _manualLongitude;
+  String? _manualCityName;
+  String? _manualCountryName;
+
+  // ---------- Prayer Time Adjustments ----------
+  Map<String, int> _prayerTimeAdjustments = {
+    "ফজর": 0,
+    "যোহর": 0,
+    "আসর": 0,
+    "মাগরিব": 0,
+    "ইশা": 0,
+  };
+
   @override
   void initState() {
     super.initState();
     _initializeData();
-    _loadAd(); // ✅ Adaptive banner load
+    _loadAd();
     _initializeAds();
+    _initializeNotificationChannel();
+    _loadManualLocation();
+    _loadPrayerTimeAdjustments();
+    _startInterstitialTimer();
   }
 
   @override
   void dispose() {
     timer?.cancel();
     _interstitialTimer?.cancel();
-    _bannerAd?.dispose(); // ✅ Null safety সহ dispose
-    _mp3Timers.forEach((key, t) => t.cancel());
+    _bannerAd?.dispose();
+    AdHelper.disposeInterstitialAd();
     super.dispose();
   }
 
-  // ✅ Adaptive Banner Ad লোড করা - TasbeehPage-এর মতোই
+  // ম্যানুয়াল লোকেশন লোড করা
+  Future<void> _loadManualLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _useManualLocation = prefs.getBool('use_manual_location') ?? false;
+      _manualLatitude = prefs.getDouble('manual_latitude');
+      _manualLongitude = prefs.getDouble('manual_longitude');
+      _manualCityName = prefs.getString('manual_city_name');
+      _manualCountryName = prefs.getString('manual_country_name');
+    });
+  }
+
+  // নামাজের সময় অ্যাডজাস্টমেন্ট লোড করা
+  Future<void> _loadPrayerTimeAdjustments() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _prayerTimeAdjustments = {
+        "ফজর": prefs.getInt('adjustment_fajr') ?? 0,
+        "যোহর": prefs.getInt('adjustment_dhuhr') ?? 0,
+        "আসর": prefs.getInt('adjustment_asr') ?? 0,
+        "মাগরিব": prefs.getInt('adjustment_maghrib') ?? 0,
+        "ইশা": prefs.getInt('adjustment_isha') ?? 0,
+      };
+    });
+  }
+
+  // নামাজের সময় অ্যাডজাস্টমেন্ট সেভ করা
+  Future<void> _savePrayerTimeAdjustments() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('adjustment_fajr', _prayerTimeAdjustments["ফজর"]!);
+    await prefs.setInt('adjustment_dhuhr', _prayerTimeAdjustments["যোহর"]!);
+    await prefs.setInt('adjustment_asr', _prayerTimeAdjustments["আসর"]!);
+    await prefs.setInt('adjustment_maghrib', _prayerTimeAdjustments["মাগরিব"]!);
+    await prefs.setInt('adjustment_isha', _prayerTimeAdjustments["ইশা"]!);
+  }
+
+  // অ্যাডজাস্ট করা নামাজের সময় পাওয়া
+  Map<String, String> get adjustedPrayerTimes {
+    if (prayerTimes.isEmpty) return {};
+
+    final adjustedTimes = Map<String, String>.from(prayerTimes);
+
+    for (final entry in _prayerTimeAdjustments.entries) {
+      final prayerName = entry.key;
+      final adjustment = entry.value;
+
+      if (adjustedTimes.containsKey(prayerName) && adjustment != 0) {
+        final originalTime = adjustedTimes[prayerName]!;
+        final adjustedTime = _adjustPrayerTime(originalTime, adjustment);
+        adjustedTimes[prayerName] = adjustedTime;
+      }
+    }
+
+    return adjustedTimes;
+  }
+
+  // নামাজের সময় অ্যাডজাস্ট করা
+  String _adjustPrayerTime(String time, int adjustmentMinutes) {
+    try {
+      final parts = time.split(':');
+      if (parts.length != 2) return time;
+
+      int hours = int.parse(parts[0]);
+      int minutes = int.parse(parts[1]);
+
+      // মিনিট অ্যাডজাস্ট করা
+      minutes += adjustmentMinutes;
+
+      // ঘণ্টা সামঞ্জস্য করা
+      while (minutes >= 60) {
+        minutes -= 60;
+        hours = (hours + 1) % 24;
+      }
+
+      while (minutes < 0) {
+        minutes += 60;
+        hours = (hours - 1) % 24;
+        if (hours < 0) hours += 24;
+      }
+
+      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+    } catch (e) {
+      print('Error adjusting prayer time: $e');
+      return time;
+    }
+  }
+
+  // লোকেশন মোড পরিবর্তন
+  Future<void> _changeLocationMode(
+    bool useManual, {
+    double? lat,
+    double? lng,
+    String? city,
+    String? country,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      _useManualLocation = useManual;
+      if (useManual && lat != null && lng != null) {
+        _manualLatitude = lat;
+        _manualLongitude = lng;
+        _manualCityName = city;
+        _manualCountryName = country;
+      }
+    });
+
+    await prefs.setBool('use_manual_location', useManual);
+    if (useManual) {
+      await prefs.setDouble('manual_latitude', lat!);
+      await prefs.setDouble('manual_longitude', lng!);
+      await prefs.setString('manual_city_name', city ?? 'মানুয়াল লোকেশন');
+      await prefs.setString('manual_country_name', country ?? '');
+    }
+
+    // নতুন লোকেশনে নামাজের সময় আপডেট করুন
+    await fetchLocationAndPrayerTimes();
+  }
+
+  // নামাজের সময় অ্যাডজাস্ট করা
+  void _adjustPrayerTimeByName(String prayerName, int adjustment) {
+    setState(() {
+      _prayerTimeAdjustments[prayerName] =
+          (_prayerTimeAdjustments[prayerName] ?? 0) + adjustment;
+    });
+    _savePrayerTimeAdjustments();
+
+    // UI আপডেট করার জন্য
+    findNextPrayer();
+  }
+
+  // লোকেশন মডাল শো করা
+  void _showLocationModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => LocationModal(
+        currentLocationMode: _useManualLocation ? 'manual' : 'auto',
+        onLocationModeChanged: (mode, lat, lng, city, country) {
+          if (mode == 'auto') {
+            _changeLocationMode(false);
+          } else {
+            _changeLocationMode(
+              true,
+              lat: lat,
+              lng: lng,
+              city: city,
+              country: country,
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  // সেটিংস মডাল শো করা
+  void _showSettingsModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PrayerTimeAdjustmentModal(
+        prayerTimeAdjustments: _prayerTimeAdjustments,
+        onAdjustmentChanged: _adjustPrayerTimeByName,
+        onResetAll: _resetAllAdjustments,
+      ),
+    );
+  }
+
+  // সব অ্যাডজাস্টমেন্ট রিসেট করা
+  void _resetAllAdjustments() {
+    setState(() {
+      _prayerTimeAdjustments = {
+        "ফজর": 0,
+        "যোহর": 0,
+        "আসর": 0,
+        "মাগরিব": 0,
+        "ইশা": 0,
+      };
+    });
+    _savePrayerTimeAdjustments();
+    findNextPrayer();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("সব অ্যাডজাস্টমেন্ট রিসেট করা হয়েছে")),
+    );
+  }
+
+  // নোটিফিকেশন চ্যানেল ইনিশিয়ালাইজেশন
+  Future<void> _initializeNotificationChannel() async {
+    await AwesomeNotifications().initialize(null, [
+      NotificationChannel(
+        channelKey: 'prayer_reminder_channel',
+        channelName: 'Prayer Reminders',
+        channelDescription: 'Notifications for prayer times',
+        defaultColor: Colors.green,
+        ledColor: Colors.green,
+        importance: NotificationImportance.High,
+      ),
+    ]);
+  }
+
+  // ব্যানার অ্যাড লোড করা
   Future<void> _loadAd() async {
     try {
-      // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
       bool canShowAd = await AdHelper.canShowBannerAd();
-
       if (!canShowAd) {
         print('Banner ad limit reached, not showing ad');
         return;
@@ -94,6 +311,12 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             print('Adaptive Banner ad failed to load: $error');
             ad.dispose();
             _isBannerAdReady = false;
+            // ৩০ সেকেন্ড পর রিট্রাই
+            Future.delayed(Duration(seconds: 30), () {
+              if (!_isBannerAdReady) {
+                _loadAd();
+              }
+            });
           },
           onAdOpened: (Ad ad) {
             AdHelper.canClickAd().then((canClick) {
@@ -115,7 +338,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
-  // অ্যাড সিস্টেম ইনিশিয়ালাইজেশন
+  // অ্যাডস ইনিশিয়ালাইজেশন
   Future<void> _initializeAds() async {
     try {
       await AdHelper.initialize();
@@ -123,76 +346,114 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
       _showInterstitialAds = prefs.getBool('show_interstitial_ads') ?? true;
 
-      final lastShownDate = prefs.getString('last_interstitial_date');
-      final today = DateTime.now().toIso8601String().split('T')[0];
+      // শেষ interstitial ad দেখানোর সময় লোড করুন
+      final lastShownTimestamp = prefs.getInt('last_interstitial_timestamp');
+      if (lastShownTimestamp != null) {
+        _lastInterstitialShownTime = DateTime.fromMillisecondsSinceEpoch(
+          lastShownTimestamp,
+        );
+        print('Last interstitial ad shown: $_lastInterstitialShownTime');
+      } else {
+        print('No previous interstitial ad found');
+      }
 
-      setState(() {
-        _interstitialAdShownToday = (lastShownDate == today);
-      });
-
-      _startInterstitialTimer();
+      print('Ads initialized successfully');
     } catch (e) {
       print('অ্যাড ইনিশিয়ালাইজেশনে ত্রুটি: $e');
     }
   }
 
+  // প্রতি ১ মিনিটে interstitial ad চেক করার টাইমার
   void _startInterstitialTimer() {
-    _interstitialTimer?.cancel();
-    _interstitialTimer = Timer(Duration(seconds: 10), () {
-      _showInterstitialAdIfNeeded();
+    _interstitialTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+      _checkAndShowInterstitialAd();
     });
+    print('Interstitial ad timer started (checks every 1 minute)');
   }
 
-  Future<void> _showInterstitialAdIfNeeded() async {
+  // interstitial ad চেক এবং শো করা
+  void _checkAndShowInterstitialAd() {
     try {
-      if (!_showInterstitialAds || _interstitialAdShownToday) return;
-
-      await AdHelper.showInterstitialAd(
-        onAdShowed: () {
-          _recordInterstitialShown();
-        },
-        onAdDismissed: () {},
-        onAdFailedToShow: () {},
-        adContext: 'PrayerTimePage',
-      );
+      if (_canShowInterstitialAd()) {
+        print('🔄 2 hours passed - showing interstitial ad');
+        _showInterstitialAd();
+      }
     } catch (e) {
-      print('Interstitial অ্যাড শো করতে ত্রুটি: $e');
+      print('Error checking interstitial ad: $e');
     }
   }
 
+  // interstitial ad দেখানোর যোগ্য কিনা চেক করা
+  bool _canShowInterstitialAd() {
+    if (!_showInterstitialAds) {
+      print('Interstitial ads disabled by user');
+      return false;
+    }
+
+    if (_lastInterstitialShownTime == null) {
+      print('First interstitial ad - can show');
+      return true;
+    }
+
+    final now = DateTime.now();
+    final difference = now.difference(_lastInterstitialShownTime!);
+
+    // ২ ঘণ্টার কম হলে দেখাবেন না
+    final canShow = difference.inHours >= 2;
+
+    if (!canShow) {
+      final hoursLeft = 2 - difference.inHours;
+      final minutesLeft = 60 - difference.inMinutes % 60;
+      print('Next interstitial ad in: $hoursLeft hours $minutesLeft minutes');
+    }
+
+    return canShow;
+  }
+
+  // interstitial ad দেখানো
+  Future<void> _showInterstitialAd() async {
+    try {
+      if (!_canShowInterstitialAd()) return;
+
+      print('Attempting to show interstitial ad...');
+
+      AdHelper.showInterstitialAd(
+        onAdShowed: _recordInterstitialShown,
+        adContext: 'PrayerTimePage_2Hour',
+      );
+    } catch (e) {
+      print('Error showing interstitial ad: $e');
+    }
+  }
+
+  // interstitial ad দেখানোর সময় রেকর্ড করা
   void _recordInterstitialShown() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final today = DateTime.now().toIso8601String().split('T')[0];
-
-      await prefs.setString('last_interstitial_date', today);
+      final now = DateTime.now();
 
       setState(() {
-        _interstitialAdShownToday = true;
+        _lastInterstitialShownTime = now;
       });
-    } catch (e) {
-      print('Interstitial অ্যাড রেকর্ড করতে ত্রুটি: $e');
-    }
-  }
 
-  Future<void> _toggleInterstitialAds(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('show_interstitial_ads', value);
+      await prefs.setInt(
+        'last_interstitial_timestamp',
+        now.millisecondsSinceEpoch,
+      );
 
-    setState(() {
-      _showInterstitialAds = value;
-    });
+      print('✅ Interstitial ad shown and recorded at: $now');
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          value
-              ? 'পূর্ণস্ক্রিন অ্যাড সক্রিয় করা হয়েছে'
-              : 'পূর্ণস্ক্রিন অ্যাড বন্ধ করা হয়েছে',
+      // ইউজারকে জানানো (ঐচ্ছিক)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('পূর্ণস্ক্রিন অ্যাড দেখানো হয়েছে'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
         ),
-        duration: Duration(seconds: 2),
-      ),
-    );
+      );
+    } catch (e) {
+      print('❌ Interstitial অ্যাড রেকর্ড করতে ত্রুটি: $e');
+    }
   }
 
   // ডেটা ইনিশিয়ালাইজেশন
@@ -206,7 +467,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     });
 
     if (_locationPermissionGranted && hasInternet) {
-      fetchLocationAndPrayerTimes();
+      await fetchLocationAndPrayerTimes();
+    } else {
+      await _scheduleAllNotifications();
     }
   }
 
@@ -255,12 +518,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         findNextPrayer();
       }
     });
-
-    // নোটিফিকেশন শিডিউল করা
-    prayerTimes.forEach((prayer, time) async {
-      bool soundEnabled = prefs.getBool("azan_sound_$prayer") ?? true;
-      _schedulePrayerNotification(prayer, time, soundEnabled);
-    });
   }
 
   // লোকেশন এবং নামাজের সময় ফেচ করা
@@ -273,9 +530,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("ইন্টারনেট সংযোগ নেই। সেভ করা সময় দেখানো হচ্ছে।"),
-          duration: Duration(seconds: 3),
         ),
       );
+      await _scheduleAllNotifications();
       return;
     }
 
@@ -283,33 +540,30 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       _isOnline = true;
     });
 
-    if (!_locationPermissionGranted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("লোকেশন এক্সেস প্রয়োজন")));
-      return;
-    }
-
     try {
-      final result = await _prayerTimeService.fetchPrayerTimes();
+      final result = await _prayerTimeService.fetchPrayerTimes(
+        useManualLocation: _useManualLocation,
+        manualLatitude: _manualLatitude,
+        manualLongitude: _manualLongitude,
+        manualCityName: _manualCityName,
+        manualCountryName: _manualCountryName,
+      );
 
       if (result != null) {
         setState(() {
-          cityName = result['cityName'];
-          countryName = result['countryName'];
+          if (_useManualLocation && _manualCityName != null) {
+            cityName = _manualCityName;
+            countryName = _manualCountryName;
+          } else {
+            cityName = result['cityName'];
+            countryName = result['countryName'];
+          }
           prayerTimes = result['prayerTimes'];
         });
 
         findNextPrayer();
         _saveData();
-
-        final prefs = await SharedPreferences.getInstance();
-        for (final entry in prayerTimes.entries) {
-          final prayer = entry.key;
-          final time = entry.value;
-          final soundEnabled = prefs.getBool("azan_sound_$prayer") ?? true;
-          _schedulePrayerNotification(prayer, time, soundEnabled);
-        }
+        await _scheduleAllNotifications();
       }
     } catch (e) {
       print("Location fetch error: $e");
@@ -329,7 +583,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
   // পরবর্তী নামাজ খুঁজে বের করা
   void findNextPrayer() {
-    final result = _prayerTimeService.findNextPrayer(prayerTimes);
+    final result = _prayerTimeService.findNextPrayer(adjustedPrayerTimes);
 
     if (result != null) {
       setState(() {
@@ -339,7 +593,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
       timer?.cancel();
       timer = Timer.periodic(const Duration(seconds: 1), (_) {
-        final updatedResult = _prayerTimeService.findNextPrayer(prayerTimes);
+        final updatedResult = _prayerTimeService.findNextPrayer(
+          adjustedPrayerTimes,
+        );
         if (updatedResult != null) {
           setState(() {
             countdown = updatedResult['countdown'];
@@ -354,49 +610,17 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
-  // আজান সক্ষম/অক্ষম সেট করা
-  Future<void> _setAzanEnabled(String prayerName, bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool("azan_sound_$prayerName", enabled);
+  // সব নোটিফিকেশন শিডিউল করা
+  Future<void> _scheduleAllNotifications() async {
+    if (prayerTimes.isEmpty) return;
 
-    if (!enabled) {
-      _mp3Timers[prayerName]?.cancel();
-      _mp3Timers.remove(prayerName);
-    } else {
-      if (prayerTimes[prayerName] != null) {
-        _scheduleMp3ForPrayer(prayerName, prayerTimes[prayerName]!);
+    for (final entry in prayerTimes.entries) {
+      final prayerName = entry.key;
+      final time = entry.value;
+
+      if (["ফজর", "যোহর", "আসর", "মাগরিব", "ইশা"].contains(prayerName)) {
+        await _schedulePrayerNotification(prayerName, time);
       }
-    }
-
-    setState(() {});
-  }
-
-  // নামাজের জন্য MP3 শিডিউল করা
-  Future<void> _scheduleMp3ForPrayer(String prayerName, String time) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      bool soundEnabled = prefs.getBool("azan_sound_$prayerName") ?? true;
-      if (!soundEnabled) return;
-
-      final prayerDate = _prayerTimeService.parsePrayerTime(time);
-      if (prayerDate == null) return;
-
-      final mp3Time = prayerDate.subtract(const Duration(minutes: 5));
-      final now = DateTime.now();
-
-      if (mp3Time.isAfter(now)) {
-        _mp3Timers[prayerName]?.cancel();
-
-        _mp3Timers[prayerName] = Timer(mp3Time.difference(now), () async {
-          await _audioPlayer.play(AssetSource('assets/sounds/azan.mp3'));
-
-          Timer(const Duration(hours: 24), () {
-            _scheduleMp3ForPrayer(prayerName, time);
-          });
-        });
-      }
-    } catch (e) {
-      print("Error scheduling MP3: $e");
     }
   }
 
@@ -404,7 +628,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   Future<void> _schedulePrayerNotification(
     String prayerName,
     String time,
-    bool soundEnabled,
   ) async {
     if (!_notificationPermissionGranted) return;
 
@@ -421,127 +644,117 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         await AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: prayerName.hashCode,
-            channelKey: 'azan_channel',
-            title: 'নামাজের সময়',
+            channelKey: 'prayer_reminder_channel',
+            title: 'নামাজের সময়',
             body: '$prayerName নামাজ শুরু হওয়ার ১০ মিনিট বাকি',
             notificationLayout: NotificationLayout.Default,
           ),
           schedule: NotificationCalendar(
+            year: notificationTime.year,
+            month: notificationTime.month,
+            day: notificationTime.day,
             hour: notificationTime.hour,
             minute: notificationTime.minute,
             second: 0,
-            repeats: true,
+          ),
+        );
+      } else {
+        final tomorrowNotificationTime = notificationTime.add(
+          const Duration(days: 1),
+        );
+        await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: prayerName.hashCode,
+            channelKey: 'prayer_reminder_channel',
+            title: 'নামাজের সময়',
+            body: '$prayerName নামাজ শুরু হওয়ার ১০ মিনিট বাকি',
+            notificationLayout: NotificationLayout.Default,
+          ),
+          schedule: NotificationCalendar(
+            year: tomorrowNotificationTime.year,
+            month: tomorrowNotificationTime.month,
+            day: tomorrowNotificationTime.day,
+            hour: tomorrowNotificationTime.hour,
+            minute: tomorrowNotificationTime.minute,
+            second: 0,
           ),
         );
       }
-
-      if (soundEnabled) {
-        _scheduleMp3ForPrayer(prayerName, time);
-      }
     } catch (e) {
-      print("Error scheduling notification: $e");
+      print("Error scheduling notification for $prayerName: $e");
     }
   }
 
-  // নামাজের সারি উইজেট
-  Widget prayerRow(String prayerName, String time) {
-    return FutureBuilder<bool>(
-      future: SharedPreferences.getInstance().then(
-        (prefs) => prefs.getBool("azan_sound_$prayerName") ?? true,
+  // Prayer time detail dialog
+  void _showPrayerTimeDetail(String prayerName, String time) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _prayerTimeService.getPrayerIcon(prayerName),
+                size: 48,
+                color: _prayerTimeService.getPrayerColor(prayerName),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                prayerName,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _prayerTimeService.formatTimeTo12Hour(time),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                time,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Monospace',
+                  color: Colors.grey[500],
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _prayerTimeService.getPrayerColor(
+                    prayerName,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+                child: const Text(
+                  "ঠিক আছে",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      builder: (context, snapshot) {
-        bool enabled = snapshot.data ?? true;
-        Color prayerColor = _prayerTimeService.getPrayerColor(prayerName);
-        IconData prayerIcon = _prayerTimeService.getPrayerIcon(prayerName);
-
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        final cardColor = isDark ? Colors.grey[850] : Colors.white;
-        final textColor = isDark ? Colors.white : Colors.black87;
-        final subtitleColor = isDark ? Colors.grey[400] : Colors.grey[700];
-
-        return Container(
-          margin: const EdgeInsets.symmetric(vertical: 3, horizontal: 6),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: isDark
-                ? null
-                : [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 3,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-          ),
-          child: ListTile(
-            dense: true,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 2,
-            ),
-            leading: Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: prayerColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(prayerIcon, color: prayerColor, size: 16),
-            ),
-            title: Text(
-              prayerName,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: textColor,
-              ),
-            ),
-            subtitle: Text(
-              _prayerTimeService.formatTimeTo12Hour(time),
-              style: TextStyle(
-                fontSize: 12,
-                color: subtitleColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-              decoration: BoxDecoration(
-                color: prayerColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "আজান",
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: prayerColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                  Transform.scale(
-                    scale: 0.55,
-                    child: Switch(
-                      value: enabled,
-                      activeColor: prayerColor,
-                      inactiveThumbColor: Colors.grey.shade400,
-                      inactiveTrackColor: Colors.grey.shade300,
-                      onChanged: (value) => _setAzanEnabled(prayerName, value),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
-  // অফলাইন ইন্ডিকেটর
   Widget _buildOfflineIndicator() {
     if (_isOnline) return const SizedBox.shrink();
 
@@ -562,660 +775,117 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     );
   }
 
-  // নামাজ ট্যাব বিল্ড করা
-  Widget _buildPrayerTab() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isSmallScreen = screenHeight < 700;
-
-    return Column(
-      children: [
-        _buildOfflineIndicator(),
-
-        // হেডার সেকশন
-        Container(
-          padding: EdgeInsets.fromLTRB(14, isSmallScreen ? 12 : 14, 14, 10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isDark
-                  ? [
-                      Colors.green.shade900,
-                      Colors.green.shade800,
-                      Colors.green.shade700,
-                    ]
-                  : [
-                      Colors.green.shade600,
-                      Colors.green.shade500,
-                      Colors.green.shade400,
-                    ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: const [0.0, 0.6, 1.0],
-            ),
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(16),
-              bottomRight: Radius.circular(16),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: isDark
-                    ? Colors.black.withOpacity(0.4)
-                    : Colors.green.shade800.withOpacity(0.2),
-                blurRadius: 6,
-                spreadRadius: 1,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // লোকেশন এবং রিফ্রেশ বাটন
-              Container(
-                margin: const EdgeInsets.only(bottom: 2),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.green[900]!.withOpacity(0.3)
-                      : Colors.grey[100]!,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 2,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.green[800]!.withOpacity(0.2)
-                              : Colors.green[50]!,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? Colors.green[700]!.withOpacity(0.3)
-                                    : Colors.green[700]!.withOpacity(0.15),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.location_on,
-                                size: 12,
-                                color: isDark
-                                    ? Colors.green[100]!
-                                    : Colors.green[700]!,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                "$cityName, $countryName",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark
-                                      ? Colors.green[100]!
-                                      : Colors.green[800]!,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.green[700]!.withOpacity(0.3)
-                            : Colors.green[50]!,
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        onPressed: fetchLocationAndPrayerTimes,
-                        icon: Icon(
-                          Icons.refresh_rounded,
-                          color: isDark
-                              ? Colors.green[100]!
-                              : Colors.green[700]!,
-                          size: 16,
-                        ),
-                        iconSize: 16,
-                        padding: const EdgeInsets.all(5),
-                        tooltip: "রিফ্রেশ করুন",
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // পরবর্তী নামাজ এবং সূর্যোদয়/সূর্যাস্ত সেকশন
-              Container(
-                margin: const EdgeInsets.only(top: 5),
-                child: Row(
-                  children: [
-                    // পরবর্তী নামাজ কাউন্টডাউন
-                    Expanded(
-                      flex: 6,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.white.withOpacity(0.15),
-                              Colors.white.withOpacity(0.08),
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              "পরবর্তী ওয়াক্ত",
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              nextPrayer.isNotEmpty
-                                  ? nextPrayer
-                                  : "লোড হচ্ছে...",
-                              style: TextStyle(
-                                fontSize: isSmallScreen ? 12 : 13,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.15),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  _buildTimeUnit("ঘণ্টা", countdown.inHours),
-                                  _buildDivider(),
-                                  _buildTimeUnit(
-                                    "মিনিট",
-                                    countdown.inMinutes % 60,
-                                  ),
-                                  _buildDivider(),
-                                  _buildTimeUnit(
-                                    "সেকেন্ড",
-                                    countdown.inSeconds % 60,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // সূর্যোদয়/সূর্যাস্ত
-                    Expanded(
-                      flex: 4,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.orange.withOpacity(0.3),
-                              Colors.deepOrange.withOpacity(0.2),
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Colors.orange.withOpacity(0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // সূর্যোদয়
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.4),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.wb_sunny,
-                                        color: Colors.yellow.shade200,
-                                        size: 14,
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                        "সূর্যোদয়",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    prayerTimes.containsKey("সূর্যোদয়")
-                                        ? _prayerTimeService.formatTimeTo12Hour(
-                                            prayerTimes["সূর্যোদয়"]!,
-                                          )
-                                        : "--:--",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // ডিভাইডার
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: 25,
-                                    height: 1,
-                                    color: Colors.white.withOpacity(0.5),
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 1,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // সূর্যাস্ত
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.deepOrange.withOpacity(0.4),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.nightlight_round,
-                                        color: Colors.orange.shade200,
-                                        size: 14,
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                        "সূর্যাস্ত",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    prayerTimes.containsKey("সূর্যাস্ত")
-                                        ? _prayerTimeService.formatTimeTo12Hour(
-                                            prayerTimes["সূর্যাস্ত"]!,
-                                          )
-                                        : "--:--",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+        title: const Text(
+          "আজকের ওয়াক্ত ",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+            color: Colors.white,
           ),
         ),
-
-        // নামাজের সময় তালিকা সেকশন
-        Expanded(
-          child: Container(
-            color: isDark ? Colors.grey[900] : Colors.grey.shade50,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.schedule,
-                        color: isDark
-                            ? Colors.green.shade400
-                            : Colors.green.shade700,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        "নামাজের সময়সমূহ",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? Colors.grey.shade300
-                              : Colors.grey.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: prayerTimes.isNotEmpty
-                      ? ListView(
-                          padding: const EdgeInsets.fromLTRB(6, 0, 6, 8),
-                          children: prayerTimes.entries
-                              .where(
-                                (e) =>
-                                    e.key != "সূর্যোদয়" &&
-                                    e.key != "সূর্যাস্ত",
-                              )
-                              .map((e) => prayerRow(e.key, e.value))
-                              .toList(),
-                        )
-                      : Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.schedule,
-                                size: 40,
-                                color: Colors.grey,
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                "নামাজের সময় লোড হচ্ছে...",
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                              const SizedBox(height: 10),
-                              ElevatedButton(
-                                onPressed: fetchLocationAndPrayerTimes,
-                                child: Text("রিফ্রেশ করুন"),
-                              ),
-                            ],
-                          ),
-                        ),
-                ),
-              ],
+        actions: [
+          IconButton(
+            icon: Icon(
+              _useManualLocation ? Icons.location_off : Icons.location_on,
+              color: Colors.white,
             ),
+            onPressed: _showLocationModal,
+            tooltip: "লোকেশন পরিবর্তন",
           ),
-        ),
-
-        // নিষিদ্ধ সময় এবং তথ্য সেকশন
-        _buildProhibitedTimeSection(),
-      ],
-    );
-  }
-
-  // নিষিদ্ধ সময় সেকশন বিল্ড করা
-  Widget _buildProhibitedTimeSection() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // নিষিদ্ধ সময় কার্ড
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[850] : Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "নিষিদ্ধ সময়",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _showFloatingInfo(
-                            context,
-                            "সালাতের নিষিদ্ধ সময় সম্পর্কে",
-                            _prohibitedTimeService.getProhibitedTimeInfo(),
-                          );
-                        },
-                        child: Icon(
-                          Icons.info_outline,
-                          color: isDark ? Colors.blue[200] : Colors.blue[700],
-                          size: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    "ভোর: ${_prohibitedTimeService.calculateSunriseProhibitedTime(prayerTimes)}",
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: isDark ? Colors.grey[300] : Colors.grey[700],
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    "দুপুর: ${_prohibitedTimeService.calculateDhuhrProhibitedTime(prayerTimes)}",
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: isDark ? Colors.grey[300] : Colors.grey[700],
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    "সন্ধ্যা: ${_prohibitedTimeService.calculateSunsetProhibitedTime(prayerTimes)}",
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: isDark ? Colors.grey[300] : Colors.grey[700],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 6),
-          // নফল সালাত এবং বিশেষ ফ্যাক্ট কার্ড
-          Expanded(
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    _showFloatingInfo(
-                      context,
-                      "নফল সালাতের ওয়াক্ত",
-                      _prohibitedTimeService.getNafalPrayerInfo(),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey[800] : Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 2,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.keyboard_arrow_up,
-                          color: Colors.blue,
-                          size: 14,
-                        ),
-                        const SizedBox(width: 3),
-                        Flexible(
-                          child: Text(
-                            "নফল সালাত",
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    _showFloatingInfo(
-                      context,
-                      "সালাত সম্পর্কে বিশেষ ফ্যাক্ট",
-                      _prohibitedTimeService.getSpecialFacts(),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey[800] : Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 2,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.keyboard_arrow_up,
-                          color: Colors.orange,
-                          size: 14,
-                        ),
-                        const SizedBox(width: 3),
-                        Flexible(
-                          child: Text(
-                            "বিশেষ ফ্যাক্ট",
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.white),
+            onPressed: _showSettingsModal,
+            tooltip: "সেটিংস",
           ),
         ],
       ),
+      body: _buildPrayerTab(),
+      bottomNavigationBar: _buildBannerAd(),
     );
   }
 
-  // সময় ইউনিট বিল্ড করার হেল্পার মেথড
-  Widget _buildTimeUnit(String label, int value) {
-    return Column(
-      children: [
-        Text(
-          value.toString().padLeft(2, '0'),
-          style: TextStyle(
-            fontSize: MediaQuery.of(context).size.height < 700 ? 18 : 20,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
-            fontFeatures: [const FontFeature.tabularFigures()],
-          ),
+  // Banner Ad Widget
+  Widget _buildBannerAd() {
+    if (_isBannerAdReady && _bannerAd != null) {
+      return SafeArea(
+        top: false,
+        child: Container(
+          width: _bannerAd!.size.width.toDouble(),
+          height: _bannerAd!.size.height.toDouble(),
+          alignment: Alignment.center,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[900]
+              : Colors.white,
+          child: AdWidget(ad: _bannerAd!),
         ),
-        const SizedBox(height: 1),
-        Text(
-          label,
-          style: TextStyle(fontSize: 9, color: Colors.white.withOpacity(0.7)),
-        ),
-      ],
-    );
+      );
+    } else {
+      return SafeArea(top: false, child: Container(height: 0));
+    }
   }
 
-  Widget _buildDivider() {
-    return Container(
-      width: 1,
-      height: 20,
-      color: Colors.white.withOpacity(0.3),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+  Widget _buildPrayerTab() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxHeight = constraints.maxHeight;
+        final bool isSmallScreen = maxHeight < 700;
+        final bool isVerySmallScreen = maxHeight < 600;
+
+        return Column(
+          children: [
+            _buildOfflineIndicator(),
+
+            PrayerHeaderSection(
+              cityName: cityName,
+              countryName: countryName,
+              nextPrayer: nextPrayer,
+              countdown: countdown,
+              prayerTimes: adjustedPrayerTimes,
+              isSmallScreen: isSmallScreen,
+              isVerySmallScreen: isVerySmallScreen,
+              prayerTimeService: _prayerTimeService,
+              onRefresh: fetchLocationAndPrayerTimes,
+              useManualLocation: _useManualLocation,
+            ),
+
+            Expanded(
+              child: Container(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.grey.shade50,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: PrayerListSection(
+                        prayerTimes: adjustedPrayerTimes,
+                        nextPrayer: nextPrayer,
+                        isSmallScreen: isSmallScreen,
+                        isVerySmallScreen: isVerySmallScreen,
+                        prayerTimeService: _prayerTimeService,
+                        onRefresh: fetchLocationAndPrayerTimes,
+                        onPrayerTap: _showPrayerTimeDetail,
+                        prayerTimeAdjustments: _prayerTimeAdjustments,
+                      ),
+                    ),
+
+                    ProhibitedTimeSection(
+                      isSmallScreen: isSmallScreen,
+                      prayerTimes: adjustedPrayerTimes,
+                      prohibitedTimeService: _prohibitedTimeService,
+                      onShowInfo: _showFloatingInfo,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1253,41 +923,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           ),
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        centerTitle: true,
-        title: const Text(
-          "আজকের নামাজের সময়",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 17,
-            color: Colors.white,
-          ),
-        ),
-      ),
-      body: _buildPrayerTab(),
-      // ✅ Adaptive Banner Ad - TasbeehPage-এর মতোই
-      bottomNavigationBar: _isBannerAdReady && _bannerAd != null
-          ? SafeArea(
-              top: false,
-              child: Container(
-                width: double.infinity,
-                height: _bannerAd!.size.height.toDouble(),
-                alignment: Alignment.center,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[900]
-                    : Colors.white,
-                child: AdWidget(ad: _bannerAd!),
-              ),
-            )
-          : // ব্যানার অ্যাড না থাকলে শুধু সিস্টেম ন্যাভিগেশন বার এর জন্য স্পেস রাখুন
-            SafeArea(child: Container(height: 0)),
     );
   }
 }

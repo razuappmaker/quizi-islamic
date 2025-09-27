@@ -209,7 +209,7 @@ class _QiblaPageState extends State<QiblaPage>
       Position position;
       try {
         position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.medium,
+          desiredAccuracy: LocationAccuracy.high, // উচ্চ নির্ভুলতা
         ).timeout(const Duration(seconds: 15));
 
         _cachedPosition = position;
@@ -300,17 +300,26 @@ class _QiblaPageState extends State<QiblaPage>
     const double kaabaLat = 21.4225;
     const double kaabaLng = 39.8262;
 
-    double deltaLng = (kaabaLng - longitude) * pi / 180;
-    double lat1 = latitude * pi / 180;
-    double lat2 = kaabaLat * pi / 180;
+    // Convert to radians
+    double latRad = latitude * pi / 180;
+    double lngRad = longitude * pi / 180;
+    double kaabaLatRad = kaabaLat * pi / 180;
+    double kaabaLngRad = kaabaLng * pi / 180;
 
-    double y = sin(deltaLng);
-    double x = cos(lat1) * tan(lat2) - sin(lat1) * cos(deltaLng);
-    double calculatedAngle = atan2(y, x) * 180 / pi;
-    calculatedAngle = (calculatedAngle + 360) % 360;
+    // Calculate the Qibla direction using spherical trigonometry
+    double y = sin(kaabaLngRad - lngRad);
+    double x =
+        cos(latRad) * tan(kaabaLatRad) -
+        sin(latRad) * cos(kaabaLngRad - lngRad);
+
+    double qiblaDirection = atan2(y, x);
+    double qiblaDirectionDegrees = qiblaDirection * 180 / pi;
+
+    // Normalize to 0-360 degrees
+    qiblaDirectionDegrees = (qiblaDirectionDegrees + 360) % 360;
 
     setState(() {
-      qiblaAngle = calculatedAngle;
+      qiblaAngle = qiblaDirectionDegrees;
       _isLocationLoaded = true;
     });
   }
@@ -327,318 +336,112 @@ class _QiblaPageState extends State<QiblaPage>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
       appBar: AppBar(
         title: const Text(
-          "কিবলা নির্দেশনা",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          "কিবলা কম্পাস",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        elevation: 4,
+        backgroundColor: Colors.green[700],
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          // ✅ রিফ্রেশ বাটন শুধুমাত্র আইকন হিসেবে এপবারে
           IconButton(
-            icon: const Icon(Icons.info_outline),
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              setState(() {
+                _isLoading = true;
+                _animationController.reset();
+              });
+              _checkInternetConnection();
+              _getLocationAndCalculateQibla();
+            },
+            tooltip: "রিফ্রেশ করুন",
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: Colors.white),
             onPressed: _toggleCompassInstructions,
             tooltip: "কম্পাস নির্দেশনা",
           ),
         ],
       ),
       body: SafeArea(
-        bottom: true, // ✅ নিচের SafeArea চালু করুন
+        bottom: true,
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     // Internet status indicator
                     if (!_isInternetAvailable)
                       Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 8,
+                          vertical: 12,
                         ),
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
                           color: Colors.orange[100],
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.orange),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.wifi_off,
-                              size: 18,
+                              size: 20,
                               color: Colors.orange[800],
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              "ইন্টারনেট সংযোগ নেই, সেভ করা লোকেশন ব্যবহার করা হচ্ছে",
-                              style: TextStyle(
-                                color: Colors.orange[800],
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                    // Header with location information
-                    FadeTransition(
-                      opacity: _animation,
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 2,
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              color: Colors.green,
-                              size: 32,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              cityName,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            if (countryName.isNotEmpty)
-                              Text(
-                                countryName,
+                            Flexible(
+                              child: Text(
+                                "ইন্টারনেট সংযোগ নেই, সেভ করা লোকেশন ব্যবহার করা হচ্ছে",
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.green.shade600,
+                                  color: Colors.orange[800],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              ),
-                            if (cityName == "সেভ করা অবস্থান")
-                              const Padding(
-                                padding: EdgeInsets.only(top: 8),
-                                child: Text(
-                                  "(সেভ করা লোকেশন ব্যবহার করা হচ্ছে)",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.orange,
-                                  ),
-                                ),
-                              ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "স্থানাঙ্ক: ${_lastLatitude.toStringAsFixed(4)}, ${_lastLongitude.toStringAsFixed(4)}",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 30),
+                    // ✅ কম্প্যাক্ট লোকেশন সেকশন - এক/দুই লাইনে
+                    _buildCompactLocationSection(isDarkMode),
+
+                    const SizedBox(height: 24),
 
                     // Compass Section
                     if (_isLoading)
-                      const Padding(
-                        padding: EdgeInsets.all(40.0),
-                        child: Column(
-                          children: [
-                            CircularProgressIndicator(color: Colors.green),
-                            SizedBox(height: 16),
-                            Text(
-                              "কিবলা দিকনির্দেশ লোড হচ্ছে...",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
+                      _buildLoadingIndicator()
                     else
-                      StreamBuilder<CompassEvent>(
-                        stream: FlutterCompass.events,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Column(
-                              children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  color: Colors.red,
-                                  size: 50,
-                                ),
-                                SizedBox(height: 16),
-                                Text(
-                                  "কম্পাস লোড করতে সমস্যা হচ্ছে\nমোবাইলটি সামান্য নাড়ান বা রিফ্রESH করুন",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            );
-                          }
+                      _buildProfessionalCompassSection(isDarkMode),
 
-                          double? heading = snapshot.data?.heading;
-                          _currentHeading = heading;
-                          double rotation = 0;
-                          if (heading != null && qiblaAngle != null) {
-                            rotation =
-                                ((qiblaAngle! - heading) * (pi / 180) * -1);
-                          }
+                    const SizedBox(height: 24),
 
-                          return Column(
-                            children: [
-                              _buildCompassUI(rotation, heading ?? 0),
-                              if (_showCompassInstructions)
-                                _buildCompassInstructions(),
-                            ],
-                          );
-                        },
-                      ),
+                    // Instructions Section
+                    if (_showCompassInstructions)
+                      _buildInstructionsCard(isDarkMode),
 
-                    const SizedBox(height: 30),
-
-                    // Information Section
-                    FadeTransition(
-                      opacity: _animation,
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 2,
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              "💡 নির্দেশনা",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            _buildQuranInstructionRow(
-                              "জামাতের সাথে নামাজ আদায় করুন",
-                              "সুরা আল-বাকারা: ৪৩",
-                              Icons.menu_book,
-                            ),
-                            const SizedBox(height: 8),
-                            _buildQuranInstructionRow(
-                              "যেখানেই থাকুন নামাজ প্রতিষ্ঠা করুন",
-                              "সুরা আল-বাকারা: ১১৫",
-                              Icons.menu_book,
-                            ),
-                            const SizedBox(height: 8),
-                            _buildQuranInstructionRow(
-                              "নামাজের সময় হলে তা আদায়ে অবহেলা করবেন না",
-                              "সুরা আল-বাকারা: ২৩৮",
-                              Icons.menu_book,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // Permission Denied Message
-                    if (_isPermissionDenied)
-                      FadeTransition(
-                        opacity: _animation,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.orange[50],
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.orange),
-                          ),
-                          child: Column(
-                            children: [
-                              const Text(
-                                "লোকেশন এক্সেস প্রয়োজন",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orange,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                "সঠিক কিবলা দিকনির্দেশের জন্য আপনার লোকেশন এক্সেস প্রয়োজন",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              const SizedBox(height: 12),
-                              ElevatedButton(
-                                onPressed: _openAppSettings,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  foregroundColor: Colors.white,
-                                ),
-                                child: const Text("সেটিংস খুলুন"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                    const SizedBox(height: 20),
-
-                    // Refresh Button
-                    FadeTransition(
-                      opacity: _animation,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _isLoading = true;
-                            _animationController.reset();
-                          });
-                          _checkInternetConnection();
-                          _getLocationAndCalculateQibla();
-                        },
-                        icon: const Icon(Icons.refresh),
-                        label: const Text("রিফ্রেশ করুন"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                      ),
-                    ),
+                    if (_isPermissionDenied) _buildPermissionCard(isDarkMode),
 
                     const SizedBox(height: 20),
                   ],
@@ -646,17 +449,474 @@ class _QiblaPageState extends State<QiblaPage>
               ),
             ),
 
-            // ✅ Adaptive Bottom Banner Ad - SafeArea এর ভিতরে
+            // ✅ Adaptive Bottom Banner Ad
             if (_isBottomBannerAdReady && _bottomBannerAd != null)
               Container(
                 width: double.infinity,
                 height: _bottomBannerAd!.size.height.toDouble(),
                 alignment: Alignment.center,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[900]
-                    : Colors.white,
+                color: isDarkMode ? Colors.grey[800] : Colors.white,
                 child: AdWidget(ad: _bottomBannerAd!),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ✅ কম্প্যাক্ট লোকেশন সেকশন
+  Widget _buildCompactLocationSection(bool isDarkMode) {
+    return FadeTransition(
+      opacity: _animation,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.location_pin, color: Colors.green[600], size: 32),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    cityName,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green[600],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (countryName.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      countryName,
+                      style: TextStyle(fontSize: 14, color: Colors.green[500]),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  if (cityName == "সেভ করা অবস্থান") ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      "সেভ করা লোকেশন",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange[700],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Icon(
+              Icons.gps_fixed,
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+            strokeWidth: 3,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            "কিবলা দিকনির্দেশ লোড হচ্ছে...",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.green[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ✅ প্রফেশনাল কম্পাস সেকশন
+  Widget _buildProfessionalCompassSection(bool isDarkMode) {
+    return StreamBuilder<CompassEvent>(
+      stream: FlutterCompass.events,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return _buildCompassError();
+        }
+
+        double? heading = snapshot.data?.heading;
+        _currentHeading = heading;
+
+        double rotation = 0;
+        if (heading != null && qiblaAngle != null) {
+          // সঠিক রোটেশন ক্যালকুলেশন
+          rotation = ((qiblaAngle! - heading) * (pi / 180));
+        }
+
+        return Column(
+          children: [
+            _buildProfessionalCompassUI(rotation, heading ?? 0, isDarkMode),
+            const SizedBox(height: 20),
+            _buildDirectionInfo(heading ?? 0, isDarkMode),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCompassError() {
+    return Column(
+      children: [
+        Icon(Icons.error_outline, color: Colors.red, size: 60),
+        const SizedBox(height: 16),
+        Text(
+          "কম্পাস লোড করতে সমস্যা হচ্ছে\nমোবাইলটি সামান্য নাড়ান বা রিফ্রেশ করুন",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ✅ প্রফেশনাল কম্পাস UI
+  Widget _buildProfessionalCompassUI(
+    double rotation,
+    double heading,
+    bool isDarkMode,
+  ) {
+    return Container(
+      width: 300,
+      height: 300,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // কম্পাস বেস
+          Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  isDarkMode ? Colors.grey[700]! : Colors.grey[200]!,
+                  isDarkMode ? Colors.grey[900]! : Colors.grey[100]!,
+                ],
+              ),
+              border: Border.all(
+                color: isDarkMode ? Colors.grey[600]! : Colors.grey[400]!,
+                width: 4,
+              ),
+            ),
+            child: CustomPaint(
+              painter: ProfessionalCompassPainter(
+                textColor: isDarkMode ? Colors.white : Colors.black,
+                heading: heading,
+              ),
+            ),
+          ),
+
+          // কিবলা ইন্ডিকেটর
+          Transform.rotate(
+            angle: rotation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // কিবলা তীর
+                Container(
+                  width: 4,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.red[700]!, Colors.red[400]!],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withOpacity(0.5),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // কিবলা লেবেল
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.red[700],
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: const Text(
+                    "🕋 কিবলা",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // সেন্টার টার্গেট
+          Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.red[700],
+              border: Border.all(color: Colors.white, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.red.withOpacity(0.5),
+                  blurRadius: 15,
+                  spreadRadius: 3,
+                ),
+              ],
+            ),
+          ),
+
+          // নর্থ ইন্ডিকেটর
+          Positioned(
+            top: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.blue[700],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                "N",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDirectionInfo(double heading, bool isDarkMode) {
+    double difference = qiblaAngle != null ? (qiblaAngle! - heading).abs() : 0;
+    difference = difference > 180 ? 360 - difference : difference;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[800] : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildInfoItem(
+                "কিবলা দিক",
+                "${qiblaAngle?.toStringAsFixed(1) ?? '0'}°",
+                Icons.explore,
+                isDarkMode,
+              ),
+              _buildInfoItem(
+                "বর্তমান দিক",
+                "${heading.toStringAsFixed(1)}°",
+                Icons.navigation,
+                isDarkMode,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          LinearProgressIndicator(
+            value: qiblaAngle != null ? 1 - (difference / 180) : 0,
+            backgroundColor: isDarkMode ? Colors.grey[600] : Colors.grey[200],
+            color: _getProgressColor(difference),
+            minHeight: 10,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            _getAlignmentText(difference),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: _getTextColor(difference),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "ভারত: ${_lastLatitude.toStringAsFixed(4)}°, ${_lastLongitude.toStringAsFixed(4)}°",
+            style: TextStyle(
+              fontSize: 12,
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoItem(
+    String title,
+    String value,
+    IconData icon,
+    bool isDarkMode,
+  ) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.green[600], size: 24),
+        const SizedBox(height: 8),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Color _getProgressColor(double difference) {
+    if (difference < 2) return Colors.green;
+    if (difference < 5) return Colors.lightGreen;
+    if (difference < 15) return Colors.orange;
+    return Colors.red;
+  }
+
+  Color _getTextColor(double difference) {
+    if (difference < 2) return Colors.green;
+    if (difference < 5) return Colors.lightGreen;
+    if (difference < 15) return Colors.orange;
+    return Colors.red;
+  }
+
+  String _getAlignmentText(double difference) {
+    if (difference < 1) return "🎯 সম্পূর্ণ সঠিক! নামাজ শুরু করুন";
+    if (difference < 3) return "👍 অত্যন্ত সঠিক, নামাজের জন্য প্রস্তুত";
+    if (difference < 8) return "👌 প্রায় সঠিক, সামান্য adjustment করুন";
+    if (difference < 20) return "↔️ দিক ঠিক করুন, তারপর নামাজ পড়ুন";
+    if (difference < 45) return "🔄 ফোনটি ঘুরিয়ে কিবলার দিক করুন";
+    return "❌ সম্পূর্ণ ভুল দিক, ফোনটি ঘুরিয়ে নিন";
+  }
+
+  Widget _buildInstructionsCard(bool isDarkMode) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: isDarkMode ? Colors.grey[800] : Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.compass_calibration,
+                  color: Colors.green[600],
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  "কম্পাস ব্যবহার নির্দেশিকা",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[600],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildInstructionRow(
+              "📱 ফোনটি সমতল রাখুন এবং ঘুরান",
+              Icons.phone_android,
+            ),
+            const SizedBox(height: 8),
+            _buildInstructionRow(
+              "🎯 লাল তীর কিবলার দিক দেখাবে",
+              Icons.architecture,
+            ),
+            const SizedBox(height: 8),
+            _buildInstructionRow("🧭 N দিয়ে উত্তর দিক চিন্হিত", Icons.explore),
+            const SizedBox(height: 8),
+            _buildInstructionRow(
+              "✅ সবুজ বার দেখাবে কতটা সঠিক",
+              Icons.check_circle,
+            ),
           ],
         ),
       ),
@@ -667,292 +927,94 @@ class _QiblaPageState extends State<QiblaPage>
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: Colors.green),
-        const SizedBox(width: 12),
-        Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
-      ],
-    );
-  }
-
-  Widget _buildCompassInstructions() {
-    return Container(
-      margin: const EdgeInsets.only(top: 20),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.primary,
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.compass_calibration,
-                color: Theme.of(context).colorScheme.primary,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                "কম্পাস ব্যবহার নির্দেশিকা",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          _buildInstructionRow(
-            "মোবাইলটি সামনে-পিছনে বা ডানে-বামে ঘুরান",
-            Icons.rotate_right,
-          ),
-          const SizedBox(height: 8),
-          _buildInstructionRow(
-            "কম্পাস সঠিকভাবে কাজ করার জন্য ফোনটি সমতল রাখুন",
-            Icons.stay_current_landscape,
-          ),
-          const SizedBox(height: 8),
-          _buildInstructionRow(
-            "লাল তীরটি কিবলার দিক নির্দেশ করবে",
-            Icons.navigation,
-          ),
-          const SizedBox(height: 8),
-          _buildInstructionRow(
-            "ইন্টারনেট ছাড়াই কাজ করে, শুধু জিপিএস চালু রাখুন",
-            Icons.wifi_off,
-          ),
-          const SizedBox(height: 8),
-          _buildInstructionRow(
-            "কম্পাস ক্যালিব্রেট করতে মোবাইলটি ∞ আকারে ঘুরান",
-            Icons.autorenew,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // নির্দেশনা দেখানো জন্য মেথড বানানো হয়েছে
-  Widget _buildQuranInstructionRow(
-    String text,
-    String reference,
-    IconData icon,
-  ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
+        Icon(icon, size: 20, color: Colors.green[600]),
         const SizedBox(width: 12),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                text,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontSize: 14,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                reference,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.7),
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ),
+          child: Text(text, style: const TextStyle(fontSize: 14, height: 1.4)),
         ),
       ],
     );
   }
 
-  Widget _buildCompassUI(double rotation, double heading) {
+  Widget _buildQuranInstructionRow(String text, String reference) {
     return Column(
-      children: [
-        // Compass Container
-        Container(
-          width: 250,
-          height: 250,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Theme.of(context).colorScheme.primary,
-              width: 3,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Compass background with directions
-              Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                ),
-                child: CustomPaint(
-                  painter: CompassDirectionsPainter(
-                    textColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              Transform.rotate(
-                angle: rotation,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.navigation,
-                        size: 60,
-                        color: Colors.red,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        "কিবলা",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 12,
-                height: 12,
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildInfoItem(
-                    "কিবলা দিক",
-                    "${qiblaAngle?.toStringAsFixed(1) ?? 0}°",
-                  ),
-                  _buildInfoItem(
-                    "বর্তমান দিক",
-                    "${heading.toStringAsFixed(1)}°",
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              LinearProgressIndicator(
-                value: qiblaAngle != null
-                    ? (360 - (qiblaAngle! - heading).abs()) / 360
-                    : 0,
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withOpacity(0.1),
-                color: Theme.of(context).colorScheme.primary,
-                minHeight: 8,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                qiblaAngle != null
-                    ? _getAlignmentText((qiblaAngle! - heading).abs())
-                    : "",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoItem(String title, String value) {
-    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title,
+          text,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          reference,
           style: TextStyle(
             fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
+            color: Colors.grey[600],
+            fontStyle: FontStyle.italic,
           ),
         ),
       ],
     );
   }
 
-  String _getAlignmentText(double difference) {
-    if (difference < 5) return "পুরোপুরি সঠিক দিকে আছেন! 🎯";
-    if (difference < 15) return "প্রায় সঠিক দিকে আছেন 👍";
-    if (difference < 30) return "সামান্য adjustment প্রয়োজন";
-    if (difference < 90) return "দিক পরিবর্তন প্রয়োজন";
-    return "উল্টো দিকে আছেন, সম্পূর্ণ ঘুরে যান";
+  Widget _buildPermissionCard(bool isDarkMode) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.orange[50],
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Icon(Icons.location_off, color: Colors.orange[800], size: 40),
+            const SizedBox(height: 12),
+            Text(
+              "লোকেশন এক্সেস প্রয়োজন",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange[800],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "সঠিক কিবলা দিকনির্দেশের জন্য লোকেশন এক্সেস দিন",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.orange[700]),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _openAppSettings,
+              icon: const Icon(Icons.settings),
+              label: const Text("সেটিংস খুলুন"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-class CompassDirectionsPainter extends CustomPainter {
+// ✅ প্রফেশনাল কম্পাস পেইন্টার
+class ProfessionalCompassPainter extends CustomPainter {
   final Color textColor;
+  final double heading;
 
-  CompassDirectionsPainter({this.textColor = Colors.black});
+  ProfessionalCompassPainter({
+    this.textColor = Colors.black,
+    required this.heading,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -960,77 +1022,74 @@ class CompassDirectionsPainter extends CustomPainter {
     final radius = size.width / 2;
 
     final paint = Paint()
-      ..color = textColor.withOpacity(0.5)
+      ..color = textColor.withOpacity(0.2)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
-    // Draw directions (N, E, S, W)
-    final textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      textAlign: TextAlign.center,
-    );
+    // ডিগ্রী মার্কার্স
+    for (int i = 0; i < 360; i += 30) {
+      double angle = i * pi / 180;
+      double x1 = center.dx + (radius - 20) * cos(angle);
+      double y1 = center.dy + (radius - 20) * sin(angle);
+      double x2 = center.dx + (radius - 5) * cos(angle);
+      double y2 = center.dy + (radius - 5) * sin(angle);
 
-    // Draw North
-    textPainter.text = TextSpan(
-      text: 'N',
-      style: TextStyle(
-        color: textColor,
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(center.dx - textPainter.width / 2, center.dy - radius + 10),
-    );
+      canvas.drawLine(Offset(x1, y1), Offset(x2, y2), paint);
 
-    // Draw East
-    textPainter.text = TextSpan(
-      text: 'E',
-      style: TextStyle(
-        color: textColor,
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(center.dx + radius - 20, center.dy - textPainter.height / 2),
-    );
+      // প্রধান দিকগুলোর জন্য লেবেল
+      if (i % 90 == 0) {
+        TextPainter textPainter = TextPainter(
+          textDirection: TextDirection.ltr,
+          textAlign: TextAlign.center,
+        );
 
-    // Draw South
-    textPainter.text = TextSpan(
-      text: 'S',
-      style: TextStyle(
-        color: textColor,
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(center.dx - textPainter.width / 2, center.dy + radius - 25),
-    );
+        String direction = "";
+        switch (i) {
+          case 0:
+            direction = "N";
+            break;
+          case 90:
+            direction = "E";
+            break;
+          case 180:
+            direction = "S";
+            break;
+          case 270:
+            direction = "W";
+            break;
+        }
 
-    // Draw West
-    textPainter.text = TextSpan(
-      text: 'W',
-      style: TextStyle(
-        color: textColor,
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(center.dx - radius + 10, center.dy - textPainter.height / 2),
-    );
+        textPainter.text = TextSpan(
+          text: direction,
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.bold,
+            fontSize: direction == "N" ? 18 : 14,
+          ),
+        );
+        textPainter.layout();
+
+        double textX =
+            center.dx + (radius - 35) * cos(angle) - textPainter.width / 2;
+        double textY =
+            center.dy + (radius - 35) * sin(angle) - textPainter.height / 2;
+
+        textPainter.paint(canvas, Offset(textX, textY));
+      }
+    }
+
+    // বর্তমান হেডিং লাইন
+    final headingPaint = Paint()
+      ..color = Colors.blue.withOpacity(0.5)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    double headingAngle = heading * pi / 180;
+    double hx = center.dx + radius * cos(headingAngle);
+    double hy = center.dy + radius * sin(headingAngle);
+    canvas.drawLine(center, Offset(hx, hy), headingPaint);
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

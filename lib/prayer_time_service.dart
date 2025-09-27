@@ -21,43 +21,72 @@ class PrayerTimeService {
     }
   }
 
-  // নামাজের সময় ফেচ করা
-  Future<Map<String, dynamic>?> fetchPrayerTimes() async {
+  // নামাজের সময় ফেচ করা (ম্যানুয়াল লোকেশন সাপোর্ট সহ)
+  Future<Map<String, dynamic>?> fetchPrayerTimes({
+    bool useManualLocation = false,
+    double? manualLatitude,
+    double? manualLongitude,
+    String? manualCityName,
+    String? manualCountryName,
+  }) async {
     try {
-      // প্রথমে লোকেশন সার্ভিস চেক
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        print('Location services are disabled');
-        return null;
-      }
+      double latitude;
+      double longitude;
+      String cityName;
+      String countryName;
 
-      // লোকেশন পারমিশন চেক
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          print('Location permissions are denied');
+      if (useManualLocation &&
+          manualLatitude != null &&
+          manualLongitude != null) {
+        // ম্যানুয়াল লোকেশন ব্যবহার
+        latitude = manualLatitude;
+        longitude = manualLongitude;
+        cityName = manualCityName ?? "মানুয়াল লোকেশন";
+        countryName = manualCountryName ?? "";
+
+        print('Using manual location: $latitude, $longitude');
+        print('Manual city: $cityName, country: $countryName');
+      } else {
+        // অটোমেটিক লোকেশন
+        // প্রথমে লোকেশন সার্ভিস চেক
+        bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          print('Location services are disabled');
           return null;
         }
+
+        // লোকেশন পারমিশন চেক
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+          if (permission == LocationPermission.denied) {
+            print('Location permissions are denied');
+            return null;
+          }
+        }
+
+        if (permission == LocationPermission.deniedForever) {
+          print('Location permissions are permanently denied');
+          return null;
+        }
+
+        print('Fetching current position...');
+        final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best,
+        ).timeout(Duration(seconds: 15));
+
+        latitude = position.latitude;
+        longitude = position.longitude;
+        print('Auto location: $latitude, $longitude');
+
+        // লোকেশন তথ্য উন্নতভাবে পাওয়া
+        Map<String, String> locationInfo = await _getImprovedLocationInfo(
+          latitude,
+          longitude,
+        );
+        cityName = locationInfo['city']!;
+        countryName = locationInfo['country']!;
       }
-
-      if (permission == LocationPermission.deniedForever) {
-        print('Location permissions are permanently denied');
-        return null;
-      }
-
-      print('Fetching current position...');
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best,
-      ).timeout(Duration(seconds: 15));
-
-      print('Position: ${position.latitude}, ${position.longitude}');
-
-      // লোকেশন তথ্য উন্নতভাবে পাওয়া
-      Map<String, String> locationInfo = await _getImprovedLocationInfo(
-        position.latitude,
-        position.longitude,
-      );
 
       final today = DateTime.now();
       final formattedDate =
@@ -65,7 +94,7 @@ class PrayerTimeService {
 
       // API URL তৈরি
       final url =
-          "https://api.aladhan.com/v1/timings/$formattedDate?latitude=${position.latitude}&longitude=${position.longitude}&method=2";
+          "https://api.aladhan.com/v1/timings/$formattedDate?latitude=$latitude&longitude=$longitude&method=2";
 
       print('Fetching prayer times from: $url');
 
@@ -96,9 +125,7 @@ class PrayerTimeService {
         final prayerTimes = _convertPrayerTimes(timings);
 
         print('Prayer times fetched successfully');
-        print(
-          'City: ${locationInfo['city']}, Country: ${locationInfo['country']}',
-        );
+        print('City: $cityName, Country: $countryName');
 
         // প্রতিটি নামাজের সময় প্রিন্ট করুন
         prayerTimes.forEach((key, value) {
@@ -106,11 +133,11 @@ class PrayerTimeService {
         });
 
         return {
-          'cityName': locationInfo['city'],
-          'countryName': locationInfo['country'],
+          'cityName': cityName,
+          'countryName': countryName,
           'prayerTimes': prayerTimes,
-          'latitude': position.latitude,
-          'longitude': position.longitude,
+          'latitude': latitude,
+          'longitude': longitude,
           'timezone': data["data"]["meta"]["timezone"] ?? "Local",
         };
       } else {
@@ -120,6 +147,69 @@ class PrayerTimeService {
     } catch (e) {
       print("Prayer time fetch error: $e");
       return null;
+    }
+  }
+
+  // অ্যাডজাস্ট করা নামাজের সময় গণনা করা
+  Map<String, String> getAdjustedPrayerTimes(
+    Map<String, String> originalTimes,
+    Map<String, int> adjustments,
+  ) {
+    if (originalTimes.isEmpty) return {};
+
+    final adjustedTimes = Map<String, String>.from(originalTimes);
+
+    for (final entry in adjustments.entries) {
+      final prayerName = entry.key;
+      final adjustment = entry.value;
+
+      if (adjustedTimes.containsKey(prayerName) && adjustment != 0) {
+        final originalTime = adjustedTimes[prayerName]!;
+        final adjustedTime = _adjustPrayerTime(originalTime, adjustment);
+        adjustedTimes[prayerName] = adjustedTime;
+        print(
+          'Adjusted $prayerName: $originalTime -> $adjustedTime ($adjustment minutes)',
+        );
+      }
+    }
+
+    return adjustedTimes;
+  }
+
+  // নামাজের সময় অ্যাডজাস্ট করা
+  String _adjustPrayerTime(String time, int adjustmentMinutes) {
+    try {
+      final parts = time.split(':');
+      if (parts.length != 2) return time;
+
+      int hours = int.parse(parts[0]);
+      int minutes = int.parse(parts[1]);
+
+      // মিনিট অ্যাডজাস্ট করা
+      minutes += adjustmentMinutes;
+
+      // ঘণ্টা সামঞ্জস্য করা
+      while (minutes >= 60) {
+        minutes -= 60;
+        hours = (hours + 1) % 24;
+      }
+
+      while (minutes < 0) {
+        minutes += 60;
+        hours = (hours - 1) % 24;
+        if (hours < 0) hours += 24;
+      }
+
+      final adjustedTime =
+          '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+      print(
+        'Time adjustment: $time + $adjustmentMinutes minutes = $adjustedTime',
+      );
+
+      return adjustedTime;
+    } catch (e) {
+      print('Error adjusting prayer time: $e');
+      return time;
     }
   }
 
@@ -258,7 +348,7 @@ class PrayerTimeService {
     }
   }
 
-  // পরবর্তী নামাজ খুঁজে বের করা
+  // পরবর্তী নামাজ খুঁজে বের করা (অ্যাডজাস্টেড টাইমস সহ)
   Map<String, dynamic>? findNextPrayer(Map<String, String> prayerTimes) {
     try {
       final now = DateTime.now();
@@ -276,7 +366,7 @@ class PrayerTimeService {
       DateTime? nextPrayerTime;
       String? nextName;
 
-      // শুধুমাত্র প্রধান ৫ ওয়াক্ত নামাজ বিবেচনা করুন (টাইপো ফিক্স: "ইশa" -> "ইশা")
+      // শুধুমাত্র প্রধান ৫ ওয়াক্ত নামাজ বিবেচনা করুন
       final mainPrayers = ["ফজর", "যোহর", "আসর", "মাগরিব", "ইশা"];
 
       for (String name in mainPrayers) {
@@ -309,7 +399,7 @@ class PrayerTimeService {
         if (tomorrowFajr != null) {
           tomorrowFajr = tomorrowFajr.add(Duration(days: 1));
           nextPrayerTime = tomorrowFajr;
-          nextName = "ফজর (পরের দিন)";
+          nextName = "ফজর";
           print('Using next day Fajr: $tomorrowFajr');
         }
       }
@@ -413,7 +503,7 @@ class PrayerTimeService {
       'India': 'ভারত',
       'Pakistan': 'পাকিস্তান',
       'United Arab Emirates': 'সংযুক্ত আরব আমিরাত',
-      'Qatar': 'কাতار',
+      'Qatar': 'কাতার',
       'Oman': 'ওমান',
       'Bahrain': 'বাহরাইন',
       'United States': 'যুক্তরাষ্ট্র',

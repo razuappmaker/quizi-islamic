@@ -24,9 +24,9 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
 
   final List<Map<String, String>> guides = [
     {
-      "title": "নামাজ পরবর্তী আমল",
+      "title": "নাদিয়াতুল কোরআন",
       "path": "assets/pdf/nadiyatul_quran.pdf",
-      "description": "নামাজের পর পড়ার গুরুত্বপূর্ণ দোয়া ও আমলসমূহ",
+      "description": "সহজ কুরআন শিক্ষা",
     },
     {
       "title": "ওমরাহ গাইড",
@@ -156,10 +156,9 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                 child: ListView(
                   children: [
                     _buildPdfCard(
-                      title: "নামাজ পরবর্তী আমল",
+                      title: "নাদিয়াতুল কোরআন",
                       path: "assets/pdf/nadiyatul_quran.pdf",
-                      description:
-                          "নামাজের পর পড়ার গুরুত্বপূর্ণ দোয়া ও আমলসমূহ",
+                      description: "সহজ কুরআন শিক্ষা",
                       pageCount:
                           _pdfPageCounts["assets/pdf/nadiyatul_quran.pdf"] ?? 0,
                       isDark: isDark,
@@ -531,42 +530,102 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
 
   Future<void> _downloadPDF() async {
     try {
-      final bytes = await DefaultAssetBundle.of(context).load(widget.assetPath);
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File("${dir.path}/${widget.title}.pdf");
-      await file.writeAsBytes(bytes.buffer.asUint8List());
+      // ✅ rootBundle ব্যবহার করে assets থেকে PDF লোড করুন
+      final ByteData data = await rootBundle.load(widget.assetPath);
+      final List<int> bytes = data.buffer.asUint8List();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("ডাউনলোড সম্পন্ন: ${widget.title}"),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      // ✅ ডিভাইসের ডাউনলোড ডিরেক্টরি পান
+      final Directory? downloadsDir = await getExternalStorageDirectory();
+
+      if (downloadsDir == null) {
+        throw Exception('ডাউনলোড ডিরেক্টরি পাওয়া যায়নি');
+      }
+
+      // ✅ PDF ফাইল তৈরি করুন
+      final String filePath = '${downloadsDir.path}/${widget.title}.pdf';
+      final File file = File(filePath);
+
+      // ✅ ফাইলে ডেটা লিখুন
+      await file.writeAsBytes(bytes, flush: true);
+
+      // ✅ সাফল্য মেসেজ দেখান
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("ডাউনলোড সম্পন্ন: ${widget.title}.pdf"),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+            action: SnackBarAction(
+              label: "ফোল্ডার দেখুন",
+              onPressed: () {
+                // ইউজারকে ফোল্ডারে নিয়ে যাওয়ার অপশন
+                _openDownloadsFolder(downloadsDir.path);
+              },
+            ),
+          ),
+        );
+      }
+
+      print('PDF ডাউনলোড সম্পন্ন: $filePath');
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("ডাউনলোড ব্যর্থ: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
+      print('PDF ডাউনলোড ব্যর্থ: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("ডাউনলোড ব্যর্থ: ${e.toString()}"),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  // ✅ ফোল্ডার ওপেন করার মেথড (ঐচ্ছিক)
+  void _openDownloadsFolder(String path) async {
+    try {
+      // Android-এ ডাউনলোড ফোল্ডার ওপেন করার চেষ্টা করুন
+      final Directory downloadsDir = Directory(path);
+      if (await downloadsDir.exists()) {
+        // আপনি এখানে file_picker বা অন্য কোনো প্যাকেজ ব্যবহার করে ফোল্ডার ওপেন করতে পারেন
+        print('ডাউনলোড ফোল্ডার: $path');
+      }
+    } catch (e) {
+      print('ফোল্ডার ওপেন করতে সমস্যা: $e');
     }
   }
 
   Future<void> _sharePDF() async {
     try {
-      final bytes = await DefaultAssetBundle.of(context).load(widget.assetPath);
-      final dir = await getTemporaryDirectory();
-      final file = File("${dir.path}/${widget.title}.pdf");
-      await file.writeAsBytes(bytes.buffer.asUint8List());
-      Share.shareXFiles([XFile(file.path)], text: widget.title);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("শেয়ার করতে ব্যর্থ: $e"),
-          backgroundColor: Colors.red,
-        ),
+      // ✅ rootBundle ব্যবহার করে PDF লোড করুন
+      final ByteData data = await rootBundle.load(widget.assetPath);
+      final List<int> bytes = data.buffer.asUint8List();
+
+      // ✅ টেম্পোরারি ফাইল তৈরি করুন
+      final Directory tempDir = await getTemporaryDirectory();
+      final String tempPath = '${tempDir.path}/${widget.title}.pdf';
+      final File tempFile = File(tempPath);
+
+      // ✅ টেম্প ফাইলে ডেটা লিখুন
+      await tempFile.writeAsBytes(bytes, flush: true);
+
+      // ✅ শেয়ার করুন
+      await Share.shareXFiles(
+        [XFile(tempPath)],
+        text: '${widget.title} - ইসলামিক গাইড',
+        subject: widget.title,
       );
+    } catch (e) {
+      print('PDF শেয়ার করতে ব্যর্থ: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("শেয়ার করতে ব্যর্থ: ${e.toString()}"),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 
@@ -669,12 +728,12 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("পৃষ্ঠা নং লিখুন"),
+        title: const Text("পৃষ্ঠা নং লিখুন"),
         content: TextField(
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             hintText: "১ থেকে $_totalPages এর মধ্যে লিখুন",
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
           ),
           onChanged: (value) {
             final page = int.tryParse(value);
@@ -687,7 +746,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("বাতিল"),
+            child: const Text("বাতিল"),
           ),
         ],
       ),
@@ -743,8 +802,16 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
               });
             },
           ),
-          IconButton(icon: const Icon(Icons.download), onPressed: _downloadPDF),
-          IconButton(icon: const Icon(Icons.share), onPressed: _sharePDF),
+          IconButton(
+            icon: const Icon(Icons.download),
+            onPressed: _downloadPDF,
+            tooltip: "PDF ডাউনলোড করুন",
+          ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: _sharePDF,
+            tooltip: "PDF শেয়ার করুন",
+          ),
         ],
       ),
       body: SafeArea(
@@ -839,7 +906,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              Text(
+                              const Text(
                                 "PDF লোড হচ্ছে...",
                                 style: TextStyle(
                                   color: Colors.white,

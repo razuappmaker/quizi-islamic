@@ -1030,77 +1030,76 @@ class _HomePageState extends State<HomePage>
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true, // ✅ নিচে কন্টেন্ট ঢুকে যাবে না
       builder: (context) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(2),
+        return SafeArea(
+          // ✅ বটম শীট কনটেন্ট SafeArea এর মধ্যে
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              Text(
-                'আরও ইসলামী জ্ঞান',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green[700],
+                Text(
+                  'আরও ইসলামী জ্ঞান',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[700],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-              _buildCompactOptionItem(
-                context,
-                Icons.history_rounded,
-                'ইসলামের ইতিহাস',
-                onTap: () {
-                  Navigator.pop(context); // বটম শীট বন্ধ করুন
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const IslamicHistoryPage(),
-                    ),
-                  );
-                },
-              ),
-              _buildCompactOptionItem(
-                context,
-                Icons.person,
-                'হজরত মুহাম্মাদ (সা.)-এর জীবনী',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProphetBiographyPage(),
-                    ),
-                  );
-                },
-              ),
-              /*_buildCompactOptionItem(
-                context,
-                Icons.auto_awesome_motion_rounded,
-                'প্রথম খলিফা হযরত আবু বকর সিদ্দিক (রা.)',
-                onTap: () {
-                  Navigator.pop(context);
-                  // হাদিস সংকলন পেইজে নেভিগেট করুন
-                },
-              ),*/
-              const SizedBox(height: 8),
-            ],
+                _buildCompactOptionItem(
+                  context,
+                  Icons.history_rounded,
+                  'ইসলামের ইতিহাস',
+                  onTap: () {
+                    Navigator.pop(context); // বটম শীট বন্ধ করুন
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            SafeArea(child: const IslamicHistoryPage()),
+                      ),
+                    );
+                  },
+                ),
+                _buildCompactOptionItem(
+                  context,
+                  Icons.person,
+                  'হজরত মুহাম্মাদ (সা.)-এর জীবনী',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            SafeArea(child: const ProphetBiographyPage()),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
           ),
         );
       },
@@ -1127,12 +1126,11 @@ class _HomePageState extends State<HomePage>
         size: 14,
         color: Colors.grey[500],
       ),
-      onTap:
-          onTap ??
-          () => Navigator.pop(context), // ডিফল্টভাবে শুধু বটম শীট বন্ধ করবে
+      onTap: onTap ?? () => Navigator.pop(context),
     );
   }
 
+  // ইসলামিক নলেজ কার্ড
   Widget _buildIslamicKnowledgeCard(
     BuildContext context,
     String title,
@@ -1153,7 +1151,7 @@ class _HomePageState extends State<HomePage>
     return Container(
       width: tablet
           ? responsiveValue(context, 120)
-          : responsiveValue(context, 170), // 140 Defaul value
+          : responsiveValue(context, 170),
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(
@@ -1183,32 +1181,33 @@ class _HomePageState extends State<HomePage>
                 } else if (page != null) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => page),
+                    MaterialPageRoute(
+                      builder: (context) => SafeArea(child: page),
+                    ),
                   );
                 }
               },
           child: Container(
-            padding: EdgeInsets.all(responsiveValue(context, 6)), //10
+            padding: EdgeInsets.all(responsiveValue(context, 6)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: EdgeInsets.all(responsiveValue(context, 6)), // 8
+                  padding: EdgeInsets.all(responsiveValue(context, 6)),
                   decoration: BoxDecoration(
                     color: iconColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     icon,
-                    size: responsiveValue(context, 20), // 24
+                    size: responsiveValue(context, 20),
                     color: iconColor,
                   ),
                 ),
-                ResponsiveSizedBox(height: 6), //8
+                ResponsiveSizedBox(height: 6),
                 ResponsiveText(
                   title,
                   fontSize: 11,
-                  //12
                   fontWeight: FontWeight.bold,
                   color: textColor,
                   textAlign: TextAlign.center,
@@ -1221,7 +1220,6 @@ class _HomePageState extends State<HomePage>
                   ResponsiveText(
                     description,
                     fontSize: 9,
-                    //10
                     color: secondaryTextColor,
                     textAlign: TextAlign.center,
                     maxLines: 2,
