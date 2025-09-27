@@ -45,12 +45,12 @@ class _DoyaListPageState extends State<DoyaListPage> {
   final double _fontSizeStep = 2.0;
 
   // ✅ Adaptive Bottom Banner Ad
-  BannerAd? _bottomBannerAd; // ✅ Nullable করুন
+  BannerAd? _bottomBannerAd;
   bool _isBottomBannerAdReady = false;
 
   // ✅ Adaptive Inline Banner Ads (প্রতি ৬টি দোয়ার পর)
-  final Map<int, BannerAd?> _inlineBannerAds = {};
-  final Map<int, bool> _inlineBannerAdReady = {};
+  final Map<String, BannerAd?> _inlineBannerAds = {};
+  final Map<String, bool> _inlineBannerAdReady = {};
 
   // রেসপনসিভ লেআউট ভেরিয়েবল
   bool _isTablet = false;
@@ -140,11 +140,12 @@ class _DoyaListPageState extends State<DoyaListPage> {
     // পেইজ বন্ধ হলে সকল expanded state রিসেট করুন
     _expandedDoyaIndices.clear();
     _showFullWarningStates.clear();
-    _bottomBannerAd?.dispose(); // ✅ Null safety সহ dispose
+    _bottomBannerAd?.dispose();
 
     // ✅ সকল inline banner ads dispose করুন
     _inlineBannerAds.forEach((key, ad) => ad?.dispose());
     _inlineBannerAds.clear();
+    _inlineBannerAdReady.clear();
 
     _searchController.dispose();
     super.dispose();
@@ -166,18 +167,22 @@ class _DoyaListPageState extends State<DoyaListPage> {
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) {
             print('Adaptive Bottom banner ad loaded successfully');
-            setState(() {
-              _isBottomBannerAdReady = true;
-            });
+            if (mounted) {
+              setState(() {
+                _isBottomBannerAdReady = true;
+              });
+            }
             AdHelper.recordBannerAdShown();
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
             print('Adaptive Bottom banner ad failed to load: $error');
             ad.dispose();
             _bottomBannerAd = null;
-            setState(() {
-              _isBottomBannerAdReady = false;
-            });
+            if (mounted) {
+              setState(() {
+                _isBottomBannerAdReady = false;
+              });
+            }
           },
           onAdOpened: (Ad ad) {
             AdHelper.canClickAd().then((canClick) {
@@ -197,14 +202,22 @@ class _DoyaListPageState extends State<DoyaListPage> {
       print('Error loading adaptive bottom banner ad: $e');
       _bottomBannerAd?.dispose();
       _bottomBannerAd = null;
-      setState(() {
-        _isBottomBannerAdReady = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isBottomBannerAdReady = false;
+        });
+      }
     }
   }
 
   // ✅ Adaptive Inline Banner Ad লোড করার মেথড (প্রতি ৬টি দোয়ার পর)
-  Future<void> _loadInlineBannerAd(int index) async {
+  Future<void> _loadInlineBannerAd(String adKey) async {
+    // Prevent duplicate loading
+    if (_inlineBannerAds.containsKey(adKey) &&
+        _inlineBannerAdReady[adKey] == true) {
+      return;
+    }
+
     try {
       // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
       bool canShowAd = await AdHelper.canShowBannerAd();
@@ -218,25 +231,31 @@ class _DoyaListPageState extends State<DoyaListPage> {
         context,
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) {
-            print('Inline Adaptive banner ad loaded for index $index');
-            setState(() {
-              _inlineBannerAdReady[index] = true;
-            });
+            print('Inline Adaptive banner ad loaded for key $adKey');
+            if (mounted) {
+              setState(() {
+                _inlineBannerAdReady[adKey] = true;
+              });
+            }
             AdHelper.recordBannerAdShown();
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
             print(
-              'Inline Adaptive banner ad failed to load for index $index: $error',
+              'Inline Adaptive banner ad failed to load for key $adKey: $error',
             );
             ad.dispose();
-            _inlineBannerAds.remove(index);
-            _inlineBannerAdReady.remove(index);
+            if (mounted) {
+              setState(() {
+                _inlineBannerAds.remove(adKey);
+                _inlineBannerAdReady.remove(adKey);
+              });
+            }
           },
           onAdOpened: (Ad ad) {
             AdHelper.canClickAd().then((canClick) {
               if (canClick) {
                 AdHelper.recordAdClick();
-                print('Inline Adaptive Banner ad clicked at index $index');
+                print('Inline Adaptive Banner ad clicked at key $adKey');
               } else {
                 print('Ad click limit reached');
               }
@@ -245,12 +264,20 @@ class _DoyaListPageState extends State<DoyaListPage> {
         ),
       );
 
-      _inlineBannerAds[index] = inlineAd;
-      await inlineAd.load();
+      if (mounted) {
+        setState(() {
+          _inlineBannerAds[adKey] = inlineAd;
+        });
+        await inlineAd.load();
+      }
     } catch (e) {
-      print('Error loading adaptive inline banner ad for index $index: $e');
-      _inlineBannerAds.remove(index);
-      _inlineBannerAdReady.remove(index);
+      print('Error loading adaptive inline banner ad for key $adKey: $e');
+      if (mounted) {
+        setState(() {
+          _inlineBannerAds.remove(adKey);
+          _inlineBannerAdReady.remove(adKey);
+        });
+      }
     }
   }
 
@@ -479,17 +506,21 @@ class _DoyaListPageState extends State<DoyaListPage> {
   }
 
   // ✅ Adaptive Inline Banner Ad বিল্ড করার মেথড
-  Widget _buildInlineBanner(int index) {
-    final bannerAd = _inlineBannerAds[index];
-    final isReady = _inlineBannerAdReady[index] ?? false;
+  Widget _buildInlineBanner(String adKey) {
+    final bannerAd = _inlineBannerAds[adKey];
+    final isReady = _inlineBannerAdReady[adKey] ?? false;
 
-    if (bannerAd == null || !isReady) {
-      // প্রথমবার লোড করুন
-      if (bannerAd == null) {
-        _loadInlineBannerAd(index);
-      }
+    if (bannerAd == null) {
+      // প্রথমবার লোড শুরু করুন কিন্তু immediately placeholder return না করুন
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadInlineBannerAd(adKey);
+      });
+      return const SizedBox.shrink(); // প্রথমে hide করুন
+    }
+
+    if (!isReady) {
       return Container(
-        height: 50, // Placeholder height
+        height: 50,
         margin: const EdgeInsets.symmetric(vertical: 12),
         child: const Center(child: CircularProgressIndicator()),
       );
@@ -697,6 +728,76 @@ class _DoyaListPageState extends State<DoyaListPage> {
     );
   }
 
+  // লোডিং ইন্ডিকেটর বিল্ড করার মেথড
+  Widget _buildLoadingIndicator() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text('দোয়া লোড হচ্ছে...'),
+        ],
+      ),
+    );
+  }
+
+  // এম্পটি স্টেট বিল্ড করার মেথড
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off, size: 60, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          const Text('কোন দোয়া পাওয়া যায়নি', style: TextStyle(fontSize: 18)),
+        ],
+      ),
+    );
+  }
+
+  // দোয়া লিস্ট বিল্ড করার মেথড
+  Widget _buildDoyaList() {
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(
+        vertical: 16,
+        horizontal: _isTablet ? 8 : 0,
+      ),
+      itemCount: filteredDoyas.length,
+      itemBuilder: (context, index) {
+        final doya = filteredDoyas[index];
+
+        // Cache the widget to avoid rebuilds
+        final doyaCard = _buildDoyaCard(doya, index);
+
+        List<Widget> widgets = [doyaCard];
+
+        // ✅ প্রতি ৬ টা দোয়ার পর Adaptive ব্যানার অ্যাড
+        if ((index + 1) % 6 == 0) {
+          // filtered list-এর জন্য unique key তৈরি করুন
+          final adKey = '${doya['title']}_$index';
+          final bannerAd = _buildInlineBanner(adKey);
+          widgets.add(bannerAd);
+        }
+
+        return Column(children: widgets);
+      },
+    );
+  }
+
+  // বটম ব্যানার অ্যাড বিল্ড করার মেথড
+  Widget _buildBottomBannerAd() {
+    return Container(
+      width: double.infinity,
+      height: _bottomBannerAd!.size.height.toDouble(),
+      alignment: Alignment.center,
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[900]
+          : Colors.white,
+      child: AdWidget(ad: _bottomBannerAd!),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // বিল্ড করার সময় ডিভাইস টাইপ চেক করুন
@@ -713,6 +814,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: _isTablet ? 22 : 20,
+                  color: Colors.white,
                 ),
               )
             : TextField(
@@ -777,56 +879,15 @@ class _DoyaListPageState extends State<DoyaListPage> {
           children: [
             Expanded(
               child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? _buildLoadingIndicator()
                   : filteredDoyas.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 60,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'কোন দোয়া পাওয়া যায়নি',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: _isTablet ? 8 : 0,
-                      ),
-                      itemCount: filteredDoyas.length,
-                      itemBuilder: (context, index) {
-                        final doya = filteredDoyas[index];
-                        List<Widget> widgets = [_buildDoyaCard(doya, index)];
-
-                        // ✅ প্রতি ৬ টা দোয়ার পর Adaptive ব্যানার অ্যাড
-                        if ((index + 1) % 6 == 0) {
-                          widgets.add(_buildInlineBanner(index));
-                        }
-
-                        return Column(children: widgets);
-                      },
-                    ),
+                  ? _buildEmptyState()
+                  : _buildDoyaList(),
             ),
 
             // ✅ Adaptive Bottom Banner Ad - SafeArea এর ভিতরে
             if (_isBottomBannerAdReady && _bottomBannerAd != null)
-              Container(
-                width: double.infinity,
-                height: _bottomBannerAd!.size.height.toDouble(),
-                alignment: Alignment.center,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[900]
-                    : Colors.white,
-                child: AdWidget(ad: _bottomBannerAd!),
-              ),
+              _buildBottomBannerAd(),
           ],
         ),
       ),

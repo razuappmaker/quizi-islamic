@@ -38,9 +38,9 @@ class _QiblaPageState extends State<QiblaPage>
   Position? _cachedPosition;
   bool _isFirstLoad = true;
 
-  // Banner Ad variables
-  BannerAd? _bannerAd;
-  bool _isBannerAdLoaded = false;
+  // ✅ Adaptive Banner Ad variables
+  BannerAd? _bottomBannerAd;
+  bool _isBottomBannerAdReady = false;
 
   @override
   void initState() {
@@ -60,24 +60,8 @@ class _QiblaPageState extends State<QiblaPage>
     // Initialize Ads
     AdHelper.initialize();
 
-    // Create & load banner ad
-    _bannerAd = BannerAd(
-      size: AdSize.banner,
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          setState(() {
-            _isBannerAdLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          ad.dispose();
-          print('Banner Ad failed to load: $error');
-        },
-      ),
-    );
-    _bannerAd!.load();
+    // ✅ Load adaptive bottom banner ad
+    _loadBottomBannerAd();
 
     _checkInternetConnection();
     _loadLastLocation();
@@ -94,8 +78,67 @@ class _QiblaPageState extends State<QiblaPage>
   @override
   void dispose() {
     _animationController.dispose();
-    _bannerAd?.dispose();
+    _bottomBannerAd?.dispose();
     super.dispose();
+  }
+
+  // ✅ Adaptive Bottom Banner Ad লোড করার মেথড
+  Future<void> _loadBottomBannerAd() async {
+    try {
+      // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
+      bool canShowAd = await AdHelper.canShowBannerAd();
+
+      if (!canShowAd) {
+        print('Bottom banner ad limit reached, not showing ad');
+        return;
+      }
+
+      _bottomBannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+        context,
+        listener: BannerAdListener(
+          onAdLoaded: (Ad ad) {
+            print('Adaptive Bottom banner ad loaded successfully');
+            if (mounted) {
+              setState(() {
+                _isBottomBannerAdReady = true;
+              });
+            }
+            AdHelper.recordBannerAdShown();
+          },
+          onAdFailedToLoad: (Ad ad, LoadAdError error) {
+            print('Adaptive Bottom banner ad failed to load: $error');
+            ad.dispose();
+            _bottomBannerAd = null;
+            if (mounted) {
+              setState(() {
+                _isBottomBannerAdReady = false;
+              });
+            }
+          },
+          onAdOpened: (Ad ad) {
+            AdHelper.canClickAd().then((canClick) {
+              if (canClick) {
+                AdHelper.recordAdClick();
+                print('Adaptive Bottom Banner ad clicked.');
+              } else {
+                print('Ad click limit reached');
+              }
+            });
+          },
+        ),
+      );
+
+      await _bottomBannerAd?.load();
+    } catch (e) {
+      print('Error loading adaptive bottom banner ad: $e');
+      _bottomBannerAd?.dispose();
+      _bottomBannerAd = null;
+      if (mounted) {
+        setState(() {
+          _isBottomBannerAdReady = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadLastLocation() async {
@@ -304,6 +347,7 @@ class _QiblaPageState extends State<QiblaPage>
         ],
       ),
       body: SafeArea(
+        bottom: true, // ✅ নিচের SafeArea চালু করুন
         child: Column(
           children: [
             Expanded(
@@ -475,7 +519,6 @@ class _QiblaPageState extends State<QiblaPage>
                     const SizedBox(height: 30),
 
                     // Information Section
-                    // Information Section
                     FadeTransition(
                       opacity: _animation,
                       child: Container(
@@ -603,13 +646,16 @@ class _QiblaPageState extends State<QiblaPage>
               ),
             ),
 
-            // Banner Ad at bottom
-            if (_isBannerAdLoaded && _bannerAd != null)
+            // ✅ Adaptive Bottom Banner Ad - SafeArea এর ভিতরে
+            if (_isBottomBannerAdReady && _bottomBannerAd != null)
               Container(
-                color: Colors.transparent,
-                width: _bannerAd!.size.width.toDouble(),
-                height: _bannerAd!.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd!),
+                width: double.infinity,
+                height: _bottomBannerAd!.size.height.toDouble(),
+                alignment: Alignment.center,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
+                child: AdWidget(ad: _bottomBannerAd!),
               ),
           ],
         ),

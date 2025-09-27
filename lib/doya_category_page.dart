@@ -554,8 +554,12 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
                 onChanged: _searchAllDoyas,
               )
             : const Text(
-                'দুআ',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                'দুআর সংকলন (অর্থসহ)',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
               ),
         centerTitle: false,
         elevation: 0,

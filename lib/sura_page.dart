@@ -588,10 +588,16 @@ class _SuraPageState extends State<SuraPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[700],
+        centerTitle: true, // শিরোনাম সেন্টারে
         title: const Text(
           'আরবি, বাংলা ও অর্থসহ',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Colors.white,
+          ),
         ),
+
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.text_fields, color: Colors.white),

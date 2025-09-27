@@ -83,7 +83,7 @@ class _KalemaPageState extends State<KalemaPage> {
 
   Future<void> _initializeAds() async {
     try {
-      await MobileAds.instance.initialize();
+      await AdHelper.initialize();
       setState(() {
         _isAdInitialized = true;
       });
@@ -93,28 +93,39 @@ class _KalemaPageState extends State<KalemaPage> {
     }
   }
 
-  void _loadBannerAd() {
+  void _loadBannerAd() async {
     if (!_isAdInitialized) return;
 
-    _bannerAd = BannerAd(
-      size: AdSize.banner,
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          setState(() {
-            _isBannerAdLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          debugPrint('Banner Ad failed to load: $error');
-          ad.dispose();
-          _isBannerAdLoaded = false;
-        },
-      ),
-    );
-
-    _bannerAd!.load();
+    try {
+      _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+        context,
+        listener: BannerAdListener(
+          onAdLoaded: (Ad ad) {
+            print('Adaptive banner ad loaded successfully');
+            setState(() {
+              _isBannerAdLoaded = true;
+            });
+            // Record banner impression
+            AdHelper.recordBannerAdShown();
+          },
+          onAdFailedToLoad: (Ad ad, LoadAdError error) {
+            debugPrint('Adaptive Banner Ad failed to load: $error');
+            ad.dispose();
+            setState(() {
+              _isBannerAdLoaded = false;
+            });
+          },
+          onAdClicked: (ad) {
+            // Record ad click
+            AdHelper.recordAdClick();
+          },
+        ),
+      );
+      _bannerAd!.load();
+    } catch (e) {
+      debugPrint('Error creating adaptive banner: $e');
+      _isBannerAdLoaded = false;
+    }
   }
 
   void _increaseFontSize() {
@@ -180,17 +191,32 @@ class _KalemaPageState extends State<KalemaPage> {
     super.dispose();
   }
 
+  // Adaptive banner widget with proper sizing
+  Widget _buildAdaptiveBannerWidget(BannerAd banner) {
+    return Container(
+      width: banner.size.width.toDouble(),
+      height: banner.size.height.toDouble(),
+      alignment: Alignment.center,
+      child: AdWidget(ad: banner),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = Colors.green[800];
-    final screenWidth = MediaQuery.of(context).size.width;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "কালেমা সমূহ",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
         elevation: 2,
@@ -232,214 +258,241 @@ class _KalemaPageState extends State<KalemaPage> {
           const SizedBox(width: 8),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          ...List<Widget>.generate(kalemaList.length, (index) {
-            final kalema = kalemaList[index];
-            return Container(
-              margin: const EdgeInsets.only(bottom: 20),
-              decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[800] : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
+      body: SafeArea(
+        bottom: false, // We'll handle bottom padding manually for the ad
+        child: Column(
+          children: [
+            // Main content area with safe area padding
+            Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: EdgeInsets.only(
+                  bottom: mediaQuery
+                      .padding
+                      .bottom, // Add bottom padding for system UI
+                ),
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
                   children: [
-                    // কালেমার নাম
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: primaryColor!.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: primaryColor.withOpacity(0.3),
-                              width: 2,
+                    ...List<Widget>.generate(kalemaList.length, (index) {
+                      final kalema = kalemaList[index];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: isDarkMode ? Colors.grey[800] : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.15),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
                             ),
-                          ),
-                          child: Text(
-                            "${index + 1}",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor,
-                            ),
-                          ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            kalema["title"]!,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // আরবি টেক্সট সেকশন - লাইন পার্থক্য সহ
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: isDarkMode
-                            ? Colors.grey[900]
-                            : const Color(0xFFF8F6F0),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isDarkMode
-                              ? Colors.grey[700]!
-                              : const Color(0xFFE8E6DF),
-                          width: 2,
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          // আরবি টেক্সট (RTL) - লাইন গাইড লাইন সহ
-                          Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: Stack(
-                              children: [
-                                // গাইড লাইন (নিচের লাইন)
-                                Positioned.fill(
-                                  child: CustomPaint(
-                                    painter: _ArabicLinePainter(
-                                      lineColor: isDarkMode
-                                          ? Colors.grey[700]!
-                                          : const Color(0xFFE8E6DF),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // কালেমার নাম
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: primaryColor!.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: primaryColor.withOpacity(0.3),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      "${index + 1}",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: primaryColor,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                // আরবি টেক্সট
-                                Text(
-                                  kalema["text"]!,
-                                  style: TextStyle(
-                                    fontSize: _arabicFontSize,
-                                    fontFamily: 'ScheherazadeNew',
-                                    fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? const Color(0xFFE8D5A7)
-                                        : const Color(0xFF8B4513),
-                                    height: 2.2,
-                                    // লাইন হাইট বাড়ানো হয়েছে
-                                    wordSpacing: 3.0,
-                                    letterSpacing: 1.0,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      kalema["title"]!,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                    ),
                                   ),
-                                  textAlign: TextAlign.center,
-                                  textDirection: TextDirection.rtl,
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+
+                              // আরবি টেক্সট সেকশন - লাইন পার্থক্য সহ
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? Colors.grey[900]
+                                      : const Color(0xFFF8F6F0),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isDarkMode
+                                        ? Colors.grey[700]!
+                                        : const Color(0xFFE8E6DF),
+                                    width: 2,
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
+                                child: Column(
+                                  children: [
+                                    // আরবি টেক্সট (RTL) - লাইন গাইড লাইন সহ
+                                    Directionality(
+                                      textDirection: TextDirection.rtl,
+                                      child: Stack(
+                                        children: [
+                                          // গাইড লাইন (নিচের লাইন)
+                                          Positioned.fill(
+                                            child: CustomPaint(
+                                              painter: _ArabicLinePainter(
+                                                lineColor: isDarkMode
+                                                    ? Colors.grey[700]!
+                                                    : const Color(0xFFE8E6DF),
+                                              ),
+                                            ),
+                                          ),
+                                          // আরবি টেক্সট
+                                          Text(
+                                            kalema["text"]!,
+                                            style: TextStyle(
+                                              fontSize: _arabicFontSize,
+                                              fontFamily: 'ScheherazadeNew',
+                                              fontWeight: FontWeight.bold,
+                                              color: isDarkMode
+                                                  ? const Color(0xFFE8D5A7)
+                                                  : const Color(0xFF8B4513),
+                                              height: 2.2,
+                                              // লাইন হাইট বাড়ানো হয়েছে
+                                              wordSpacing: 3.0,
+                                              letterSpacing: 1.0,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            textDirection: TextDirection.rtl,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
 
-                          // উচ্চারণ টেক্সট
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: isDarkMode
-                                  ? Colors.blue[900]!.withOpacity(0.15)
-                                  : const Color(0xFFE3F2FD),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isDarkMode
-                                    ? Colors.blue[700]!
-                                    : const Color(0xFFBBDEFB),
-                                width: 1,
+                                    // উচ্চারণ টেক্সট
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: isDarkMode
+                                            ? Colors.blue[900]!.withOpacity(
+                                                0.15,
+                                              )
+                                            : const Color(0xFFE3F2FD),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isDarkMode
+                                              ? Colors.blue[700]!
+                                              : const Color(0xFFBBDEFB),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        kalema["transliteration"]!,
+                                        style: TextStyle(
+                                          fontSize: _textFontSize,
+                                          fontStyle: FontStyle.italic,
+                                          color: isDarkMode
+                                              ? Colors.blue[200]
+                                              : Colors.blue[800],
+                                          height: 1.6,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              kalema["transliteration"]!,
-                              style: TextStyle(
-                                fontSize: _textFontSize,
-                                fontStyle: FontStyle.italic,
-                                color: isDarkMode
-                                    ? Colors.blue[200]
-                                    : Colors.blue[800],
-                                height: 1.6,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                              const SizedBox(height: 20),
 
-                    // অর্থ সেকশন
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isDarkMode
-                            ? Colors.purple[900]!.withOpacity(0.15)
-                            : const Color(0xFFF3E5F5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDarkMode
-                              ? Colors.purple[700]!
-                              : const Color(0xFFE1BEE7),
-                          width: 1,
+                              // অর্থ সেকশন
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? Colors.purple[900]!.withOpacity(0.15)
+                                      : const Color(0xFFF3E5F5),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isDarkMode
+                                        ? Colors.purple[700]!
+                                        : const Color(0xFFE1BEE7),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "অর্থ:",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDarkMode
+                                            ? Colors.purple[200]
+                                            : Colors.purple[800],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      kalema["meaning"]!,
+                                      style: TextStyle(
+                                        fontSize: _textFontSize,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black87,
+                                        height: 1.6,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "অর্থ:",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode
-                                  ? Colors.purple[200]
-                                  : Colors.purple[800],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            kalema["meaning"]!,
-                            style: TextStyle(
-                              fontSize: _textFontSize,
-                              color: isDarkMode ? Colors.white : Colors.black87,
-                              height: 1.6,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                      );
+                    }),
                   ],
                 ),
               ),
-            );
-          }),
-        ],
+            ),
+
+            // নিচের adaptive ব্যানার অ্যাড - safe area consideration
+            if (_isBannerAdLoaded && _bannerAd != null)
+              Container(
+                width: screenWidth,
+                height: _bannerAd!.size.height.toDouble(),
+                alignment: Alignment.center,
+                color: Colors.transparent,
+                // Add bottom padding to account for system navigation bar
+                margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
+                child: _buildAdaptiveBannerWidget(_bannerAd!),
+              ),
+          ],
+        ),
       ),
-      bottomNavigationBar: _isBannerAdLoaded && _bannerAd != null
-          ? Container(
-              color: Colors.transparent,
-              height: _bannerAd!.size.height.toDouble(),
-              width: screenWidth,
-              child: AdWidget(ad: _bannerAd!),
-            )
-          : null,
     );
   }
 }

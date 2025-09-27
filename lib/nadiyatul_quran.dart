@@ -20,6 +20,7 @@ class NadiyatulQuran extends StatefulWidget {
 class _NadiyatulQuranState extends State<NadiyatulQuran> {
   BannerAd? _bannerAd;
   Map<String, int> _pdfPageCounts = {};
+  bool _isBannerAdLoaded = false;
 
   final List<Map<String, String>> guides = [
     {
@@ -37,25 +38,51 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
   @override
   void initState() {
     super.initState();
-    _loadBannerAd();
+    _initializeAds();
     _loadPdfInfo();
+  }
+
+  Future<void> _initializeAds() async {
+    try {
+      await AdHelper.initialize();
+      _loadBannerAd();
+    } catch (e) {
+      debugPrint('Failed to initialize ads: $e');
+    }
   }
 
   void _loadBannerAd() async {
     final canShow = await AdHelper.canShowBannerAd();
-    if (canShow) {
-      _bannerAd = AdHelper.createBannerAd(
-        AdSize.banner,
+    if (!canShow) return;
+
+    try {
+      _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+        context,
         listener: BannerAdListener(
-          onAdLoaded: (_) async {
+          onAdLoaded: (Ad ad) async {
+            print('Adaptive banner ad loaded successfully');
             await AdHelper.recordBannerAdShown();
-            setState(() {});
+            setState(() {
+              _isBannerAdLoaded = true;
+            });
           },
-          onAdFailedToLoad: (ad, error) {
+          onAdFailedToLoad: (Ad ad, LoadAdError error) {
+            debugPrint('Adaptive Banner Ad failed to load: $error');
             ad.dispose();
+            setState(() {
+              _isBannerAdLoaded = false;
+            });
+          },
+          onAdClicked: (ad) {
+            // Record ad click
+            AdHelper.recordAdClick();
           },
         ),
-      )..load();
+      );
+      _bannerAd!.load();
+    } catch (e) {
+      debugPrint('Error creating adaptive banner: $e');
+      _isBannerAdLoaded = false;
     }
   }
 
@@ -88,56 +115,82 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
     );
   }
 
+  // Adaptive banner widget with proper sizing
+  Widget _buildAdaptiveBannerWidget(BannerAd banner) {
+    return Container(
+      width: banner.size.width.toDouble(),
+      height: banner.size.height.toDouble(),
+      alignment: Alignment.center,
+      child: AdWidget(ad: banner),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[700],
         title: const Text(
           'কোরআন শিক্ষা',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ListView(
-                children: [
-                  _buildPdfCard(
-                    title: "নামাজ পরবর্তী আমল",
-                    path: "assets/pdf/nadiyatul_quran.pdf",
-                    description: "নামাজের পর পড়ার গুরুত্বপূর্ণ দোয়া ও আমলসমূহ",
-                    pageCount:
-                        _pdfPageCounts["assets/pdf/nadiyatul_quran.pdf"] ?? 0,
-                    isDark: isDark,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildPdfCard(
-                    title: "ওমরাহ গাইড",
-                    path: "assets/pdf/umrah_guide.pdf",
-                    description: "ওমরাহ পালনের সম্পূর্ণ ধাপে ধাপে গাইড",
-                    pageCount:
-                        _pdfPageCounts["assets/pdf/umrah_guide.pdf"] ?? 0,
-                    isDark: isDark,
-                  ),
-                ],
+      body: SafeArea(
+        bottom: false, // We'll handle bottom padding manually for the ad
+        child: Column(
+          children: [
+            // Main content area with safe area padding
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: mediaQuery.padding.bottom,
+                  // Add bottom padding for system UI
+                  left: 16.0,
+                  right: 16.0,
+                  top: 16.0,
+                ),
+                child: ListView(
+                  children: [
+                    _buildPdfCard(
+                      title: "নামাজ পরবর্তী আমল",
+                      path: "assets/pdf/nadiyatul_quran.pdf",
+                      description:
+                          "নামাজের পর পড়ার গুরুত্বপূর্ণ দোয়া ও আমলসমূহ",
+                      pageCount:
+                          _pdfPageCounts["assets/pdf/nadiyatul_quran.pdf"] ?? 0,
+                      isDark: isDark,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildPdfCard(
+                      title: "ওমরাহ গাইড",
+                      path: "assets/pdf/umrah_guide.pdf",
+                      description: "ওমরাহ পালনের সম্পূর্ণ ধাপে ধাপে গাইড",
+                      pageCount:
+                          _pdfPageCounts["assets/pdf/umrah_guide.pdf"] ?? 0,
+                      isDark: isDark,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          if (_bannerAd != null)
-            SafeArea(
-              child: SizedBox(
-                width: _bannerAd!.size.width.toDouble(),
+
+            // নিচের adaptive ব্যানার অ্যাড - safe area consideration
+            if (_isBannerAdLoaded && _bannerAd != null)
+              Container(
+                width: mediaQuery.size.width,
                 height: _bannerAd!.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd!),
+                alignment: Alignment.center,
+                color: Colors.transparent,
+                // Add bottom padding to account for system navigation bar
+                margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
+                child: _buildAdaptiveBannerWidget(_bannerAd!),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -409,6 +462,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
   final PdfViewerController _pdfController = PdfViewerController();
   BannerAd? _bannerAd;
   bool _isLoading = true;
+  bool _isBannerAdLoaded = false;
   int _currentPage = 1;
   int _totalPages = 32; // ডিফল্ট হিসেবে 12 ধরে নিচ্ছি
   double _zoomLevel = 1.0;
@@ -416,25 +470,51 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
   @override
   void initState() {
     super.initState();
-    _loadBannerAd();
+    _initializeAds();
     _initializePdf();
+  }
+
+  Future<void> _initializeAds() async {
+    try {
+      await AdHelper.initialize();
+      _loadBannerAd();
+    } catch (e) {
+      debugPrint('Failed to initialize ads: $e');
+    }
   }
 
   void _loadBannerAd() async {
     final canShow = await AdHelper.canShowBannerAd();
-    if (canShow) {
-      _bannerAd = AdHelper.createBannerAd(
-        AdSize.banner,
+    if (!canShow) return;
+
+    try {
+      _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+        context,
         listener: BannerAdListener(
-          onAdLoaded: (_) async {
+          onAdLoaded: (Ad ad) async {
+            print('PDF Viewer Adaptive banner ad loaded successfully');
             await AdHelper.recordBannerAdShown();
-            setState(() {});
+            setState(() {
+              _isBannerAdLoaded = true;
+            });
           },
-          onAdFailedToLoad: (ad, error) {
+          onAdFailedToLoad: (Ad ad, LoadAdError error) {
+            debugPrint('PDF Viewer Adaptive Banner Ad failed to load: $error');
             ad.dispose();
+            setState(() {
+              _isBannerAdLoaded = false;
+            });
+          },
+          onAdClicked: (ad) {
+            // Record ad click
+            AdHelper.recordAdClick();
           },
         ),
-      )..load();
+      );
+      _bannerAd!.load();
+    } catch (e) {
+      debugPrint('Error creating PDF viewer adaptive banner: $e');
+      _isBannerAdLoaded = false;
     }
   }
 
@@ -614,6 +694,16 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
     );
   }
 
+  // Adaptive banner widget with proper sizing
+  Widget _buildAdaptiveBannerWidget(BannerAd banner) {
+    return Container(
+      width: banner.size.width.toDouble(),
+      height: banner.size.height.toDouble(),
+      alignment: Alignment.center,
+      child: AdWidget(ad: banner),
+    );
+  }
+
   @override
   void dispose() {
     _bannerAd?.dispose();
@@ -623,6 +713,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -656,109 +747,127 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
           IconButton(icon: const Icon(Icons.share), onPressed: _sharePDF),
         ],
       ),
-      body: Column(
-        children: [
-          // PDF নেভিগেশন কন্ট্রোল
-          Container(
-            color: isDark ? Colors.grey[900] : Colors.grey[100],
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.first_page),
-                  onPressed: () => _goToPage(1),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.navigate_before),
-                  onPressed: () => _goToPage(_currentPage - 1),
-                ),
+      body: SafeArea(
+        bottom: false, // We'll handle bottom padding manually for the ad
+        child: Column(
+          children: [
+            // PDF নেভিগেশন কন্ট্রোল
+            Container(
+              color: isDark ? Colors.grey[900] : Colors.grey[100],
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.first_page),
+                    onPressed: () => _goToPage(1),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.navigate_before),
+                    onPressed: () => _goToPage(_currentPage - 1),
+                  ),
 
-                // পৃষ্ঠা ইনডিকেটর - ট্যাপ করলে ডায়ালগ খুলবে
-                Expanded(
-                  child: GestureDetector(
-                    onTap: _showPageInputDialog,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.grey[800] : Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "পৃষ্ঠা: $_currentPage/$_totalPages",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.black,
+                  // পৃষ্ঠা ইনডিকেটর - ট্যাপ করলে ডায়ালগ খুলবে
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _showPageInputDialog,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[800] : Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isDark
+                                ? Colors.grey[600]!
+                                : Colors.grey[300]!,
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                IconButton(
-                  icon: const Icon(Icons.navigate_next),
-                  onPressed: () => _goToPage(_currentPage + 1),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.last_page),
-                  onPressed: () => _goToPage(_totalPages),
-                ),
-              ],
-            ),
-          ),
-
-          // PDF ভিউয়ার
-          Expanded(
-            child: Stack(
-              children: [
-                SfPdfViewer.asset(
-                  widget.assetPath,
-                  controller: _pdfController,
-                  onPageChanged: (PdfPageChangedDetails details) {
-                    setState(() {
-                      _currentPage = details.newPageNumber;
-                    });
-                  },
-                ),
-
-                if (_isLoading)
-                  Container(
-                    color: Colors.black.withOpacity(0.7),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.green[700]!,
+                        child: Center(
+                          child: Text(
+                            "পৃষ্ঠা: $_currentPage/$_totalPages",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black,
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "PDF লোড হচ্ছে...",
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-              ],
-            ),
-          ),
 
-          if (_bannerAd != null)
-            SafeArea(
-              child: SizedBox(
-                width: _bannerAd!.size.width.toDouble(),
-                height: _bannerAd!.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd!),
+                  IconButton(
+                    icon: const Icon(Icons.navigate_next),
+                    onPressed: () => _goToPage(_currentPage + 1),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.last_page),
+                    onPressed: () => _goToPage(_totalPages),
+                  ),
+                ],
               ),
             ),
-        ],
+
+            // PDF ভিউয়ার
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: mediaQuery
+                      .padding
+                      .bottom, // Add bottom padding for system UI
+                ),
+                child: Stack(
+                  children: [
+                    SfPdfViewer.asset(
+                      widget.assetPath,
+                      controller: _pdfController,
+                      onPageChanged: (PdfPageChangedDetails details) {
+                        setState(() {
+                          _currentPage = details.newPageNumber;
+                        });
+                      },
+                    ),
+
+                    if (_isLoading)
+                      Container(
+                        color: Colors.black.withOpacity(0.7),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.green[700]!,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                "PDF লোড হচ্ছে...",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+
+            // নিচের adaptive ব্যানার অ্যাড - safe area consideration
+            if (_isBannerAdLoaded && _bannerAd != null)
+              Container(
+                width: mediaQuery.size.width,
+                height: _bannerAd!.size.height.toDouble(),
+                alignment: Alignment.center,
+                color: Colors.transparent,
+                // Add bottom padding to account for system navigation bar
+                margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
+                child: _buildAdaptiveBannerWidget(_bannerAd!),
+              ),
+          ],
+        ),
       ),
 
       // ফ্লোটিং অ্যাকশন বাটন

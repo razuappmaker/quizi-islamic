@@ -126,6 +126,7 @@ flutter:
         - asset: assets/fonts/ScheherazadeNew-Bold.ttf
           weight: 700
 
+
   # fonts:
   #   - family: Schyler
   #     fonts:
