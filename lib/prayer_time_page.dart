@@ -856,6 +856,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             Expanded(
               child: Container(
                 color: Theme.of(context).brightness == Brightness.dark
+                    //? Colors.grey[900]
                     ? Colors.grey[900]
                     : Colors.grey.shade50,
                 child: Column(

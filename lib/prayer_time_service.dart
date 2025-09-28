@@ -8,6 +8,11 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class PrayerTimeService {
+  Timer? _countdownTimer;
+  Duration _currentCountdown = Duration.zero;
+  String _currentNextPrayer = "";
+  Map<String, String> _currentPrayerTimes = {};
+
   // ইন্টারনেট কানেকশন চেক
   Future<bool> checkInternetConnection() async {
     try {
@@ -20,6 +25,15 @@ class PrayerTimeService {
       return false;
     }
   }
+
+  // Getter for current countdown
+  Duration get countdownDuration => _currentCountdown;
+
+  // Getter for next prayer name
+  String get nextPrayerName => _currentNextPrayer;
+
+  // Getter for prayer times
+  Map<String, String> get prayerTimes => _currentPrayerTimes;
 
   // নামাজের সময় ফেচ করা (ম্যানুয়াল লোকেশন সাপোর্ট সহ)
   Future<Map<String, dynamic>?> fetchPrayerTimes({
@@ -123,6 +137,7 @@ class PrayerTimeService {
 
         // সময় কনভার্সন
         final prayerTimes = _convertPrayerTimes(timings);
+        _currentPrayerTimes = prayerTimes;
 
         print('Prayer times fetched successfully');
         print('City: $cityName, Country: $countryName');
@@ -131,6 +146,9 @@ class PrayerTimeService {
         prayerTimes.forEach((key, value) {
           print('$key: $value');
         });
+
+        // Start countdown timer
+        _startCountdownTimer(prayerTimes);
 
         return {
           'cityName': cityName,
@@ -148,6 +166,36 @@ class PrayerTimeService {
       print("Prayer time fetch error: $e");
       return null;
     }
+  }
+
+  // Start countdown timer with seconds
+  void _startCountdownTimer(Map<String, String> prayerTimes) {
+    _countdownTimer?.cancel();
+
+    // Update countdown immediately
+    _updateCountdown(prayerTimes);
+
+    // Start timer for seconds update
+    _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _updateCountdown(prayerTimes);
+    });
+  }
+
+  // Update countdown with seconds
+  void _updateCountdown(Map<String, String> prayerTimes) {
+    final result = findNextPrayer(prayerTimes);
+    if (result != null) {
+      _currentNextPrayer = result['nextPrayer'];
+      _currentCountdown = result['countdown'];
+    } else {
+      _currentNextPrayer = "লোড হচ্ছে...";
+      _currentCountdown = Duration.zero;
+    }
+  }
+
+  // Dispose timer
+  void dispose() {
+    _countdownTimer?.cancel();
   }
 
   // অ্যাডজাস্ট করা নামাজের সময় গণনা করা
@@ -352,13 +400,14 @@ class PrayerTimeService {
   Map<String, dynamic>? findNextPrayer(Map<String, String> prayerTimes) {
     try {
       final now = DateTime.now();
-      // বর্তমান সময় (শুধু ঘন্টা এবং মিনিট)
+      // বর্তমান সময় (ঘন্টা, মিনিট, সেকেন্ড সহ)
       DateTime currentTime = DateTime(
         now.year,
         now.month,
         now.day,
         now.hour,
         now.minute,
+        now.second,
       );
 
       print('Current time: $currentTime');
@@ -420,7 +469,7 @@ class PrayerTimeService {
       print('Error finding next prayer: $e');
     }
 
-    return {'nextPrayer': "লোড হচ্ছে...", 'countdown': Duration.zero};
+    return null;
   }
 
   // সময় পার্স করা
@@ -456,6 +505,7 @@ class PrayerTimeService {
         now.day,
         now.hour,
         now.minute,
+        now.second,
       );
 
       // যদি সময় ইতিমধ্যেই পাস হয়ে যায়, তাহলে আগামীকালের জন্য
