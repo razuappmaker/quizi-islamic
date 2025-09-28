@@ -54,7 +54,7 @@ class ProhibitedTimeSection extends StatelessWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => onShowInfo(
+                        onTap: () => _showBottomSheet(
                           context,
                           "সালাতের নিষিদ্ধ সময় সম্পর্কে",
                           prohibitedTimeService.getProhibitedTimeInfo(),
@@ -133,7 +133,7 @@ class ProhibitedTimeSection extends StatelessWidget {
     final bool isSmallScreen = MediaQuery.of(context).size.height < 700;
 
     return GestureDetector(
-      onTap: () => onShowInfo(context, dialogTitle, info),
+      onTap: () => _showBottomSheet(context, dialogTitle, info),
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -150,7 +150,7 @@ class ProhibitedTimeSection extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              Icons.keyboard_arrow_up,
+              Icons.info_outline,
               color: color,
               size: isSmallScreen ? 12 : 14,
             ),
@@ -168,6 +168,140 @@ class ProhibitedTimeSection extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showBottomSheet(BuildContext context, String title, String content) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isTablet = screenHeight > 800;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Container(
+          margin: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey[900] : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          constraints: BoxConstraints(
+            maxHeight: screenHeight * 0.8,
+            minHeight: screenHeight * 0.3,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with drag handle
+              Container(
+                padding: const EdgeInsets.only(top: 16, bottom: 8),
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[600] : Colors.grey[400],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+
+              // Title and close button
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: isTablet ? 20 : 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        size: isTablet ? 24 : 20,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Divider
+              Divider(
+                color: isDark ? Colors.grey[700] : Colors.grey[300],
+                height: 1,
+                thickness: 1,
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: isTablet ? 16 : 14,
+                      color: isDark ? Colors.grey[300] : Colors.grey[700],
+                      height: 1.6,
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                ),
+              ),
+
+              // Close button at bottom
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isDark
+                          ? Colors.blue[700]
+                          : Colors.blue[600],
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      elevation: 2,
+                    ),
+                    child: Text(
+                      "বুঝেছি",
+                      style: TextStyle(
+                        fontSize: isTablet ? 16 : 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

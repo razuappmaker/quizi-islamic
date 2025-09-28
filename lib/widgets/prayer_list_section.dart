@@ -130,20 +130,38 @@ class PrayerListSection extends StatelessWidget {
     final double titleFontSize = cardHeight * 0.2;
     final double timeFontSize = cardHeight * 0.18;
 
+    // Enhanced colors for dark mode next prayer
+    final Color nextPrayerIconColor = isDark
+        ? prayerColor.withOpacity(0.8) // More opaque in dark mode
+        : prayerColor;
+
+    final Color nextPrayerTextColor = isDark
+        ? Colors
+              .white // White text for better contrast in dark mode
+        : prayerColor;
+
+    final Color nextPrayerBadgeTextColor = isDark
+        ? Colors
+              .white // White text for badge in dark mode
+        : prayerColor;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       height: cardHeight, // Use dynamic height
       decoration: BoxDecoration(
         color: isNextPrayer
-            ? prayerColor.withOpacity(isDark ? 0.25 : 0.15)
+            ? prayerColor.withOpacity(
+                isDark ? 0.3 : 0.15,
+              ) // Increased opacity for dark mode
             : isDark
             ? Color(0xFF1E1E1E) // Professional dark grey
             : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: isNextPrayer
             ? Border.all(
-                color: prayerColor.withOpacity(isDark ? 0.5 : 0.3),
-                width: 1.5,
+                color: prayerColor.withOpacity(isDark ? 0.7 : 0.3),
+                // Increased border opacity
+                width: 2.0, // Thicker border for next prayer
               )
             : Border.all(
                 color: isDark ? Colors.grey.shade800 : Colors.transparent,
@@ -158,9 +176,9 @@ class PrayerListSection extends StatelessWidget {
                 ),
                 if (isNextPrayer)
                   BoxShadow(
-                    color: prayerColor.withOpacity(0.6),
-                    blurRadius: 12,
-                    spreadRadius: 1,
+                    color: prayerColor.withOpacity(0.8), // More visible glow
+                    blurRadius: 15,
+                    spreadRadius: 2,
                     offset: const Offset(0, 3),
                   ),
               ]
@@ -191,25 +209,43 @@ class PrayerListSection extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: cardHeight * 0.2),
             child: Row(
               children: [
-                // Prayer Icon
+                // Prayer Icon - Enhanced for next prayer in dark mode
+                // Prayer Icon - Enhanced visibility for next prayer in dark mode
                 Container(
                   width: iconSize + 20,
                   height: iconSize + 20,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        prayerColor.withOpacity(isDark ? 0.4 : 0.2),
-                        prayerColor.withOpacity(isDark ? 0.3 : 0.1),
-                      ],
+                      colors: isNextPrayer && isDark
+                          ? [
+                              prayerColor, // Solid color without opacity
+                              prayerColor.withOpacity(0.7),
+                            ]
+                          : [
+                              prayerColor.withOpacity(isDark ? 0.4 : 0.2),
+                              prayerColor.withOpacity(isDark ? 0.3 : 0.1),
+                            ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: prayerColor.withOpacity(isDark ? 0.3 : 0.2),
-                      width: 1,
+                      color: isNextPrayer && isDark
+                          ? prayerColor // Solid border color
+                          : prayerColor.withOpacity(isDark ? 0.3 : 0.2),
+                      width: isNextPrayer && isDark ? 2.0 : 1, // Thicker border
                     ),
-                    boxShadow: isDark
+                    boxShadow: (isNextPrayer && isDark)
+                        ? [
+                            BoxShadow(
+                              color: prayerColor.withOpacity(0.6),
+                              // More prominent shadow
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
+                        : isDark
                         ? [
                             BoxShadow(
                               color: prayerColor.withOpacity(0.2),
@@ -221,14 +257,17 @@ class PrayerListSection extends StatelessWidget {
                   ),
                   child: Icon(
                     prayerIcon,
-                    color: prayerColor,
-                    size: iconSize.clamp(16, 24), // Limit icon size
+                    color: isNextPrayer && isDark
+                        ? Colors
+                              .white // White icon for maximum contrast in dark mode
+                        : prayerColor,
+                    size: iconSize.clamp(16, 24),
                   ),
                 ),
 
                 const SizedBox(width: 16),
 
-                // Prayer Name
+                // Prayer Name - Enhanced for next prayer in dark mode
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -242,7 +281,7 @@ class PrayerListSection extends StatelessWidget {
                               fontSize: titleFontSize.clamp(14, 18),
                               fontWeight: FontWeight.w600,
                               color: isNextPrayer
-                                  ? prayerColor
+                                  ? nextPrayerTextColor // Use enhanced color
                                   : isDark
                                   ? Colors.white
                                   : Colors.black87,
@@ -258,14 +297,16 @@ class PrayerListSection extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: prayerColor.withOpacity(
-                                  isDark ? 0.2 : 0.1,
+                                  isDark
+                                      ? 0.4
+                                      : 0.1, // More opaque in dark mode
                                 ),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: prayerColor.withOpacity(
-                                    isDark ? 0.4 : 0.2,
+                                    isDark ? 0.8 : 0.2, // More visible border
                                   ),
-                                  width: 1,
+                                  width: 1.5, // Thicker border
                                 ),
                               ),
                               child: Text(
@@ -273,7 +314,8 @@ class PrayerListSection extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: (titleFontSize * 0.7).clamp(10, 14),
                                   fontWeight: FontWeight.w700,
-                                  color: prayerColor,
+                                  color: nextPrayerBadgeTextColor,
+                                  // Use enhanced color
                                   letterSpacing: -0.2,
                                 ),
                               ),
@@ -285,22 +327,30 @@ class PrayerListSection extends StatelessWidget {
                   ),
                 ),
 
-                // Time
+                // Time - Enhanced for next prayer in dark mode
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: isDark
+                    color: isNextPrayer && isDark
+                        ? prayerColor.withOpacity(
+                            0.2,
+                          ) // Different background for next prayer
+                        : isDark
                         ? Color(0xFF2D2D2D) // Professional dark background
                         : Colors.grey[100]!,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isDark
+                      color: isNextPrayer && isDark
+                          ? prayerColor.withOpacity(
+                              0.5,
+                            ) // Colored border for next prayer
+                          : isDark
                           ? Colors.grey.shade700
                           : Colors.grey.shade300,
-                      width: 0.5,
+                      width: isNextPrayer && isDark ? 1.0 : 0.5,
                     ),
                   ),
                   child: Text(
@@ -309,7 +359,7 @@ class PrayerListSection extends StatelessWidget {
                       fontSize: timeFontSize.clamp(12, 16),
                       fontWeight: FontWeight.w600,
                       color: isNextPrayer
-                          ? prayerColor
+                          ? nextPrayerTextColor // Use enhanced color
                           : isDark
                           ? Colors.grey.shade300
                           : Colors.grey.shade700,

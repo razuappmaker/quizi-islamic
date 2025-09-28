@@ -380,6 +380,7 @@ class _SuraPageState extends State<SuraPage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'ScheherazadeNew', // ✅ আরবির জন্য একই ফন্ট
                     color: Theme.of(context).brightness == Brightness.dark
                         ? Colors.white
                         : Colors.black87,

@@ -24,6 +24,10 @@ class _IfterTimePageState extends State<IfterTimePage>
   Duration iftarCountdown = Duration.zero;
   Timer? iftarTimer;
 
+  // ---------- New variables for time adjustment ----------
+  int iftarTimeAdjustment = 0; // মিনিটে অ্যাডজাস্টমেন্ট
+  bool _showAdjustmentDialog = false;
+
   // Animation controller for countdown pulse effect
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -43,7 +47,6 @@ class _IfterTimePageState extends State<IfterTimePage>
     "হে ঈমানদারগণ! তোমাদের উপর রোযা ফরয করা হয়েছে, যেমন ফরয করা হয়েছিল তোমাদের পূর্ববর্তীদের উপর, যাতে তোমরা মুত্তাকী হতে পার। সূরা আল-বাকারাহ ২:১৮৩",
     "আর যে কেউ অসুস্থ অথবা সফরে থাকবে, সে যেন অন্য দিনে সংখ্যাটি পূর্ণ করে। আল্লাহ তোমাদের জন্য সহজ চান এবং তোমাদের জন্য কঠোরতা চান না। সূরা আল-বাকারাহ ২:১৮৫",
     "যখন রমজান মাস প্রবেশ করে, জান্নাতের দরজাগুলো খুলে দেওয়া হয়, জাহান্নামের দরজাগুলো বন্ধ করে দেওয়া হয় এবং শয়তানদের শিকলবদ্ধ করা হয়। সহিহ বুখারি, হাদিস: ১৮৯৯; সহিহ মুসলিম, হাদিস: ১০৭৯",
-    "মানুষের প্রত্যেকটি আমল বহু গুণ বৃদ্ধি করা হয়। আল্লাহ বলেন: রোযা ছাড়া। নিশ্চয় রোযা আমার জন্য, আর আমি নিজেই এর প্রতিদান দিব। সহিহ বুখারি, হাদিস: ১৯০৪; সহিহ মুসলিম, হাদিস: ১১৫১",
     "রমজান হলো ধৈর্যের মাস, আর ধৈর্যের প্রতিদান হলো জান্নাত। সুনান ইবনে খুযাইমাহ, হাদিস: ১৮৮৭",
     "তোমাদের মধ্যে যে ব্যক্তি এ মাস (রমজান) পাবে, সে যেন এ মাসে রোযা রাখে।সূরা আল-বাকারাহ ২:১৮৫",
     "যে ব্যক্তি ঈমান ও সওয়াবের আশায় রমজানের রোযা রাখবে, তার পূর্বেকার গুনাহ মাফ করে দেওয়া হবে। সহিহ বুখারি, হাদিস: ৩৮; সহিহ মুসলিম, হাদিস: ৭৬০",
@@ -58,6 +61,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     _loadSavedData();
     _selectRandomHadith();
     _initializeAds(); // অ্যাড সিস্টেম ইনিশিয়ালাইজ করুন
+    _loadAdjustmentSettings(); // 🔹 নতুন মেথড কল করুন
 
     // Initialize animation controller
     _animationController = AnimationController(
@@ -77,6 +81,298 @@ class _IfterTimePageState extends State<IfterTimePage>
     _bannerAd?.dispose(); // ✅ Null safety সহ dispose
     _animationController.dispose();
     super.dispose();
+  }
+
+  // 🔹 নতুন মেথড: অ্যাডজাস্টমেন্ট সেটিংস লোড করুন
+  Future<void> _loadAdjustmentSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      iftarTimeAdjustment = prefs.getInt('ifter_time_adjustment') ?? 0;
+    });
+    print(
+      '🕒 ইফতার সময় অ্যাডজাস্টমেন্ট লোড করা হয়েছে: $iftarTimeAdjustment মিনিট',
+    );
+  }
+
+  // 🔹 নতুন মেথড: অ্যাডজাস্টমেন্ট সেভ করুন
+  Future<void> _saveAdjustmentSettings(int adjustment) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('ifter_time_adjustment', adjustment);
+    setState(() {
+      iftarTimeAdjustment = adjustment;
+    });
+
+    // ইফতার কাউন্টডাউন রিক্যালকুলেট করুন
+    if (prayerTimes.isNotEmpty) {
+      _calculateIftarCountdown();
+    }
+
+    print('💾 ইফতার সময় অ্যাডজাস্টমেন্ট সেভ করা হয়েছে: $adjustment মিনিট');
+  }
+
+  // 🔹 নতুন মেথড: অ্যাডজাস্টমেন্ট ডায়ালগ শো করুন
+  void _showTimeAdjustmentDialog() {
+    setState(() {
+      _showAdjustmentDialog = true;
+    });
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Row(
+                children: [
+                  Icon(Icons.schedule, color: Colors.green),
+                  SizedBox(width: 8),
+                  Text("ইফতার সময় সামঞ্জস্য করুন"),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "ইফতারের সময় সামঞ্জস্য করুন (+/- মিনিট)",
+                    style: TextStyle(fontSize: 14),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+
+                  // Adjustment display
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          "বর্তমান অ্যাডজাস্টমেন্ট",
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment মিনিট",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: iftarTimeAdjustment == 0
+                                ? Colors.grey
+                                : iftarTimeAdjustment > 0
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                  // Adjustment buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Decrease button
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            iftarTimeAdjustment -= 1;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: CircleBorder(),
+                          padding: EdgeInsets.all(16),
+                        ),
+                        child: Icon(Icons.remove, color: Colors.white),
+                      ),
+
+                      // Reset button
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            iftarTimeAdjustment = 0;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          shape: CircleBorder(),
+                          padding: EdgeInsets.all(16),
+                        ),
+                        child: Icon(Icons.refresh, color: Colors.white),
+                      ),
+
+                      // Increase button
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            iftarTimeAdjustment += 1;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: CircleBorder(),
+                          padding: EdgeInsets.all(16),
+                        ),
+                        child: Icon(Icons.add, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+
+                  // Quick adjustment buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            iftarTimeAdjustment -= 5;
+                          });
+                        },
+                        child: Text(
+                          "-৫ মিনিট",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            iftarTimeAdjustment += 5;
+                          });
+                        },
+                        child: Text(
+                          "+৫ মিনিট",
+                          style: TextStyle(color: Colors.green),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _showAdjustmentDialog = false;
+                    });
+                  },
+                  child: Text("বাতিল"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _saveAdjustmentSettings(iftarTimeAdjustment);
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _showAdjustmentDialog = false;
+                    });
+
+                    // স্ন্যাকবারে মেসেজ দেখান
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          iftarTimeAdjustment == 0
+                              ? "ইফতার সময় রিসেট করা হয়েছে"
+                              : "ইফতার সময় ${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment মিনিট অ্যাডজাস্ট করা হয়েছে",
+                        ),
+                        duration: Duration(seconds: 2),
+                        backgroundColor: iftarTimeAdjustment == 0
+                            ? Colors.orange
+                            : Colors.green,
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                  ),
+                  child: Text("সংরক্ষণ করুন"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((value) {
+      setState(() {
+        _showAdjustmentDialog = false;
+      });
+    });
+  }
+
+  // 🔹 নতুন মেথড: ইফতার সময় অ্যাডজাস্ট করুন
+  String _adjustIftarTime(String time, int adjustmentMinutes) {
+    try {
+      final parts = time.split(':');
+      if (parts.length != 2) return time;
+
+      int hours = int.parse(parts[0]);
+      int minutes = int.parse(parts[1]);
+
+      // মিনিট অ্যাডজাস্ট করা
+      minutes += adjustmentMinutes;
+
+      // ঘণ্টা সামঞ্জস্য করা
+      while (minutes >= 60) {
+        minutes -= 60;
+        hours = (hours + 1) % 24;
+      }
+
+      while (minutes < 0) {
+        minutes += 60;
+        hours = (hours - 1) % 24;
+        if (hours < 0) hours += 24;
+      }
+
+      final adjustedTime =
+          '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+
+      return adjustedTime;
+    } catch (e) {
+      print('❌ ইফতার সময় অ্যাডজাস্ট করতে ত্রুটি: $e');
+      return time;
+    }
+  }
+
+  // 🔹 নতুন মেথড: অ্যাডজাস্টমেন্ট ইন্ডিকেটর
+  Widget _buildAdjustmentIndicator(bool isDarkMode) {
+    if (iftarTimeAdjustment == 0) return SizedBox();
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: iftarTimeAdjustment > 0
+            ? Colors.green.withOpacity(0.2)
+            : Colors.red.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: iftarTimeAdjustment > 0 ? Colors.green : Colors.red,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            iftarTimeAdjustment > 0 ? Icons.arrow_upward : Icons.arrow_downward,
+            size: 14,
+            color: iftarTimeAdjustment > 0 ? Colors.green : Colors.red,
+          ),
+          SizedBox(width: 4),
+          Text(
+            "${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment মিনিট",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: iftarTimeAdjustment > 0 ? Colors.green : Colors.red,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ✅ Adaptive Banner Ad লোড করা - অন্যান্য পেইজের মতোই
@@ -255,10 +551,67 @@ class _IfterTimePageState extends State<IfterTimePage>
       cityName = prefs.getString("cityName") ?? "অজানা";
       countryName = prefs.getString("countryName") ?? "অজানা";
 
-      String? savedPrayerTimes = prefs.getString("prayerTimes");
-      if (savedPrayerTimes != null) {
-        prayerTimes = Map<String, String>.from(jsonDecode(savedPrayerTimes));
+      // 🔹 Priority 1: Adjusted prayer times (যদি থাকে)
+      String? savedAdjustedTimes = prefs.getString("adjusted_prayer_times");
+      if (savedAdjustedTimes != null) {
+        try {
+          prayerTimes = Map<String, String>.from(
+            jsonDecode(savedAdjustedTimes),
+          );
+          print('✅ ইফতার পেজ - অ্যাডজাস্টেড নামাজের সময় ব্যবহার করা হচ্ছে');
+
+          // 🔹 ডিবাগিং: মাগরিব সময় প্রিন্ট করুন
+          if (prayerTimes.containsKey("মাগরিব")) {
+            print('🕒 অ্যাডজাস্টেড মাগরিব সময়: ${prayerTimes["মাগরিব"]}');
+          }
+        } catch (e) {
+          print('❌ অ্যাডজাস্টেড টাইমস পার্স করতে ত্রুটি: $e');
+        }
+      }
+
+      // 🔹 Priority 2: Original prayer times (যদি Adjusted না থাকে)
+      if (prayerTimes.isEmpty) {
+        String? savedOriginalTimes = prefs.getString("prayerTimes");
+        if (savedOriginalTimes != null) {
+          try {
+            prayerTimes = Map<String, String>.from(
+              jsonDecode(savedOriginalTimes),
+            );
+            print('ℹ️ ইফতার পেজ - অরিজিনাল নামাজের সময় ব্যবহার করা হচ্ছে');
+
+            if (prayerTimes.containsKey("মাগরিব")) {
+              print('🕒 অরিজিনাল মাগরিব সময়: ${prayerTimes["মাগরিব"]}');
+            }
+          } catch (e) {
+            print('❌ অরিজিনাল টাইমস পার্স করতে ত্রুটি: $e');
+          }
+        }
+      }
+
+      // 🔹 অ্যাডজাস্টমেন্টস লোড করুন (ইনফোর জন্য)
+      String? savedAdjustments = prefs.getString('prayer_time_adjustments');
+      if (savedAdjustments != null) {
+        try {
+          Map<String, dynamic> adjustments = Map<String, dynamic>.from(
+            jsonDecode(savedAdjustments),
+          );
+          print('📝 ইফতার পেজ - লোড করা অ্যাডজাস্টমেন্টস: $adjustments');
+
+          // 🔹 মাগরিব অ্যাডজাস্টমেন্ট চেক করুন
+          if (adjustments.containsKey("মাগরিব")) {
+            print(
+              '🎯 মাগরিব অ্যাডজাস্টমেন্ট: ${adjustments["মাগরিব"]} minutes',
+            );
+          }
+        } catch (e) {
+          print('❌ অ্যাডজাস্টমেন্টস পার্স করতে ত্রুটি: $e');
+        }
+      }
+
+      if (prayerTimes.isNotEmpty) {
         _calculateIftarCountdown();
+      } else {
+        print('⚠️ ইফতার পেজ - কোন নামাজের সময় পাওয়া যায়নি');
       }
     });
   }
@@ -272,16 +625,25 @@ class _IfterTimePageState extends State<IfterTimePage>
     });
   }
 
-  // ইফতারের কাউন্টডাউন ক্যালকুলেশন
+  // 🔹 আপডেট করা মেথড: ইফতারের সময় ক্যালকুলেশন (অ্যাডজাস্টমেন্ট সহ)
   void _calculateIftarCountdown() {
     if (prayerTimes.containsKey("মাগরিব")) {
-      final maghribTime = prayerTimes["মাগরিব"]!;
+      String maghribTime = prayerTimes["মাগরিব"]!;
+
+      // 🔹 অ্যাডজাস্টমেন্ট প্রয়োগ করুন
+      if (iftarTimeAdjustment != 0) {
+        maghribTime = _adjustIftarTime(maghribTime, iftarTimeAdjustment);
+        print(
+          '🕒 অ্যাডজাস্টেড ইফতার সময়: $maghribTime ($iftarTimeAdjustment মিনিট)',
+        );
+      }
+
       final parts = maghribTime.split(":");
       final hour = int.parse(parts[0]);
       final minute = int.parse(parts[1]);
 
       final now = DateTime.now();
-      final maghribDateTime = DateTime(
+      DateTime maghribDateTime = DateTime(
         now.year,
         now.month,
         now.day,
@@ -304,7 +666,6 @@ class _IfterTimePageState extends State<IfterTimePage>
           });
         });
       } else {
-        // If maghrib time has passed for today, calculate for tomorrow
         final tomorrowMaghrib = maghribDateTime.add(const Duration(days: 1));
         setState(() {
           iftarCountdown = tomorrowMaghrib.difference(now);
@@ -343,10 +704,16 @@ class _IfterTimePageState extends State<IfterTimePage>
     return "--:--";
   }
 
-  // ইফতারের সময় ফরম্যাট করা
+  // 🔹 আপডেট করা মেথড: ইফতারের সময় ফরম্যাট করা (অ্যাডজাস্টমেন্ট সহ)
   String _getIftarTime() {
     if (prayerTimes.containsKey("মাগরিব")) {
-      final maghribTime = prayerTimes["মাগরিব"]!;
+      String maghribTime = prayerTimes["মাগরিব"]!;
+
+      // 🔹 অ্যাডজাস্টমেন্ট প্রয়োগ করুন
+      if (iftarTimeAdjustment != 0) {
+        maghribTime = _adjustIftarTime(maghribTime, iftarTimeAdjustment);
+      }
+
       final parts = maghribTime.split(":");
       final hour = int.parse(parts[0]);
       final minute = int.parse(parts[1]);
@@ -357,63 +724,92 @@ class _IfterTimePageState extends State<IfterTimePage>
     return "--:--";
   }
 
-  // সময় ইউনিট বিল্ড করার হেল্পার মেথড
-  Widget _buildTimeUnit(String label, int value, bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Column(
-        children: [
-          // Time value container
-          Container(
-            width: 64,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: isDarkMode
-                  ? Colors.black.withOpacity(0.3)
-                  : Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-            child: Text(
-              value.toString().padLeft(2, '0'),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-                letterSpacing: 1,
-              ),
-            ),
+  // প্রোগ্রেস ক্যালকুলেশন
+  double _calculateProgress(Duration remainingTime) {
+    // Assuming iftar is at sunset (adjust according to your logic)
+    // This calculates progress based on remaining time (0 = time's up, 1 = full time remaining)
+    const totalDaylightHours = 12; // Adjust based on your calculation
+    final totalSeconds = totalDaylightHours * 3600;
+    final remainingSeconds = remainingTime.inSeconds;
+
+    return remainingSeconds / totalSeconds;
+  }
+
+  // কাউন্টডাউন কালার নির্ধারণ
+  Color _getCountdownColor(Duration remainingTime) {
+    final hours = remainingTime.inHours;
+    final minutes = remainingTime.inMinutes % 60;
+
+    if (hours > 1) {
+      return Colors.greenAccent; // Plenty of time - green
+    } else if (hours == 1) {
+      return Colors.orangeAccent; // Getting close - orange
+    } else if (minutes > 30) {
+      return Colors.orange; // Less than an hour - dark orange
+    } else if (minutes > 10) {
+      return Colors.deepOrange; // Less than 30 minutes - red-orange
+    } else {
+      return Colors.redAccent; // Very close - red
+    }
+  }
+
+  // প্রোগ্রেস টেক্সট
+  String _getProgressText(Duration remainingTime) {
+    final hours = remainingTime.inHours;
+    final minutes = remainingTime.inMinutes % 60;
+
+    if (hours > 1) {
+      return "ইফতারের সময় আসছে";
+    } else if (hours == 1) {
+      return "প্রস্তুত হোন";
+    } else if (minutes > 30) {
+      return "অল্প সময় বাকি";
+    } else if (minutes > 10) {
+      return "শীঘ্রই ইফতার";
+    } else {
+      return "ইফতারের সময় কাছাকাছি";
+    }
+  }
+
+  // সময় ইউনিট বিল্ড করার হেল্পার মেথড - আপডেট করা
+  Widget _buildTimeUnit(String label, int value, bool isDarkMode, Color color) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: color.withOpacity(0.5), width: 1),
           ),
-          const SizedBox(height: 8),
-          // Label
-          Text(
-            label,
-            textAlign: TextAlign.center,
+          child: Text(
+            value.toString().padLeft(2, '0'),
             style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withOpacity(0.9),
-              fontWeight: FontWeight.w500,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: color,
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.8)),
+        ),
+      ],
     );
   }
 
-  // Helper widget for colon separator
-  Widget _buildColon() {
+  // কোলন সেপারেটর - আপডেট করা
+  Widget _buildColon(Color color) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         ":",
         style: TextStyle(
-          fontSize: 28,
+          fontSize: 20,
           fontWeight: FontWeight.bold,
-          color: Colors.white.withOpacity(0.8),
+          color: color,
         ),
       ),
     );
@@ -467,11 +863,13 @@ class _IfterTimePageState extends State<IfterTimePage>
             color: Colors.white,
           ),
         ),
-        // অ্যাড স্ট্যাটাস ইন্ডিকেটর (অপশনাল - ডিবাগিং এর জন্য)
+        // 🔹 সেটিং আইকন যোগ করুন
         actions: [
-          // এই অংশটি প্রোডাকশনে কমেন্ট আউট করে দিতে পারেন
-          // _buildAdStatusIndicator(isDarkMode),
-          // SizedBox(width: 8),
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.white),
+            onPressed: _showTimeAdjustmentDialog,
+            tooltip: "ইফতার সময় সামঞ্জস্য করুন",
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -493,13 +891,20 @@ class _IfterTimePageState extends State<IfterTimePage>
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      "$cityName, $countryName",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "$cityName, $countryName",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        // 🔹 অ্যাডজাস্টমেন্ট ইন্ডিকেটর যোগ করুন
+                        _buildAdjustmentIndicator(isDarkMode),
+                      ],
                     ),
                   ),
                   IconButton(
@@ -516,7 +921,7 @@ class _IfterTimePageState extends State<IfterTimePage>
 
             const SizedBox(height: 24),
 
-            // ইফতার কাউন্টডাউন সেকশন
+            // ইফতার কাউন্টডাউন সেকশন - আপডেট করা
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -538,58 +943,130 @@ class _IfterTimePageState extends State<IfterTimePage>
               ),
               child: Column(
                 children: [
-                  // Header with icon
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  // Header with icon and adjustment info
+                  Column(
                     children: [
-                      Icon(
-                        Icons.nightlight_round,
-                        color: Colors.white.withOpacity(0.9),
-                        size: 22,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.nightlight_round,
+                            color: Colors.white.withOpacity(0.9),
+                            size: 22,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            "ইফতারের সময় বাকি",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "ইফতারের সময় বাকি",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
+                      // 🔹 অ্যাডজাস্টমেন্ট তথ্য
+                      if (iftarTimeAdjustment != 0) ...[
+                        SizedBox(height: 8),
+                        Text(
+                          "(${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment মিনিট অ্যাডজাস্টেড)",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white.withOpacity(0.8),
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Countdown timer with circular progress border
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Circular progress background
+                      Container(
+                        width: 200,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.1),
                         ),
                       ),
+
+                      // Animated circular progress border
+                      SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: TweenAnimationBuilder(
+                          duration: const Duration(seconds: 1),
+                          tween: Tween<double>(begin: 0.0, end: 1.0),
+                          builder: (context, double value, child) {
+                            return CircularProgressIndicator(
+                              value: _calculateProgress(iftarCountdown),
+                              strokeWidth: 6,
+                              backgroundColor: Colors.white.withOpacity(0.2),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                _getCountdownColor(iftarCountdown),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      // Countdown content
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Main countdown numbers
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildTimeUnit(
+                                "ঘণ্টা",
+                                iftarCountdown.inHours,
+                                isDarkMode,
+                                _getCountdownColor(iftarCountdown),
+                              ),
+                              const SizedBox(width: 8),
+                              _buildColon(_getCountdownColor(iftarCountdown)),
+                              const SizedBox(width: 8),
+                              _buildTimeUnit(
+                                "মিনিট",
+                                iftarCountdown.inMinutes % 60,
+                                isDarkMode,
+                                _getCountdownColor(iftarCountdown),
+                              ),
+                              const SizedBox(width: 8),
+                              _buildColon(_getCountdownColor(iftarCountdown)),
+                              const SizedBox(width: 8),
+                              _buildTimeUnit(
+                                "সেকেন্ড",
+                                iftarCountdown.inSeconds % 60,
+                                isDarkMode,
+                                _getCountdownColor(iftarCountdown),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Progress text
+                          Text(
+                            _getProgressText(iftarCountdown),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white.withOpacity(0.8),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 20),
 
-                  // Countdown timer with improved design
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildTimeUnit(
-                        "ঘণ্টা",
-                        iftarCountdown.inHours,
-                        isDarkMode,
-                      ),
-                      const SizedBox(width: 12),
-                      _buildColon(),
-                      const SizedBox(width: 12),
-                      _buildTimeUnit(
-                        "মিনিট",
-                        iftarCountdown.inMinutes % 60,
-                        isDarkMode,
-                      ),
-                      const SizedBox(width: 12),
-                      _buildColon(),
-                      const SizedBox(width: 12),
-                      _buildTimeUnit(
-                        "সেকেন্ড",
-                        iftarCountdown.inSeconds % 60,
-                        isDarkMode,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Iftar time with improved styling
                   Container(
@@ -600,6 +1077,10 @@ class _IfterTimePageState extends State<IfterTimePage>
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -823,6 +1304,7 @@ class _IfterTimePageState extends State<IfterTimePage>
           ],
         ),
       ),
+
       // ✅ Adaptive Banner Ad - অন্যান্য পেইজের মতোই
       bottomNavigationBar: _isBannerAdReady && _bannerAd != null
           ? SafeArea(

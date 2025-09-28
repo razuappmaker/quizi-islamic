@@ -541,27 +541,56 @@ class PrayerTimeService {
   Future<String> _translateToBengali(String englishText) async {
     // একটি সাধারণ ম্যাপিং টেবিল
     Map<String, String> translationMap = {
+      // প্রাসঙ্গিক দেশ ও শহর
       'Kuwait': 'কুয়েত',
       'Kuwait City': 'কুয়েত সিটি',
       'Dhaka': 'ঢাকা',
       'Chittagong': 'চট্টগ্রাম',
       'Riyadh': 'রিয়াদ',
+      'Jeddah': 'জেদ্দা',
+      'Makkah': 'মক্কা',
+      'Madinah': 'মদিনা',
+      'Dammam': 'দাম্মাম',
+      'Khobar': 'খোবার',
       'Dubai': 'দুবাই',
+      'Abu Dhabi': 'আবুধাবি',
+      'Sharjah': 'শারজাহ',
+      'Ajman': 'আজমান',
+      'Ras Al Khaimah': 'রাস আল খাইমা',
+      'Fujairah': 'ফুজেইরা',
+      'Umm Al Quwain': 'উম্ম আল কউইন',
       'Doha': 'দোহা',
+      'Qatar': 'কাতার',
       'Saudi Arabia': 'সৌদি আরব',
       'Bangladesh': 'বাংলাদেশ',
       'India': 'ভারত',
       'Pakistan': 'পাকিস্তান',
       'United Arab Emirates': 'সংযুক্ত আরব আমিরাত',
-      'Qatar': 'কাতার',
       'Oman': 'ওমান',
+      'Muscat': 'মাসকাট',
       'Bahrain': 'বাহরাইন',
+      'Manama': 'মানামা',
       'United States': 'যুক্তরাষ্ট্র',
       'USA': 'যুক্তরাষ্ট্র',
       'America': 'আমেরিকা',
+      'Canada': 'কানাডা',
+      'Australia': 'অস্ট্রেলিয়া',
+      'United Kingdom': 'যুক্তরাজ্য',
+      'UK': 'যুক্তরাজ্য',
+      'London': 'লন্ডন',
+      'New York': 'নিউ ইয়র্ক',
       'California': 'ক্যালিফোর্নিয়া',
+      'San Francisco': 'সান ফ্রান্সিস্কো',
+      'Los Angeles': 'লস এঞ্জেলেস',
       'Mountain View': 'মাউন্টেন ভিউ',
-      // আরও শহর/দেশ যোগ করুন
+      'Boston': 'বস্টন',
+      'Chicago': 'চিকাগো',
+      'Houston': 'হিউস্টন',
+      'Singapore': 'সিঙ্গাপুর',
+      'Malaysia': 'মালয়েশিয়া',
+      'Kuala Lumpur': 'কুয়ালালামপুর',
+      'Saudi': 'সৌদি', // বিকল্প, প্রয়োজনমতো
+      // আরও দেশ/শহর যুক্ত করুন
     };
 
     // পুরো টেক্সট ম্যাপিং

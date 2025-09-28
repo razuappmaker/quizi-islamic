@@ -240,10 +240,17 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("মোট তাসবিহ"),
+        foregroundColor: Colors.white,
+
+        title: const Text(
+          "মোট তাসবিহ",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+
         backgroundColor: Colors.green[800],
         centerTitle: true,
       ),
+
       body: SafeArea(
         bottom: true, // সবসময় bottom safe area maintain করবে
         child: Column(
