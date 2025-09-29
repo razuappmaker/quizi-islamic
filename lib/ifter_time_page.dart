@@ -277,7 +277,8 @@ class _IfterTimePageState extends State<IfterTimePage>
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "ইফতারের সময় সামঞ্জস্য করুন (+/- মিনিট)",
+            "স্থানীয় মসজিদের সময়ের সাথে মিলিয়ে নিন\n"
+            "(+/-) বাটন দিয়ে ১ মিনিট করে প্রয়োজনমতো সামঞ্জস্য করুন",
             style: TextStyle(fontSize: 14),
             textAlign: TextAlign.center,
           ),
@@ -679,9 +680,9 @@ class _IfterTimePageState extends State<IfterTimePage>
   AppBar _buildAppBar(Color primaryColor) {
     return AppBar(
       backgroundColor: primaryColor,
-      centerTitle: true,
+      //centerTitle: true,
       title: const Text(
-        "ইফতার ও সেহরির সময়",
+        "ইফতার ও সেহরি",
         style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 18,
@@ -689,10 +690,59 @@ class _IfterTimePageState extends State<IfterTimePage>
         ),
       ),
       actions: [
-        IconButton(
-          icon: Icon(Icons.settings, color: Colors.white),
-          onPressed: _showTimeAdjustmentDialog,
-          tooltip: "ইফতার সময় সামঞ্জস্য করুন",
+        Container(
+          margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _showTimeAdjustmentDialog,
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.green[600]!, Colors.green[800]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.green[100]!.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.edit_calendar_rounded,
+                      size: 14,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      "সময় সেটিং",
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -1300,19 +1350,47 @@ class _IfterTimePageState extends State<IfterTimePage>
 
           // প্রোগ্রেস পার্সেন্টেজ
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: accentColor.withOpacity(0.4), width: 1),
-            ),
-            child: Text(
-              "${(progress * 100).toStringAsFixed(0)}%",
-              style: TextStyle(
-                fontSize: isTablet ? 14 : 12,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
+              gradient: LinearGradient(
+                colors: [
+                  accentColor.withOpacity(0.3),
+                  accentColor.withOpacity(0.1),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: accentColor.withOpacity(0.5),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.dining, // রমজান স্পেসিফিক আইকন
+                  size: isTablet ? 16 : 14,
+                  color: Colors.white,
+                ),
+                SizedBox(width: 6),
+                Text(
+                  "রোজার বাকি ${(progress * 100).toStringAsFixed(0)}%",
+                  style: TextStyle(
+                    fontSize: isTablet ? 13 : 11,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

@@ -1,8 +1,9 @@
-// Sura Page
+// sura_page.dart (আপডেটেড)
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'json_loader.dart';
 import 'ad_helper.dart';
+import 'word_by_word_quran_page.dart'; // নতুন ফাইল ইম্পোর্ট
 
 class SuraPage extends StatefulWidget {
   const SuraPage({Key? key}) : super(key: key);
@@ -15,27 +16,24 @@ class _SuraPageState extends State<SuraPage> {
   List<Map<String, dynamic>> dailySuras = [];
   Set<int> expandedIndices = {};
   bool _isLoading = true;
-  Map<int, bool> _showFullWarning =
-      {}; // Track full warning state for each sura
-  double _fontSize = 16.0; // Default font size
+  Map<int, bool> _showFullWarning = {};
+  double _fontSize = 16.0;
   final double _minFontSize = 12.0;
   final double _maxFontSize = 28.0;
   final double _fontSizeStep = 2.0;
 
-  BannerAd? _bannerAd; // ✅ Nullable করুন adaptive banner-এর জন্য
+  BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
 
   @override
   void initState() {
     super.initState();
     _loadSuraData();
-    _loadAd(); // ✅ Adaptive banner load
+    _loadAd();
   }
 
-  // ✅ Adaptive Banner Ad লোড করা - অন্যান্য পেইজের মতোই
   Future<void> _loadAd() async {
     try {
-      // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
       bool canShowAd = await AdHelper.canShowBannerAd();
 
       if (!canShowAd) {
@@ -133,9 +131,17 @@ class _SuraPageState extends State<SuraPage> {
     });
   }
 
+  // Word by Word Quran পেজে নেভিগেট করার মেথড
+  void _navigateToWordByWordQuran() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const WordByWordQuranPage()),
+    );
+  }
+
   @override
   void dispose() {
-    _bannerAd?.dispose(); // ✅ Null safety সহ dispose
+    _bannerAd?.dispose();
     expandedIndices.clear();
     _showFullWarning.clear();
     super.dispose();
@@ -589,47 +595,128 @@ class _SuraPageState extends State<SuraPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[700],
-        centerTitle: true, // শিরোনাম সেন্টারে
         title: const Text(
-          'আরবি, বাংলা ও অর্থসহ',
+          'সুরা',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
             color: Colors.white,
           ),
         ),
-
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.text_fields, color: Colors.white),
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem(
-                value: 'increase',
-                child: ListTile(
-                  leading: const Icon(Icons.zoom_in),
-                  title: const Text('ফন্ট বড় করুন'),
-                  onTap: _increaseFontSize,
+          // শব্দে শব্দে কুরআন বাটন - প্রফেশনাল ডিজাইন
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            child: ElevatedButton.icon(
+              onPressed: _navigateToWordByWordQuran,
+              icon: const Icon(
+                Icons.menu_book_rounded,
+                size: 18,
+                color: Colors.white,
+              ),
+              label: const Text(
+                "শব্দে শব্দে কুরআন",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
               ),
-              PopupMenuItem(
-                value: 'decrease',
-                child: ListTile(
-                  leading: const Icon(Icons.zoom_out),
-                  title: const Text('ফন্ট ছোট করুন'),
-                  onTap: _decreaseFontSize,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[800],
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
                 ),
-              ),
-              PopupMenuItem(
-                value: 'reset',
-                child: ListTile(
-                  leading: const Icon(Icons.restart_alt),
-                  title: const Text('ডিফল্ট ফন্ট সাইজ'),
-                  onTap: _resetFontSize,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(color: Colors.green[100]!.withOpacity(0.3)),
                 ),
+                elevation: 2,
+                shadowColor: Colors.black.withOpacity(0.3),
               ),
-            ],
+            ),
           ),
+
           const SizedBox(width: 8),
+
+          // ফন্ট কন্ট্রোল বাটন - প্রফেশনাল ডিজাইন
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            child: PopupMenuButton<String>(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green[800],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.green[100]!.withOpacity(0.3),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.text_fields,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              offset: const Offset(0, 50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem(
+                  value: 'increase',
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.zoom_in,
+                      color: Colors.green[700],
+                      size: 22,
+                    ),
+                    title: const Text(
+                      'ফন্ট বড় করুন',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    onTap: _increaseFontSize,
+                  ),
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'decrease',
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.zoom_out,
+                      color: Colors.green[700],
+                      size: 22,
+                    ),
+                    title: const Text(
+                      'ফন্ট ছোট করুন',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    onTap: _decreaseFontSize,
+                  ),
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'reset',
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.restart_alt,
+                      color: Colors.green[700],
+                      size: 22,
+                    ),
+                    title: const Text(
+                      'ডিফল্ট ফন্ট সাইজ',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    onTap: _resetFontSize,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 12),
         ],
       ),
       body: Column(
@@ -642,14 +729,12 @@ class _SuraPageState extends State<SuraPage> {
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
-                      // Main InteractiveViewer removed - 2 finger zoom disabled
                       itemCount: dailySuras.length,
                       itemBuilder: (context, index) =>
                           buildSura(dailySuras[index], index),
                     ),
             ),
           ),
-          // ✅ Adaptive Banner Ad - অন্যান্য পেইজের মতোই
           if (_isBannerAdReady && _bannerAd != null)
             SafeArea(
               top: false,

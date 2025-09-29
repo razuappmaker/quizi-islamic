@@ -1,13 +1,15 @@
-// MCQ Page
+// MCQ পেইজ - গুগল সার্চ ফিচার সহ  without Bonus
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'result_page.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'ad_helper.dart';
-import 'network_json_loader.dart'; // নেটওয়ার্ক লোডার import করুন
+import 'network_json_loader.dart';
 
 class MCQPage extends StatefulWidget {
   final String category;
@@ -28,14 +30,30 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   Timer? _timer;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  // Banner Ad
+  // ব্যানার এড
   BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
 
-  // Interstitial Ad flags
+  // ইন্টারস্টিশিয়াল এড ফ্ল্যাগ
   bool _hasShownHalfwayAd = false;
   bool _hasShownFinalAd = false;
   Orientation _currentOrientation = Orientation.portrait;
+
+  // constants গুলি এভাবে সেট করুন
+  static const double _optionCardMinHeight = 48.0; // Reduced from 56.0
+  static const double _optionCardMaxHeight = 65.0; // Reduced from 80.0
+  static const double _optionCardHeightFactor = 0.065; // Reduced from 0.08
+  static const double _optionCardMarginBottom = 12.0; // Reduced from 16.0
+  static const double _optionCardBorderRadius = 14.0;
+  static const double _optionFontSize = 16.0;
+  static const double _optionSelectedBorderWidth = 1.8;
+
+  // ছোট মোবাইলের জন্য কম্প্যাক্ট কনস্ট্যান্ট
+  static const double _optionCardMinHeightCompact = 40.0;
+  static const double _optionCardMaxHeightCompact = 52.0;
+  static const double _optionCardHeightFactorCompact = 0.05;
+  static const double _optionCardPaddingRatioVertical = 0.20;
+  static const double _optionCardPaddingRatioHorizontal = 0.25;
 
   @override
   void initState() {
@@ -44,10 +62,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     _audioPlayer.setVolume(1.0);
 
     loadQuestions();
-    // AdHelper.initialize() main.dart এ হয়ে গেছে, শুধু interstitial লোড করুন
     AdHelper.loadInterstitialAd();
 
-    // Adaptive banner লোড করার জন্য প্রথম frame এর পর call করুন
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadAdaptiveBanner();
     });
@@ -72,7 +88,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     }
   }
 
-  // Orientation change হলে banner reload
   Future<void> _reloadBannerOnOrientationChange() async {
     if (_bannerAd != null) {
       _bannerAd?.dispose();
@@ -81,40 +96,35 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     await _loadAdaptiveBanner();
   }
 
-  // Adaptive Banner লোড করার মেথড
   Future<void> _loadAdaptiveBanner() async {
     try {
-      // প্রথমে check করুন আমরা banner ad show করতে পারবো কিনা
       bool canShowAd = await AdHelper.canShowBannerAd();
 
       if (!canShowAd) {
-        print('Banner ad limit reached, not showing ad');
+        print('ব্যানার এড লিমিট reached, এড দেখানো হবে না');
         return;
       }
 
-      // Adaptive banner তৈরি করুন with fallback mechanism
       _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
         context,
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) {
             setState(() => _isBannerAdReady = true);
-            // Banner ad shown রেকর্ড করুন
             AdHelper.recordBannerAdShown();
-            print('Banner ad loaded successfully.');
+            print('ব্যানার এড সফলভাবে লোড হয়েছে');
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
-            print('Banner ad failed to load: $error');
+            print('ব্যানার এড লোড হতে ব্যর্থ: $error');
             ad.dispose();
             _isBannerAdReady = false;
           },
           onAdOpened: (Ad ad) {
-            // Ad click রেকর্ড করুন
             AdHelper.canClickAd().then((canClick) {
               if (canClick) {
                 AdHelper.recordAdClick();
-                print('Banner ad clicked.');
+                print('ব্যানার এড ক্লিক করা হয়েছে');
               } else {
-                print('Ad click limit reached');
+                print('এড ক্লিক লিমিট reached');
               }
             });
           },
@@ -122,16 +132,13 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
         orientation: _currentOrientation,
       );
 
-      // Banner লোড করুন
       await _bannerAd?.load();
     } catch (e) {
-      print('Error loading adaptive banner: $e');
-      // Fallback: regular banner লোড করার চেষ্টা করুন
+      print('Adaptive ব্যানার লোড করতে ত্রুটি: $e');
       _loadRegularBanner();
     }
   }
 
-  // Regular banner লোড করার fallback মেথড
   void _loadRegularBanner() {
     try {
       _bannerAd = AdHelper.createBannerAd(
@@ -140,10 +147,10 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
           onAdLoaded: (Ad ad) {
             setState(() => _isBannerAdReady = true);
             AdHelper.recordBannerAdShown();
-            print('Regular banner ad loaded successfully.');
+            print('নিয়মিত ব্যানার এড সফলভাবে লোড হয়েছে');
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
-            print('Regular banner ad failed to load: $error');
+            print('নিয়মিত ব্যানার এড লোড হতে ব্যর্থ: $error');
             ad.dispose();
             _isBannerAdReady = false;
           },
@@ -151,9 +158,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             AdHelper.canClickAd().then((canClick) {
               if (canClick) {
                 AdHelper.recordAdClick();
-                print('Banner ad clicked.');
+                print('ব্যানার এড ক্লিক করা হয়েছে');
               } else {
-                print('Ad click limit reached');
+                print('এড ক্লিক লিমিট reached');
               }
             });
           },
@@ -162,27 +169,93 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
 
       _bannerAd?.load();
     } catch (e) {
-      print('Error loading regular banner: $e');
+      print('নিয়মিত ব্যানার লোড করতে ত্রুটি: $e');
     }
   }
 
-  // ✅ আপডেটেড: JSON থেকে প্রশ্ন লোড করুন (নেটওয়ার্ক → লোকাল → ডিফল্ট)
+  // গুগল সার্চ ফাংশন
+  Future<void> _searchOnGoogle() async {
+    final question = questions[currentQuestionIndex]['question'];
+
+    // কনফার্মেশন ডায়ালগ দেখান
+    bool? shouldSearch = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'গুগলে সার্চ করুন',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'আপনি কি "$question" প্রশ্নটি গুগলে সার্চ করতে চান?',
+          style: const TextStyle(fontSize: 14, height: 1.4),
+          textAlign: TextAlign.center,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('বাতিল', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('সার্চ করুন'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldSearch == true) {
+      final encodedQuestion = Uri.encodeComponent('$question ইসলামিক প্রশ্ন');
+      final url = 'https://www.google.com/search?q=$encodedQuestion';
+
+      try {
+        if (await canLaunchUrl(Uri.parse(url))) {
+          await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('গুগল সার্চ খোলা যাচ্ছে না'),
+              backgroundColor: Colors.red[700],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        print('URL লঞ্চ করতে ত্রুটি: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('গুগল সার্চ খুলতে ত্রুটি'),
+            backgroundColor: Colors.red[700],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> loadQuestions() async {
     try {
       print('🔄 প্রশ্ন লোড শুরু: ${widget.category}');
 
-      // ১ম চেষ্টা: নেটওয়ার্ক থেকে সম্পূর্ণ questions.json লোড করুন
       final List<dynamic> allQuestionsData =
-          await NetworkJsonLoader.loadJsonList(
-            'assets/questions.json', // এই path টি নেটওয়ার্কে থাকতে হবে
-          );
+          await NetworkJsonLoader.loadJsonList('assets/questions.json');
 
-      // নেটওয়ার্ক থেকে পাওয়া ডেটা process করুন
       if (allQuestionsData is List && allQuestionsData.isNotEmpty) {
-        // যদি নেটওয়ার্ক ডেটা List হিসেবে আসে
         Map<String, dynamic> questionsMap = {};
 
-        // List কে Map এ convert করুন (যদি প্রয়োজন হয়)
         for (var item in allQuestionsData) {
           if (item is Map<String, dynamic>) {
             questionsMap.addAll(item);
@@ -193,7 +266,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
         print('✅ নেটওয়ার্ক থেকে প্রশ্ন সফলভাবে লোড হয়েছে');
         return;
       } else if (allQuestionsData is Map) {
-        // যদি নেটওয়ার্ক ডেটা সরাসরি Map হিসেবে আসে
         setQuestionsFromMap(allQuestionsData as Map<String, dynamic>);
         print('✅ নেটওয়ার্ক থেকে প্রশ্ন সফলভাবে লোড হয়েছে');
         return;
@@ -202,7 +274,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       print('❌ নেটওয়ার্ক থেকে লোড ব্যর্থ: $e');
     }
 
-    // ২য় চেষ্টা: লোকাল asset থেকে লোড করুন
     try {
       print('🔄 লোকাল asset থেকে প্রশ্ন লোড করার চেষ্টা');
       final String localResponse = await rootBundle.loadString(
@@ -214,7 +285,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     } catch (e) {
       print('❌ লোকাল asset থেকে লোড ব্যর্থ: $e');
 
-      // ৩য় চেষ্টা: ডিফল্ট প্রশ্ন ব্যবহার করুন
       setState(() {
         questions = _getDefaultQuestions();
         if (questions.isNotEmpty) {
@@ -225,12 +295,10 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     }
   }
 
-  // ✅ সহায়ক মেথড: Map থেকে প্রশ্ন সেট করুন
   void setQuestionsFromMap(Map<String, dynamic> questionsMap) {
     setState(() {
       questions = questionsMap[widget.category] ?? [];
       if (questions.isEmpty) {
-        // যদি specific category না পাওয়া যায়, তবে ডিফল্ট প্রশ্ন ব্যবহার করুন
         questions = _getDefaultQuestions();
       }
 
@@ -240,7 +308,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     });
   }
 
-  // ✅ ডিফল্ট প্রশ্ন (যদি সবকিছু ব্যর্থ হয়)
   List<dynamic> _getDefaultQuestions() {
     return [
       {
@@ -313,14 +380,12 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       });
       startTimer();
 
-      // ✅ 50% প্রশ্ন শেষ হলে interstitial ad show করুন
       if (!_hasShownHalfwayAd &&
           currentQuestionIndex >= (questions.length / 2).floor()) {
         _hasShownHalfwayAd = true;
         _showInterstitialAd();
       }
     } else {
-      // ✅ শেষ প্রশ্ন শেষ হলে final interstitial ad show করুন
       if (!_hasShownFinalAd) {
         _hasShownFinalAd = true;
         _showAdThenNavigate();
@@ -330,43 +395,37 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     }
   }
 
-  // Interstitial ad show করার মেথড
   void _showInterstitialAd() {
     AdHelper.showInterstitialAd(
       onAdShowed: () {
-        print('Interstitial ad showed at halfway point');
+        print('অর্ধেক পথে ইন্টারস্টিশিয়াল এড দেখানো হয়েছে');
       },
       onAdDismissed: () {
-        print('Interstitial ad dismissed');
-        // Ad dismiss হওয়ার পর পরবর্তী ad preload করুন
+        print('ইন্টারস্টিশিয়াল এড dismiss করা হয়েছে');
         AdHelper.loadInterstitialAd();
       },
       onAdFailedToShow: () {
-        print('Interstitial ad failed to show at halfway point');
-        // Failed হলে পরবর্তী ad load করার চেষ্টা করুন
+        print('অর্ধেক পথে ইন্টারস্টিশিয়াল এড দেখাতে ব্যর্থ');
         AdHelper.loadInterstitialAd();
       },
-      adContext: 'MCQPage_Halfway', // ট্র্যাকিং এর জন্য
+      adContext: 'MCQPage_Halfway',
     );
   }
 
-  // Ad show করার পর result page এ navigate করার মেথড
   void _showAdThenNavigate() {
     AdHelper.showInterstitialAd(
       onAdShowed: () {
-        print('Final interstitial ad showed');
+        print('ফাইনাল ইন্টারস্টিশিয়াল এড দেখানো হয়েছে');
       },
       onAdDismissed: () {
         _navigateToResult();
-        // Ad dismiss হওয়ার পর পরবর্তী ad preload করুন
         AdHelper.loadInterstitialAd();
       },
       onAdFailedToShow: () {
         _navigateToResult();
-        // Failed হলে পরবর্তী ad load করার চেষ্টা করুন
         AdHelper.loadInterstitialAd();
       },
-      adContext: 'MCQPage_Final', // ট্র্যাকিং এর জন্য
+      adContext: 'MCQPage_Final',
     );
   }
 
@@ -408,6 +467,17 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = Colors.green[800];
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final bool isTablet = screenWidth > 600;
+    final bool isSmallPhone = screenHeight < 600 || screenWidth < 360;
+    // রেসপন্সিভ ফন্ট সাইজ ক্যালকুলেশন
+    final double responsiveFontSize = screenWidth < 360
+        ? 14.0
+        : screenWidth < 400
+        ? 16.0
+        : 17.0;
 
     if (questions.isEmpty) {
       return Scaffold(
@@ -440,239 +510,597 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
         appBar: AppBar(
           title: Text(
             'প্রশ্ন ${currentQuestionIndex + 1}/${questions.length}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: screenWidth < 360 ? 16 : 18,
+            ),
           ),
           backgroundColor: primaryColor,
           elevation: 0,
           centerTitle: true,
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Progress bar with percentage
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: LinearProgressIndicator(
-                              value:
-                                  (currentQuestionIndex + 1) / questions.length,
-                              backgroundColor: Colors.grey[300],
-                              color: primaryColor,
-                              minHeight: 8,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '${((currentQuestionIndex + 1) / questions.length * 100).toStringAsFixed(0)}%',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Timer section
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _timeLeft <= 5
-                            ? Colors.red.withOpacity(0.1)
-                            : primaryColor!.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.timer,
-                            color: _timeLeft <= 5 ? Colors.red : primaryColor,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'সময় বাকি: $_timeLeft সেকেন্ড',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: _timeLeft <= 5 ? Colors.red : primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Question image
-                    if (question['image'] != null)
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(screenWidth * 0.04),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // প্রোগ্রেস বার - শতকরা সহ
                       Container(
                         margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: LinearProgressIndicator(
+                                value:
+                                    (currentQuestionIndex + 1) /
+                                    questions.length,
+                                backgroundColor: Colors.grey[300],
+                                color: primaryColor,
+                                minHeight: 8,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              '${((currentQuestionIndex + 1) / questions.length * 100).toStringAsFixed(0)}%',
+                              style: TextStyle(
+                                fontSize: responsiveFontSize - 1,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
                             ),
                           ],
                         ),
-                        child: ClipRRect(
+                      ),
+
+                      // টাইমার সেকশন
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.015,
+                          horizontal: screenWidth * 0.04,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _timeLeft <= 5
+                              ? Colors.red.withOpacity(0.1)
+                              : primaryColor!.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            'assets/images/${question['image']}',
-                            height: 200,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.timer,
+                              color: _timeLeft <= 5 ? Colors.red : primaryColor,
+                              size: responsiveFontSize + 2,
+                            ),
+                            SizedBox(width: screenWidth * 0.02),
+                            Text(
+                              'সময় বাকি: $_timeLeft সেকেন্ড',
+                              style: TextStyle(
+                                fontSize: responsiveFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: _timeLeft <= 5
+                                    ? Colors.red
+                                    : primaryColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
-                    // Question text
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        question['question'],
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          height: 1.4,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+                      SizedBox(height: screenHeight * 0.03),
 
-                    const SizedBox(height: 20),
-
-                    // Options
-                    ...(question['options'] as List<dynamic>).map((option) {
-                      Color optionColor = isDarkMode
-                          ? Colors.grey[800]!
-                          : Colors.white;
-                      Color textColor = isDarkMode
-                          ? Colors.white70
-                          : Colors.black87;
-                      BoxBorder? border;
-
-                      if (isAnswered) {
-                        if (option == question['answer']) {
-                          optionColor = Colors.green.withOpacity(0.2);
-                          textColor = isDarkMode
-                              ? Colors.green[300]!
-                              : Colors.green;
-                          border = Border.all(color: Colors.green, width: 1.5);
-                        } else if (option == selectedOption) {
-                          optionColor = Colors.red.withOpacity(0.2);
-                          textColor = isDarkMode
-                              ? Colors.red[300]!
-                              : Colors.red;
-                          border = Border.all(color: Colors.red, width: 1.5);
-                        }
-                      }
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: Material(
-                          color: optionColor,
-                          borderRadius: BorderRadius.circular(12),
-                          child: InkWell(
-                            onTap: () => checkAnswer(option),
+                      // প্রশ্ন ইমেজ
+                      if (question['image'] != null)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
-                            child: Container(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              'assets/images/${question['image']}',
+                              height: screenHeight * 0.2,
                               width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: border,
-                                boxShadow: [
-                                  if (!isAnswered)
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                ],
-                              ),
-                              child: Text(
-                                option,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: textColor,
-                                  fontWeight:
-                                      isAnswered && option == question['answer']
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                ),
-                              ),
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
-                      );
-                    }).toList(),
 
-                    const SizedBox(height: 24),
-
-                    // Next button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: isAnswered ? goToNextQuestion : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 4,
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                      // প্রশ্ন কন্টেইনার - ফুলি রেসপন্সিভ
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: isTablet
+                              ? screenHeight * 0.025
+                              : isSmallPhone
+                              ? screenHeight * 0.018
+                              : screenHeight * 0.022,
+                          horizontal: isTablet
+                              ? screenWidth * 0.05
+                              : isSmallPhone
+                              ? screenWidth * 0.035
+                              : screenWidth * 0.04,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDarkMode
+                              ? Colors.grey[800]
+                              : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(
+                            isTablet
+                                ? 16
+                                : isSmallPhone
+                                ? 10
+                                : 12,
                           ),
                         ),
                         child: Text(
-                          currentQuestionIndex < questions.length - 1
-                              ? 'পরবর্তী প্রশ্ন'
-                              : 'ফলাফল দেখুন',
+                          question['question'],
+                          style: TextStyle(
+                            fontSize: isTablet
+                                ? responsiveFontSize + 2
+                                : isSmallPhone
+                                ? responsiveFontSize - 1
+                                : responsiveFontSize + 1,
+                            fontWeight: FontWeight.w600,
+                            height: isTablet
+                                ? 1.5
+                                : isSmallPhone
+                                ? 1.3
+                                : 1.4,
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ),
-                  ],
+
+                      SizedBox(height: screenHeight * 0.025),
+
+                      // অপশনগুলি - রেসপন্সিভ ভার্সন
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final double screenHeight = constraints.maxHeight;
+                          final double screenWidth = MediaQuery.of(
+                            context,
+                          ).size.width;
+
+                          // স্ক্রিন সাইজ ডিটেকশন - আরও একুরেট
+                          final bool isTablet = screenWidth > 600;
+                          final bool isSmallPhone =
+                              screenHeight < 600 || screenWidth < 360;
+                          final bool isLargePhone =
+                              screenHeight > 700 && screenWidth > 400;
+
+                          // হাইট ক্যালকুলেশন - ছোট মোবাইলের জন্য আরও কম
+                          final double optionCardHeight = math.max(
+                            isTablet
+                                ? _optionCardMinHeight * 0.95
+                                : isSmallPhone
+                                ? _optionCardMinHeightCompact
+                                : isLargePhone
+                                ? _optionCardMinHeight * 0.9
+                                : _optionCardMinHeight * 0.85,
+                            math.min(
+                              screenHeight *
+                                  (isTablet
+                                      ? _optionCardHeightFactor * 0.9
+                                      : isSmallPhone
+                                      ? _optionCardHeightFactorCompact
+                                      : isLargePhone
+                                      ? _optionCardHeightFactor * 0.8
+                                      : _optionCardHeightFactor * 0.7),
+                              isTablet
+                                  ? _optionCardMaxHeight * 0.95
+                                  : isSmallPhone
+                                  ? _optionCardMaxHeightCompact
+                                  : isLargePhone
+                                  ? _optionCardMaxHeight * 0.9
+                                  : _optionCardMaxHeight * 0.85,
+                            ),
+                          );
+
+                          // অ্যাডাপ্টিভ ফন্ট সাইজ
+                          final double optionFontSize = isTablet
+                              ? _optionFontSize * 1.05
+                              : isSmallPhone
+                              ? _optionFontSize * 0.82
+                              : isLargePhone
+                              ? _optionFontSize * 0.95
+                              : _optionFontSize * 0.88;
+
+                          return Column(
+                            children: (question['options'] as List<dynamic>).map((
+                              option,
+                            ) {
+                              // ডাইনামিক প্যাডিং - ছোট স্ক্রিনের জন্য কম
+                              final double verticalPadding =
+                                  optionCardHeight *
+                                  (isSmallPhone
+                                      ? 0.18
+                                      : _optionCardPaddingRatioVertical);
+                              final double horizontalPadding =
+                                  optionCardHeight *
+                                  (isSmallPhone
+                                      ? 0.22
+                                      : _optionCardPaddingRatioHorizontal);
+
+                              Color optionColor = isDarkMode
+                                  ? Colors.grey[800]!
+                                  : Colors.white;
+                              Color textColor = isDarkMode
+                                  ? Colors.white70
+                                  : Colors.black87;
+                              BoxBorder? border;
+                              Color? shadowColor;
+
+                              if (isAnswered) {
+                                if (option == question['answer']) {
+                                  optionColor = isDarkMode
+                                      ? Colors.green.withOpacity(0.16)
+                                      : Colors.green.withOpacity(0.10);
+                                  textColor = isDarkMode
+                                      ? Colors.green[400]!
+                                      : Colors.green[700]!;
+                                  border = Border.all(
+                                    color: Colors.green,
+                                    width: _optionSelectedBorderWidth,
+                                  );
+                                } else if (option == selectedOption) {
+                                  optionColor = isDarkMode
+                                      ? Colors.red.withOpacity(0.16)
+                                      : Colors.red.withOpacity(0.10);
+                                  textColor = isDarkMode
+                                      ? Colors.red[400]!
+                                      : Colors.red[700]!;
+                                  border = Border.all(
+                                    color: Colors.red,
+                                    width: _optionSelectedBorderWidth,
+                                  );
+                                }
+                              } else {
+                                shadowColor = isDarkMode
+                                    ? Colors.black.withOpacity(0.20)
+                                    : Colors.black.withOpacity(0.06);
+                              }
+
+                              return Container(
+                                margin: EdgeInsets.only(
+                                  bottom: isTablet
+                                      ? _optionCardMarginBottom * 1.1
+                                      : isSmallPhone
+                                      ? _optionCardMarginBottom * 0.7
+                                      : _optionCardMarginBottom * 0.85,
+                                ),
+                                height: optionCardHeight,
+                                child: Material(
+                                  elevation: isAnswered
+                                      ? 0
+                                      : (isTablet
+                                            ? 1.5
+                                            : (isSmallPhone ? 0.5 : 1)),
+                                  color: optionColor,
+                                  borderRadius: BorderRadius.circular(
+                                    _optionCardBorderRadius,
+                                  ),
+                                  shadowColor: shadowColor,
+                                  surfaceTintColor: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () => checkAnswer(option),
+                                    borderRadius: BorderRadius.circular(
+                                      _optionCardBorderRadius,
+                                    ),
+                                    splashColor: isAnswered
+                                        ? Colors.transparent
+                                        : (isDarkMode
+                                              ? Colors.white.withOpacity(0.08)
+                                              : Colors.black.withOpacity(0.04)),
+                                    highlightColor: isAnswered
+                                        ? Colors.transparent
+                                        : (isDarkMode
+                                              ? Colors.white.withOpacity(0.04)
+                                              : Colors.black.withOpacity(0.02)),
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 180,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: verticalPadding,
+                                        horizontal: horizontalPadding,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          _optionCardBorderRadius,
+                                        ),
+                                        border: border,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          // অপশন ইন্ডিকেটর - ছোট স্ক্রিনের জন্য ছোট
+                                          Container(
+                                            width: isSmallPhone
+                                                ? 24
+                                                : (isTablet ? 30 : 26),
+                                            height: isSmallPhone
+                                                ? 24
+                                                : (isTablet ? 30 : 26),
+                                            margin: EdgeInsets.only(
+                                              right: isSmallPhone
+                                                  ? 10
+                                                  : (isTablet ? 14 : 12),
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: isAnswered
+                                                  ? (option ==
+                                                            question['answer']
+                                                        ? Colors.green
+                                                              .withOpacity(0.1)
+                                                        : option ==
+                                                              selectedOption
+                                                        ? Colors.red
+                                                              .withOpacity(0.1)
+                                                        : isDarkMode
+                                                        ? Colors.grey[700]
+                                                        : Colors.grey[200])
+                                                  : (isDarkMode
+                                                        ? Colors.grey[700]
+                                                        : Colors.grey[200]),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    isSmallPhone ? 6 : 8,
+                                                  ),
+                                              border:
+                                                  isAnswered &&
+                                                      option ==
+                                                          question['answer']
+                                                  ? Border.all(
+                                                      color: Colors.green,
+                                                      width: 1.5,
+                                                    )
+                                                  : null,
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                [
+                                                  'ক',
+                                                  'খ',
+                                                  'গ',
+                                                  'ঘ',
+                                                ][(question['options']
+                                                        as List<dynamic>)
+                                                    .indexOf(option)],
+                                                style: TextStyle(
+                                                  fontSize: isSmallPhone
+                                                      ? 11
+                                                      : (isTablet ? 13 : 12),
+                                                  fontWeight: FontWeight.w600,
+                                                  color: isAnswered
+                                                      ? (option ==
+                                                                question['answer']
+                                                            ? Colors.green
+                                                            : option ==
+                                                                  selectedOption
+                                                            ? Colors.red
+                                                            : isDarkMode
+                                                            ? Colors.white60
+                                                            : Colors.black54)
+                                                      : (isDarkMode
+                                                            ? Colors.white70
+                                                            : Colors.black87),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+                                          // অপশন টেক্সট
+                                          Expanded(
+                                            child: Text(
+                                              option,
+                                              style: TextStyle(
+                                                fontSize: optionFontSize,
+                                                color: textColor,
+                                                fontWeight:
+                                                    isAnswered &&
+                                                        option ==
+                                                            question['answer']
+                                                    ? FontWeight.w600
+                                                    : FontWeight.normal,
+                                                height: isSmallPhone
+                                                    ? 1.2
+                                                    : (isTablet ? 1.35 : 1.25),
+                                              ),
+                                              textAlign: TextAlign.left,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+
+                                          // করেক্ট/রংগ ইন্ডিকেটর আইকন - ছোট স্ক্রিনের জন্য ছোট
+                                          if (isAnswered)
+                                            AnimatedOpacity(
+                                              duration: const Duration(
+                                                milliseconds: 250,
+                                              ),
+                                              opacity: isAnswered ? 1.0 : 0.0,
+                                              child: Icon(
+                                                option == question['answer']
+                                                    ? Icons.check_circle_rounded
+                                                    : option == selectedOption
+                                                    ? Icons.cancel_rounded
+                                                    : Icons.circle_outlined,
+                                                size: isSmallPhone
+                                                    ? 16
+                                                    : (isTablet ? 20 : 18),
+                                                color:
+                                                    option == question['answer']
+                                                    ? Colors.green
+                                                    : option == selectedOption
+                                                    ? Colors.red
+                                                    : Colors.transparent,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+
+                      SizedBox(height: screenHeight * 0.03),
+
+                      // পরবর্তী বাটন
+                      SizedBox(
+                        width: double.infinity,
+                        height: screenHeight * 0.06,
+                        child: ElevatedButton(
+                          onPressed: isAnswered ? goToNextQuestion : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 4,
+                            textStyle: TextStyle(
+                              fontSize: responsiveFontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          child: Text(
+                            currentQuestionIndex < questions.length - 1
+                                ? 'পরবর্তী প্রশ্ন'
+                                : 'ফলাফল দেখুন',
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+
+                      // গুগল সার্চ বাটন - আরও আকর্ষণীয় ভার্সন
+                      if (isAnswered)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          child: Column(
+                            children: [
+                              // ডিভাইডার সহ টেক্সট
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Divider(
+                                        color: isDarkMode
+                                            ? Colors.grey[700]
+                                            : Colors.grey[300],
+                                        thickness: 1,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      child: Text(
+                                        'উত্তরটি যাচাই করতে',
+                                        style: TextStyle(
+                                          fontSize: responsiveFontSize - 3,
+                                          fontWeight: FontWeight.w500,
+                                          color: isDarkMode
+                                              ? Colors.grey[400]
+                                              : Colors.grey[600],
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Divider(
+                                        color: isDarkMode
+                                            ? Colors.grey[700]
+                                            : Colors.grey[300],
+                                        thickness: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // কম্প্যাক্ট গুগল সার্চ বাটন
+                              SizedBox(
+                                width: double.infinity,
+                                height: screenHeight * 0.055,
+                                child: OutlinedButton.icon(
+                                  onPressed: _searchOnGoogle,
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: isDarkMode
+                                        ? Colors.blue[300]
+                                        : Colors.blue[600],
+                                    side: BorderSide(
+                                      color: isDarkMode
+                                          ? Colors.blue[400]!
+                                          : Colors.blue[300]!,
+                                      width: 1.5,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    backgroundColor: isDarkMode
+                                        ? Colors.blue[900]!.withOpacity(0.1)
+                                        : Colors.blue[50]!.withOpacity(0.5),
+                                    textStyle: TextStyle(
+                                      fontSize: responsiveFontSize - 1,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.04,
+                                      vertical: screenHeight * 0.015,
+                                    ),
+                                  ),
+                                  icon: Icon(
+                                    Icons.search,
+                                    size: responsiveFontSize,
+                                    color: isDarkMode
+                                        ? Colors.blue[300]
+                                        : Colors.blue[600],
+                                  ),
+                                  label: const Text('গুগলে তথ্য যাচাই করুন'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            // ✅ Banner Ad (যদি লোড হয়ে থাকে এবং limit না থাকে)
-            if (_isBannerAdReady && _bannerAd != null)
-              SafeArea(
-                child: Container(
+              // ব্যানার এড - সেফ এরিয়ার মধ্যে সঠিকভাবে স্থাপন
+              if (_isBannerAdReady && _bannerAd != null)
+                Container(
                   alignment: Alignment.center,
                   width: MediaQuery.of(context).size.width,
                   height: _bannerAd!.size.height.toDouble(),
                   child: AdWidget(ad: _bannerAd!),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

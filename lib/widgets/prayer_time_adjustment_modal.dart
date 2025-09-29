@@ -102,7 +102,9 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
 
           const SizedBox(height: 10),
           Text(
-            "প্রতিটি নামাজের সময় ১ মিনিট করে সামঞ্জস্য করুন",
+            "স্থানীয় মসজিদের সময়ের সাথে মিলিয়ে নিন\n"
+            "(+/-) বাটন দিয়ে ১ মিনিট করে প্রয়োজনমতো সামঞ্জস্য করুন",
+
             style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
           ),
 

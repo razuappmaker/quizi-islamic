@@ -5,21 +5,18 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 
 class NetworkJsonLoader {
-  // আপনার ডোমেইন============================================================
-  // আপনার ডোমেইন============================================================
   static const String baseUrl = "https://appmaker.com/assets/";
 
   static Future<List<dynamic>> loadJsonList(String filePath) async {
-    // filePath example: 'assets/questions.json' বা 'assets/salat_doyas.json'
-    // আমরা শুধু file name টা নিবো: 'questions.json' বা 'salat_doyas.json'
     final fileName = filePath.split('/').last;
-
     print('🔄 লোড করার চেষ্টা: $fileName');
 
-    // ১ম চেষ্টা: নেটওয়ার্ক থেকে লোড
+    // ১ম চেষ্টা: নেটওয়ার্ক থেকে লোড (দ্রুত timeout সহ)
     try {
       print('🌐 নেটওয়ার্ক থেকে লোড: $fileName');
-      final networkData = await _loadFromNetwork(fileName);
+      final networkData = await _loadFromNetwork(
+        fileName,
+      ).timeout(Duration(seconds: 6)); // ✅ মোট timeout 6 সেকেন্ড
       print('✅ নেটওয়ার্ক থেকে সফল: $fileName');
       return networkData;
     } catch (e) {
@@ -29,19 +26,20 @@ class NetworkJsonLoader {
     // ২য় চেষ্টা: লোকাল asset থেকে লোড
     try {
       print('📁 লোকাল asset থেকে লোড: $filePath');
-      final localData = await _loadFromAsset(filePath);
+      final localData = await _loadFromAsset(
+        filePath,
+      ).timeout(Duration(seconds: 3)); // ✅ লোকালেও timeout
       print('✅ লোকাল asset থেকে সফল: $filePath');
       return localData;
     } catch (e) {
       print('❌ লোকাল asset ব্যর্থ ($filePath): $e');
     }
 
-    // ৩য় চেষ্টা: ডিফল্ট ডেটা
+    // ৩য় চেষ্টা: ডিফল্ট ডেটা (ইনস্ট্যান্ট)
     print('⚠️ সকল সোর্স ব্যর্থ, ডিফল্ট ডেটা ব্যবহার: $fileName');
     return _getDefaultData(fileName);
   }
 
-  // network_json_loader.dart - _loadFromNetwork মেথডে এডিট করুন
   static Future<List<dynamic>> _loadFromNetwork(String fileName) async {
     final url = '$baseUrl$fileName';
     print('🔗 নেটওয়ার্ক URL: $url');
@@ -49,23 +47,27 @@ class NetworkJsonLoader {
     final httpClient = HttpClient();
 
     try {
-      httpClient.connectionTimeout = Duration(seconds: 8);
+      httpClient.connectionTimeout = Duration(seconds: 4); // ✅ 4 সেকেন্ড
+      httpClient.idleTimeout = Duration(seconds: 4); // ✅ idle timeout
 
       final request = await httpClient.getUrl(Uri.parse(url));
-      final response = await request.close().timeout(Duration(seconds: 10));
+      final response = await request.close().timeout(
+        Duration(seconds: 5),
+      ); // ✅ 5 সেকেন্ড
 
       print('📊 HTTP Status Code: ${response.statusCode}');
-      print('📊 Content-Type: ${response.headers.contentType}');
 
       if (response.statusCode == 200) {
-        final responseBody = await response.transform(utf8.decoder).join();
+        final responseBody = await response
+            .transform(utf8.decoder)
+            .timeout(Duration(seconds: 3)) // ✅ ডেটা রিডিং timeout
+            .join();
 
-        // ✅ Debug: প্রথম 500 character দেখুন
-        final previewLength = responseBody.length < 500
+        // ✅ সংক্ষিপ্ত debug (performance জন্য)
+        final previewLength = responseBody.length < 100
             ? responseBody.length
-            : 500;
-        print('📄 Response preview (first $previewLength chars):');
-        print(responseBody.substring(0, previewLength));
+            : 100;
+        print('📄 Response preview (first $previewLength chars)');
 
         try {
           final jsonData = json.decode(responseBody);
@@ -76,17 +78,20 @@ class NetworkJsonLoader {
           throw Exception('অবৈধ JSON ফরম্যাট');
         } catch (e) {
           print('❌ JSON decode error: $e');
-          throw Exception('Invalid JSON format from server');
+          throw Exception('Invalid JSON format');
         }
       } else {
         throw Exception('HTTP error: ${response.statusCode}');
       }
     } on TimeoutException {
+      print('⏰ নেটওয়ার্ক টাইমআউট - দ্রুত ফ্যালব্যাক');
       throw Exception('নেটওয়ার্ক টাইমআউট');
     } on SocketException {
+      print('🌐 ইন্টারনেট সংযোগ নেই - দ্রুত ফ্যালব্যাক');
       throw Exception('ইন্টারনেট সংযোগ নেই');
     } catch (e) {
-      throw Exception('নেটওয়ার্ক ত্রুটি: $e');
+      print('❌ নেটওয়ার্ক ত্রুটি: $e');
+      throw Exception('নেটওয়ার্ক ত্রুটি');
     } finally {
       httpClient.close();
     }
@@ -107,6 +112,7 @@ class NetworkJsonLoader {
   }
 
   // ফাইল অনুযায়ী ডিফল্ট ডেটা
+  // network_json_loader.dart - _getDefaultData মেথডে যোগ করুন
   static List<dynamic> _getDefaultData(String fileName) {
     print('📋 ডিফল্ট ডেটা ব্যবহার: $fileName');
 
@@ -130,9 +136,61 @@ class NetworkJsonLoader {
         return _getDefaultFastingDoyas();
       case 'misc_doyas.json':
         return _getDefaultMiscDoyas();
+      case 'wordquran.json': // ✅ নতুন কেস যোগ করুন
+        return _getDefaultWordQuran();
       default:
         return _getGenericDefaultData();
     }
+  }
+
+  // Word Quran-এর জন্য ডিফল্ট ডেটা যোগ করুন
+  static List<dynamic> _getDefaultWordQuran() {
+    return [
+      {
+        'title': 'সূরা আল ফাতিহা - الفاتحة',
+        'ayat': [
+          {
+            'arabic_words': [
+              {'word': 'بِسْمِ', 'meaning': 'নামে'},
+              {'word': 'ٱللَّٰهِ', 'meaning': 'আল্লাহর'},
+              {'word': 'ٱلرَّحْمَٰنِ', 'meaning': 'পরম করুণাময়'},
+              {'word': 'ٱلرَّحِيمِ', 'meaning': 'অতি দয়ালু'},
+            ],
+            'transliteration': 'বিসমিল্লাহির রাহমানির রাহিম',
+            'meaning': 'পরম করুণাময়, পরম দয়ালু আল্লাহর নামে।',
+            'reference': 'কুরআন, সূরা আল ফাতিহা, আয়াত ১',
+          },
+          {
+            'arabic_words': [
+              {'word': 'الْحَمْدُ', 'meaning': 'সমস্ত প্রশংসা'},
+              {'word': 'لِلَّهِ', 'meaning': 'আল্লাহর জন্য'},
+              {'word': 'رَبِّ', 'meaning': 'প্রতিপালক'},
+              {'word': 'الْعَالَمِينَ', 'meaning': 'সকল সৃষ্টির'},
+            ],
+            'transliteration': 'আলহামদু লিল্লাহি রাব্বিল আলামিন',
+            'meaning':
+                'সমস্ত প্রশংসা আল্লাহর জন্য, যিনি সকল সৃষ্টির প্রতিপালক।',
+            'reference': 'কুরআন, সূরা আল ফাতিহা, আয়াত ২',
+          },
+        ],
+      },
+      {
+        'title': 'সূরা আল ইখলাস - الإخلاص',
+        'ayat': [
+          {
+            'arabic_words': [
+              {'word': 'قُلْ', 'meaning': 'বলুন'},
+              {'word': 'هُوَ', 'meaning': 'তিনি'},
+              {'word': 'اللَّهُ', 'meaning': 'আল্লাহ'},
+              {'word': 'أَحَدٌ', 'meaning': 'এক'},
+            ],
+            'transliteration': 'কুল হুওয়াল্লাহু আহাদ',
+            'meaning': 'বলুন, তিনি আল্লাহ, একক।',
+            'reference': 'কুরআন, সূরা আল ইখলাস, আয়াত ১',
+          },
+        ],
+      },
+    ];
   }
 
   // বিভিন্ন ধরনের ডিফল্ট ডেটা
