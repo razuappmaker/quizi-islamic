@@ -592,7 +592,7 @@ class _HomePageState extends State<HomePage>
               _buildIslamicKnowledgeCard(
                 context,
                 'সেহেরী ও ইফতার',
-                Icons.time_to_leave,
+                Icons.restaurant,
                 iconColor,
                 // ডার্ক মুডে সাদা
                 cardColor,
@@ -869,7 +869,7 @@ class _HomePageState extends State<HomePage>
           null,
           isDarkMode,
           isTablet,
-          description: 'আরও জ্ঞান',
+          description: 'মুহাম্মাদ (সঃ) জীবনী',
           onTap: () {
             _showMoreOptions(context);
           },
@@ -1026,7 +1026,6 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  // অন্যান্য options ডায়ালগ
   // অন্যান্য options ডায়ালগ
   void _showMoreOptions(BuildContext context) {
     showModalBottomSheet(
@@ -1306,14 +1305,6 @@ class _HomePageState extends State<HomePage>
             url: 'https://www.google.com/maps/search/?api=1&query=মসজিদ',
             semanticsLabel: 'নিকটবর্তী মসজিদ',
           ),
-          /*_buildDrawerItem(
-            // New add
-            context,
-            Icons.book,
-            'নামাজের সময়',
-            const ArabiLearningPage(),
-            semanticsLabel: 'কুরআন শিক্ষা',
-          ),*/
           _buildDrawerItem(
             context,
             Icons.info,
