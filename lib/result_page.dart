@@ -5,8 +5,13 @@ import 'ad_helper.dart';
 class ResultPage extends StatefulWidget {
   final int total;
   final int correct;
+  final int totalPoints; // নতুন parameter যোগ করুন
 
-  ResultPage({required this.total, required this.correct});
+  ResultPage({
+    required this.total,
+    required this.correct,
+    required this.totalPoints, // required হিসেবে যোগ করুন
+  });
 
   @override
   _ResultPageState createState() => _ResultPageState();
@@ -208,13 +213,56 @@ class _ResultPageState extends State<ResultPage> {
                               Icons.emoji_events,
                               Colors.orange,
                             ),
+                            Divider(height: 24),
+                            // 🔥 নতুন: অর্জিত পয়েন্ট সারি
+                            _buildStatRow(
+                              'অর্জিত পয়েন্ট',
+                              '${widget.totalPoints} পয়েন্ট',
+                              Icons.monetization_on,
+                              Colors.purple,
+                            ),
                           ],
                         ),
                       ),
                     ),
                     SizedBox(height: 32),
 
-                    // Action Buttons (উপরে স্থানান্তরিত)
+                    // পয়েন্ট ইনফো বক্স (নতুন)
+                    if (widget.totalPoints > 0)
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.purple[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.purple[200]!,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: Colors.purple[700],
+                              size: 20,
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'অভিনন্দন! আপনি এই কুইজ থেকে ${widget.totalPoints} পয়েন্ট অর্জন করেছেন। প্রোফাইল থেকে পয়েন্ট জমা করে রিচার্জ নিতে পারবেন।',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.purple[800],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    SizedBox(height: 24),
+
+                    // Action Buttons
                     Column(
                       children: [
                         ElevatedButton.icon(
@@ -272,11 +320,46 @@ class _ResultPageState extends State<ResultPage> {
                             minimumSize: Size(double.infinity, 50),
                           ),
                         ),
+                        SizedBox(height: 12),
+                        // প্রোফাইল বাটন (নতুন)
+                        OutlinedButton.icon(
+                          icon: Icon(Icons.person, size: 22),
+                          label: Text(
+                            'প্রোফাইল দেখুন',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.popUntil(
+                              context,
+                              (route) => route.isFirst,
+                            );
+                            // প্রোফাইল পেজে নেভিগেট করুন - আপনার নেভিগেশন অনুযায়ী পরিবর্তন করুন
+                            // Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.purple[700],
+                            side: BorderSide(
+                              color: Colors.purple[300]!,
+                              width: 1,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            minimumSize: Size(double.infinity, 50),
+                          ),
+                        ),
                       ],
                     ),
                     SizedBox(height: 32),
 
-                    // ইসলাম সম্পর্কে জানা উচিত সেকশন (নিচে স্থানান্তরিত)
+                    // ইসলাম সম্পর্কে জানা উচিত সেকশন
                     _buildIslamKnowledgeSection(),
                     SizedBox(height: 20),
                   ],
@@ -346,10 +429,10 @@ class _ResultPageState extends State<ResultPage> {
           border: Border.all(color: Colors.green[100]!, width: 1),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center, // কলাম কনটেন্ট সেন্টার
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.center, // রো কনটেন্ট সেন্টার
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   Icons.lightbulb_outline,
@@ -378,16 +461,13 @@ class _ResultPageState extends State<ResultPage> {
                 color: Colors.grey[700],
                 height: 1.5,
               ),
-              textAlign: TextAlign.left, // টেক্সট সেন্টার
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 16),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               alignment: WrapAlignment.center,
-              // সমস্ত চিপ মাঝ বরাবর
-              crossAxisAlignment: WrapCrossAlignment.center,
-              // ক্রস অক্ষ বরাবর সেন্টার
               children: [
                 _buildKnowledgeChip('কুরআন অধ্যয়ন', Icons.book, Colors.blue),
                 _buildKnowledgeChip(
@@ -411,7 +491,7 @@ class _ResultPageState extends State<ResultPage> {
         ),
       ),
     );
-  } //------
+  }
 
   Widget _buildKnowledgeChip(String text, IconData icon, Color color) {
     return Chip(

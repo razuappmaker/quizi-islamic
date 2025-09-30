@@ -1,16 +1,13 @@
-// Main
-// Main.dart
-// main.dart
-
 // main.dart
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:islamicquiz/ifter_time_page.dart';
-import 'package:islamicquiz/qiblah_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
+import 'package:islamicquiz/ifter_time_page.dart';
+import 'package:islamicquiz/profile_screen.dart';
+import 'package:islamicquiz/qiblah_page.dart';
 import 'mcq_page.dart';
 import 'islamic_history_page.dart';
 import 'prophet_biography_page.dart';
@@ -29,12 +26,16 @@ import 'tasbeeh_page.dart';
 import 'screens/splash_screen.dart';
 import 'providers/theme_provider.dart';
 import 'utils/responsive_utils.dart';
-import 'widgets/image_slider.dart';
 import 'widgets/bottom_nav_bar.dart';
+import 'screens/admin_login_screen.dart';
+import 'quran_verse_scroller.dart';
+//import 'widgets/image_slider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await AdHelper.initialize();
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
@@ -58,20 +59,17 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.green,
             brightness: Brightness.light,
             fontFamily: 'HindSiliguri',
-            textTheme: TextTheme(
-              bodyLarge: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              bodyMedium: const TextStyle(fontSize: 14),
-              headlineSmall: const TextStyle(
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              bodyMedium: TextStyle(fontSize: 14),
+              headlineSmall: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[700],
+                backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -89,21 +87,18 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.dark,
             fontFamily: 'HindSiliguri',
             scaffoldBackgroundColor: Colors.grey[900],
-            appBarTheme: AppBarTheme(backgroundColor: Colors.green[900]),
-            textTheme: TextTheme(
-              bodyLarge: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              bodyMedium: const TextStyle(fontSize: 14),
-              headlineSmall: const TextStyle(
+            appBarTheme: const AppBarTheme(backgroundColor: Colors.green),
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              bodyMedium: TextStyle(fontSize: 14),
+              headlineSmall: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[700],
+                backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -300,12 +295,17 @@ class _HomePageState extends State<HomePage>
                         ),
                         child: Column(
                           children: [
-                            // পুরানো _buildImageSlider কে নতুন ImageSlider widget দিয়ে প্রতিস্থাপন করুন
-                            ImageSlider(
+                            QuranVerseScroller(
                               isDarkMode: isDarkMode,
                               isTablet: tablet,
                               isLandscape: landscape,
                             ),
+                            // ImageSlider widget স্লাইডার চাইলে কমেন্ট আউট
+                            /*ImageSlider(
+                              isDarkMode: isDarkMode,
+                              isTablet: tablet,
+                              isLandscape: landscape,
+                            ),*/
                             ResponsiveSizedBox(height: 8),
                             _buildCategorySelector(isDarkMode),
                             ResponsiveSizedBox(height: 8),
@@ -352,16 +352,6 @@ class _HomePageState extends State<HomePage>
             });
           },
         ),
-        /*bottomNavigationBar: CustomBottomNavBar(
-          isDarkMode: isDarkMode,
-          currentIndex: _currentBottomNavIndex,
-          onTap: (index) {
-            setState(() {
-              _currentBottomNavIndex = index;
-            });
-            CustomBottomNavBar.handleBottomNavItemTap(context, index);
-          },
-        ),*/
       ),
     );
   }
@@ -483,8 +473,10 @@ class _HomePageState extends State<HomePage>
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  MCQPage(category: selectedCategory!),
+                              builder: (context) => MCQPage(
+                                category: selectedCategory!,
+                                quizId: selectedCategory!, // 🔥 FIXED
+                              ),
                             ),
                           );
                         },
@@ -1330,6 +1322,21 @@ class _HomePageState extends State<HomePage>
           ),
           _buildDrawerItem(
             context,
+            Icons.contact_page,
+            'প্রফাইল',
+            const ProfileScreen(),
+            semanticsLabel: 'যোগাযোগ',
+          ),
+          _buildDrawerItem(
+            context,
+            Icons.admin_panel_settings,
+            'এডমিন প্যানেল',
+            const AdminLoginScreen(),
+            // 🔥 সরাসরি AdminRechargeScreen এর বদলে AdminLoginScreen
+            semanticsLabel: 'এডমিন প্যানেল',
+          ),
+          _buildDrawerItem(
+            context,
             Icons.privacy_tip,
             'Privacy Policy',
             null,
@@ -1441,14 +1448,6 @@ class _HomePageState extends State<HomePage>
             const PrayerTimePage(),
             semanticsLabel: 'নামাজের সময়',
           ),
-          // ড্রয়ারে এটা দেখাতে চাইলে কমেন্ট উঠিয়ে দাও
-          /*_buildDrawerItem(
-            context,
-            Icons.menu_book, // Quran icon
-            'নাদিয়াতুল কুরআন',
-            const NamajAmol(),
-            semanticsLabel: 'নাদিয়াতুল কুরআন',
-          ),*/
           _buildDrawerItem(
             context,
             Icons.mosque,
@@ -1478,6 +1477,23 @@ class _HomePageState extends State<HomePage>
             const ContactPage(),
             semanticsLabel: 'যোগাযোগ',
           ),
+          // 🔥 প্রোফাইল আইটেম যোগ করুন
+          _buildDrawerItem(
+            context,
+            Icons.person,
+            'আমার প্রোফাইল',
+            ProfileScreen(),
+            semanticsLabel: 'প্রোফাইল পেজ',
+          ),
+          _buildDrawerItem(
+            context,
+            Icons.admin_panel_settings,
+            'এডমিন প্যানেল',
+            const AdminLoginScreen(),
+            // 🔥 সরাসরি AdminRechargeScreen এর বদলে AdminLoginScreen
+            semanticsLabel: 'এডমিন প্যানেল',
+          ),
+
           _buildDrawerItem(
             context,
             Icons.privacy_tip,
