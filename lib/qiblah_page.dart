@@ -337,6 +337,7 @@ class _QiblaPageState extends State<QiblaPage>
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
@@ -354,7 +355,6 @@ class _QiblaPageState extends State<QiblaPage>
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          // ✅ রিফ্রেশ বাটন শুধুমাত্র আইকন হিসেবে এপবারে
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () {
@@ -375,12 +375,18 @@ class _QiblaPageState extends State<QiblaPage>
         ],
       ),
       body: SafeArea(
-        bottom: true,
+        bottom: false,
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                // ✅ REMOVE bottom padding from here - only keep top, left, right
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 16,
+                  // ❌ REMOVE: bottom: mediaQuery.padding.bottom,
+                ),
                 child: Column(
                   children: [
                     // Internet status indicator
@@ -421,12 +427,10 @@ class _QiblaPageState extends State<QiblaPage>
                         ),
                       ),
 
-                    // ✅ কম্প্যাক্ট লোকেশন সেকশন - এক/দুই লাইনে
+                    // Your existing content...
                     _buildCompactLocationSection(isDarkMode),
-
                     const SizedBox(height: 24),
 
-                    // Compass Section
                     if (_isLoading)
                       _buildLoadingIndicator()
                     else
@@ -434,28 +438,33 @@ class _QiblaPageState extends State<QiblaPage>
 
                     const SizedBox(height: 24),
 
-                    // Instructions Section
                     if (_showCompassInstructions)
                       _buildInstructionsCard(isDarkMode),
 
                     const SizedBox(height: 16),
 
-                    // Permission Denied Message
                     if (_isPermissionDenied) _buildPermissionCard(isDarkMode),
 
-                    const SizedBox(height: 20),
+                    // ✅ ADD extra space at the bottom of content instead of padding
+                    SizedBox(
+                      height: _isBottomBannerAdReady
+                          ? 20
+                          : mediaQuery.padding.bottom + 20,
+                    ),
                   ],
                 ),
               ),
             ),
 
-            // ✅ Adaptive Bottom Banner Ad
+            // ✅ Adaptive Bottom Banner Ad - KEEP the margin here only
             if (_isBottomBannerAdReady && _bottomBannerAd != null)
               Container(
                 width: double.infinity,
                 height: _bottomBannerAd!.size.height.toDouble(),
                 alignment: Alignment.center,
                 color: isDarkMode ? Colors.grey[800] : Colors.white,
+                margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
+                // ✅ Only here
                 child: AdWidget(ad: _bottomBannerAd!),
               ),
           ],

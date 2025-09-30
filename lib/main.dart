@@ -29,7 +29,9 @@ import 'utils/responsive_utils.dart';
 import 'widgets/bottom_nav_bar.dart';
 import 'screens/admin_login_screen.dart';
 import 'quran_verse_scroller.dart';
+
 //import 'widgets/image_slider.dart';
+import 'word_by_word_quran_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -216,6 +218,28 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  // ✅ হোম পেজ রিফ্রেশ মেথড যোগ করুন
+  void _refreshHomePage() {
+    setState(() {
+      // স্টেট রিসেট করুন
+      selectedCategory = null;
+      _isConnected = true;
+    });
+
+    // অ্যানিমেশন রিসেট এবং রিস্টার্ট করুন
+    _animationController.reset();
+    _animationController.forward();
+
+    // স্ন্যাকবার দেখান (ঐচ্ছিক)
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('হোম পেজ রিফ্রেশ করা হয়েছে', textAlign: TextAlign.center),
+        duration: Duration(seconds: 1),
+        backgroundColor: Colors.green[700],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -337,19 +361,59 @@ class _HomePageState extends State<HomePage>
         bottomNavigationBar: CustomBottomNavBar(
           isDarkMode: isDarkMode,
           currentIndex: _currentBottomNavIndex,
-          onTap: (index) {
+          onTap: (index) async {
+            // ✅ হোমে ক্লিক করলে রিফ্রেশ হবে
+            if (index == 0 && _currentBottomNavIndex == 0) {
+              // যদি ইতিমধ্যে হোমে থাকে এবং আবার হোমে ক্লিক করে
+              _refreshHomePage();
+            }
+
             setState(() {
               _currentBottomNavIndex = index;
             });
 
-            CustomBottomNavBar.handleBottomNavItemTap(context, index).then((_) {
-              // কাজ শেষে স্বয়ংক্রিয়ভাবে হোমে ফিরে আসা (শুধুমাত্র হোম ছাড়া অন্য আইটেমের জন্য)
-              if (mounted && index != 0) {
-                setState(() {
-                  _currentBottomNavIndex = 0;
-                });
-              }
-            });
+            // ✅ নতুন নেভিগেশন লজিক
+            switch (index) {
+              case 0:
+                // হোম - রিফ্রেশ করা হয়েছে উপরে
+                break;
+              case 1:
+                // রেটিং
+                final Uri ratingUri = Uri.parse(
+                  'https://play.google.com/store/apps/details?id=com.example.quizapp',
+                );
+                if (await canLaunchUrl(ratingUri)) {
+                  await launchUrl(
+                    ratingUri,
+                    mode: LaunchMode.externalApplication,
+                  );
+                }
+                // রেটিং এর পর হোমে ফিরে আসা
+                if (mounted) {
+                  setState(() {
+                    _currentBottomNavIndex = 0;
+                  });
+                }
+                break;
+              case 2:
+                // শব্দে কুরআন
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WordByWordQuranPage(),
+                  ),
+                );
+                break;
+              case 3:
+                // প্রোফাইল
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+                break;
+            }
           },
         ),
       ),
@@ -1174,10 +1238,11 @@ class _HomePageState extends State<HomePage>
                     );
                   }
                 } else if (page != null) {
+                  // ✅ FIXED: Remove SafeArea wrapper
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SafeArea(child: page),
+                      builder: (context) => page, // No SafeArea wrapper
                     ),
                   );
                 }

@@ -271,6 +271,7 @@ class _KalemaPageState extends State<KalemaPage> {
                       .bottom, // Add bottom padding for system UI
                 ),
                 child: ListView(
+                  physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.all(16),
                   children: [
                     ...List<Widget>.generate(kalemaList.length, (index) {

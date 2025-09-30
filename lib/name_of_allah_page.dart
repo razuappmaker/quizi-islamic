@@ -1208,6 +1208,7 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                       .bottom, // Add bottom padding for system UI
                 ),
                 child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.all(16),
                   itemCount: totalItems,
                   itemBuilder: (context, index) {
