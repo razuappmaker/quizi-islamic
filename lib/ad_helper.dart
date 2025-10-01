@@ -289,7 +289,121 @@ class AdHelper {
 
   // Check if ads are initialized
   static bool get isInitialized => _isAdInitialized;
+
+  // ===========================================================================
+  // 🧪 TESTING SECTION START - COMMENT THIS SECTION IN PRODUCTION 🧪
+  // ===========================================================================
+
+  // Test method to always show banner ad (bypassing limits)
+  static BannerAd createTestBannerAd({BannerAdListener? listener}) {
+    print('🧪 TEST MODE: Creating test banner ad (limits bypassed)');
+    return BannerAd(
+      adUnitId: bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener:
+          listener ??
+          BannerAdListener(
+            onAdLoaded: (Ad ad) => print('🧪 TEST: Banner ad loaded'),
+            onAdFailedToLoad: (Ad ad, LoadAdError error) =>
+                print('🧪 TEST: Banner ad failed: $error'),
+          ),
+    );
+  }
+
+  // Test method to always show interstitial ad (bypassing limits)
+  static Future<void> showTestInterstitialAd({
+    VoidCallback? onAdShowed,
+    VoidCallback? onAdDismissed,
+    VoidCallback? onAdFailedToShow,
+  }) async {
+    print('🧪 TEST MODE: Showing test interstitial ad (limits bypassed)');
+
+    if (_isInterstitialAdLoaded && _interstitialAd != null) {
+      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdShowedFullScreenContent: (InterstitialAd ad) {
+          print('🧪 TEST: Interstitial ad showed');
+          onAdShowed?.call();
+        },
+        onAdDismissedFullScreenContent: (InterstitialAd ad) {
+          print('🧪 TEST: Interstitial ad dismissed');
+          ad.dispose();
+          _isInterstitialAdLoaded = false;
+          onAdDismissed?.call();
+          loadInterstitialAd();
+        },
+        onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+          print('🧪 TEST: Interstitial ad failed: $error');
+          ad.dispose();
+          _isInterstitialAdLoaded = false;
+          onAdFailedToShow?.call();
+          loadInterstitialAd();
+        },
+      );
+
+      _interstitialAd!.show();
+      _interstitialAd = null;
+    } else {
+      print('🧪 TEST: Interstitial not loaded, loading now...');
+      loadInterstitialAd(
+        onAdLoaded: () {
+          showTestInterstitialAd(
+            onAdShowed: onAdShowed,
+            onAdDismissed: onAdDismissed,
+            onAdFailedToShow: onAdFailedToShow,
+          );
+        },
+        onAdFailedToLoad: onAdFailedToShow,
+      );
+    }
+  }
+
+  // Test method to check current ad limits status
+  static Future<void> printTestAdStatus() async {
+    final stats = await getAdStats();
+    print('🧪 TEST AD STATUS:');
+    print(
+      '🧪 Daily Impressions: ${stats['daily_impressions']}/${stats['max_daily_impressions']}',
+    );
+    print(
+      '🧪 Daily Clicks: ${stats['daily_clicks']}/${stats['max_daily_clicks']}',
+    );
+    print('🧪 Can Show Banner: ${await canShowBannerAd()}');
+    print(
+      '🧪 Can Show Interstitial: ${await _adLimitManager.canShowInterstitialAd()}',
+    );
+    print('🧪 Can Click Ad: ${await canClickAd()}');
+  }
+
+  // Test method to simulate ad clicks
+  static Future<void> simulateAdClick() async {
+    print('🧪 TEST: Simulating ad click');
+    await recordAdClick();
+    await printTestAdStatus();
+  }
+
+  // Test method to reset all ad limits for testing
+  static Future<void> resetTestLimits() async {
+    print('🧪 TEST: Resetting all ad limits');
+    await resetAdLimits();
+    await printTestAdStatus();
+  }
+
+  // Test method to force load interstitial ad
+  static void forceLoadInterstitialAd() {
+    print('🧪 TEST: Force loading interstitial ad');
+    _interstitialLoadAttempts = 0;
+    loadInterstitialAd(
+      onAdLoaded: () => print('🧪 TEST: Interstitial loaded successfully'),
+      onAdFailedToLoad: () => print('🧪 TEST: Interstitial failed to load'),
+    );
+  }
+
+  // ===========================================================================
+  // 🧪 TESTING SECTION END - COMMENT THIS SECTION IN PRODUCTION 🧪
+  // ===========================================================================
 }
+
 //------------------------------------------
 
 // Ad limit management class

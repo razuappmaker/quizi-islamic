@@ -45,8 +45,16 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final bottomPadding = mediaQuery.padding.bottom;
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 16,
+        bottom: 16 + bottomPadding,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.only(
@@ -62,7 +70,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
             child: Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.only(bottom: 20),
+              margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
                 color: Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(2),
@@ -70,19 +78,22 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
             ),
           ),
 
+          // Header Section
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "নামাজের সময় সামঞ্জস্য করুন",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onBackground,
+              Expanded(
+                child: Text(
+                  "নামাজের সময় সামঞ্জস্য করুন",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.refresh, color: Colors.blue),
+                icon: Icon(Icons.refresh, color: Colors.blue, size: 22),
                 onPressed: () {
                   widget.onResetAll();
                   setState(() {
@@ -100,27 +111,52 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
             ],
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             "স্থানীয় মসজিদের সময়ের সাথে মিলিয়ে নিন\n"
-            "(+/-) বাটন দিয়ে ১ মিনিট করে প্রয়োজনমতো সামঞ্জস্য করুন",
-
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+            "(+/-) বাটন দিয়ে ১ মিনিট করে সামঞ্জস্য করুন",
+            style: TextStyle(
+              color: Colors.grey.shade600,
+              fontSize: 13,
+              height: 1.4,
+            ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // Adjustment List
-          ..._buildAdjustmentList(),
+          // Adjustment List with reduced height
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight:
+                  MediaQuery.of(context).size.height *
+                  0.3, // 25% reduced from 0.4 to 0.3
+            ),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: _buildAdjustmentList(),
+              ),
+            ),
+          ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Close Button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               onPressed: () => Navigator.pop(context),
-              child: Text("বন্ধ করুন"),
+              child: Text(
+                "বন্ধ করুন",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
             ),
           ),
         ],
@@ -135,32 +171,43 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
       final adjustment = _currentAdjustments[prayerName] ?? 0;
 
       return Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.only(bottom: 8), // Reduced margin
+        padding: const EdgeInsets.all(10), // Reduced padding
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Expanded(
+            // Prayer Name
+            SizedBox(
+              width: 60, // Fixed width for prayer names
               child: Text(
                 prayerName,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ),
 
+            const SizedBox(width: 8),
+
             // Adjustment Display
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: adjustment == 0
                     ? Colors.grey.shade100
                     : adjustment > 0
                     ? Colors.green.shade50
                     : Colors.red.shade50,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: adjustment == 0
                       ? Colors.grey.shade300
@@ -176,6 +223,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                     ? "+$adjustment মিনিট"
                     : "$adjustment মিনিট",
                 style: TextStyle(
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: adjustment == 0
                       ? Colors.grey.shade600
@@ -186,30 +234,69 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
               ),
             ),
 
-            const SizedBox(width: 10),
+            const Spacer(),
 
             // Minus Button
-            IconButton(
-              icon: Icon(Icons.remove, color: Colors.red),
-              onPressed: () => _adjustTime(prayerName, -1),
-              style: IconButton.styleFrom(backgroundColor: Colors.red.shade50),
-            ),
-
-            // Plus Button
-            IconButton(
-              icon: Icon(Icons.add, color: Colors.green),
-              onPressed: () => _adjustTime(prayerName, 1),
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.green.shade50,
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.shade100),
+              ),
+              child: IconButton(
+                icon: Icon(Icons.remove, color: Colors.red, size: 16),
+                onPressed: () => _adjustTime(prayerName, -1),
+                padding: EdgeInsets.zero,
+                style: IconButton.styleFrom(
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
               ),
             ),
 
+            const SizedBox(width: 6),
+
+            // Plus Button
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green.shade100),
+              ),
+              child: IconButton(
+                icon: Icon(Icons.add, color: Colors.green, size: 16),
+                onPressed: () => _adjustTime(prayerName, 1),
+                padding: EdgeInsets.zero,
+                style: IconButton.styleFrom(
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 6),
+
             // Reset Button
             if (adjustment != 0)
-              IconButton(
-                icon: Icon(Icons.refresh, color: Colors.blue, size: 18),
-                onPressed: () => _resetAdjustment(prayerName),
-                tooltip: "রিসেট করুন",
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue.shade100),
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.refresh, color: Colors.blue, size: 14),
+                  onPressed: () => _resetAdjustment(prayerName),
+                  padding: EdgeInsets.zero,
+                  tooltip: "রিসেট করুন",
+                  style: IconButton.styleFrom(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
               ),
           ],
         ),

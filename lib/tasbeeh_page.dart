@@ -69,7 +69,6 @@ class _TasbeehPageState extends State<TasbeehPage> {
 
   Future<void> _loadBannerAd() async {
     try {
-      // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন - TasbeehStatsPage-এর মতোই
       bool canShowAd = await AdHelper.canShowBannerAd();
 
       if (!canShowAd) {
@@ -228,6 +227,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
     ];
 
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenWidth < 600;
 
     // Responsive width calculations
@@ -324,246 +324,267 @@ class _TasbeehPageState extends State<TasbeehPage> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            // Main Content
-            Expanded(
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                color: _backgroundColor,
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: (screenWidth - contentWidth) / 2,
-                    vertical: 16,
-                  ),
-                  child: Column(
-                    children: [
-                      // Header Display Card
-                      Container(
-                        width: cardWidth,
-                        margin: EdgeInsets.only(bottom: 20),
-                        child: Card(
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          color: _isDarkMode ? Colors.grey[800] : Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              children: [
-                                Text(
-                                  selectedPhrase,
-                                  style: TextStyle(
-                                    fontSize: isSmallScreen ? 26 : 30,
-                                    fontWeight: FontWeight.bold,
-                                    color: _isDarkMode
-                                        ? Colors.green[300]
-                                        : Colors.green[700],
-                                    height: 1.4,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  _getCurrentCount().toString(),
-                                  style: TextStyle(
-                                    fontSize: isSmallScreen ? 52 : 60,
-                                    fontWeight: FontWeight.w800,
-                                    color: _isDarkMode
-                                        ? Colors.green[300]
-                                        : Colors.green[700],
-                                    letterSpacing: 1.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+        body: Container(
+          color: _backgroundColor,
+          child: Column(
+            children: [
+              // Main Content - SafeArea ব্যবহার করে
+              Expanded(
+                child: SafeArea(
+                  bottom: false, // নিচের SafeArea বন্ধ
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    color: _backgroundColor,
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: (screenWidth - contentWidth) / 2,
+                        vertical: 16,
+                      ),
+                      child: Column(
+                        children: [
+                          // Header Display Card
+                          Container(
+                            width: cardWidth,
+                            margin: EdgeInsets.only(bottom: 20),
+                            child: Card(
+                              elevation: 8,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              color: _isDarkMode
+                                  ? Colors.grey[800]
+                                  : Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Column(
                                   children: [
-                                    Icon(
-                                      Icons.access_time,
-                                      size: 16,
-                                      color: _isDarkMode
-                                          ? Colors.grey[400]
-                                          : Colors.grey[600],
-                                    ),
-                                    SizedBox(width: 6),
                                     Text(
-                                      "বর্তমান সেশন",
+                                      selectedPhrase,
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: isSmallScreen ? 26 : 30,
+                                        fontWeight: FontWeight.bold,
                                         color: _isDarkMode
-                                            ? Colors.grey[400]
-                                            : Colors.grey[600],
-                                        fontWeight: FontWeight.w500,
+                                            ? Colors.green[300]
+                                            : Colors.green[700],
+                                        height: 1.4,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      _getCurrentCount().toString(),
+                                      style: TextStyle(
+                                        fontSize: isSmallScreen ? 52 : 60,
+                                        fontWeight: FontWeight.w800,
+                                        color: _isDarkMode
+                                            ? Colors.green[300]
+                                            : Colors.green[700],
+                                        letterSpacing: 1.5,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.access_time,
+                                          size: 16,
+                                          color: _isDarkMode
+                                              ? Colors.grey[400]
+                                              : Colors.grey[600],
+                                        ),
+                                        SizedBox(width: 6),
+                                        Text(
+                                          "বর্তমান সেশন",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: _isDarkMode
+                                                ? Colors.grey[400]
+                                                : Colors.grey[600],
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      "মোট জিকির: ${_getTotalCount()}",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: _isDarkMode
+                                            ? Colors.green[300]
+                                            : Colors.green[600],
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  "মোট জিকির: ${_getTotalCount()}",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: _isDarkMode
-                                        ? Colors.green[300]
-                                        : Colors.green[600],
-                                    fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+
+                          // Tasbeeh Buttons
+                          Container(
+                            width: contentWidth,
+                            margin: EdgeInsets.only(bottom: 20),
+                            child: Column(
+                              children: tasbeehPhrases.asMap().entries.map((
+                                entry,
+                              ) {
+                                int index = entry.key;
+                                String phrase = entry.value;
+                                Color color = colors[index % colors.length];
+                                Color darkColor = index == 0
+                                    ? Colors.green[300]!
+                                    : index == 1
+                                    ? Colors.blue[300]!
+                                    : Colors.orange[300]!;
+
+                                return Container(
+                                  margin: EdgeInsets.only(bottom: 12),
+                                  child: _buildTasbeehButton(
+                                    phrase: phrase,
+                                    color: color,
+                                    darkColor: darkColor,
+                                    count: _getCountForPhrase(phrase),
+                                    isSelected: selectedPhrase == phrase,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+
+                          // Benefits Card
+                          Container(
+                            width: contentWidth,
+                            child: _buildBenefitCard(
+                              "জিকিরের ফজিলত",
+                              benefits["সুখ ও মনের প্রশান্তি লাভ"] ?? "",
+                              context,
+                            ),
+                          ),
+
+                          // Extra space for bottom buttons and ad
+                          SizedBox(height: _isBannerAdReady ? 80 : 120),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Bottom Section (Buttons + Ad) - SafeArea ব্যবহার করে
+              SafeArea(
+                top: false, // উপরের SafeArea বন্ধ
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Action Buttons Section
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: (screenWidth - contentWidth) / 2,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _isDarkMode ? Colors.grey[900] : Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 8,
+                            offset: Offset(0, -2),
+                          ),
+                        ],
+                      ),
+                      child: isSmallScreen
+                          ? Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildActionButton(
+                                        icon: Icons.refresh,
+                                        text: "সেশন রিসেট",
+                                        color: Colors.orange,
+                                        onPressed: _resetUICounts,
+                                        isSmall: true,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: _buildActionButton(
+                                        icon: Icons.bar_chart,
+                                        text: "লাইফটাইম স্ট্যাটস",
+                                        color: Colors.blue,
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TasbeehStatsPage(),
+                                            ),
+                                          );
+                                        },
+                                        isSmall: true,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Expanded(
+                                  child: _buildActionButton(
+                                    icon: Icons.refresh,
+                                    text: "সেশন রিসেট",
+                                    color: Colors.orange,
+                                    onPressed: _resetUICounts,
+                                    isSmall: false,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildActionButton(
+                                    icon: Icons.bar_chart,
+                                    text: "লাইফটাইম স্ট্যাটস",
+                                    color: Colors.blue,
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              TasbeehStatsPage(),
+                                        ),
+                                      );
+                                    },
+                                    isSmall: false,
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                      ),
-
-                      // Tasbeeh Buttons
-                      Container(
-                        width: contentWidth,
-                        margin: EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          children: tasbeehPhrases.asMap().entries.map((entry) {
-                            int index = entry.key;
-                            String phrase = entry.value;
-                            Color color = colors[index % colors.length];
-                            Color darkColor = index == 0
-                                ? Colors.green[300]!
-                                : index == 1
-                                ? Colors.blue[300]!
-                                : Colors.orange[300]!;
-
-                            return Container(
-                              margin: EdgeInsets.only(bottom: 12),
-                              child: _buildTasbeehButton(
-                                phrase: phrase,
-                                color: color,
-                                darkColor: darkColor,
-                                count: _getCountForPhrase(phrase),
-                                isSelected: selectedPhrase == phrase,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-
-                      // Benefits Card
-                      Container(
-                        width: contentWidth,
-                        child: _buildBenefitCard(
-                          "জিকিরের ফজিলত",
-                          benefits["সুখ ও মনের প্রশান্তি লাভ"] ?? "",
-                          context,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // Action Buttons Section
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(
-                horizontal: (screenWidth - contentWidth) / 2,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                color: _isDarkMode ? Colors.grey[900] : Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 8,
-                    offset: Offset(0, -2),
-                  ),
-                ],
-              ),
-              child: isSmallScreen
-                  ? Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildActionButton(
-                                icon: Icons.refresh,
-                                text: "সেশন রিসেট",
-                                color: Colors.orange,
-                                onPressed: _resetUICounts,
-                                isSmall: true,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: _buildActionButton(
-                                icon: Icons.bar_chart,
-                                text: "লাইফটাইম স্ট্যাটস",
-                                color: Colors.blue,
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TasbeehStatsPage(),
-                                    ),
-                                  );
-                                },
-                                isSmall: true,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        Expanded(
-                          child: _buildActionButton(
-                            icon: Icons.refresh,
-                            text: "সেশন রিসেট",
-                            color: Colors.orange,
-                            onPressed: _resetUICounts,
-                            isSmall: false,
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: _buildActionButton(
-                            icon: Icons.bar_chart,
-                            text: "লাইফটাইম স্ট্যাটস",
-                            color: Colors.blue,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TasbeehStatsPage(),
-                                ),
-                              );
-                            },
-                            isSmall: false,
-                          ),
-                        ),
-                      ],
                     ),
-            ),
 
-            // ✅ Adaptive Banner Ad - TasbeehStatsPage-এর মতোই
-            if (_isBannerAdReady && _bannerAd != null)
-              SafeArea(
-                top: false,
-                child: Container(
-                  width: double.infinity,
-                  height: _bannerAd!.size.height.toDouble(),
-                  alignment: Alignment.center,
-                  color: _isDarkMode ? Colors.grey[900] : Colors.white,
-                  child: AdWidget(ad: _bannerAd!),
+                    // ✅ Adaptive Banner Ad
+                    if (_isBannerAdReady && _bannerAd != null)
+                      Container(
+                        width: double.infinity,
+                        height: _bannerAd!.size.height.toDouble(),
+                        alignment: Alignment.center,
+                        color: _isDarkMode ? Colors.grey[900] : Colors.white,
+                        child: AdWidget(ad: _bannerAd!),
+                      ),
+                  ],
                 ),
               ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // ... বাকি সব মেথড একই থাকবে (_buildTasbeehButton, _buildActionButton, _buildBenefitCard)
   Widget _buildTasbeehButton({
     required String phrase,
     required Color color,

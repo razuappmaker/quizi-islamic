@@ -1,3 +1,4 @@
+// Prayer Time
 // prayer_time_page.dart - Final Version
 
 import 'dart:async';
@@ -646,7 +647,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             id: prayerName.hashCode,
             channelKey: 'prayer_reminder_channel',
             title: 'নামাজের সময়',
-            body: '$prayerName নামাজ শুরু হওয়ার ১০ মিনিট বাকি',
+            body: '$prayerName আযান শুরু হওয়ার ১০ মিনিট বাকি',
             notificationLayout: NotificationLayout.Default,
           ),
           schedule: NotificationCalendar(
@@ -781,7 +782,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       appBar: AppBar(
         backgroundColor: Colors.green,
         title: const Text(
-          "আজকের ওয়াক্ত",
+          "নামাজ",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 17,
@@ -933,8 +934,12 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxHeight = constraints.maxHeight;
+        final maxWidth = constraints.maxWidth;
+
         final bool isSmallScreen = maxHeight < 700;
         final bool isVerySmallScreen = maxHeight < 600;
+        final bool isTablet = maxWidth > 600;
+        final bool isSmallPhone = maxHeight < 600 || maxWidth < 360;
 
         return Column(
           children: [
@@ -948,6 +953,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
               prayerTimes: adjustedPrayerTimes,
               isSmallScreen: isSmallScreen,
               isVerySmallScreen: isVerySmallScreen,
+              isTablet: isTablet,
+              isSmallPhone: isSmallPhone,
               prayerTimeService: _prayerTimeService,
               onRefresh: fetchLocationAndPrayerTimes,
               useManualLocation: _useManualLocation,
@@ -956,7 +963,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             Expanded(
               child: Container(
                 color: Theme.of(context).brightness == Brightness.dark
-                    //? Colors.grey[900]
                     ? Colors.grey[900]
                     : Colors.grey.shade50,
                 child: Column(
@@ -967,6 +973,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                         nextPrayer: nextPrayer,
                         isSmallScreen: isSmallScreen,
                         isVerySmallScreen: isVerySmallScreen,
+                        isTablet: isTablet,
+                        isSmallPhone: isSmallPhone,
                         prayerTimeService: _prayerTimeService,
                         onRefresh: fetchLocationAndPrayerTimes,
                         onPrayerTap: _showPrayerTimeDetail,
@@ -976,6 +984,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
                     ProhibitedTimeSection(
                       isSmallScreen: isSmallScreen,
+                      isVerySmallScreen: isVerySmallScreen,
+                      isTablet: isTablet,
+                      isSmallPhone: isSmallPhone,
                       prayerTimes: adjustedPrayerTimes,
                       prohibitedTimeService: _prohibitedTimeService,
                       onShowInfo: _showFloatingInfo,

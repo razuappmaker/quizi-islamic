@@ -1,3 +1,4 @@
+// MCQ Page
 // mcq_page.dart - Main UI Component
 import 'dart:async';
 import 'dart:math' as math;
@@ -44,18 +45,18 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   int _earnedPointsForNotification = 0;
 
   // Constants
-  static const double _optionCardMinHeight = 48.0;
-  static const double _optionCardMaxHeight = 65.0;
-  static const double _optionCardHeightFactor = 0.065;
-  static const double _optionCardMarginBottom = 12.0;
-  static const double _optionCardBorderRadius = 14.0;
-  static const double _optionFontSize = 16.0;
-  static const double _optionSelectedBorderWidth = 1.8;
-  static const double _optionCardMinHeightCompact = 40.0;
-  static const double _optionCardMaxHeightCompact = 52.0;
-  static const double _optionCardHeightFactorCompact = 0.05;
-  static const double _optionCardPaddingRatioVertical = 0.20;
-  static const double _optionCardPaddingRatioHorizontal = 0.25;
+  static const double _optionCardMinHeight = 36.0;
+  static const double _optionCardMaxHeight = 48.0;
+  static const double _optionCardHeightFactor = 0.05;
+  static const double _optionCardMarginBottom = 8.0;
+  static const double _optionCardBorderRadius = 12.0;
+  static const double _optionFontSize = 14.0;
+  static const double _optionSelectedBorderWidth = 1.5;
+  static const double _optionCardMinHeightCompact = 32.0;
+  static const double _optionCardMaxHeightCompact = 40.0;
+  static const double _optionCardHeightFactorCompact = 0.04;
+  static const double _optionCardPaddingRatioVertical = 0.15;
+  static const double _optionCardPaddingRatioHorizontal = 0.20;
 
   @override
   void initState() {
@@ -381,10 +382,10 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     final bool isTablet = screenWidth > 600;
     final bool isSmallPhone = screenHeight < 600 || screenWidth < 360;
     final double responsiveFontSize = screenWidth < 360
-        ? 14.0
+        ? 12.0
         : screenWidth < 400
-        ? 16.0
-        : 17.0;
+        ? 14.0
+        : 15.0;
 
     // Loading state
     if (!_securityManager.quizStarted) {
@@ -405,13 +406,21 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             'প্রশ্ন ${currentQuestionIndex + 1}/${_securityManager.questions.length}',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: screenWidth < 360 ? 16 : 18,
+              fontSize: screenWidth < 360 ? 14 : 16,
               color: Colors.white,
             ),
           ),
           backgroundColor: primaryColor,
           elevation: 0,
           centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
+            onPressed: () => _onWillPop(),
+          ),
         ),
         body: Stack(
           children: [
@@ -420,7 +429,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.all(screenWidth * 0.04),
+                      padding: EdgeInsets.all(screenWidth * 0.03),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -432,10 +441,10 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                             screenWidth,
                             screenHeight,
                             responsiveFontSize,
-                            isTablet, // FIX: Added isTablet parameter
+                            isTablet,
                           ),
 
-                          SizedBox(height: screenHeight * 0.03),
+                          SizedBox(height: screenHeight * 0.02),
 
                           // Question Image
                           if (question['image'] != null)
@@ -452,7 +461,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                             responsiveFontSize,
                           ),
 
-                          SizedBox(height: screenHeight * 0.025),
+                          SizedBox(height: screenHeight * 0.02),
 
                           // Options
                           _buildOptionsSection(
@@ -465,7 +474,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                             responsiveFontSize,
                           ),
 
-                          SizedBox(height: screenHeight * 0.03),
+                          SizedBox(height: screenHeight * 0.02),
 
                           // Next Button
                           _buildNextButton(
@@ -474,7 +483,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                             responsiveFontSize,
                           ),
 
-                          SizedBox(height: screenHeight * 0.03),
+                          SizedBox(height: screenHeight * 0.02),
 
                           // Google Search Button
                           if (isAnswered)
@@ -520,18 +529,36 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   Widget _buildLoadingScreen(Color? primaryColor) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.category),
+        title: Text(
+          widget.category,
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: primaryColor,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('কুইজ লোড হচ্ছে...'),
+            SizedBox(height: 12),
+            Text(
+              'কুইজ লোড হচ্ছে...',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -541,10 +568,21 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   Widget _buildErrorScreen(Color? primaryColor) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('লোড হচ্ছে...'),
+        title: const Text(
+          'লোড হচ্ছে...',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: primaryColor,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: const Center(
         child: Column(
@@ -553,8 +591,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
             ),
-            SizedBox(height: 16),
-            Text('প্রশ্নগুলি লোড হচ্ছে...', style: TextStyle(fontSize: 16)),
+            SizedBox(height: 12),
+            Text('প্রশ্নগুলি লোড হচ্ছে...', style: TextStyle(fontSize: 14)),
           ],
         ),
       ),
@@ -568,20 +606,20 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     double screenWidth,
     double screenHeight,
     double responsiveFontSize,
-    bool isTablet, // FIX: Added this parameter
+    bool isTablet,
   ) {
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: screenHeight * 0.02,
-        horizontal: screenWidth * 0.04,
+        vertical: screenHeight * 0.015,
+        horizontal: screenWidth * 0.03,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
-            blurRadius: 8,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -589,12 +627,12 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.only(bottom: 16),
+            margin: const EdgeInsets.only(bottom: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.only(bottom: 6),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -618,7 +656,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                   ),
                 ),
                 Container(
-                  height: 4,
+                  height: 3,
                   decoration: BoxDecoration(color: Colors.grey[300]),
                   child: Stack(
                     children: [
@@ -657,14 +695,14 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   ) {
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: screenHeight * 0.01,
-        horizontal: screenWidth * 0.03,
+        vertical: screenHeight * 0.008,
+        horizontal: screenWidth * 0.025,
       ),
       decoration: BoxDecoration(
         color: _timeLeft <= 10
             ? Colors.red.withOpacity(0.06)
             : primaryColor.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: _timeLeft <= 10
               ? Colors.red.withOpacity(0.15)
@@ -680,9 +718,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
               Icon(
                 Icons.timer_outlined,
                 color: _timeLeft <= 10 ? Colors.red : primaryColor,
-                size: isTablet ? responsiveFontSize + 4 : responsiveFontSize,
+                size: isTablet ? responsiveFontSize + 2 : responsiveFontSize,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -691,8 +729,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     'সময়',
                     style: TextStyle(
                       fontSize: isTablet
-                          ? responsiveFontSize - 1
-                          : responsiveFontSize - 4,
+                          ? responsiveFontSize - 2
+                          : responsiveFontSize - 5,
                       color: Colors.grey[500],
                     ),
                   ),
@@ -700,8 +738,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     '$_timeLeft সেকেন্ড',
                     style: TextStyle(
                       fontSize: isTablet
-                          ? responsiveFontSize + 2
-                          : responsiveFontSize - 1,
+                          ? responsiveFontSize
+                          : responsiveFontSize - 2,
                       fontWeight: FontWeight.bold,
                       color: _timeLeft <= 10 ? Colors.red : primaryColor,
                     ),
@@ -711,13 +749,13 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             ],
           ),
           Container(
-            width: isTablet ? 40 : 30,
-            height: isTablet ? 40 : 30,
+            width: isTablet ? 32 : 26,
+            height: isTablet ? 32 : 26,
             child: CircularProgressIndicator(
               value: _timeLeft / 20.0,
               strokeWidth: _timeLeft <= 10
-                  ? (isTablet ? 7 : 5)
-                  : (isTablet ? 5 : 3.5),
+                  ? (isTablet ? 5 : 4)
+                  : (isTablet ? 4 : 3),
               backgroundColor: Colors.grey[200],
               valueColor: AlwaysStoppedAnimation<Color>(
                 _timeLeft <= 10 ? Colors.red : primaryColor,
@@ -731,22 +769,22 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
 
   Widget _buildQuestionImage(dynamic question, double screenHeight) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
+            blurRadius: 4,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         child: Image.asset(
           'assets/images/${question['image']}',
-          height: screenHeight * 0.2,
+          height: screenHeight * 0.15,
           width: double.infinity,
           fit: BoxFit.cover,
         ),
@@ -766,40 +804,40 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: isTablet
-            ? screenHeight * 0.025
-            : isSmallPhone
             ? screenHeight * 0.018
-            : screenHeight * 0.022,
-        horizontal: isTablet
-            ? screenWidth * 0.05
             : isSmallPhone
-            ? screenWidth * 0.035
-            : screenWidth * 0.04,
+            ? screenHeight * 0.012
+            : screenHeight * 0.015,
+        horizontal: isTablet
+            ? screenWidth * 0.04
+            : isSmallPhone
+            ? screenWidth * 0.03
+            : screenWidth * 0.035,
       ),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
         borderRadius: BorderRadius.circular(
           isTablet
-              ? 16
+              ? 12
               : isSmallPhone
-              ? 10
-              : 12,
+              ? 8
+              : 10,
         ),
       ),
       child: Text(
         question['question'],
         style: TextStyle(
           fontSize: isTablet
-              ? responsiveFontSize + 2
+              ? responsiveFontSize + 1
               : isSmallPhone
               ? responsiveFontSize - 1
-              : responsiveFontSize + 1,
+              : responsiveFontSize,
           fontWeight: FontWeight.w600,
           height: isTablet
-              ? 1.5
+              ? 1.4
               : isSmallPhone
-              ? 1.3
-              : 1.4,
+              ? 1.2
+              : 1.3,
           color: isDarkMode ? Colors.white : Colors.black87,
         ),
         textAlign: TextAlign.center,
@@ -827,47 +865,47 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
 
         final double optionCardHeight = math.max(
           isTablet
-              ? _optionCardMinHeight * 0.95
+              ? _optionCardMinHeight * 0.8
               : isSmallPhone
               ? _optionCardMinHeightCompact
               : isLargePhone
-              ? _optionCardMinHeight * 0.9
-              : _optionCardMinHeight * 0.85,
+              ? _optionCardMinHeight * 0.75
+              : _optionCardMinHeight * 0.7,
           math.min(
             screenHeight *
                 (isTablet
-                    ? _optionCardHeightFactor * 0.9
+                    ? _optionCardHeightFactor * 0.7
                     : isSmallPhone
                     ? _optionCardHeightFactorCompact
                     : isLargePhone
-                    ? _optionCardHeightFactor * 0.8
-                    : _optionCardHeightFactor * 0.7),
+                    ? _optionCardHeightFactor * 0.6
+                    : _optionCardHeightFactor * 0.5),
             isTablet
-                ? _optionCardMaxHeight * 0.95
+                ? _optionCardMaxHeight * 0.8
                 : isSmallPhone
                 ? _optionCardMaxHeightCompact
                 : isLargePhone
-                ? _optionCardMaxHeight * 0.9
-                : _optionCardMaxHeight * 0.85,
+                ? _optionCardMaxHeight * 0.75
+                : _optionCardMaxHeight * 0.7,
           ),
         );
 
         final double optionFontSize = isTablet
-            ? _optionFontSize * 1.05
+            ? _optionFontSize * 0.9
             : isSmallPhone
-            ? _optionFontSize * 0.82
+            ? _optionFontSize * 0.75
             : isLargePhone
-            ? _optionFontSize * 0.95
-            : _optionFontSize * 0.88;
+            ? _optionFontSize * 0.85
+            : _optionFontSize * 0.8;
 
         return Column(
           children: (question['options'] as List<dynamic>).map((option) {
             final double verticalPadding =
                 optionCardHeight *
-                (isSmallPhone ? 0.18 : _optionCardPaddingRatioVertical);
+                (isSmallPhone ? 0.12 : _optionCardPaddingRatioVertical);
             final double horizontalPadding =
                 optionCardHeight *
-                (isSmallPhone ? 0.22 : _optionCardPaddingRatioHorizontal);
+                (isSmallPhone ? 0.15 : _optionCardPaddingRatioHorizontal);
 
             Color optionColor = isDarkMode ? Colors.grey[800]! : Colors.white;
             Color textColor = isDarkMode ? Colors.white70 : Colors.black87;
@@ -905,16 +943,16 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             return Container(
               margin: EdgeInsets.only(
                 bottom: isTablet
-                    ? _optionCardMarginBottom * 1.1
+                    ? _optionCardMarginBottom * 0.9
                     : isSmallPhone
-                    ? _optionCardMarginBottom * 0.7
-                    : _optionCardMarginBottom * 0.85,
+                    ? _optionCardMarginBottom * 0.6
+                    : _optionCardMarginBottom * 0.75,
               ),
               height: optionCardHeight,
               child: Material(
                 elevation: isAnswered
                     ? 0
-                    : (isTablet ? 1.5 : (isSmallPhone ? 0.5 : 1)),
+                    : (isTablet ? 1.2 : (isSmallPhone ? 0.4 : 0.8)),
                 color: optionColor,
                 borderRadius: BorderRadius.circular(_optionCardBorderRadius),
                 shadowColor: shadowColor,
@@ -951,10 +989,10 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                       children: [
                         // Option Indicator
                         Container(
-                          width: isSmallPhone ? 24 : (isTablet ? 30 : 26),
-                          height: isSmallPhone ? 24 : (isTablet ? 30 : 26),
+                          width: isSmallPhone ? 20 : (isTablet ? 26 : 22),
+                          height: isSmallPhone ? 20 : (isTablet ? 26 : 22),
                           margin: EdgeInsets.only(
-                            right: isSmallPhone ? 10 : (isTablet ? 14 : 12),
+                            right: isSmallPhone ? 8 : (isTablet ? 12 : 10),
                           ),
                           decoration: BoxDecoration(
                             color: isAnswered
@@ -969,10 +1007,10 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                                       ? Colors.grey[700]
                                       : Colors.grey[200]),
                             borderRadius: BorderRadius.circular(
-                              isSmallPhone ? 6 : 8,
+                              isSmallPhone ? 5 : 6,
                             ),
                             border: isAnswered && option == question['answer']
-                                ? Border.all(color: Colors.green, width: 1.5)
+                                ? Border.all(color: Colors.green, width: 1.2)
                                 : null,
                           ),
                           child: Center(
@@ -982,8 +1020,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                                   .indexOf(option)],
                               style: TextStyle(
                                 fontSize: isSmallPhone
-                                    ? 11
-                                    : (isTablet ? 13 : 12),
+                                    ? 10
+                                    : (isTablet ? 12 : 11),
                                 fontWeight: FontWeight.w600,
                                 color: isAnswered
                                     ? (option == question['answer']
@@ -1001,24 +1039,27 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                           ),
                         ),
 
-                        // Option Text
+                        // Option Text - Fixed for small screens
                         Expanded(
-                          child: Text(
-                            option,
-                            style: TextStyle(
-                              fontSize: optionFontSize,
-                              color: textColor,
-                              fontWeight:
-                                  isAnswered && option == question['answer']
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                              height: isSmallPhone
-                                  ? 1.2
-                                  : (isTablet ? 1.35 : 1.25),
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              option,
+                              style: TextStyle(
+                                fontSize: optionFontSize,
+                                color: textColor,
+                                fontWeight:
+                                    isAnswered && option == question['answer']
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                                height: isSmallPhone
+                                    ? 1.1
+                                    : (isTablet ? 1.25 : 1.2),
+                              ),
+                              textAlign: TextAlign.left,
+                              maxLines: 3, // Increased from 2 to 3
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            textAlign: TextAlign.left,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
 
@@ -1033,7 +1074,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                                   : option == selectedOption
                                   ? Icons.cancel_rounded
                                   : Icons.circle_outlined,
-                              size: isSmallPhone ? 16 : (isTablet ? 20 : 18),
+                              size: isSmallPhone ? 14 : (isTablet ? 18 : 16),
                               color: option == question['answer']
                                   ? Colors.green
                                   : option == selectedOption
@@ -1060,25 +1101,34 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   ) {
     return SizedBox(
       width: double.infinity,
-      height: screenHeight * 0.06,
+      height: screenHeight * 0.06, // আরও বাড়ানো হলো
       child: ElevatedButton(
         onPressed: isAnswered ? goToNextQuestion : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
           ),
-          elevation: 4,
+          elevation: 3,
           textStyle: TextStyle(
             fontSize: responsiveFontSize,
             fontWeight: FontWeight.bold,
           ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 4,
+          ), // প্যাডিং যোগ করা হলো
         ),
-        child: Text(
-          currentQuestionIndex < _securityManager.questions.length - 1
-              ? 'পরবর্তী প্রশ্ন'
-              : 'ফলাফল দেখুন',
+        child: FittedBox(
+          // FittedBox যোগ করা হলো
+          fit: BoxFit.scaleDown,
+          child: Text(
+            currentQuestionIndex < _securityManager.questions.length - 1
+                ? 'পরবর্তী প্রশ্ন'
+                : 'ফলাফল দেখুন',
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
@@ -1092,11 +1142,11 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     dynamic question,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 6),
             child: Row(
               children: [
                 Expanded(
@@ -1106,11 +1156,11 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
                     'উত্তরটি যাচাই করতে',
                     style: TextStyle(
-                      fontSize: responsiveFontSize - 3,
+                      fontSize: responsiveFontSize - 4,
                       fontWeight: FontWeight.w500,
                       color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                     ),
@@ -1127,7 +1177,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
           ),
           SizedBox(
             width: double.infinity,
-            height: screenHeight * 0.055,
+            height: screenHeight * 0.045,
             child: OutlinedButton.icon(
               onPressed: () => _securityManager.searchOnGoogle(
                 context: context,
@@ -1139,26 +1189,26 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     : Colors.blue[600],
                 side: BorderSide(
                   color: isDarkMode ? Colors.blue[400]! : Colors.blue[300]!,
-                  width: 1.5,
+                  width: 1.2,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 backgroundColor: isDarkMode
                     ? Colors.blue[900]!.withOpacity(0.1)
                     : Colors.blue[50]!.withOpacity(0.5),
                 textStyle: TextStyle(
-                  fontSize: responsiveFontSize - 1,
+                  fontSize: responsiveFontSize - 2,
                   fontWeight: FontWeight.w600,
                 ),
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.04,
-                  vertical: screenHeight * 0.015,
+                  horizontal: screenWidth * 0.03,
+                  vertical: screenHeight * 0.012,
                 ),
               ),
               icon: Icon(
                 Icons.search,
-                size: responsiveFontSize,
+                size: responsiveFontSize - 1,
                 color: isDarkMode ? Colors.blue[300] : Colors.blue[600],
               ),
               label: const Text('গুগলে তথ্য যাচাই করুন'),
@@ -1176,7 +1226,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     dynamic question,
   ) {
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 80,
+      top: MediaQuery.of(context).padding.top + 60,
       left: 0,
       right: 0,
       child: Align(
@@ -1184,19 +1234,19 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
         child: Container(
           margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
           padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.012,
-            horizontal: screenWidth * 0.06,
+            vertical: screenHeight * 0.01,
+            horizontal: screenWidth * 0.05,
           ),
           decoration: BoxDecoration(
             color: selectedOption == question['answer']
                 ? Colors.green.withOpacity(0.9)
                 : Colors.orange.withOpacity(0.9),
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -1209,15 +1259,15 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     ? Icons.emoji_events
                     : Icons.thumb_up,
                 color: Colors.white,
-                size: responsiveFontSize + 2,
+                size: responsiveFontSize,
               ),
-              SizedBox(width: screenWidth * 0.02),
+              SizedBox(width: screenWidth * 0.015),
               Text(
                 selectedOption == question['answer']
                     ? '+$_earnedPointsForNotification পয়েন্ট ✅'
                     : '+$_earnedPointsForNotification পয়েন্ট 👍',
                 style: TextStyle(
-                  fontSize: responsiveFontSize,
+                  fontSize: responsiveFontSize - 1,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),

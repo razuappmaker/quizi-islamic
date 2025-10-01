@@ -10,6 +10,8 @@ class PrayerHeaderSection extends StatelessWidget {
   final Map<String, String> prayerTimes;
   final bool isSmallScreen;
   final bool isVerySmallScreen;
+  final bool isTablet; // Added parameter
+  final bool isSmallPhone; // Added parameter
   final PrayerTimeService prayerTimeService;
   final VoidCallback onRefresh;
   final bool useManualLocation;
@@ -23,6 +25,8 @@ class PrayerHeaderSection extends StatelessWidget {
     required this.prayerTimes,
     required this.isSmallScreen,
     required this.isVerySmallScreen,
+    required this.isTablet, // Added parameter
+    required this.isSmallPhone, // Added parameter
     required this.prayerTimeService,
     required this.onRefresh,
     required this.useManualLocation,
@@ -33,20 +37,38 @@ class PrayerHeaderSection extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Dynamic height calculation based on screen height
-    final bool isShortScreen = screenHeight < 600;
-    final bool isTallScreen = screenHeight > 800;
+    // Calculate dynamic heights based on screen size
+    final double headerHeight = isVerySmallScreen
+        ? 140 // ছোট স্ক্রিনে ১৫% কম
+        : isSmallScreen
+        ? 160 // মাঝারি স্ক্রিনে ১০% কম
+        : 180; // বড় স্ক্রিনে মূল সাইজ
+
+    final double fontSize = isVerySmallScreen
+        ? 12
+        : isSmallScreen
+        ? 14
+        : 16;
+
+    final double iconSize = isVerySmallScreen
+        ? 12
+        : isSmallScreen
+        ? 14
+        : 16;
+
+    final double paddingSize = isVerySmallScreen
+        ? 6
+        : isSmallScreen
+        ? 8
+        : 10;
 
     return Container(
+      height: headerHeight,
       padding: EdgeInsets.fromLTRB(
-        12,
-        isShortScreen
-            ? 6
-            : isTallScreen
-            ? 10
-            : 8,
-        12,
-        isShortScreen ? 6 : 8,
+        paddingSize,
+        paddingSize * 0.5,
+        paddingSize,
+        paddingSize,
       ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -82,28 +104,82 @@ class PrayerHeaderSection extends StatelessWidget {
       child: Column(
         children: [
           // Top Section - Location and Refresh (Compact)
-          _buildCompactLocationSection(isDark, isShortScreen),
+          _buildCompactLocationSection(
+            isDark,
+            isVerySmallScreen,
+            isSmallScreen,
+            isTablet,
+            isSmallPhone,
+          ),
 
-          SizedBox(height: isShortScreen ? 6 : 8),
+          SizedBox(
+            height: isVerySmallScreen
+                ? 6
+                : isSmallScreen
+                ? 7
+                : 8,
+          ),
 
           // Bottom Section - Prayer Info and Sun Times (Compact)
-          _buildCompactPrayerSunSection(isDark, isShortScreen),
+          _buildCompactPrayerSunSection(
+            isDark,
+            isVerySmallScreen,
+            isSmallScreen,
+            isTablet,
+            isSmallPhone,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCompactLocationSection(bool isDark, bool isShortScreen) {
-    // Short screen-এ 50% height reduction
-    final double containerPadding = isShortScreen ? 1 : 6;
-    final double iconPadding = isShortScreen ? 1 : 4;
-    final double iconSize = isShortScreen ? 10 : 16;
-    final double textFontSize = isShortScreen ? 9 : 14;
-    final double badgeVerticalPadding = isShortScreen ? 0.5 : 3;
-    final double badgeFontSize = isShortScreen ? 6 : 10;
-    final double refreshIconSize = isShortScreen ? 10 : 16;
-    final double refreshPadding = isShortScreen ? 0.5 : 2;
-    final double refreshSplashRadius = isShortScreen ? 10 : 18;
+  Widget _buildCompactLocationSection(
+    bool isDark,
+    bool isVerySmallScreen,
+    bool isSmallScreen,
+    bool isTablet,
+    bool isSmallPhone,
+  ) {
+    final double containerPadding = isVerySmallScreen
+        ? 4
+        : isSmallScreen
+        ? 5
+        : 6;
+    final double iconPadding = isVerySmallScreen
+        ? 2
+        : isSmallScreen
+        ? 3
+        : 4;
+    final double iconSize = isVerySmallScreen
+        ? 10
+        : isSmallScreen
+        ? 12
+        : 16;
+    final double textFontSize = isVerySmallScreen
+        ? 9
+        : isSmallScreen
+        ? 10
+        : 14;
+    final double badgeVerticalPadding = isVerySmallScreen
+        ? 1
+        : isSmallScreen
+        ? 2
+        : 3;
+    final double badgeFontSize = isVerySmallScreen
+        ? 6
+        : isSmallScreen
+        ? 7
+        : 10;
+    final double refreshIconSize = isVerySmallScreen
+        ? 10
+        : isSmallScreen
+        ? 12
+        : 16;
+    final double refreshSplashRadius = isVerySmallScreen
+        ? 10
+        : isSmallScreen
+        ? 14
+        : 18;
 
     return Container(
       padding: EdgeInsets.all(containerPadding),
@@ -111,12 +187,18 @@ class PrayerHeaderSection extends StatelessWidget {
         color: isDark
             ? Colors.white.withOpacity(0.12)
             : Colors.white.withOpacity(0.25),
-        borderRadius: BorderRadius.circular(isShortScreen ? 4 : 10),
+        borderRadius: BorderRadius.circular(
+          isVerySmallScreen
+              ? 6
+              : isSmallScreen
+              ? 8
+              : 10,
+        ),
         border: Border.all(
           color: isDark
               ? Colors.white.withOpacity(0.2)
               : Color(0xFF4CAF50).withOpacity(0.3),
-          width: isShortScreen ? 0.5 : 0.8,
+          width: isVerySmallScreen ? 0.5 : 0.8,
         ),
       ),
       child: Row(
@@ -137,7 +219,13 @@ class PrayerHeaderSection extends StatelessWidget {
             ),
           ),
 
-          SizedBox(width: isShortScreen ? 2 : 8),
+          SizedBox(
+            width: isVerySmallScreen
+                ? 4
+                : isSmallScreen
+                ? 6
+                : 8,
+          ),
 
           // Location Text with prefix
           Expanded(
@@ -147,7 +235,11 @@ class PrayerHeaderSection extends StatelessWidget {
                 Text(
                   "আপনি এখন অবস্থান করছেন",
                   style: TextStyle(
-                    fontSize: isShortScreen ? 7 : 9,
+                    fontSize: isVerySmallScreen
+                        ? 7
+                        : isSmallScreen
+                        ? 8
+                        : 9,
                     color: isDark
                         ? Colors.white.withOpacity(0.8)
                         : Color(0xFF388E3C),
@@ -174,14 +266,24 @@ class PrayerHeaderSection extends StatelessWidget {
           if (useManualLocation) ...[
             Container(
               padding: EdgeInsets.symmetric(
-                horizontal: isShortScreen ? 2 : 6,
+                horizontal: isVerySmallScreen
+                    ? 4
+                    : isSmallScreen
+                    ? 5
+                    : 6,
                 vertical: badgeVerticalPadding,
               ),
               decoration: BoxDecoration(
                 color: isDark
                     ? Colors.amber.withOpacity(0.3)
                     : Colors.orange.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(isShortScreen ? 2 : 5),
+                borderRadius: BorderRadius.circular(
+                  isVerySmallScreen
+                      ? 3
+                      : isSmallScreen
+                      ? 4
+                      : 5,
+                ),
                 border: Border.all(
                   color: isDark
                       ? Colors.amber.withOpacity(0.5)
@@ -200,13 +302,27 @@ class PrayerHeaderSection extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: isShortScreen ? 1 : 6),
+            SizedBox(
+              width: isVerySmallScreen
+                  ? 4
+                  : isSmallScreen
+                  ? 5
+                  : 6,
+            ),
           ],
 
           // Refresh Button
           Container(
-            width: isShortScreen ? 20 : 28,
-            height: isShortScreen ? 20 : 28,
+            width: isVerySmallScreen
+                ? 20
+                : isSmallScreen
+                ? 24
+                : 28,
+            height: isVerySmallScreen
+                ? 20
+                : isSmallScreen
+                ? 24
+                : 28,
             decoration: BoxDecoration(
               color: isDark
                   ? Colors.white.withOpacity(0.15)
@@ -223,8 +339,16 @@ class PrayerHeaderSection extends StatelessWidget {
               iconSize: refreshIconSize,
               padding: EdgeInsets.zero,
               constraints: BoxConstraints(
-                minWidth: isShortScreen ? 20 : 28,
-                minHeight: isShortScreen ? 20 : 28,
+                minWidth: isVerySmallScreen
+                    ? 20
+                    : isSmallScreen
+                    ? 24
+                    : 28,
+                minHeight: isVerySmallScreen
+                    ? 20
+                    : isSmallScreen
+                    ? 24
+                    : 28,
               ),
               tooltip: "রিফ্রেশ করুন",
               splashRadius: refreshSplashRadius,
@@ -235,34 +359,106 @@ class PrayerHeaderSection extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactPrayerSunSection(bool isDark, bool isShortScreen) {
+  Widget _buildCompactPrayerSunSection(
+    bool isDark,
+    bool isVerySmallScreen,
+    bool isSmallScreen,
+    bool isTablet,
+    bool isSmallPhone,
+  ) {
     return Row(
       children: [
         // Next Prayer Countdown
         Expanded(
           flex: 10,
-          child: _buildCompactPrayerCard(isDark, isShortScreen),
+          child: _buildCompactPrayerCard(
+            isDark,
+            isVerySmallScreen,
+            isSmallScreen,
+            isTablet,
+            isSmallPhone,
+          ),
         ),
 
-        SizedBox(width: isShortScreen ? 6 : 8),
+        SizedBox(
+          width: isVerySmallScreen
+              ? 6
+              : isSmallScreen
+              ? 7
+              : 8,
+        ),
 
         // Sunrise/Sunset Times
         Expanded(
           flex: 4,
-          child: _buildCompactSunTimesCard(isDark, isShortScreen),
+          child: _buildCompactSunTimesCard(
+            isDark,
+            isVerySmallScreen,
+            isSmallScreen,
+            isTablet,
+            isSmallPhone,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildCompactPrayerCard(bool isDark, bool isShortScreen) {
+  Widget _buildCompactPrayerCard(
+    bool isDark,
+    bool isVerySmallScreen,
+    bool isSmallScreen,
+    bool isTablet,
+    bool isSmallPhone,
+  ) {
+    final double cardPadding = isVerySmallScreen
+        ? 6
+        : isSmallScreen
+        ? 8
+        : 10;
+    final double titleFontSize = isVerySmallScreen
+        ? 10
+        : isSmallScreen
+        ? 11
+        : 12;
+    final double prayerFontSize = isVerySmallScreen
+        ? 12
+        : isSmallScreen
+        ? 14
+        : 16;
+    final double countdownPadding = isVerySmallScreen
+        ? 6
+        : isSmallScreen
+        ? 7
+        : 8;
+    final double timeUnitFontSize = isVerySmallScreen
+        ? 14
+        : isSmallScreen
+        ? 16
+        : 18;
+    final double timeLabelFontSize = isVerySmallScreen
+        ? 8
+        : isSmallScreen
+        ? 9
+        : 10;
+    final double statusFontSize = isVerySmallScreen
+        ? 7
+        : isSmallScreen
+        ? 8
+        : 9;
+
     return Container(
-      padding: EdgeInsets.all(isShortScreen ? 8 : 10),
+      padding: EdgeInsets.all(cardPadding),
       decoration: BoxDecoration(
         color: isDark
             ? Colors.white.withOpacity(0.1)
             : Colors.white.withOpacity(0.25),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(
+          isVerySmallScreen
+              ? 8
+              : isSmallScreen
+              ? 10
+              : 12,
+        ),
         border: Border.all(
           color: isDark
               ? Colors.white.withOpacity(0.2)
@@ -282,18 +478,24 @@ class PrayerHeaderSection extends StatelessWidget {
                 Text(
                   "পরবর্তী নামাজ",
                   style: TextStyle(
-                    fontSize: isShortScreen ? 11 : 12,
+                    fontSize: titleFontSize,
                     color: isDark
                         ? Colors.white.withOpacity(0.9)
                         : Color(0xFF388E3C),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 4),
+                SizedBox(
+                  height: isVerySmallScreen
+                      ? 2
+                      : isSmallScreen
+                      ? 3
+                      : 4,
+                ),
                 Text(
                   nextPrayer.isNotEmpty ? nextPrayer : "লোড হচ্ছে...",
                   style: TextStyle(
-                    fontSize: isShortScreen ? 14 : 16,
+                    fontSize: prayerFontSize,
                     fontWeight: FontWeight.w800,
                     color: isDark ? Colors.white : Color(0xFF1B5E20),
                     letterSpacing: -0.2,
@@ -305,21 +507,37 @@ class PrayerHeaderSection extends StatelessWidget {
             ),
           ),
 
-          SizedBox(width: isShortScreen ? 6 : 8),
+          SizedBox(
+            width: isVerySmallScreen
+                ? 4
+                : isSmallScreen
+                ? 6
+                : 8,
+          ),
 
           // Countdown Timer (Right side) - With status border
           Expanded(
             flex: 6,
             child: Container(
               padding: EdgeInsets.symmetric(
-                horizontal: isShortScreen ? 8 : 10,
-                vertical: isShortScreen ? 6 : 8,
+                horizontal: countdownPadding,
+                vertical: isVerySmallScreen
+                    ? 4
+                    : isSmallScreen
+                    ? 5
+                    : 6,
               ),
               decoration: BoxDecoration(
                 color: isDark
                     ? Colors.black.withOpacity(0.25)
                     : Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(
+                  isVerySmallScreen
+                      ? 6
+                      : isSmallScreen
+                      ? 8
+                      : 10,
+                ),
                 border: Border.all(
                   color: _getCountdownBorderColor(countdown),
                   width: 2.0,
@@ -342,31 +560,40 @@ class PrayerHeaderSection extends StatelessWidget {
                       _buildTimeUnit(
                         "ঘণ্টা",
                         countdown.inHours,
-                        isShortScreen,
+                        timeUnitFontSize,
+                        timeLabelFontSize,
                         isDark,
                       ),
-                      _buildDivider(isShortScreen, isDark),
+                      _buildDivider(isVerySmallScreen, isSmallScreen, isDark),
                       _buildTimeUnit(
                         "মিনিট",
                         countdown.inMinutes % 60,
-                        isShortScreen,
+                        timeUnitFontSize,
+                        timeLabelFontSize,
                         isDark,
                       ),
-                      _buildDivider(isShortScreen, isDark),
+                      _buildDivider(isVerySmallScreen, isSmallScreen, isDark),
                       _buildTimeUnit(
                         "সেকেন্ড",
                         countdown.inSeconds % 60,
-                        isShortScreen,
+                        timeUnitFontSize,
+                        timeLabelFontSize,
                         isDark,
                       ),
                     ],
                   ),
-                  SizedBox(height: isShortScreen ? 2 : 4),
+                  SizedBox(
+                    height: isVerySmallScreen
+                        ? 1
+                        : isSmallScreen
+                        ? 2
+                        : 4,
+                  ),
                   // Countdown status text
                   Text(
                     _getCountdownStatus(countdown),
                     style: TextStyle(
-                      fontSize: isShortScreen ? 8 : 9,
+                      fontSize: statusFontSize,
                       color: _getCountdownTextColor(countdown, isDark),
                       fontWeight: FontWeight.w700,
                     ),
@@ -432,9 +659,36 @@ class PrayerHeaderSection extends StatelessWidget {
     }
   }
 
-  Widget _buildCompactSunTimesCard(bool isDark, bool isShortScreen) {
+  Widget _buildCompactSunTimesCard(
+    bool isDark,
+    bool isVerySmallScreen,
+    bool isSmallScreen,
+    bool isTablet,
+    bool isSmallPhone,
+  ) {
+    final double cardPadding = isVerySmallScreen
+        ? 4
+        : isSmallScreen
+        ? 6
+        : 8;
+    final double iconSize = isVerySmallScreen
+        ? 10
+        : isSmallScreen
+        ? 12
+        : 14;
+    final double labelFontSize = isVerySmallScreen
+        ? 9
+        : isSmallScreen
+        ? 10
+        : 11;
+    final double timeFontSize = isVerySmallScreen
+        ? 10
+        : isSmallScreen
+        ? 12
+        : 14;
+
     return Container(
-      padding: EdgeInsets.all(isShortScreen ? 6 : 8),
+      padding: EdgeInsets.all(cardPadding),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -449,7 +703,13 @@ class PrayerHeaderSection extends StatelessWidget {
                   Color(0xFFFFB74D), // Medium light orange
                 ],
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(
+          isVerySmallScreen
+              ? 8
+              : isSmallScreen
+              ? 10
+              : 12,
+        ),
         border: Border.all(
           color: isDark ? Color(0xFFE65100) : Color(0xFFF57C00),
           width: 1.0,
@@ -472,13 +732,21 @@ class PrayerHeaderSection extends StatelessWidget {
             icon: Icons.wb_twilight,
             label: "সূর্যোদয়",
             time: prayerTimes["সূর্যোদয়"],
-            isShortScreen: isShortScreen,
+            iconSize: iconSize,
+            labelFontSize: labelFontSize,
+            timeFontSize: timeFontSize,
             isDark: isDark,
           ),
 
           Container(
             height: 1.0,
-            margin: EdgeInsets.symmetric(vertical: isShortScreen ? 2 : 3),
+            margin: EdgeInsets.symmetric(
+              vertical: isVerySmallScreen
+                  ? 1
+                  : isSmallScreen
+                  ? 2
+                  : 3,
+            ),
             color: isDark
                 ? Colors.white.withOpacity(0.3)
                 : Colors.orange.withOpacity(0.4),
@@ -489,7 +757,9 @@ class PrayerHeaderSection extends StatelessWidget {
             icon: Icons.nightlight_round,
             label: "সূর্যাস্ত",
             time: prayerTimes["সূর্যাস্ত"],
-            isShortScreen: isShortScreen,
+            iconSize: iconSize,
+            labelFontSize: labelFontSize,
+            timeFontSize: timeFontSize,
             isDark: isDark,
           ),
         ],
@@ -501,7 +771,9 @@ class PrayerHeaderSection extends StatelessWidget {
     required IconData icon,
     required String label,
     required String? time,
-    required bool isShortScreen,
+    required double iconSize,
+    required double labelFontSize,
+    required double timeFontSize,
     required bool isDark,
   }) {
     return Column(
@@ -513,13 +785,13 @@ class PrayerHeaderSection extends StatelessWidget {
             Icon(
               icon,
               color: isDark ? Colors.white : Color(0xFF5D4037),
-              size: isShortScreen ? 12 : 14,
+              size: iconSize,
             ),
             SizedBox(width: 4),
             Text(
               label,
               style: TextStyle(
-                fontSize: isShortScreen ? 10 : 11,
+                fontSize: labelFontSize,
                 color: isDark
                     ? Colors.white.withOpacity(0.9)
                     : Color(0xFF5D4037),
@@ -532,7 +804,7 @@ class PrayerHeaderSection extends StatelessWidget {
         Text(
           time != null ? _formatTimeCompact(time) : "--:--",
           style: TextStyle(
-            fontSize: isShortScreen ? 12 : 14,
+            fontSize: timeFontSize,
             fontWeight: FontWeight.w800,
             color: isDark ? Colors.white : Color(0xFF3E2723),
           ),
@@ -544,7 +816,8 @@ class PrayerHeaderSection extends StatelessWidget {
   Widget _buildTimeUnit(
     String label,
     int value,
-    bool isShortScreen,
+    double timeFontSize,
+    double labelFontSize,
     bool isDark,
   ) {
     return Column(
@@ -553,7 +826,7 @@ class PrayerHeaderSection extends StatelessWidget {
         Text(
           value.toString().padLeft(2, '0'),
           style: TextStyle(
-            fontSize: isShortScreen ? 16 : 18,
+            fontSize: timeFontSize,
             fontWeight: FontWeight.w900,
             color: isDark ? Colors.white : Color(0xFF1B5E20),
             fontFeatures: const [FontFeature.tabularFigures()],
@@ -572,7 +845,7 @@ class PrayerHeaderSection extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: isShortScreen ? 9 : 10,
+            fontSize: labelFontSize,
             color: isDark ? Colors.white.withOpacity(0.9) : Color(0xFF388E3C),
             fontWeight: FontWeight.w600,
           ),
@@ -581,10 +854,18 @@ class PrayerHeaderSection extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider(bool isShortScreen, bool isDark) {
+  Widget _buildDivider(
+    bool isVerySmallScreen,
+    bool isSmallScreen,
+    bool isDark,
+  ) {
     return Container(
       width: 1,
-      height: isShortScreen ? 24 : 28,
+      height: isVerySmallScreen
+          ? 20
+          : isSmallScreen
+          ? 24
+          : 28,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,

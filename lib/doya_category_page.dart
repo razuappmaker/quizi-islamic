@@ -1,12 +1,10 @@
-// Doya Category Page - Responsive Version for Mobile & Tablet
+// Doya Page - Fixed Version
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:flutter/services.dart'; // Clipboard এর জন্য
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ad_helper.dart';
-import 'network_json_loader.dart'; // নতুন নেটওয়ার্ক লোডার
-import 'doya_list_page.dart'; // নতুন ফাইল ইম্পোর্ট
+import 'network_json_loader.dart';
+import 'doya_list_page.dart';
 
 class DoyaCategoryPage extends StatefulWidget {
   const DoyaCategoryPage({Key? key}) : super(key: key);
@@ -17,7 +15,7 @@ class DoyaCategoryPage extends StatefulWidget {
 
 class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   // Bottom Banner Ad ভেরিয়েবল
-  BannerAd? _bottomBannerAd; // ✅ Nullable করুন adaptive banner-এর জন্য
+  BannerAd? _bottomBannerAd;
   bool _isBottomBannerAdReady = false;
   double _bannerAdHeight = 0.0;
 
@@ -26,7 +24,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   bool _showInterstitialAds = true;
   int _doyaCardOpenCount = 0;
 
-  // ক্যাটাগরি তালিকা - final হিসেবে ডিক্লেয়ার করুন
+  // ক্যাটাগরি তালিকা
   final List<Map<String, dynamic>> categories = [
     {
       'title': 'সালাত-নামাজ',
@@ -60,7 +58,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     },
     {
       'title': 'রোগ মুক্তি',
-      'icon': Icons.local_hospital, // আইকন আপডেট
+      'icon': Icons.local_hospital,
       'color': Colors.red,
       'jsonFile': 'assets/rog_mukti_doyas.json',
     },
@@ -91,45 +89,44 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   @override
   void initState() {
     super.initState();
-
-    // AdMob initialize
     AdHelper.initialize();
-    _initializeAds(); // Interstitial অ্যাড ইনিশিয়ালাইজ
-
-    // ✅ Adaptive Bottom Banner Ad লোড
-    _loadBottomBannerAd();
-
-    // গ্লোবাল সার্চের জন্য সকল দোয়া লোড
+    _initializeAds();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadBottomBannerAd();
+    });
     _loadAllDoyas();
   }
 
-  // ✅ Adaptive Bottom Banner Ad লোড করার মেথড
   Future<void> _loadBottomBannerAd() async {
     try {
-      // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
       bool canShowAd = await AdHelper.canShowBannerAd();
-
       if (!canShowAd) {
         print('Banner ad limit reached, not showing ad');
+        setState(() {
+          _bannerAdHeight = 0.0;
+          _isBottomBannerAdReady = false;
+        });
         return;
       }
 
-      _bottomBannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+      final bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
         context,
+        width: MediaQuery.of(context).size.width.toInt(),
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) {
-            print('Adaptive Bottom banner ad loaded successfully');
+            print('✅ Adaptive Bottom banner ad loaded successfully');
             setState(() {
+              _bottomBannerAd = ad as BannerAd?;
               _isBottomBannerAdReady = true;
               _bannerAdHeight = _bottomBannerAd!.size.height.toDouble();
             });
             AdHelper.recordBannerAdShown();
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
-            print('Adaptive Bottom banner ad failed to load: $error');
+            print('❌ Adaptive Bottom banner ad failed to load: $error');
             ad.dispose();
-            _bottomBannerAd = null;
             setState(() {
+              _bottomBannerAd = null;
               _isBottomBannerAdReady = false;
               _bannerAdHeight = 0.0;
             });
@@ -138,19 +135,19 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
             AdHelper.canClickAd().then((canClick) {
               if (canClick) {
                 AdHelper.recordAdClick();
-                print('Adaptive Bottom Banner ad clicked.');
+                print('🔵 Adaptive Bottom Banner ad clicked.');
               } else {
-                print('Ad click limit reached');
+                print('🔴 Ad click limit reached');
               }
             });
           },
-          onAdClosed: (ad) => print('Bottom banner ad closed'),
+          onAdClosed: (ad) => print('🔵 Bottom banner ad closed'),
         ),
       );
 
-      await _bottomBannerAd?.load();
+      bannerAd.load();
     } catch (e) {
-      print('Error loading adaptive bottom banner ad: $e');
+      print('❌ Error loading adaptive bottom banner ad: $e');
       _bottomBannerAd?.dispose();
       _bottomBannerAd = null;
       setState(() {
@@ -160,67 +157,37 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     }
   }
 
-  // অ্যাড সিস্টেম ইনিশিয়ালাইজেশন
   Future<void> _initializeAds() async {
     try {
-      // সেটিংস লোড করুন
       final prefs = await SharedPreferences.getInstance();
-
-      // interstitial অ্যাড সেটিংস লোড করুন (ডিফল্ট true)
       _showInterstitialAds = prefs.getBool('show_interstitial_ads') ?? true;
 
-      // আজকে interstitial অ্যাড দেখানো হয়েছে কিনা চেক করুন
       final lastShownDate = prefs.getString('last_interstitial_date_doya');
       final today = DateTime.now().toIso8601String().split('T')[0];
 
       setState(() {
         _interstitialAdShownToday = (lastShownDate == today);
       });
-
-      print(
-        'দোয়া পেজ - অ্যাড সিস্টেম ইনিশিয়ালাইজড: interstitial অ্যাড = $_showInterstitialAds, আজকে দেখানো হয়েছে = $_interstitialAdShownToday',
-      );
     } catch (e) {
       print('দোয়া পেজ - অ্যাড ইনিশিয়ালাইজেশনে ত্রুটি: $e');
     }
   }
 
-  // Interstitial অ্যাড শো করুন যদি প্রয়োজন হয়
   Future<void> _showInterstitialAdIfNeeded() async {
     try {
-      // interstitial অ্যাড বন্ধ থাকলে স্কিপ করুন
-      if (!_showInterstitialAds) {
-        print('দোয়া পেজ - Interstitial অ্যাড ইউজার বন্ধ রেখেছেন');
+      if (!_showInterstitialAds ||
+          _interstitialAdShownToday ||
+          _doyaCardOpenCount < 6) {
         return;
       }
 
-      // যদি আজকে ইতিমধ্যে interstitial অ্যাড দেখানো হয়ে থাকে তবে স্কিপ করুন
-      if (_interstitialAdShownToday) {
-        print('দোয়া পেজ - ইতিমধ্যে আজ interstitial অ্যাড দেখানো হয়েছে');
-        return;
-      }
-
-      // দোয়া কার্ড ওপেন কাউন্টার চেক (৬টি দোয়া পড়লে)
-      if (_doyaCardOpenCount < 6) {
-        print('দোয়া পেজ - দোয়া কার্ড ওপেন কাউন্ট: $_doyaCardOpenCount/6');
-        return;
-      }
-
-      print('দোয়া পেজ - Interstitial অ্যাড শো করার চেষ্টা করা হচ্ছে...');
-
-      // AdHelper এর মাধ্যমে interstitial অ্যাড শো করুন
       await AdHelper.showInterstitialAd(
         onAdShowed: () {
-          print('দোয়া পেজ - Interstitial অ্যাড শো করা হলো');
           _recordInterstitialShown();
-          _resetDoyaCardCount(); // কাউন্টার রিসেট
+          _resetDoyaCardCount();
         },
-        onAdDismissed: () {
-          print('দোয়া পেজ - Interstitial অ্যাড ডিসমিস করা হলো');
-        },
-        onAdFailedToShow: () {
-          print('দোয়া পেজ - Interstitial অ্যাড শো করতে ব্যর্থ');
-        },
+        onAdDismissed: () {},
+        onAdFailedToShow: () {},
         adContext: 'DoyaPage',
       );
     } catch (e) {
@@ -228,68 +195,47 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     }
   }
 
-  // Interstitial অ্যাড দেখানো রেকর্ড করুন
   void _recordInterstitialShown() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final today = DateTime.now().toIso8601String().split('T')[0];
-
       await prefs.setString('last_interstitial_date_doya', today);
-
       setState(() {
         _interstitialAdShownToday = true;
       });
-
-      print(
-        'দোয়া পেজ - আজকের interstitial অ্যাড দেখানো রেকর্ড করা হলো: $today',
-      );
     } catch (e) {
       print('দোয়া পেজ - Interstitial অ্যাড রেকর্ড করতে ত্রুটি: $e');
     }
   }
 
-  // দোয়া কার্ড কাউন্টার রিসেট করুন
   void _resetDoyaCardCount() {
     setState(() {
       _doyaCardOpenCount = 0;
     });
   }
 
-  // দোয়া কার্ড ওপেন কাউন্টার ইনক্রিমেন্ট করুন
   void _incrementDoyaCardCount() {
     setState(() {
       _doyaCardOpenCount++;
     });
-
-    print('দোয়া পেজ - দোয়া কার্ড ওপেন কাউন্ট: $_doyaCardOpenCount/6');
-
-    // ৬টি দোয়া পড়লে interstitial অ্যাড শো করুন
     if (_doyaCardOpenCount >= 6) {
       _showInterstitialAdIfNeeded();
     }
   }
 
-  // ডিভাইসের ধরন চেক করার মেথড
   void _checkDeviceType(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final shortestSide = mediaQuery.size.shortestSide;
-
-    // ট্যাবলেটের থ্রেশহোল্ড: 600dp
+    final shortestSide = MediaQuery.of(context).size.shortestSide;
     setState(() {
       _isTablet = shortestSide >= 600;
     });
   }
 
-  // সকল দোয়া লোড করার মেথড
   Future<void> _loadAllDoyas() async {
     setState(() => _isLoadingAllDoyas = true);
-
     try {
       List<Map<String, String>> allDoyas = [];
-
       for (var category in categories) {
         try {
-          // NetworkJsonLoader ব্যবহার করুন (নেটওয়ার্ক থেকে প্রথমে, তারপর লোকাল)
           final loadedData = await NetworkJsonLoader.loadJsonList(
             category['jsonFile'],
           );
@@ -302,18 +248,15 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
             );
           }).toList();
 
-          // প্রতিটি দোয়ায় ক্যাটাগরি তথ্য যোগ করুন
           for (var doya in convertedData) {
             doya['category'] = category['title'];
             doya['categoryColor'] = category['color'].toString();
           }
-
           allDoyas.addAll(convertedData);
         } catch (e) {
           print('Error loading ${category['jsonFile']}: $e');
         }
       }
-
       setState(() {
         _allDoyas = allDoyas;
         _isLoadingAllDoyas = false;
@@ -326,15 +269,13 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
   @override
   void dispose() {
-    _bottomBannerAd?.dispose(); // ✅ Null safety সহ dispose
+    _bottomBannerAd?.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
-  // সার্চ শুরু করার মেথড
   void _startSearch() => setState(() => _isSearching = true);
 
-  // সার্চ বন্ধ করার মেথড
   void _stopSearch() {
     setState(() {
       _isSearching = false;
@@ -343,7 +284,6 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     });
   }
 
-  // সকল দোয়ায় সার্চ করার মেথড
   void _searchAllDoyas(String query) {
     if (query.isEmpty) {
       setState(() => _searchResults.clear());
@@ -365,7 +305,6 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     setState(() => _searchResults = results);
   }
 
-  // ক্যাটাগরি পেইজে নেভিগেট করার মেথড
   void _navigateToCategoryDoyas(
     BuildContext context,
     Map<String, dynamic> category,
@@ -377,16 +316,13 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           categoryTitle: category['title'],
           jsonFile: category['jsonFile'],
           categoryColor: category['color'],
-          onDoyaCardOpen:
-              _incrementDoyaCardCount, // কাউন্টার ইনক্রিমেন্ট কলব্যাক
+          onDoyaCardOpen: _incrementDoyaCardCount,
         ),
       ),
     );
   }
 
-  // সার্চ করা দোয়ায় নেভিগেট করার মেথড
   void _navigateToSearchedDoya(BuildContext context, Map<String, String> doya) {
-    // এই দোয়ার ক্যাটাগরি খুঁজুন
     final category = categories.firstWhere(
       (cat) => cat['title'] == doya['category'],
       orElse: () => categories.last,
@@ -400,24 +336,22 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           jsonFile: category['jsonFile'],
           categoryColor: category['color'],
           initialSearchQuery: doya['title'],
-          onDoyaCardOpen:
-              _incrementDoyaCardCount, // কাউন্টার ইনক্রিমেন্ট কলব্যাক
+          onDoyaCardOpen: _incrementDoyaCardCount,
         ),
       ),
     );
   }
 
-  // ক্যাটাগরি কার্ড বিল্ড করার মেথড - রেসপনসিভ
   Widget _buildCategoryCard(Map<String, dynamic> category) {
     return Card(
       elevation: 4,
-      margin: EdgeInsets.all(_isTablet ? 12 : 8), // ট্যাবলেটে বেশি margin
+      margin: EdgeInsets.all(_isTablet ? 12 : 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () => _navigateToCategoryDoyas(context, category),
         child: Container(
-          height: _isTablet ? 140 : 120, // ট্যাবলেটে উচ্চতা বেশি
+          height: _isTablet ? 140 : 120,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -435,14 +369,14 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
             children: [
               Icon(
                 category['icon'],
-                size: _isTablet ? 40 : 32, // ট্যাবলেটে বড় আইকন
+                size: _isTablet ? 40 : 32,
                 color: Colors.white,
               ),
               const SizedBox(height: 8),
               Text(
                 category['title'],
                 style: TextStyle(
-                  fontSize: _isTablet ? 18 : 16, // ট্যাবলেটে বড় ফন্ট
+                  fontSize: _isTablet ? 18 : 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -457,9 +391,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
-  // সার্চ রেজাল্ট কার্ড বিল্ড করার মেথড
   Widget _buildSearchResultCard(Map<String, String> doya) {
-    Color categoryColor = Colors.teal; // ডিফল্ট কালার
+    Color categoryColor = Colors.teal;
     try {
       categoryColor = Color(int.parse(doya['categoryColor'] ?? '0xFF009688'));
     } catch (e) {
@@ -494,48 +427,33 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
-  // বডি কন্টেন্ট বিল্ড করার মেথড
   Widget _buildBodyContent() {
     return _isSearching ? _buildSearchResults() : _buildCategoryGrid();
   }
 
-  // ✅ Adaptive বটম ব্যানার অ্যাড বিল্ড করার মেথড
   Widget _buildBottomBannerAd() {
-    if (!_isBottomBannerAdReady || _bottomBannerAd == null) {
-      return SizedBox(
-        height: _bannerAdHeight,
-      ); // Empty space when ad not loaded
+    if (!_isBottomBannerAdReady ||
+        _bannerAdHeight <= 0 ||
+        _bottomBannerAd == null) {
+      return const SizedBox.shrink();
     }
 
-    return SafeArea(
-      top: false,
-      child: Container(
-        width: double.infinity,
-        height: _bottomBannerAd!.size.height.toDouble(),
-        alignment: Alignment.center,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[900]
-            : Colors.white,
-        child: AdWidget(ad: _bottomBannerAd!),
-      ),
+    return Container(
+      width: double.infinity,
+      height: _bannerAdHeight,
+      alignment: Alignment.center,
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[900]
+          : Colors.white,
+      child: AdWidget(ad: _bottomBannerAd!),
     );
-  }
-
-  // সিস্টেম ন্যাভিগেশন বার এর height নির্ণয় করার মেথড
-  double _getSystemNavigationBarHeight(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    return mediaQuery.padding.bottom;
   }
 
   @override
   Widget build(BuildContext context) {
-    // বিল্ড করার সময় ডিভাইস টাইপ চেক করুন
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkDeviceType(context);
     });
-
-    final systemNavigationBarHeight = _getSystemNavigationBarHeight(context);
-    final totalBottomPadding = _bannerAdHeight + systemNavigationBarHeight;
 
     return Scaffold(
       appBar: AppBar(
@@ -576,52 +494,35 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
         ],
       ),
       body: SafeArea(
-        bottom: false, // নিচের SafeArea বন্ধ রাখুন
-        child: Stack(
+        child: Column(
           children: [
-            // Main content with bottom padding
-            Padding(
-              padding: EdgeInsets.only(bottom: totalBottomPadding),
-              child: _buildBodyContent(),
-            ),
+            // Main Content - সম্পূর্ণ জায়গা নেয়
+            Expanded(child: _buildBodyContent()),
 
-            // ✅ Adaptive Bottom banner ad positioned at the bottom
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: systemNavigationBarHeight,
-              // System navigation bar এর উপরে
-              child: _buildBottomBannerAd(),
-            ),
+            // Banner Ad - শুধুমাত্র যখন প্রয়োজন
+            _buildBottomBannerAd(),
           ],
         ),
       ),
     );
   }
 
-  // ক্যাটাগরি গ্রিড বিল্ড করার মেথড - রেসপনসিভ
   Widget _buildCategoryGrid() {
-    // ডিভাইস অনুযায়ী কলাম সংখ্যা নির্ধারণ
-    final crossAxisCount = _isTablet
-        ? 4
-        : 2; // ট্যাবলেটে ৪ কলাম, মোবাইলে ২ কলাম
+    final crossAxisCount = _isTablet ? 4 : 2;
 
     return GridView.builder(
-      padding: EdgeInsets.all(_isTablet ? 20 : 16), // ট্যাবলেটে বেশি padding
+      padding: EdgeInsets.all(_isTablet ? 20 : 16),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        crossAxisSpacing: _isTablet ? 16 : 12, // ট্যাবলেটে বেশি spacing
+        crossAxisSpacing: _isTablet ? 16 : 12,
         mainAxisSpacing: _isTablet ? 16 : 12,
-        childAspectRatio: _isTablet
-            ? 0.8
-            : 0.9, // ট্যাবলেটে aspect ratio adjustment
+        childAspectRatio: _isTablet ? 0.8 : 0.9,
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) => _buildCategoryCard(categories[index]),
     );
   }
 
-  // সার্চ রেজাল্ট বিল্ড করার মেথড
   Widget _buildSearchResults() {
     if (_isLoadingAllDoyas) {
       return const Center(child: CircularProgressIndicator());

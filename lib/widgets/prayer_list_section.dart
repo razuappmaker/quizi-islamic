@@ -8,9 +8,12 @@ class PrayerListSection extends StatelessWidget {
   final String nextPrayer;
   final bool isSmallScreen;
   final bool isVerySmallScreen;
+  final bool isTablet;
+  final bool isSmallPhone;
   final PrayerTimeService prayerTimeService;
   final VoidCallback onRefresh;
   final Function(String, String) onPrayerTap;
+  final Map<String, int> prayerTimeAdjustments;
 
   const PrayerListSection({
     Key? key,
@@ -18,10 +21,12 @@ class PrayerListSection extends StatelessWidget {
     required this.nextPrayer,
     required this.isSmallScreen,
     required this.isVerySmallScreen,
+    required this.isTablet,
+    required this.isSmallPhone,
     required this.prayerTimeService,
     required this.onRefresh,
     required this.onPrayerTap,
-    required Map<String, int> prayerTimeAdjustments,
+    required this.prayerTimeAdjustments,
   }) : super(key: key);
 
   @override
@@ -29,22 +34,52 @@ class PrayerListSection extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    // Calculate dynamic heights based on screen size
+    final double itemHeight = isVerySmallScreen
+        ? 60 // ছোট স্ক্রিনে ১৫% কম
+        : isSmallScreen
+        ? 70 // মাঝারি স্ক্রিনে ১০% কম
+        : 80; // বড় স্ক্রিনে মূল সাইজ
+
+    final double fontSize = isVerySmallScreen
+        ? 12
+        : isSmallScreen
+        ? 14
+        : 16;
+
+    final double iconSize = isVerySmallScreen
+        ? 16
+        : isSmallScreen
+        ? 18
+        : 20;
+
+    final double paddingSize = isVerySmallScreen
+        ? 8
+        : isSmallScreen
+        ? 10
+        : 12;
+
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+          padding: EdgeInsets.fromLTRB(
+            paddingSize,
+            paddingSize,
+            paddingSize,
+            paddingSize,
+          ),
           child: Row(
             children: [
               Icon(
                 Icons.schedule,
                 color: isDark ? Colors.green.shade400 : Colors.green.shade700,
-                size: 16,
+                size: iconSize,
               ),
-              const SizedBox(width: 5),
+              SizedBox(width: paddingSize * 0.5),
               Text(
                 "নামাজের সময়সমূহ",
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w600,
                   color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
                 ),
@@ -71,7 +106,12 @@ class PrayerListSection extends StatelessWidget {
                     );
 
                     return ListView(
-                      padding: const EdgeInsets.fromLTRB(6, 0, 6, 8),
+                      padding: EdgeInsets.fromLTRB(
+                        paddingSize * 0.5,
+                        0,
+                        paddingSize * 0.5,
+                        paddingSize,
+                      ),
                       children: prayerTimes.entries
                           .where(
                             (e) => e.key != "সূর্যোদয়" && e.key != "সূর্যাস্ত",
@@ -94,15 +134,63 @@ class PrayerListSection extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.schedule, size: 40, color: Colors.grey),
-                      const SizedBox(height: 10),
+                      Icon(
+                        Icons.schedule,
+                        size: isVerySmallScreen
+                            ? 32
+                            : isSmallScreen
+                            ? 36
+                            : 40,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(
+                        height: isVerySmallScreen
+                            ? 6
+                            : isSmallScreen
+                            ? 8
+                            : 10,
+                      ),
                       Text(
                         "নামাজের সময় লোড হচ্ছে...",
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: isVerySmallScreen
+                              ? 12
+                              : isSmallScreen
+                              ? 14
+                              : 16,
+                        ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: isVerySmallScreen
+                            ? 6
+                            : isSmallScreen
+                            ? 8
+                            : 10,
+                      ),
                       ElevatedButton(
                         onPressed: onRefresh,
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isVerySmallScreen
+                                ? 16
+                                : isSmallScreen
+                                ? 18
+                                : 20,
+                            vertical: isVerySmallScreen
+                                ? 8
+                                : isSmallScreen
+                                ? 10
+                                : 12,
+                          ),
+                          textStyle: TextStyle(
+                            fontSize: isVerySmallScreen
+                                ? 12
+                                : isSmallScreen
+                                ? 14
+                                : 16,
+                          ),
+                        ),
                         child: Text("রিফ্রেশ করুন"),
                       ),
                     ],
@@ -125,10 +213,24 @@ class PrayerListSection extends StatelessWidget {
     IconData prayerIcon = prayerTimeService.getPrayerIcon(prayerName);
     final isNextPrayer = nextPrayer == prayerName;
 
-    // Calculate dynamic sizes based on card height
-    final double iconSize = cardHeight * 0.3;
-    final double titleFontSize = cardHeight * 0.2;
-    final double timeFontSize = cardHeight * 0.18;
+    // Calculate dynamic sizes based on card height and screen size
+    final double iconSize = isVerySmallScreen
+        ? cardHeight * 0.25
+        : isSmallScreen
+        ? cardHeight * 0.28
+        : cardHeight * 0.3;
+
+    final double titleFontSize = isVerySmallScreen
+        ? cardHeight * 0.18
+        : isSmallScreen
+        ? cardHeight * 0.19
+        : cardHeight * 0.2;
+
+    final double timeFontSize = isVerySmallScreen
+        ? cardHeight * 0.16
+        : isSmallScreen
+        ? cardHeight * 0.17
+        : cardHeight * 0.18;
 
     // Enhanced colors for dark mode next prayer
     final Color nextPrayerIconColor = isDark
@@ -146,7 +248,18 @@ class PrayerListSection extends StatelessWidget {
         : prayerColor;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: EdgeInsets.symmetric(
+        vertical: isVerySmallScreen
+            ? 3
+            : isSmallScreen
+            ? 4
+            : 5,
+        horizontal: isVerySmallScreen
+            ? 6
+            : isSmallScreen
+            ? 7
+            : 8,
+      ),
       height: cardHeight, // Use dynamic height
       decoration: BoxDecoration(
         color: isNextPrayer
@@ -156,12 +269,20 @@ class PrayerListSection extends StatelessWidget {
             : isDark
             ? Color(0xFF1E1E1E) // Professional dark grey
             : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(
+          isVerySmallScreen
+              ? 10
+              : isSmallScreen
+              ? 11
+              : 12,
+        ),
         border: isNextPrayer
             ? Border.all(
                 color: prayerColor.withOpacity(isDark ? 0.7 : 0.3),
                 // Increased border opacity
-                width: 2.0, // Thicker border for next prayer
+                width: isVerySmallScreen
+                    ? 1.5
+                    : 2.0, // Thicker border for next prayer
               )
             : Border.all(
                 color: isDark ? Colors.grey.shade800 : Colors.transparent,
@@ -171,28 +292,52 @@ class PrayerListSection extends StatelessWidget {
             ? [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.4),
-                  blurRadius: 8,
+                  blurRadius: isVerySmallScreen
+                      ? 6
+                      : isSmallScreen
+                      ? 7
+                      : 8,
                   offset: const Offset(0, 2),
                 ),
                 if (isNextPrayer)
                   BoxShadow(
                     color: prayerColor.withOpacity(0.8), // More visible glow
-                    blurRadius: 15,
-                    spreadRadius: 2,
+                    blurRadius: isVerySmallScreen
+                        ? 12
+                        : isSmallScreen
+                        ? 14
+                        : 15,
+                    spreadRadius: isVerySmallScreen
+                        ? 1
+                        : isSmallScreen
+                        ? 1.5
+                        : 2,
                     offset: const Offset(0, 3),
                   ),
               ]
             : [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 6,
+                  blurRadius: isVerySmallScreen
+                      ? 4
+                      : isSmallScreen
+                      ? 5
+                      : 6,
                   offset: const Offset(0, 2),
                 ),
                 if (isNextPrayer)
                   BoxShadow(
                     color: prayerColor.withOpacity(0.2),
-                    blurRadius: 10,
-                    spreadRadius: 1,
+                    blurRadius: isVerySmallScreen
+                        ? 8
+                        : isSmallScreen
+                        ? 9
+                        : 10,
+                    spreadRadius: isVerySmallScreen
+                        ? 0.5
+                        : isSmallScreen
+                        ? 0.75
+                        : 1,
                     offset: const Offset(0, 3),
                   ),
               ],
@@ -200,20 +345,41 @@ class PrayerListSection extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(
+            isVerySmallScreen
+                ? 10
+                : isSmallScreen
+                ? 11
+                : 12,
+          ),
           onTap: () {
             HapticFeedback.lightImpact();
             onPrayerTap(prayerName, time);
           },
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: cardHeight * 0.2),
+            padding: EdgeInsets.symmetric(
+              horizontal: isVerySmallScreen
+                  ? cardHeight * 0.15
+                  : cardHeight * 0.2,
+            ),
             child: Row(
               children: [
                 // Prayer Icon - Enhanced for next prayer in dark mode
-                // Prayer Icon - Enhanced visibility for next prayer in dark mode
                 Container(
-                  width: iconSize + 20,
-                  height: iconSize + 20,
+                  width:
+                      iconSize +
+                      (isVerySmallScreen
+                          ? 16
+                          : isSmallScreen
+                          ? 18
+                          : 20),
+                  height:
+                      iconSize +
+                      (isVerySmallScreen
+                          ? 16
+                          : isSmallScreen
+                          ? 18
+                          : 20),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: isNextPrayer && isDark
@@ -228,20 +394,36 @@ class PrayerListSection extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(
+                      isVerySmallScreen
+                          ? 8
+                          : isSmallScreen
+                          ? 9
+                          : 10,
+                    ),
                     border: Border.all(
                       color: isNextPrayer && isDark
                           ? prayerColor // Solid border color
                           : prayerColor.withOpacity(isDark ? 0.3 : 0.2),
-                      width: isNextPrayer && isDark ? 2.0 : 1, // Thicker border
+                      width: isNextPrayer && isDark
+                          ? (isVerySmallScreen ? 1.5 : 2.0)
+                          : 1, // Thicker border
                     ),
                     boxShadow: (isNextPrayer && isDark)
                         ? [
                             BoxShadow(
                               color: prayerColor.withOpacity(0.6),
                               // More prominent shadow
-                              blurRadius: 10,
-                              spreadRadius: 1,
+                              blurRadius: isVerySmallScreen
+                                  ? 8
+                                  : isSmallScreen
+                                  ? 9
+                                  : 10,
+                              spreadRadius: isVerySmallScreen
+                                  ? 0.5
+                                  : isSmallScreen
+                                  ? 0.75
+                                  : 1,
                               offset: const Offset(0, 3),
                             ),
                           ]
@@ -249,7 +431,11 @@ class PrayerListSection extends StatelessWidget {
                         ? [
                             BoxShadow(
                               color: prayerColor.withOpacity(0.2),
-                              blurRadius: 4,
+                              blurRadius: isVerySmallScreen
+                                  ? 3
+                                  : isSmallScreen
+                                  ? 3.5
+                                  : 4,
                               offset: const Offset(0, 1),
                             ),
                           ]
@@ -261,11 +447,28 @@ class PrayerListSection extends StatelessWidget {
                         ? Colors
                               .white // White icon for maximum contrast in dark mode
                         : prayerColor,
-                    size: iconSize.clamp(16, 24),
+                    size: iconSize.clamp(
+                      isVerySmallScreen
+                          ? 14
+                          : isSmallScreen
+                          ? 16
+                          : 18,
+                      isVerySmallScreen
+                          ? 20
+                          : isSmallScreen
+                          ? 22
+                          : 24,
+                    ),
                   ),
                 ),
 
-                const SizedBox(width: 16),
+                SizedBox(
+                  width: isVerySmallScreen
+                      ? 12
+                      : isSmallScreen
+                      ? 14
+                      : 16,
+                ),
 
                 // Prayer Name - Enhanced for next prayer in dark mode
                 Expanded(
@@ -278,7 +481,18 @@ class PrayerListSection extends StatelessWidget {
                           Text(
                             prayerName,
                             style: TextStyle(
-                              fontSize: titleFontSize.clamp(14, 18),
+                              fontSize: titleFontSize.clamp(
+                                isVerySmallScreen
+                                    ? 12
+                                    : isSmallScreen
+                                    ? 14
+                                    : 16,
+                                isVerySmallScreen
+                                    ? 16
+                                    : isSmallScreen
+                                    ? 18
+                                    : 20,
+                              ),
                               fontWeight: FontWeight.w600,
                               color: isNextPrayer
                                   ? nextPrayerTextColor // Use enhanced color
@@ -289,11 +503,25 @@ class PrayerListSection extends StatelessWidget {
                             ),
                           ),
                           if (isNextPrayer) ...[
-                            const SizedBox(width: 8),
+                            SizedBox(
+                              width: isVerySmallScreen
+                                  ? 6
+                                  : isSmallScreen
+                                  ? 7
+                                  : 8,
+                            ),
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isVerySmallScreen
+                                    ? 6
+                                    : isSmallScreen
+                                    ? 7
+                                    : 8,
+                                vertical: isVerySmallScreen
+                                    ? 1
+                                    : isSmallScreen
+                                    ? 1.5
+                                    : 2,
                               ),
                               decoration: BoxDecoration(
                                 color: prayerColor.withOpacity(
@@ -301,18 +529,37 @@ class PrayerListSection extends StatelessWidget {
                                       ? 0.4
                                       : 0.1, // More opaque in dark mode
                                 ),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(
+                                  isVerySmallScreen
+                                      ? 10
+                                      : isSmallScreen
+                                      ? 11
+                                      : 12,
+                                ),
                                 border: Border.all(
                                   color: prayerColor.withOpacity(
                                     isDark ? 0.8 : 0.2, // More visible border
                                   ),
-                                  width: 1.5, // Thicker border
+                                  width: isVerySmallScreen
+                                      ? 1.0
+                                      : 1.5, // Thicker border
                                 ),
                               ),
                               child: Text(
                                 "পরবর্তী",
                                 style: TextStyle(
-                                  fontSize: (titleFontSize * 0.7).clamp(10, 14),
+                                  fontSize: (titleFontSize * 0.7).clamp(
+                                    isVerySmallScreen
+                                        ? 8
+                                        : isSmallScreen
+                                        ? 10
+                                        : 12,
+                                    isVerySmallScreen
+                                        ? 12
+                                        : isSmallScreen
+                                        ? 14
+                                        : 16,
+                                  ),
                                   fontWeight: FontWeight.w700,
                                   color: nextPrayerBadgeTextColor,
                                   // Use enhanced color
@@ -329,9 +576,17 @@ class PrayerListSection extends StatelessWidget {
 
                 // Time - Enhanced for next prayer in dark mode
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isVerySmallScreen
+                        ? 8
+                        : isSmallScreen
+                        ? 10
+                        : 12,
+                    vertical: isVerySmallScreen
+                        ? 4
+                        : isSmallScreen
+                        ? 5
+                        : 6,
                   ),
                   decoration: BoxDecoration(
                     color: isNextPrayer && isDark
@@ -341,7 +596,13 @@ class PrayerListSection extends StatelessWidget {
                         : isDark
                         ? Color(0xFF2D2D2D) // Professional dark background
                         : Colors.grey[100]!,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(
+                      isVerySmallScreen
+                          ? 6
+                          : isSmallScreen
+                          ? 7
+                          : 8,
+                    ),
                     border: Border.all(
                       color: isNextPrayer && isDark
                           ? prayerColor.withOpacity(
@@ -350,13 +611,26 @@ class PrayerListSection extends StatelessWidget {
                           : isDark
                           ? Colors.grey.shade700
                           : Colors.grey.shade300,
-                      width: isNextPrayer && isDark ? 1.0 : 0.5,
+                      width: isNextPrayer && isDark
+                          ? (isVerySmallScreen ? 0.8 : 1.0)
+                          : 0.5,
                     ),
                   ),
                   child: Text(
                     prayerTimeService.formatTimeTo12Hour(time),
                     style: TextStyle(
-                      fontSize: timeFontSize.clamp(12, 16),
+                      fontSize: timeFontSize.clamp(
+                        isVerySmallScreen
+                            ? 10
+                            : isSmallScreen
+                            ? 12
+                            : 14,
+                        isVerySmallScreen
+                            ? 14
+                            : isSmallScreen
+                            ? 16
+                            : 18,
+                      ),
                       fontWeight: FontWeight.w600,
                       color: isNextPrayer
                           ? nextPrayerTextColor // Use enhanced color
@@ -385,22 +659,22 @@ class PrayerListSection extends StatelessWidget {
     // Base calculation based on available height and prayer count
     double baseHeight = availableHeight / prayerCount;
 
-    // Adjust based on screen height
-    if (screenHeight < 600) {
-      // Very small screens (under 600px)
+    // Adjust based on screen size categories
+    if (isVerySmallScreen) {
+      // Very small screens (under 600px) - 15% reduced
+      return baseHeight.clamp(50, 60);
+    } else if (isSmallScreen) {
+      // Small screens (600px - 700px) - 10% reduced
       return baseHeight.clamp(55, 65);
-    } else if (screenHeight < 700) {
-      // Small screens (600px - 700px)
-      return baseHeight.clamp(60, 75);
-    } else if (screenHeight < 800) {
-      // Medium screens (700px - 800px)
-      return baseHeight.clamp(65, 80);
-    } else if (screenHeight < 900) {
-      // Large screens (800px - 900px)
-      return baseHeight.clamp(70, 85);
-    } else {
-      // Very large screens (900px+)
+    } else if (isSmallPhone) {
+      // Small phones
+      return baseHeight.clamp(60, 70);
+    } else if (isTablet) {
+      // Tablets - slightly larger for better touch targets
       return baseHeight.clamp(75, 90);
+    } else {
+      // Large screens - original size
+      return baseHeight.clamp(70, 85);
     }
   }
 }

@@ -4,6 +4,9 @@ import '../prohibited_time_service.dart';
 
 class ProhibitedTimeSection extends StatelessWidget {
   final bool isSmallScreen;
+  final bool isVerySmallScreen;
+  final bool isTablet;
+  final bool isSmallPhone;
   final Map<String, String> prayerTimes;
   final ProhibitedTimeService prohibitedTimeService;
   final Function(BuildContext, String, String) onShowInfo;
@@ -11,6 +14,9 @@ class ProhibitedTimeSection extends StatelessWidget {
   const ProhibitedTimeSection({
     Key? key,
     required this.isSmallScreen,
+    required this.isVerySmallScreen,
+    required this.isTablet,
+    required this.isSmallPhone,
     required this.prayerTimes,
     required this.prohibitedTimeService,
     required this.onShowInfo,
@@ -20,99 +26,205 @@ class ProhibitedTimeSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // Calculate dynamic heights based on screen size
+    final double sectionHeight = isVerySmallScreen
+        ? 80 // ছোট স্ক্রিনে ১৫% কম
+        : isSmallScreen
+        ? 90 // মাঝারি স্ক্রিনে ১০% কম
+        : 100; // বড় স্ক্রিনে মূল সাইজ
+
+    // সবগুলোর জন্য একই ফন্ট সাইজ
+    final double titleFontSize = isVerySmallScreen
+        ? 10
+        : isSmallScreen
+        ? 12
+        : 14;
+
+    // সময়ের জন্য আলাদা ফন্ট সাইজ - বড় স্ক্রিনে একটু ছোট
+    final double timeFontSize = isVerySmallScreen
+        ? 8
+        : isSmallScreen
+        ? 10
+        : 11; // বড় স্ক্রিনে 12 (আগে ছিল 12)
+
+    final double iconSize = isVerySmallScreen
+        ? 12
+        : isSmallScreen
+        ? 14
+        : 16;
+
+    final double paddingSize = isVerySmallScreen
+        ? 6
+        : isSmallScreen
+        ? 8
+        : 10;
+
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 4, 10, isSmallScreen ? 4 : 8),
+      height: sectionHeight,
+      padding: EdgeInsets.fromLTRB(
+        paddingSize,
+        paddingSize * 0.5,
+        paddingSize,
+        isSmallScreen ? paddingSize * 0.5 : paddingSize,
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Left Section - Prohibited Times
           Expanded(
+            flex: 3,
             child: Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(paddingSize),
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey[850] : Colors.white,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(
+                  isVerySmallScreen
+                      ? 8
+                      : isSmallScreen
+                      ? 9
+                      : 10,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
-                    blurRadius: 3,
+                    blurRadius: isVerySmallScreen
+                        ? 2
+                        : isSmallScreen
+                        ? 2.5
+                        : 3,
                     offset: const Offset(0, 1),
                   ),
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "নিষিদ্ধ সময়",
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 11 : 12,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : Colors.black87,
+                  // Header Row - এখন একই ফন্ট সাইজ
+                  Container(
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "নিষিদ্ধ সময়",
+                            style: TextStyle(
+                              fontSize: titleFontSize, // ← একই ফন্ট সাইজ
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () => _showBottomSheet(
-                          context,
-                          "সালাতের নিষিদ্ধ সময় সম্পর্কে",
-                          prohibitedTimeService.getProhibitedTimeInfo(),
+                        SizedBox(width: paddingSize * 0.5),
+                        GestureDetector(
+                          onTap: () => _showBottomSheet(
+                            context,
+                            "সালাতের নিষিদ্ধ সময় সম্পর্কে",
+                            prohibitedTimeService.getProhibitedTimeInfo(),
+                          ),
+                          child: Icon(
+                            Icons.info_outline,
+                            color: isDark ? Colors.blue[200] : Colors.blue[700],
+                            size: iconSize,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.info_outline,
-                          color: isDark ? Colors.blue[200] : Colors.blue[700],
-                          size: isSmallScreen ? 12 : 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    "ভোর: ${prohibitedTimeService.calculateSunriseProhibitedTime(prayerTimes)}",
-                    style: TextStyle(
-                      fontSize: isSmallScreen ? 9 : 10,
-                      color: isDark ? Colors.grey[300] : Colors.grey[700],
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    "দুপুর: ${prohibitedTimeService.calculateDhuhrProhibitedTime(prayerTimes)}",
-                    style: TextStyle(
-                      fontSize: isSmallScreen ? 9 : 10,
-                      color: isDark ? Colors.grey[300] : Colors.grey[700],
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    "সন্ধ্যা: ${prohibitedTimeService.calculateSunsetProhibitedTime(prayerTimes)}",
-                    style: TextStyle(
-                      fontSize: isSmallScreen ? 9 : 10,
-                      color: isDark ? Colors.grey[300] : Colors.grey[700],
+
+                  SizedBox(height: paddingSize * 0.5),
+
+                  // Prohibited Times Content
+                  // Prohibited Times Content
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.zero,
+                      child: Table(
+                        columnWidths: {
+                          0: FixedColumnWidth(30), // আইকন কলাম
+                          1: FixedColumnWidth(40), // লেবেল কলাম
+                          2: FlexColumnWidth(), // সময় কলাম (বাকি সব)
+                        },
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
+                        children: [
+                          _buildTableTimeRow(
+                            icon: Icons.wb_twilight,
+                            label: "ভোর",
+                            time: prohibitedTimeService
+                                .calculateSunriseProhibitedTime(prayerTimes),
+                            fontSize: timeFontSize,
+                            isDark: isDark,
+                          ),
+                          _buildTableTimeRow(
+                            icon: Icons.light_mode,
+                            label: "দুপুর",
+                            time: prohibitedTimeService
+                                .calculateDhuhrProhibitedTime(prayerTimes),
+                            fontSize: timeFontSize,
+                            isDark: isDark,
+                          ),
+                          _buildTableTimeRow(
+                            icon: Icons.nightlight,
+                            label: "সন্ধ্যা",
+                            time: prohibitedTimeService
+                                .calculateSunsetProhibitedTime(prayerTimes),
+                            fontSize: timeFontSize,
+                            isDark: isDark,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(width: 6),
+
+          SizedBox(width: paddingSize * 0.8),
+
+          // Right Section - Info Cards
           Expanded(
+            flex: 2,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildInfoCard(
-                  context,
-                  "নফল সালাত",
-                  "নফল সালাতের ওয়াক্ত",
-                  Colors.blue,
-                  prohibitedTimeService.getNafalPrayerInfo(),
+                // Nafal Prayer Card - এখন একই ফন্ট সাইজ
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: paddingSize * 0.4),
+                    child: _buildInfoCard(
+                      context,
+                      "নফল সালাত",
+                      "নফল সালাতের ওয়াক্ত",
+                      Colors.blue,
+                      prohibitedTimeService.getNafalPrayerInfo(),
+                      titleFontSize,
+                      // ← একই ফন্ট সাইজ
+                      iconSize,
+                      paddingSize,
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 8),
-                _buildInfoCard(
-                  context,
-                  "বিশেষ ফ্যাক্ট",
-                  "সালাত সম্পর্কে বিশেষ ফ্যাক্ট",
-                  Colors.orange,
-                  prohibitedTimeService.getSpecialFacts(),
+
+                // Special Facts Card - এখন একই ফন্ট সাইজ
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(top: paddingSize * 0.4),
+                    child: _buildInfoCard(
+                      context,
+                      "বিশেষ ফ্যাক্ট",
+                      "সালাত সম্পর্কে বিশেষ ফ্যাক্ট",
+                      Colors.orange,
+                      prohibitedTimeService.getSpecialFacts(),
+                      titleFontSize,
+                      // ← একই ফন্ট সাইজ
+                      iconSize,
+                      paddingSize,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -122,47 +234,146 @@ class ProhibitedTimeSection extends StatelessWidget {
     );
   }
 
+  TableRow _buildTableTimeRow({
+    required IconData icon,
+    required String label,
+    required String time,
+    required double fontSize,
+    required bool isDark,
+  }) {
+    return TableRow(
+      children: [
+        // আইকন
+        Padding(
+          padding: EdgeInsets.only(right: 4),
+          child: Icon(
+            icon,
+            size: fontSize * 0.8,
+            color: isDark ? Colors.grey[500] : Colors.grey[600],
+          ),
+        ),
+
+        // লেবেল
+        Padding(
+          padding: EdgeInsets.only(right: 4),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: fontSize * 0.8,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.grey[400] : Colors.grey[700],
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+
+        // সময়
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            time,
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.grey[300] : Colors.grey[900],
+            ),
+            maxLines: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // _buildTimeRowWithStyle মেথড যোগ করুন
+  Widget _buildTimeRowWithStyle({
+    required String label,
+    required String time,
+    required double fontSize,
+    required bool isDark,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$label: ',
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.w500,
+            color: isDark ? Colors.grey[400] : Colors.grey[700],
+          ),
+        ),
+        Text(
+          time,
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.grey[300] : Colors.grey[900],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // _buildInfoCard মেথড
   Widget _buildInfoCard(
     BuildContext context,
     String title,
     String dialogTitle,
     Color color,
     String info,
+    double fontSize,
+    double iconSize,
+    double paddingSize,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bool isSmallScreen = MediaQuery.of(context).size.height < 700;
 
     return GestureDetector(
       onTap: () => _showBottomSheet(context, dialogTitle, info),
       child: Container(
-        padding: const EdgeInsets.all(8),
+        width: double.infinity,
+        height: double.infinity,
+        padding: EdgeInsets.all(paddingSize * 0.8),
         decoration: BoxDecoration(
           color: isDark ? Colors.grey[800] : Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(
+            isVerySmallScreen
+                ? 6
+                : isSmallScreen
+                ? 7
+                : 8,
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
-              blurRadius: 2,
+              blurRadius: isVerySmallScreen
+                  ? 1.5
+                  : isSmallScreen
+                  ? 1.8
+                  : 2,
               offset: const Offset(0, 1),
             ),
           ],
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(
-              Icons.info_outline,
-              color: color,
-              size: isSmallScreen ? 12 : 14,
-            ),
-            const SizedBox(width: 3),
-            Flexible(
+            Icon(Icons.info_outline, color: color, size: iconSize - 2),
+            SizedBox(width: paddingSize * 0.5),
+            Expanded(
               child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 10 : 11,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : Colors.black87,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.left,
               ),
             ),
           ],
@@ -171,10 +382,33 @@ class ProhibitedTimeSection extends StatelessWidget {
     );
   }
 
+  // Helper method for time rows
+  Widget _buildTimeRow(
+    String text,
+    double fontSize,
+    bool isDark,
+    double maxHeight,
+  ) {
+    return Container(
+      height: maxHeight,
+      alignment: Alignment.centerLeft,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: fontSize,
+          color: isDark ? Colors.grey[300] : Colors.grey[700],
+          height: 1.1,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
   void _showBottomSheet(BuildContext context, String title, String content) {
+    // _showBottomSheet মেথড একই থাকবে...
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenHeight = MediaQuery.of(context).size.height;
-    final isTablet = screenHeight > 800;
 
     showModalBottomSheet(
       context: context,
@@ -182,31 +416,78 @@ class ProhibitedTimeSection extends StatelessWidget {
       isScrollControlled: true,
       builder: (BuildContext context) {
         return Container(
-          margin: const EdgeInsets.all(10),
+          margin: EdgeInsets.all(
+            isVerySmallScreen
+                ? 8
+                : isSmallScreen
+                ? 9
+                : 10,
+          ),
           decoration: BoxDecoration(
             color: isDark ? Colors.grey[900] : Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(
+              isVerySmallScreen
+                  ? 16
+                  : isSmallScreen
+                  ? 18
+                  : 20,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.3),
-                blurRadius: 20,
+                blurRadius: isVerySmallScreen
+                    ? 15
+                    : isSmallScreen
+                    ? 18
+                    : 20,
                 offset: const Offset(0, 5),
               ),
             ],
           ),
           constraints: BoxConstraints(
-            maxHeight: screenHeight * 0.8,
-            minHeight: screenHeight * 0.3,
+            maxHeight:
+                screenHeight *
+                (isVerySmallScreen
+                    ? 0.7
+                    : isSmallScreen
+                    ? 0.75
+                    : 0.8),
+            minHeight:
+                screenHeight *
+                (isVerySmallScreen
+                    ? 0.25
+                    : isSmallScreen
+                    ? 0.28
+                    : 0.3),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Header with drag handle
               Container(
-                padding: const EdgeInsets.only(top: 16, bottom: 8),
+                padding: EdgeInsets.only(
+                  top: isVerySmallScreen
+                      ? 12
+                      : isSmallScreen
+                      ? 14
+                      : 16,
+                  bottom: isVerySmallScreen
+                      ? 6
+                      : isSmallScreen
+                      ? 7
+                      : 8,
+                ),
                 child: Container(
-                  width: 40,
-                  height: 4,
+                  width: isVerySmallScreen
+                      ? 35
+                      : isSmallScreen
+                      ? 38
+                      : 40,
+                  height: isVerySmallScreen
+                      ? 3
+                      : isSmallScreen
+                      ? 3.5
+                      : 4,
                   decoration: BoxDecoration(
                     color: isDark ? Colors.grey[600] : Colors.grey[400],
                     borderRadius: BorderRadius.circular(2),
@@ -216,9 +497,17 @@ class ProhibitedTimeSection extends StatelessWidget {
 
               // Title and close button
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
+                padding: EdgeInsets.symmetric(
+                  horizontal: isVerySmallScreen
+                      ? 16
+                      : isSmallScreen
+                      ? 18
+                      : 20,
+                  vertical: isVerySmallScreen
+                      ? 6
+                      : isSmallScreen
+                      ? 7
+                      : 8,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -227,7 +516,17 @@ class ProhibitedTimeSection extends StatelessWidget {
                       child: Text(
                         title,
                         style: TextStyle(
-                          fontSize: isTablet ? 20 : 18,
+                          fontSize: isTablet
+                              ? (isVerySmallScreen
+                                    ? 18
+                                    : isSmallScreen
+                                    ? 19
+                                    : 20)
+                              : (isVerySmallScreen
+                                    ? 16
+                                    : isSmallScreen
+                                    ? 17
+                                    : 18),
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
@@ -237,7 +536,17 @@ class ProhibitedTimeSection extends StatelessWidget {
                       icon: Icon(
                         Icons.close,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
-                        size: isTablet ? 24 : 20,
+                        size: isTablet
+                            ? (isVerySmallScreen
+                                  ? 22
+                                  : isSmallScreen
+                                  ? 23
+                                  : 24)
+                            : (isVerySmallScreen
+                                  ? 18
+                                  : isSmallScreen
+                                  ? 19
+                                  : 20),
                       ),
                       onPressed: () => Navigator.of(context).pop(),
                       padding: EdgeInsets.zero,
@@ -257,13 +566,33 @@ class ProhibitedTimeSection extends StatelessWidget {
               // Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(
+                    isVerySmallScreen
+                        ? 16
+                        : isSmallScreen
+                        ? 18
+                        : 20,
+                  ),
                   child: Text(
                     content,
                     style: TextStyle(
-                      fontSize: isTablet ? 16 : 14,
+                      fontSize: isTablet
+                          ? (isVerySmallScreen
+                                ? 14
+                                : isSmallScreen
+                                ? 15
+                                : 16)
+                          : (isVerySmallScreen
+                                ? 12
+                                : isSmallScreen
+                                ? 13
+                                : 14),
                       color: isDark ? Colors.grey[300] : Colors.grey[700],
-                      height: 1.6,
+                      height: isVerySmallScreen
+                          ? 1.4
+                          : isSmallScreen
+                          ? 1.5
+                          : 1.6,
                     ),
                     textAlign: TextAlign.justify,
                   ),
@@ -272,7 +601,28 @@ class ProhibitedTimeSection extends StatelessWidget {
 
               // Close button at bottom
               Container(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                padding: EdgeInsets.fromLTRB(
+                  isVerySmallScreen
+                      ? 16
+                      : isSmallScreen
+                      ? 18
+                      : 20,
+                  isVerySmallScreen
+                      ? 8
+                      : isSmallScreen
+                      ? 9
+                      : 10,
+                  isVerySmallScreen
+                      ? 16
+                      : isSmallScreen
+                      ? 18
+                      : 20,
+                  isVerySmallScreen
+                      ? 16
+                      : isSmallScreen
+                      ? 18
+                      : 20,
+                ),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -283,15 +633,37 @@ class ProhibitedTimeSection extends StatelessWidget {
                           : Colors.blue[600],
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(
+                          isVerySmallScreen
+                              ? 10
+                              : isSmallScreen
+                              ? 11
+                              : 12,
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.symmetric(
+                        vertical: isVerySmallScreen
+                            ? 12
+                            : isSmallScreen
+                            ? 13
+                            : 14,
+                      ),
                       elevation: 2,
                     ),
                     child: Text(
                       "বুঝেছি",
                       style: TextStyle(
-                        fontSize: isTablet ? 16 : 14,
+                        fontSize: isTablet
+                            ? (isVerySmallScreen
+                                  ? 14
+                                  : isSmallScreen
+                                  ? 15
+                                  : 16)
+                            : (isVerySmallScreen
+                                  ? 12
+                                  : isSmallScreen
+                                  ? 13
+                                  : 14),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

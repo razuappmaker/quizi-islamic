@@ -52,9 +52,7 @@ dependencies:
   permission_handler: ^12.0.1
   syncfusion_flutter_pdfviewer: ^31.1.19
   carousel_slider: ^5.1.1
-  firebase_core: ^4.1.1
-  firebase_auth: ^6.1.0
-  cloud_firestore: ^6.0.2
+
 
 
 
