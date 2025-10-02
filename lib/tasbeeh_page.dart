@@ -272,13 +272,25 @@ class _TasbeehPageState extends State<TasbeehPage> {
           backgroundColor: Colors.green[800],
           centerTitle: true,
           elevation: 2,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
-            },
+          leading: Container(
+            margin: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.arrow_back_rounded, // একই আইকন
+                color: Colors.white,
+                size: 20, // একই সাইজ
+              ),
+              onPressed: () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
+              },
+              splashRadius: 20, // একই স্প্ল্যাশ রেডিয়াস
+            ),
           ),
           actions: [
             IconButton(

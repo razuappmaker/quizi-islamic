@@ -164,6 +164,18 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
         ),
         centerTitle: true,
         backgroundColor: isDarkMode ? Colors.green[800] : Colors.green[700],
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
       ),
       body: SafeArea(
         bottom: false, // We'll handle bottom padding manually for the ad

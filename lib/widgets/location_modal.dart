@@ -166,6 +166,77 @@ class _LocationModalState extends State<LocationModal> {
       "lon": 51.5261,
       "flag": Colors.brown,
     },
+    // ওমান
+    {
+      "country": "ওমান",
+      "city": "মাস্কাট",
+      "lat": 23.5859,
+      "lon": 58.4059,
+      "flag": Colors.green,
+    },
+
+    // বাহরাইন
+    {
+      "country": "বাহরাইন",
+      "city": "মানামা",
+      "lat": 26.2285,
+      "lon": 50.5860,
+      "flag": Colors.red,
+    },
+
+    // জর্ডান
+    {
+      "country": "জর্ডান",
+      "city": "আম্মান",
+      "lat": 31.9454,
+      "lon": 35.9284,
+      "flag": Colors.red,
+    },
+
+    // লেবানন
+    {
+      "country": "লেবানন",
+      "city": "বেইরুট",
+      "lat": 33.8938,
+      "lon": 35.5018,
+      "flag": Colors.red,
+    },
+
+    // ইতালি
+    {
+      "country": "ইতালি",
+      "city": "রোম",
+      "lat": 41.9028,
+      "lon": 12.4964,
+      "flag": Colors.green,
+    },
+
+    // গ্রিস
+    {
+      "country": "গ্রিস",
+      "city": "এথেন্স",
+      "lat": 37.9838,
+      "lon": 23.7275,
+      "flag": Colors.blue,
+    },
+
+    // দক্ষিণ কোরিয়া
+    {
+      "country": "দক্ষিণ কোরিয়া",
+      "city": "সিউল",
+      "lat": 37.5665,
+      "lon": 126.9780,
+      "flag": Colors.red,
+    },
+
+    // মালদ্বীপ
+    {
+      "country": "মালদ্বীপ",
+      "city": "মালে",
+      "lat": 4.1755,
+      "lon": 73.5093,
+      "flag": Colors.red,
+    },
 
     // অন্যান্য দেশ
     {

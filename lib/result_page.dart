@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'ad_helper.dart';
+import 'profile_screen.dart';
 
 class ResultPage extends StatefulWidget {
   final int total;
@@ -332,12 +333,12 @@ class _ResultPageState extends State<ResultPage> {
                             ),
                           ),
                           onPressed: () {
-                            Navigator.popUntil(
+                            Navigator.pushReplacement(
                               context,
-                              (route) => route.isFirst,
+                              MaterialPageRoute(
+                                builder: (context) => ProfileScreen(),
+                              ),
                             );
-                            // প্রোফাইল পেজে নেভিগেট করুন - আপনার নেভিগেশন অনুযায়ী পরিবর্তন করুন
-                            // Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
                           },
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.purple[700],

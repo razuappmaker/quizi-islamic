@@ -354,6 +354,18 @@ class _QiblaPageState extends State<QiblaPage>
         backgroundColor: Colors.green[700],
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),

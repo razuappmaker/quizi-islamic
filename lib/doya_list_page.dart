@@ -11,6 +11,7 @@ class DoyaListPage extends StatefulWidget {
   final String jsonFile;
   final Color categoryColor;
   final String? initialSearchQuery;
+  final String? preSelectedDoyaTitle; // নতুন প্যারামিটার
   final VoidCallback? onDoyaCardOpen; // দোয়া কার্ড ওপেন কলব্যাক
 
   const DoyaListPage({
@@ -19,6 +20,7 @@ class DoyaListPage extends StatefulWidget {
     required this.jsonFile,
     required this.categoryColor,
     this.initialSearchQuery,
+    this.preSelectedDoyaTitle, // নতুন প্যারামিটার
     this.onDoyaCardOpen,
   }) : super(key: key);
 
@@ -59,17 +61,13 @@ class _DoyaListPageState extends State<DoyaListPage> {
   void initState() {
     super.initState();
 
-    // ডিভাইস টাইপ চেক
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkDeviceType();
     });
 
     _loadDoyaData();
 
-    // AdMob initialize
     AdHelper.initialize();
-
-    // ✅ Adaptive Bottom Banner Ad লোড
     _loadBottomBannerAd();
 
     // initial search query থাকলে সেট করুন
@@ -78,6 +76,43 @@ class _DoyaListPageState extends State<DoyaListPage> {
         _searchController.text = widget.initialSearchQuery!;
         _searchDoya(widget.initialSearchQuery!);
       });
+    }
+
+    // pre-selected doya থাকলে সেট করুন
+    if (widget.preSelectedDoyaTitle != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _autoExpandPreSelectedDoya();
+      });
+    }
+  }
+
+  // নতুন মেথড: প্রি-সিলেক্টেড দোয়া অটো এক্সপ্যান্ড করুন
+  void _autoExpandPreSelectedDoya() {
+    if (widget.preSelectedDoyaTitle == null) return;
+
+    final index = doyas.indexWhere(
+      (doya) => doya['title'] == widget.preSelectedDoyaTitle,
+    );
+
+    if (index != -1 && mounted) {
+      setState(() {
+        _expandedDoyaIndices.add(index);
+
+        // স্ক্রল করে সেই দোয়ায় নিয়ে যান
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final key = GlobalKey();
+          Scrollable.ensureVisible(
+            key.currentContext!,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        });
+      });
+
+      // দোয়া কার্ড ওপেন হলে parent কে নোটিফাই করুন
+      if (widget.onDoyaCardOpen != null) {
+        widget.onDoyaCardOpen!();
+      }
     }
   }
 
@@ -541,6 +576,11 @@ class _DoyaListPageState extends State<DoyaListPage> {
   Widget _buildDoyaCard(Map<String, String> doya, int index) {
     final bool isExpanded = _expandedDoyaIndices.contains(index);
     final String duaTitle = doya['title'] ?? '';
+    // প্রি-সিলেক্টেড দোয়ার জন্য key তৈরি করুন
+    final Key? cardKey = widget.preSelectedDoyaTitle == duaTitle
+        ? GlobalKey()
+        : null;
+
     final String duaArabic = doya['arabic'] ?? '';
     final String duaTransliteration = doya['transliteration'] ?? '';
     final String duaMeaning = doya['meaning'] ?? '';
@@ -548,6 +588,8 @@ class _DoyaListPageState extends State<DoyaListPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
+      key: cardKey,
+      // key যোগ করুন
       elevation: 3,
       margin: EdgeInsets.symmetric(
         vertical: 8,
@@ -829,6 +871,18 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 cursorColor: Colors.white,
                 onChanged: _searchDoya,
               ),
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
         actions: [
           // Font size control in app bar
           if (!_isSearching)

@@ -254,6 +254,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         prayerTimeAdjustments: _prayerTimeAdjustments,
         onAdjustmentChanged: _adjustPrayerTimeByName,
         onResetAll: _resetAllAdjustments,
+        onSaveAdjustments: _savePrayerTimeAdjustments, //
       ),
     );
   }
@@ -780,13 +781,27 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: const Text(
-          "নামাজ",
+        backgroundColor: Color(0xFF2E7D32),
+        title: Text(
+          "নামাজের সময়",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
             color: Colors.white,
+          ),
+        ),
+        centerTitle: false,
+        elevation: 0,
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
           ),
         ),
         actions: [

@@ -45,7 +45,7 @@ class ProhibitedTimeSection extends StatelessWidget {
         ? 8
         : isSmallScreen
         ? 10
-        : 11; // বড় স্ক্রিনে 12 (আগে ছিল 12)
+        : 11;
 
     final double iconSize = isVerySmallScreen
         ? 12
@@ -111,7 +111,7 @@ class ProhibitedTimeSection extends StatelessWidget {
                           child: Text(
                             "নিষিদ্ধ সময়",
                             style: TextStyle(
-                              fontSize: titleFontSize, // ← একই ফন্ট সাইজ
+                              fontSize: titleFontSize,
                               fontWeight: FontWeight.w600,
                               color: isDark ? Colors.white : Colors.black87,
                             ),
@@ -136,7 +136,6 @@ class ProhibitedTimeSection extends StatelessWidget {
 
                   SizedBox(height: paddingSize * 0.5),
 
-                  // Prohibited Times Content
                   // Prohibited Times Content
                   Expanded(
                     child: Container(
@@ -191,7 +190,7 @@ class ProhibitedTimeSection extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Nafal Prayer Card - এখন একই ফন্ট সাইজ
+                // Nafal Prayer Card
                 Expanded(
                   child: Container(
                     margin: EdgeInsets.only(bottom: paddingSize * 0.4),
@@ -202,14 +201,13 @@ class ProhibitedTimeSection extends StatelessWidget {
                       Colors.blue,
                       prohibitedTimeService.getNafalPrayerInfo(),
                       titleFontSize,
-                      // ← একই ফন্ট সাইজ
                       iconSize,
                       paddingSize,
                     ),
                   ),
                 ),
 
-                // Special Facts Card - এখন একই ফন্ট সাইজ
+                // Special Facts Card
                 Expanded(
                   child: Container(
                     margin: EdgeInsets.only(top: paddingSize * 0.4),
@@ -220,7 +218,6 @@ class ProhibitedTimeSection extends StatelessWidget {
                       Colors.orange,
                       prohibitedTimeService.getSpecialFacts(),
                       titleFontSize,
-                      // ← একই ফন্ট সাইজ
                       iconSize,
                       paddingSize,
                     ),
@@ -286,38 +283,6 @@ class ProhibitedTimeSection extends StatelessWidget {
     );
   }
 
-  // _buildTimeRowWithStyle মেথড যোগ করুন
-  Widget _buildTimeRowWithStyle({
-    required String label,
-    required String time,
-    required double fontSize,
-    required bool isDark,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          '$label: ',
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w500,
-            color: isDark ? Colors.grey[400] : Colors.grey[700],
-          ),
-        ),
-        Text(
-          time,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w600,
-            color: isDark ? Colors.grey[300] : Colors.grey[900],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // _buildInfoCard মেথড
   Widget _buildInfoCard(
     BuildContext context,
     String title,
@@ -382,33 +347,14 @@ class ProhibitedTimeSection extends StatelessWidget {
     );
   }
 
-  // Helper method for time rows
-  Widget _buildTimeRow(
-    String text,
-    double fontSize,
-    bool isDark,
-    double maxHeight,
-  ) {
-    return Container(
-      height: maxHeight,
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: fontSize,
-          color: isDark ? Colors.grey[300] : Colors.grey[700],
-          height: 1.1,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-
   void _showBottomSheet(BuildContext context, String title, String content) {
-    // _showBottomSheet মেথড একই থাকবে...
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenHeight = MediaQuery.of(context).size.height;
+
+    // নিষিদ্ধ সেকশনের আনুমানিক পজিশন (সাধারণত স্ক্রিনের নিচের 1/3 অংশে)
+    final double prohibitedSectionPosition = screenHeight * 0.65;
+    final double availableSpace =
+        prohibitedSectionPosition - MediaQuery.of(context).padding.top;
 
     showModalBottomSheet(
       context: context,
@@ -416,242 +362,152 @@ class ProhibitedTimeSection extends StatelessWidget {
       isScrollControlled: true,
       builder: (BuildContext context) {
         return Container(
-          margin: EdgeInsets.all(
-            isVerySmallScreen
-                ? 8
-                : isSmallScreen
-                ? 9
-                : 10,
+          margin: EdgeInsets.only(
+            bottom:
+                screenHeight -
+                prohibitedSectionPosition +
+                20, // নিষিদ্ধ সেকশনের 20px উপরে
           ),
-          decoration: BoxDecoration(
-            color: isDark ? Colors.grey[900] : Colors.white,
-            borderRadius: BorderRadius.circular(
-              isVerySmallScreen
-                  ? 16
-                  : isSmallScreen
-                  ? 18
-                  : 20,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: isVerySmallScreen
-                    ? 15
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[900] : Colors.white,
+              borderRadius: BorderRadius.circular(
+                isVerySmallScreen
+                    ? 16
                     : isSmallScreen
                     ? 18
                     : 20,
-                offset: const Offset(0, 5),
               ),
-            ],
-          ),
-          constraints: BoxConstraints(
-            maxHeight:
-                screenHeight *
-                (isVerySmallScreen
-                    ? 0.7
-                    : isSmallScreen
-                    ? 0.75
-                    : 0.8),
-            minHeight:
-                screenHeight *
-                (isVerySmallScreen
-                    ? 0.25
-                    : isSmallScreen
-                    ? 0.28
-                    : 0.3),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header with drag handle
-              Container(
-                padding: EdgeInsets.only(
-                  top: isVerySmallScreen
-                      ? 12
-                      : isSmallScreen
-                      ? 14
-                      : 16,
-                  bottom: isVerySmallScreen
-                      ? 6
-                      : isSmallScreen
-                      ? 7
-                      : 8,
-                ),
-                child: Container(
-                  width: isVerySmallScreen
-                      ? 35
-                      : isSmallScreen
-                      ? 38
-                      : 40,
-                  height: isVerySmallScreen
-                      ? 3
-                      : isSmallScreen
-                      ? 3.5
-                      : 4,
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey[600] : Colors.grey[400],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-
-              // Title and close button
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isVerySmallScreen
-                      ? 16
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: isVerySmallScreen
+                      ? 15
                       : isSmallScreen
                       ? 18
                       : 20,
-                  vertical: isVerySmallScreen
-                      ? 6
-                      : isSmallScreen
-                      ? 7
-                      : 8,
+                  offset: const Offset(0, 5),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: isTablet
-                              ? (isVerySmallScreen
-                                    ? 18
-                                    : isSmallScreen
-                                    ? 19
-                                    : 20)
-                              : (isVerySmallScreen
-                                    ? 16
-                                    : isSmallScreen
-                                    ? 17
-                                    : 18),
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                      ),
+              ],
+            ),
+            constraints: BoxConstraints(
+              maxHeight: availableSpace * 0.8, // উপরের 80% জায়গা ব্যবহার
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header with drag handle
+                Container(
+                  padding: EdgeInsets.only(
+                    top: isVerySmallScreen
+                        ? 12
+                        : isSmallScreen
+                        ? 14
+                        : 16,
+                    bottom: isVerySmallScreen
+                        ? 6
+                        : isSmallScreen
+                        ? 7
+                        : 8,
+                  ),
+                  child: Container(
+                    width: isVerySmallScreen
+                        ? 35
+                        : isSmallScreen
+                        ? 38
+                        : 40,
+                    height: isVerySmallScreen
+                        ? 3
+                        : isSmallScreen
+                        ? 3.5
+                        : 4,
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey[600] : Colors.grey[400],
+                      borderRadius: BorderRadius.circular(2),
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
-                        size: isTablet
-                            ? (isVerySmallScreen
-                                  ? 22
-                                  : isSmallScreen
-                                  ? 23
-                                  : 24)
-                            : (isVerySmallScreen
-                                  ? 18
-                                  : isSmallScreen
-                                  ? 19
-                                  : 20),
-                      ),
-                      onPressed: () => Navigator.of(context).pop(),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
 
-              // Divider
-              Divider(
-                color: isDark ? Colors.grey[700] : Colors.grey[300],
-                height: 1,
-                thickness: 1,
-              ),
-
-              // Content
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(
-                    isVerySmallScreen
+                // Title and close button
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isVerySmallScreen
                         ? 16
                         : isSmallScreen
                         ? 18
                         : 20,
+                    vertical: isVerySmallScreen
+                        ? 6
+                        : isSmallScreen
+                        ? 7
+                        : 8,
                   ),
-                  child: Text(
-                    content,
-                    style: TextStyle(
-                      fontSize: isTablet
-                          ? (isVerySmallScreen
-                                ? 14
-                                : isSmallScreen
-                                ? 15
-                                : 16)
-                          : (isVerySmallScreen
-                                ? 12
-                                : isSmallScreen
-                                ? 13
-                                : 14),
-                      color: isDark ? Colors.grey[300] : Colors.grey[700],
-                      height: isVerySmallScreen
-                          ? 1.4
-                          : isSmallScreen
-                          ? 1.5
-                          : 1.6,
-                    ),
-                    textAlign: TextAlign.justify,
-                  ),
-                ),
-              ),
-
-              // Close button at bottom
-              Container(
-                padding: EdgeInsets.fromLTRB(
-                  isVerySmallScreen
-                      ? 16
-                      : isSmallScreen
-                      ? 18
-                      : 20,
-                  isVerySmallScreen
-                      ? 8
-                      : isSmallScreen
-                      ? 9
-                      : 10,
-                  isVerySmallScreen
-                      ? 16
-                      : isSmallScreen
-                      ? 18
-                      : 20,
-                  isVerySmallScreen
-                      ? 16
-                      : isSmallScreen
-                      ? 18
-                      : 20,
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDark
-                          ? Colors.blue[700]
-                          : Colors.blue[600],
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          isVerySmallScreen
-                              ? 10
-                              : isSmallScreen
-                              ? 11
-                              : 12,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: isTablet
+                                ? (isVerySmallScreen
+                                      ? 18
+                                      : isSmallScreen
+                                      ? 19
+                                      : 20)
+                                : (isVerySmallScreen
+                                      ? 16
+                                      : isSmallScreen
+                                      ? 17
+                                      : 18),
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
                         ),
                       ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: isVerySmallScreen
-                            ? 12
-                            : isSmallScreen
-                            ? 13
-                            : 14,
+                      IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          size: isTablet
+                              ? (isVerySmallScreen
+                                    ? 22
+                                    : isSmallScreen
+                                    ? 23
+                                    : 24)
+                              : (isVerySmallScreen
+                                    ? 18
+                                    : isSmallScreen
+                                    ? 19
+                                    : 20),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                       ),
-                      elevation: 2,
+                    ],
+                  ),
+                ),
+
+                // Divider
+                Divider(
+                  color: isDark ? Colors.grey[700] : Colors.grey[300],
+                  height: 1,
+                  thickness: 1,
+                ),
+
+                // Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(
+                      isVerySmallScreen
+                          ? 16
+                          : isSmallScreen
+                          ? 18
+                          : 20,
                     ),
                     child: Text(
-                      "বুঝেছি",
+                      content,
                       style: TextStyle(
                         fontSize: isTablet
                             ? (isVerySmallScreen
@@ -664,13 +520,91 @@ class ProhibitedTimeSection extends StatelessWidget {
                                   : isSmallScreen
                                   ? 13
                                   : 14),
-                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.grey[300] : Colors.grey[700],
+                        height: isVerySmallScreen
+                            ? 1.4
+                            : isSmallScreen
+                            ? 1.5
+                            : 1.6,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                  ),
+                ),
+
+                // Close button at bottom
+                Container(
+                  padding: EdgeInsets.fromLTRB(
+                    isVerySmallScreen
+                        ? 16
+                        : isSmallScreen
+                        ? 18
+                        : 20,
+                    isVerySmallScreen
+                        ? 8
+                        : isSmallScreen
+                        ? 9
+                        : 10,
+                    isVerySmallScreen
+                        ? 16
+                        : isSmallScreen
+                        ? 18
+                        : 20,
+                    isVerySmallScreen
+                        ? 16
+                        : isSmallScreen
+                        ? 18
+                        : 20,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark
+                            ? Colors.blue[700]
+                            : Colors.blue[600],
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            isVerySmallScreen
+                                ? 10
+                                : isSmallScreen
+                                ? 11
+                                : 12,
+                          ),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          vertical: isVerySmallScreen
+                              ? 12
+                              : isSmallScreen
+                              ? 13
+                              : 14,
+                        ),
+                        elevation: 2,
+                      ),
+                      child: Text(
+                        "বুঝেছি",
+                        style: TextStyle(
+                          fontSize: isTablet
+                              ? (isVerySmallScreen
+                                    ? 14
+                                    : isSmallScreen
+                                    ? 15
+                                    : 16)
+                              : (isVerySmallScreen
+                                    ? 12
+                                    : isSmallScreen
+                                    ? 13
+                                    : 14),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

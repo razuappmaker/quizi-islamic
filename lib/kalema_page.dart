@@ -24,7 +24,7 @@ class _KalemaPageState extends State<KalemaPage> {
       "transliteration":
           "আশহাদু আল্লা-ইলাহা ইল্লাল্লাহু ওয়া আশহাদু আন্না মুহাম্মাদান আবদুহু ওয়া রাসূলুহু।",
       "meaning":
-          "আমি সাক্ষ্য দিচ্ছি যে, আল্লাহ ছাড়া আর কোন ইলাহ নেই এবং আমি সак্ষ্য দিচ্ছি মুহাম্মদ (সা.) আল্লাহর বান্দা ও রাসূল।",
+          "আমি সাক্ষ্য দিচ্ছি যে, আল্লাহ ছাড়া আর কোন ইলাহ নেই এবং আমি সাক্ষ্য দিচ্ছি মুহাম্মদ (সা.) আল্লাহর বান্দা ও রাসূল।",
     },
     {
       "title": "কালেমা তামজীদ",
@@ -47,7 +47,7 @@ class _KalemaPageState extends State<KalemaPage> {
     {
       "title": "কালেমা রুদ্দে কুফর",
       "text":
-          "ٱللَّٰهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ أَنْ أُشْرِكَ بِكَ شَيْئًا وَأَنَا أَعْلَمُ بِهِ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ بِهِ، تُبْتُ عَنْهُ، وَتَبَرَّأْتُ مِنَ ٱلْকُفْرِ وَٱلشِّرْكِ وَٱلْكَذِبِ وَٱلْغِيبَةِ وَٱلْবِدْعَةِ وَٱلْنَمِيمَةِ وَٱلْفَوَاحِشِ وَٱلْبُهْتَانِ وَٱلْمَعَاصِي كُلِّهَا، أَسْلَمْتُ وَآمَنْتُ وَأَقُولُ لَا إِلَٰهَ إِلَّا ٱللَّٰهُ مُحَمَّدٌ رَسُولُ ٱللَّٰهِ",
+          "ٱللَّٰهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ أَنْ أُشْرِكَ بِكَ شَيْئًا وَأَنَا أَعْلَمُ بِهِ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ بِهِ، تُبْتُ عَنْهُ، وَتَبَرَّأْتُ مِنَ ٱلْكُفْرِ وَٱلشِّرْكِ وَٱلْكَذِبِ وَٱلْغِيبَةِ وَٱلْبِدْعَةِ وَٱلنَّمِيمَةِ وَٱلْفَوَاحِشِ وَٱلْبُهْتَانِ وَٱلْمَعَاصِي كُلِّهَا، أَسْلَمْتُ وَآمَنْتُ وَأَقُولُ لَا إِلَٰهَ إِلَّا ٱللَّٰهُ مُحَمَّدٌ رَسُولُ ٱللَّٰهِ",
       "transliteration":
           "আল্লাহুম্মা ইন্নি আউযু বিকা মিন আন উশরিকা বিকা শাইয়্যান ওয়া আনা আ'লামু বিহি... লা-ইলাহা ইল্লাল্লাহু মুহাম্মাদুর রাসূলুল্লাহ।",
       "meaning":
@@ -60,7 +60,7 @@ class _KalemaPageState extends State<KalemaPage> {
       "transliteration":
           "আমান্তু বিল্লাহি কামা হুয়া বি আসমা-ইহি ওয়া সিফাতিহি ওয়া কাবিল্তু জামিআ আহকামিহি।",
       "meaning":
-          "আমি Allahর প্রতি ঈমান আনলাম, যেমন তিনি তার নাম ও গুণাবলী দ্বারা আছেন এবং আমি তার সকল বিধান মেনে নিলাম।",
+          "আমি আল্লাহর প্রতি ঈমান আনলাম, যেমন তিনি তার নাম ও গুণাবলী দ্বারা আছেন এবং আমি তার সকল বিধান মেনে নিলাম।",
     },
   ];
 
@@ -220,6 +220,18 @@ class _KalemaPageState extends State<KalemaPage> {
         ),
         backgroundColor: primaryColor,
         elevation: 2,
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline, color: Colors.white),
@@ -259,236 +271,226 @@ class _KalemaPageState extends State<KalemaPage> {
         ],
       ),
       body: SafeArea(
-        bottom: false, // We'll handle bottom padding manually for the ad
+        bottom: true, // ✅ SafeArea সঠিকভাবে ব্যবহার করুন
         child: Column(
           children: [
-            // Main content area with safe area padding
+            // Main content area - WITHOUT extra bottom padding
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: mediaQuery
-                      .padding
-                      .bottom, // Add bottom padding for system UI
-                ),
-                child: ListView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    ...List<Widget>.generate(kalemaList.length, (index) {
-                      final kalema = kalemaList[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        decoration: BoxDecoration(
-                          color: isDarkMode ? Colors.grey[800] : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // কালেমার নাম
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: primaryColor!.withOpacity(0.15),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: primaryColor.withOpacity(0.3),
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      "${index + 1}",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: primaryColor,
-                                      ),
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                children: [
+                  ...List<Widget>.generate(kalemaList.length, (index) {
+                    final kalema = kalemaList[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        color: isDarkMode ? Colors.grey[800] : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // কালেমার নাম
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: primaryColor!.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: primaryColor.withOpacity(0.3),
+                                      width: 2,
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      kalema["title"]!,
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
+                                  child: Text(
+                                    "${index + 1}",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryColor,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    kalema["title"]!,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+
+                            // আরবি টেক্সট সেকশন - লাইন পার্থক্য সহ
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: isDarkMode
+                                    ? Colors.grey[900]
+                                    : const Color(0xFFF8F6F0),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isDarkMode
+                                      ? Colors.grey[700]!
+                                      : const Color(0xFFE8E6DF),
+                                  width: 2,
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  // আরবি টেক্সট (RTL) - লাইন গাইড লাইন সহ
+                                  Directionality(
+                                    textDirection: TextDirection.rtl,
+                                    child: Stack(
+                                      children: [
+                                        // গাইড লাইন (নিচের লাইন)
+                                        Positioned.fill(
+                                          child: CustomPaint(
+                                            painter: _ArabicLinePainter(
+                                              lineColor: isDarkMode
+                                                  ? Colors.grey[700]!
+                                                  : const Color(0xFFE8E6DF),
+                                            ),
+                                          ),
+                                        ),
+                                        // আরবি টেক্সট
+                                        Text(
+                                          kalema["text"]!,
+                                          style: TextStyle(
+                                            fontSize: _arabicFontSize,
+                                            fontFamily: 'ScheherazadeNew',
+                                            fontWeight: FontWeight.bold,
+                                            color: isDarkMode
+                                                ? const Color(0xFFE8D5A7)
+                                                : const Color(0xFF8B4513),
+                                            height: 2.2,
+                                            // লাইন হাইট বাড়ানো হয়েছে
+                                            wordSpacing: 3.0,
+                                            letterSpacing: 1.0,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          textDirection: TextDirection.rtl,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  // উচ্চারণ টেক্সট
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: isDarkMode
+                                          ? Colors.blue[900]!.withOpacity(0.15)
+                                          : const Color(0xFFE3F2FD),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
                                         color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black,
+                                            ? Colors.blue[700]!
+                                            : const Color(0xFFBBDEFB),
+                                        width: 1,
                                       ),
+                                    ),
+                                    child: Text(
+                                      kalema["transliteration"]!,
+                                      style: TextStyle(
+                                        fontSize: _textFontSize,
+                                        fontStyle: FontStyle.italic,
+                                        color: isDarkMode
+                                            ? Colors.blue[200]
+                                            : Colors.blue[800],
+                                        height: 1.6,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 20),
+                            ),
+                            const SizedBox(height: 20),
 
-                              // আরবি টেক্সট সেকশন - লাইন পার্থক্য সহ
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(24),
-                                decoration: BoxDecoration(
+                            // অর্থ সেকশন
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: isDarkMode
+                                    ? Colors.purple[900]!.withOpacity(0.15)
+                                    : const Color(0xFFF3E5F5),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
                                   color: isDarkMode
-                                      ? Colors.grey[900]
-                                      : const Color(0xFFF8F6F0),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: isDarkMode
-                                        ? Colors.grey[700]!
-                                        : const Color(0xFFE8E6DF),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Column(
-                                  children: [
-                                    // আরবি টেক্সট (RTL) - লাইন গাইড লাইন সহ
-                                    Directionality(
-                                      textDirection: TextDirection.rtl,
-                                      child: Stack(
-                                        children: [
-                                          // গাইড লাইন (নিচের লাইন)
-                                          Positioned.fill(
-                                            child: CustomPaint(
-                                              painter: _ArabicLinePainter(
-                                                lineColor: isDarkMode
-                                                    ? Colors.grey[700]!
-                                                    : const Color(0xFFE8E6DF),
-                                              ),
-                                            ),
-                                          ),
-                                          // আরবি টেক্সট
-                                          Text(
-                                            kalema["text"]!,
-                                            style: TextStyle(
-                                              fontSize: _arabicFontSize,
-                                              fontFamily: 'ScheherazadeNew',
-                                              fontWeight: FontWeight.bold,
-                                              color: isDarkMode
-                                                  ? const Color(0xFFE8D5A7)
-                                                  : const Color(0xFF8B4513),
-                                              height: 2.2,
-                                              // লাইন হাইট বাড়ানো হয়েছে
-                                              wordSpacing: 3.0,
-                                              letterSpacing: 1.0,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                            textDirection: TextDirection.rtl,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-
-                                    // উচ্চারণ টেক্সট
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: isDarkMode
-                                            ? Colors.blue[900]!.withOpacity(
-                                                0.15,
-                                              )
-                                            : const Color(0xFFE3F2FD),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: isDarkMode
-                                              ? Colors.blue[700]!
-                                              : const Color(0xFFBBDEFB),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        kalema["transliteration"]!,
-                                        style: TextStyle(
-                                          fontSize: _textFontSize,
-                                          fontStyle: FontStyle.italic,
-                                          color: isDarkMode
-                                              ? Colors.blue[200]
-                                              : Colors.blue[800],
-                                          height: 1.6,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ],
+                                      ? Colors.purple[700]!
+                                      : const Color(0xFFE1BEE7),
+                                  width: 1,
                                 ),
                               ),
-                              const SizedBox(height: 20),
-
-                              // অর্থ সেকশন
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: isDarkMode
-                                      ? Colors.purple[900]!.withOpacity(0.15)
-                                      : const Color(0xFFF3E5F5),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isDarkMode
-                                        ? Colors.purple[700]!
-                                        : const Color(0xFFE1BEE7),
-                                    width: 1,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "অর্থ:",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDarkMode
+                                          ? Colors.purple[200]
+                                          : Colors.purple[800],
+                                    ),
                                   ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "অর্থ:",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDarkMode
-                                            ? Colors.purple[200]
-                                            : Colors.purple[800],
-                                      ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    kalema["meaning"]!,
+                                    style: TextStyle(
+                                      fontSize: _textFontSize,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                      height: 1.6,
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      kalema["meaning"]!,
-                                      style: TextStyle(
-                                        fontSize: _textFontSize,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black87,
-                                        height: 1.6,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      );
-                    }),
-                  ],
-                ),
+                      ),
+                    );
+                  }),
+                ],
               ),
             ),
 
-            // নিচের adaptive ব্যানার অ্যাড - safe area consideration
+            // নিচের adaptive ব্যানার অ্যাড - WITHOUT extra margin
             if (_isBannerAdLoaded && _bannerAd != null)
               Container(
                 width: screenWidth,
                 height: _bannerAd!.size.height.toDouble(),
                 alignment: Alignment.center,
                 color: Colors.transparent,
-                // Add bottom padding to account for system navigation bar
-                margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
+                // ❌ NO bottom margin here - this was causing the gap
                 child: _buildAdaptiveBannerWidget(_bannerAd!),
               ),
           ],

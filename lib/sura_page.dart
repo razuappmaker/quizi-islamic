@@ -1,9 +1,10 @@
-// sura_page.dart (আপডেটেড)
+// Sura page
+// sura_page.dart (আপডেটেড প্রফেশনাল ডিজাইন - ইম্প্রুভড কালার স্কিম)
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'json_loader.dart';
 import 'ad_helper.dart';
-import 'word_by_word_quran_page.dart'; // নতুন ফাইল ইম্পোর্ট
+import 'word_by_word_quran_page.dart';
 
 class SuraPage extends StatefulWidget {
   const SuraPage({Key? key}) : super(key: key);
@@ -22,58 +23,55 @@ class _SuraPageState extends State<SuraPage> {
   final double _maxFontSize = 28.0;
   final double _fontSizeStep = 2.0;
 
-  BannerAd? _bannerAd;
-  bool _isBannerAdReady = false;
+  // Anchor Ads related variables
+  BannerAd? _anchorAd;
+  bool _isAnchorAdReady = false;
+  bool _showAnchorAd = true;
 
   @override
   void initState() {
     super.initState();
     _loadSuraData();
-    _loadAd();
+    _loadAnchorAd();
   }
 
-  Future<void> _loadAd() async {
+  Future<void> _loadAnchorAd() async {
     try {
-      bool canShowAd = await AdHelper.canShowBannerAd();
-
-      if (!canShowAd) {
-        print('Banner ad limit reached, not showing ad');
-        return;
-      }
-
-      _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+      _anchorAd = await AdHelper.createAnchoredBannerAd(
         context,
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) {
-            setState(() => _isBannerAdReady = true);
-            AdHelper.recordBannerAdShown();
-            print('Adaptive Banner ad loaded successfully.');
+            setState(() {
+              _isAnchorAdReady = true;
+              _showAnchorAd = true;
+            });
+            print('Anchor Banner ad loaded successfully.');
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
-            print('Adaptive Banner ad failed to load: $error');
-            ad.dispose();
-            _isBannerAdReady = false;
-          },
-          onAdOpened: (Ad ad) {
-            AdHelper.canClickAd().then((canClick) {
-              if (canClick) {
-                AdHelper.recordAdClick();
-                print('Adaptive Banner ad clicked.');
-              } else {
-                print('Ad click limit reached');
-              }
+            print('Anchor Banner ad failed to load: $error');
+            setState(() {
+              _isAnchorAdReady = false;
+              _showAnchorAd = false;
             });
           },
         ),
       );
-
-      await _bannerAd?.load();
     } catch (e) {
-      print('Error loading adaptive banner ad: $e');
-      _isBannerAdReady = false;
+      print('Error loading anchor ad: $e');
+      setState(() {
+        _isAnchorAdReady = false;
+        _showAnchorAd = false;
+      });
     }
   }
 
+  void _closeAnchorAd() {
+    setState(() {
+      _showAnchorAd = false;
+    });
+  }
+
+  //-----------------------------------------
   Future<void> _loadSuraData() async {
     try {
       final loadedData = await JsonLoader.loadJsonList(
@@ -95,6 +93,9 @@ class _SuraPageState extends State<SuraPage> {
         dailySuras = [
           {
             'title': 'সূরা আল ফাতিহা - الفاتحة',
+            'serial': 1,
+            'type': 'মাক্কি',
+            'ayat_count': 7,
             'ayat': [
               {
                 'arabic': 'بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ',
@@ -131,7 +132,6 @@ class _SuraPageState extends State<SuraPage> {
     });
   }
 
-  // Word by Word Quran পেজে নেভিগেট করার মেথড
   void _navigateToWordByWordQuran() {
     Navigator.push(
       context,
@@ -141,14 +141,69 @@ class _SuraPageState extends State<SuraPage> {
 
   @override
   void dispose() {
-    _bannerAd?.dispose();
+    _anchorAd?.dispose();
     expandedIndices.clear();
     _showFullWarning.clear();
     super.dispose();
   }
 
-  ///============
-  // Build the warning widget
+  // sura_page.dart (আপডেটেড - লাইট মোডে কার্ড সাদা এবং UI এডজাস্টেড)
+
+  // কালার হেল্পার মেথড - ইম্প্রুভড
+  Color _getPrimaryColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Color(0xFF2E7D32) // Light green for dark mode
+        : Color(0xFF2E7D32); // Nature Green for light mode
+  }
+
+  Color _getBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Color(0xFF121212) // Dark background
+        : Color(0xFFFAFAFA); // Very light background
+  }
+
+  Color _getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Color(0xFF1E1E1E) // Dark card
+        : Colors.white70; // Pure white card
+  }
+
+  Color _getHeaderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Color(0xFF2D2D2D) // Dark header
+        : Colors.white10; // White header - লাইট মোডে সাদা
+  }
+
+  Color _getTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Color(0xFF37474F); // Dark gray for light mode
+  }
+
+  Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[400]!
+        : Color(0xFF546E7A); // Medium gray for light mode
+  }
+
+  Color _getBorderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Color(0xFF404040)
+        : Color(0xFFE0E0E0); // Light gray border for light mode
+  }
+
+  Color _getHeaderTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Color(0xFF2E7D32); // Green text for white header in light mode
+  }
+
+  Color _getHeaderIconColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Color(0xFF2E7D32); // Green icons for white header in light mode
+  }
+
   Widget _buildWarningWidget(int index) {
     final bool showFull = _showFullWarning[index] ?? false;
 
@@ -159,10 +214,12 @@ class _SuraPageState extends State<SuraPage> {
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.orange[900]?.withOpacity(0.15)
-                  : Colors.orange[50],
+                  ? Color(0xFF1A1A1A)
+                  : Color(0xFFFFF8E1),
               border: Border.all(
-                color: Colors.orange.withOpacity(0.4),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Color(0xFF444444)
+                    : Color(0xFFFFD54F),
                 width: 1.5,
               ),
               borderRadius: BorderRadius.circular(14),
@@ -170,12 +227,13 @@ class _SuraPageState extends State<SuraPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with icon and title
                 Row(
                   children: [
                     Icon(
                       Icons.warning_amber_rounded,
-                      color: Colors.orange[700],
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Color(0xFFFFB74D)
+                          : Color(0xFFF57C00),
                       size: 22,
                     ),
                     const SizedBox(width: 10),
@@ -185,24 +243,19 @@ class _SuraPageState extends State<SuraPage> {
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                         color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.orange[100]
-                            : Colors.orange[900],
+                            ? Color(0xFFFFB74D)
+                            : Color(0xFFE65100),
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 12),
-
-                // First paragraph
                 RichText(
                   text: TextSpan(
                     style: TextStyle(
                       fontSize: 14.5,
                       height: 1.6,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white70
-                          : Colors.black87,
+                      color: _getSecondaryTextColor(context),
                     ),
                     children: const [
                       TextSpan(
@@ -221,10 +274,7 @@ class _SuraPageState extends State<SuraPage> {
                   ),
                   textAlign: TextAlign.justify,
                 ),
-
                 const SizedBox(height: 10),
-
-                // Second paragraph with bullet point
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -233,7 +283,9 @@ class _SuraPageState extends State<SuraPage> {
                       child: Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 14,
-                        color: Colors.orange[700],
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Color(0xFFFFB74D)
+                            : Color(0xFFF57C00),
                       ),
                     ),
                     Expanded(
@@ -242,19 +294,14 @@ class _SuraPageState extends State<SuraPage> {
                         style: TextStyle(
                           fontSize: 14.5,
                           height: 1.6,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white70
-                              : Colors.black87,
+                          color: _getSecondaryTextColor(context),
                         ),
                         textAlign: TextAlign.justify,
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 14),
-
-                // Close button
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
@@ -270,14 +317,24 @@ class _SuraPageState extends State<SuraPage> {
                       ),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.orange[600]!, Colors.orange[800]!],
+                          colors: [
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Color(0xFFFFB74D)
+                                : Color(0xFFFFB300),
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Color(0xFFFF9800)
+                                : Color(0xFFF57C00),
+                          ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.3),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Color(0xFFFFB74D).withOpacity(0.3)
+                                : Color(0xFFFFB300).withOpacity(0.3),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -312,27 +369,24 @@ class _SuraPageState extends State<SuraPage> {
                 ),
                 decoration: BoxDecoration(
                   color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.orange[900]?.withOpacity(0.2)
-                      : Colors.orange[50],
+                      ? Color(0xFF1A1A1A)
+                      : Color(0xFFFFF8E1),
                   border: Border.all(
-                    color: Colors.orange.withOpacity(0.5),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Color(0xFF444444)
+                        : Color(0xFFFFD54F),
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.orange.withOpacity(0.1),
-                      blurRadius: 2,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       Icons.info_outline_rounded,
-                      color: Colors.orange[700],
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Color(0xFFFFB74D)
+                          : Color(0xFFF57C00),
                       size: 18,
                     ),
                     const SizedBox(width: 6),
@@ -342,8 +396,8 @@ class _SuraPageState extends State<SuraPage> {
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                         color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.orange[100]
-                            : Colors.orange[800],
+                            ? Color(0xFFFFB74D)
+                            : Color(0xFFE65100),
                       ),
                     ),
                   ],
@@ -353,52 +407,192 @@ class _SuraPageState extends State<SuraPage> {
           );
   }
 
-  //=============
+  // হেডার সেকশন আপডেট
+  // হেডার সেকশন আপডেট
+  // হেডার সেকশন আপডেট
+  Widget _buildSuraHeader(Map<String, dynamic> sura, int index) {
+    final serial = sura['serial'] ?? (index + 1);
+    final type = sura['type'] ?? 'মাক্কি';
+    final ayatCount =
+        sura['ayat_count'] ?? (sura['ayat'] as List?)?.length ?? 0;
+    final title = sura['title'] ?? '';
+    final bool isExpanded = expandedIndices.contains(
+      index,
+    ); // ← index ব্যবহার করুন
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        color: _getHeaderColor(context),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+        border: Border.all(color: _getBorderColor(context), width: 1),
+      ),
+      child: Row(
+        children: [
+          // সিরিয়াল নং
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withOpacity(0.1)
+                  : _getPrimaryColor(context).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withOpacity(0.3)
+                    : _getPrimaryColor(context).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              '$serial',
+              style: TextStyle(
+                color: _getHeaderTextColor(context),
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // সূরা টাইটেল এবং তথ্য
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: _getHeaderTextColor(context),
+                    fontFamily: 'ScheherazadeNew',
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    // মাক্কি/মাদিনা ব্যাজ
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: type == 'মাক্কি'
+                            ? (Theme.of(context).brightness == Brightness.dark
+                                  ? Color(0xFFFFB74D)
+                                  : Color(0xFFFFA000))
+                            : (Theme.of(context).brightness == Brightness.dark
+                                  ? Color(0xFF4FC3F7)
+                                  : Color(0xFF1976D2)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        type,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    // আয়াত সংখ্যা
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withOpacity(0.1)
+                            : _getPrimaryColor(context).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withOpacity(0.3)
+                              : _getPrimaryColor(context).withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.library_books_rounded,
+                            color: _getHeaderIconColor(context),
+                            size: 14,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '$ayatCount আয়াত',
+                            style: TextStyle(
+                              color: _getHeaderTextColor(context),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // এক্সপ্যান্ড আইকন
+          AnimatedRotation(
+            turns: isExpanded ? 0.5 : 0,
+            duration: const Duration(milliseconds: 300),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withOpacity(0.2)
+                    : _getPrimaryColor(context).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.expand_more_rounded,
+                color: _getHeaderIconColor(context),
+                size: 22,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget buildSura(Map<String, dynamic> sura, int index) {
     final bool isExpanded = expandedIndices.contains(index);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Material(
         borderRadius: BorderRadius.circular(16),
-        elevation: 6,
-        shadowColor: Colors.green.withOpacity(0.3),
+        elevation: Theme.of(context).brightness == Brightness.dark ? 1 : 2,
+        shadowColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black.withOpacity(0.5)
+            : Colors.grey.withOpacity(0.2),
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: _getCardColor(context),
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: _getBorderColor(context), width: 1),
           ),
           child: Column(
             children: [
-              ListTile(
-                tileColor: isExpanded
-                    ? (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.green[900]
-                          : Colors.green[100])
-                    : (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.green[800]
-                          : Colors.green[50]),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                title: Text(
-                  sura['title'] ?? '',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'ScheherazadeNew', // ✅ আরবির জন্য একই ফন্ট
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
-                  ),
-                ),
-                trailing: Icon(
-                  isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.greenAccent
-                      : Colors.green[800],
-                  size: 28,
-                ),
+              // হেডার সেকশন
+              GestureDetector(
                 onTap: () {
                   setState(() {
                     if (isExpanded) {
@@ -409,94 +603,139 @@ class _SuraPageState extends State<SuraPage> {
                     }
                   });
                 },
+                child: _buildSuraHeader(sura, index), // ← index পাস করুন
               ),
+
+              // কন্টেন্ট সেকশন
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
                 child: isExpanded
                     ? Padding(
                         key: ValueKey('expanded_$index'),
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Warning message inside expanded sura
+                            // সতর্কবার্তা
                             _buildWarningWidget(index),
 
-                            // Font size controls
+                            // ফন্ট কন্ট্রোল
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 12,
+                                vertical: 16,
+                                horizontal: 16,
                               ),
-                              margin: const EdgeInsets.only(bottom: 16),
+                              margin: const EdgeInsets.only(bottom: 20),
                               decoration: BoxDecoration(
                                 color:
                                     Theme.of(context).brightness ==
                                         Brightness.dark
-                                    ? Colors.grey[800]
-                                    : Colors.grey[200],
-                                borderRadius: BorderRadius.circular(10),
+                                    ? Color(0xFF252525)
+                                    : Color(0xFFF8F9FA),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _getBorderColor(context),
+                                ),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'ফন্ট সাইজ:',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color:
-                                          Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white70
-                                          : Colors.black87,
-                                    ),
-                                  ),
                                   Row(
                                     children: [
-                                      IconButton(
-                                        icon: Icon(Icons.zoom_out, size: 20),
-                                        onPressed: _decreaseFontSize,
-                                        tooltip: 'ফন্ট ছোট করুন',
+                                      Icon(
+                                        Icons.text_fields_rounded,
+                                        color: _getPrimaryColor(context),
+                                        size: 18,
                                       ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 4,
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'ফন্ট সাইজ',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: _getTextColor(context),
                                         ),
-                                        decoration: BoxDecoration(
-                                          color:
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Slider(
+                                          value: _fontSize,
+                                          min: _minFontSize,
+                                          max: _maxFontSize,
+                                          divisions:
+                                              ((_maxFontSize - _minFontSize) /
+                                                      _fontSizeStep)
+                                                  .round(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _fontSize = value;
+                                            });
+                                          },
+                                          activeColor: _getPrimaryColor(
+                                            context,
+                                          ),
+                                          inactiveColor:
                                               Theme.of(context).brightness ==
                                                   Brightness.dark
-                                              ? Colors.grey[700]
-                                              : Colors.white,
+                                              ? Color(0xFF404040)
+                                              : Color(0xFFBDBDBD),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _getPrimaryColor(
+                                            context,
+                                          ).withOpacity(0.1),
                                           borderRadius: BorderRadius.circular(
-                                            6,
+                                            8,
+                                          ),
+                                          border: Border.all(
+                                            color: _getPrimaryColor(
+                                              context,
+                                            ).withOpacity(0.3),
                                           ),
                                         ),
                                         child: Text(
-                                          '${_fontSize.toInt()}',
+                                          '${_fontSize.toInt()}px',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color:
-                                                Theme.of(context).brightness ==
-                                                    Brightness.dark
-                                                ? Colors.white
-                                                : Colors.black,
+                                            color: _getPrimaryColor(context),
                                           ),
                                         ),
                                       ),
-                                      IconButton(
-                                        icon: Icon(Icons.zoom_in, size: 20),
-                                        onPressed: _increaseFontSize,
-                                        tooltip: 'ফন্ট বড় করুন',
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      _buildFontSizeButton(
+                                        icon: Icons.zoom_out_rounded,
+                                        onPressed: _decreaseFontSize,
+                                        tooltip: 'ফন্ট ছোট করুন',
                                       ),
-                                      IconButton(
-                                        icon: Icon(Icons.restart_alt, size: 20),
+                                      _buildFontSizeButton(
+                                        icon: Icons.restart_alt_rounded,
                                         onPressed: _resetFontSize,
                                         tooltip: 'ডিফল্ট ফন্ট সাইজ',
+                                      ),
+                                      _buildFontSizeButton(
+                                        icon: Icons.zoom_in_rounded,
+                                        onPressed: _increaseFontSize,
+                                        tooltip: 'ফন্ট বড় করুন',
                                       ),
                                     ],
                                   ),
@@ -504,75 +743,147 @@ class _SuraPageState extends State<SuraPage> {
                               ),
                             ),
 
+                            // আয়াতসমূহ- আয়াত কন্টেইনারের ব্যাকগ্রাউন্ড কালার আপডেট
                             ...List<Widget>.from(
                               (sura['ayat'] as List<dynamic>).map(
-                                (ay) => Column(
-                                  // InteractiveViewer removed - 2 finger zoom disabled
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Directionality(
-                                      textDirection: TextDirection.rtl,
-                                      child: SelectableText(
-                                        ay['arabic'] ?? '',
+                                (ay) => Container(
+                                  margin: const EdgeInsets.only(bottom: 24),
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Color(0xFF252525)
+                                        : Color(0xFFF8F9FA),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: _getBorderColor(context),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      // আরবি টেক্সট
+                                      Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: SelectableText(
+                                          ay['arabic'] ?? '',
+                                          style: TextStyle(
+                                            fontSize: 26,
+                                            fontFamily: 'ScheherazadeNew',
+                                            fontWeight: FontWeight.bold,
+                                            wordSpacing: 2.5,
+                                            color: _getTextColor(context),
+                                            height: 1.6,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 16),
+
+                                      // সেপারেটর
+                                      Container(
+                                        height: 1,
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.transparent,
+                                              _getPrimaryColor(
+                                                context,
+                                              ).withOpacity(0.3),
+                                              Colors.transparent,
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 12),
+
+                                      // উচ্চারণ
+                                      SelectableText(
+                                        ay['transliteration'] ?? '',
                                         style: TextStyle(
-                                          fontSize: 26,
-                                          fontFamily: 'ScheherazadeNew',
-                                          fontWeight: FontWeight.bold,
-                                          wordSpacing: 2.5,
+                                          fontSize: _fontSize,
+                                          fontStyle: FontStyle.italic,
                                           color:
                                               Theme.of(context).brightness ==
                                                   Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black87,
-                                          height: 1.6,
+                                              ? Color(0xFF4FC3F7)
+                                              : Color(0xFF2E7D32),
+                                          height: 1.4,
                                         ),
-                                        textAlign: TextAlign.right,
                                       ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    SelectableText(
-                                      ay['transliteration'] ?? '',
-                                      style: TextStyle(
-                                        fontSize: _fontSize,
-                                        fontStyle: FontStyle.italic,
-                                        color:
-                                            Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.green[200]
-                                            : Colors.green[900],
-                                        height: 1.4,
+
+                                      const SizedBox(height: 12),
+
+                                      // অর্থ
+                                      SelectableText(
+                                        'অর্থ: ${ay['meaning'] ?? ''}',
+                                        style: TextStyle(
+                                          fontSize: _fontSize,
+                                          color: _getSecondaryTextColor(
+                                            context,
+                                          ),
+                                          height: 1.4,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    SelectableText(
-                                      'অর্থ: ${ay['meaning'] ?? ''}',
-                                      style: TextStyle(
-                                        fontSize: _fontSize,
-                                        color:
-                                            Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.grey[300]
-                                            : Colors.black87,
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
+
+                            // রেফারেন্স
                             if ((sura['reference'] ?? '').isNotEmpty)
-                              SelectableText(
-                                'সূত্র: ${sura['reference']}',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontStyle: FontStyle.italic,
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
                                   color:
                                       Theme.of(context).brightness ==
                                           Brightness.dark
-                                      ? Colors.grey[400]
-                                      : Colors.deepPurple[400],
+                                      ? Color(0xFF1A1A1A)
+                                      : Color(0xFFE8F5E8),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Color(0xFF444444)
+                                        : Color(0xFFC8E6C9),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.source_rounded,
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Color(0xFF4FC3F7)
+                                          : Color(0xFF1976D2),
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: SelectableText(
+                                        'সূত্র: ${sura['reference']}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontStyle: FontStyle.italic,
+                                          color:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Color(0xFF4FC3F7)
+                                              : Color(0xFF1565C0),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                           ],
@@ -587,24 +898,52 @@ class _SuraPageState extends State<SuraPage> {
     );
   }
 
-  //=================
+  Widget _buildFontSizeButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    required String tooltip,
+  }) {
+    return IconButton(
+      icon: Icon(icon, size: 20),
+      onPressed: onPressed,
+      tooltip: tooltip,
+      style: IconButton.styleFrom(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Color(0xFF2D2D2D)
+            : Color(0xFFF5F5F5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[700],
+        backgroundColor: _getPrimaryColor(context),
         title: const Text(
-          'সুরা',
+          'পবিত্র সুরাসমূহ',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: 18,
             color: Colors.white,
           ),
         ),
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
         actions: [
-          // শব্দে শব্দে কুরআন বাটন - প্রফেশনাল ডিজাইন
           Container(
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             child: ElevatedButton.icon(
@@ -618,12 +957,14 @@ class _SuraPageState extends State<SuraPage> {
                 "শব্দে শব্দে কুরআন",
                 style: TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[800],
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.green[600]!
+                    : Colors.green[800]!,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -631,126 +972,126 @@ class _SuraPageState extends State<SuraPage> {
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(color: Colors.green[100]!.withOpacity(0.3)),
+                  side: BorderSide(color: Colors.white.withOpacity(0.3)),
                 ),
-                elevation: 2,
-                shadowColor: Colors.black.withOpacity(0.3),
+                elevation: 1,
               ),
             ),
           ),
-
           const SizedBox(width: 8),
-
-          // ফন্ট কন্ট্রোল বাটন - প্রফেশনাল ডিজাইন
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            child: PopupMenuButton<String>(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.green[800],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.green[100]!.withOpacity(0.3),
-                  ),
-                ),
-                child: const Icon(
-                  Icons.text_fields,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              offset: const Offset(0, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              itemBuilder: (BuildContext context) => [
-                PopupMenuItem(
-                  value: 'increase',
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.zoom_in,
-                      color: Colors.green[700],
-                      size: 22,
-                    ),
-                    title: const Text(
-                      'ফন্ট বড় করুন',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    onTap: _increaseFontSize,
-                  ),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem(
-                  value: 'decrease',
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.zoom_out,
-                      color: Colors.green[700],
-                      size: 22,
-                    ),
-                    title: const Text(
-                      'ফন্ট ছোট করুন',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    onTap: _decreaseFontSize,
-                  ),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem(
-                  value: 'reset',
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.restart_alt,
-                      color: Colors.green[700],
-                      size: 22,
-                    ),
-                    title: const Text(
-                      'ডিফল্ট ফন্ট সাইজ',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    onTap: _resetFontSize,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 12),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(
-                bottom: _isBannerAdReady ? 0 : bottomPadding,
+      body: Container(
+        color: _getBackgroundColor(context),
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: _showAnchorAd ? 0 : bottomPadding,
+                ),
+                child: _isLoading
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              color: _getPrimaryColor(context),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'সুরা লোড হচ্ছে...',
+                              style: TextStyle(
+                                color: _getSecondaryTextColor(context),
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : dailySuras.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline_rounded,
+                              color: _getSecondaryTextColor(context),
+                              size: 64,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'কোন সুরা পাওয়া যায়নি',
+                              style: TextStyle(
+                                color: _getSecondaryTextColor(context),
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: dailySuras.length,
+                        itemBuilder: (context, index) =>
+                            buildSura(dailySuras[index], index),
+                      ),
               ),
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      itemCount: dailySuras.length,
-                      itemBuilder: (context, index) =>
-                          buildSura(dailySuras[index], index),
-                    ),
             ),
-          ),
-          if (_isBannerAdReady && _bannerAd != null)
-            SafeArea(
-              top: false,
-              child: Container(
-                width: double.infinity,
-                height: _bannerAd!.size.height.toDouble(),
-                alignment: Alignment.center,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[900]
-                    : Colors.white,
-                child: AdWidget(ad: _bannerAd!),
-              ),
-            )
-          else
-            const SizedBox.shrink(),
-        ],
+
+            // Anchor Ad Section
+            // Anchor Ad Section - Minimal Design
+            if (_isAnchorAdReady && _showAnchorAd && _anchorAd != null)
+              SafeArea(
+                top: false,
+                child: Container(
+                  width: double.infinity,
+                  color: _getCardColor(context),
+                  child: Stack(
+                    children: [
+                      // Ad Widget
+                      Container(
+                        width: double.infinity,
+                        height: _anchorAd!.size.height.toDouble(),
+                        alignment: Alignment.center,
+                        child: AdWidget(ad: _anchorAd!),
+                      ),
+
+                      // Minimal Close Button
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: _closeAnchorAd,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.black54
+                                  : Colors.white54,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              size: 14,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              const SizedBox.shrink(),
+          ],
+        ),
       ),
     );
   }

@@ -680,13 +680,24 @@ class _IfterTimePageState extends State<IfterTimePage>
   AppBar _buildAppBar(Color primaryColor) {
     return AppBar(
       backgroundColor: primaryColor,
-      //centerTitle: true,
       title: const Text(
         "ইফতার ও সেহরি",
         style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 18,
           color: Colors.white,
+        ),
+      ),
+      leading: Container(
+        margin: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+          splashRadius: 20,
         ),
       ),
       actions: [
@@ -1350,7 +1361,7 @@ class _IfterTimePageState extends State<IfterTimePage>
 
           // প্রোগ্রেস পার্সেন্টেজ
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -1539,7 +1550,7 @@ class _IfterTimePageState extends State<IfterTimePage>
               Expanded(
                 child: _buildTimeCard(
                   icon: Icons.nights_stay,
-                  title: "সাহরির শেষ সময়",
+                  title: "সাহরি শেষ",
                   time: _calculateSehriTime(),
                   color: Colors.orange,
                   isDarkMode: isDarkMode,
@@ -1553,7 +1564,7 @@ class _IfterTimePageState extends State<IfterTimePage>
               Expanded(
                 child: _buildTimeCard(
                   icon: Icons.wb_sunny,
-                  title: "ইফতারের সময়",
+                  title: "ইফতার",
                   time: _getIftarTime(),
                   color: Colors.green,
                   isDarkMode: isDarkMode,

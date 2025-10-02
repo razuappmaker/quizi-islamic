@@ -251,6 +251,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           for (var doya in convertedData) {
             doya['category'] = category['title'];
             doya['categoryColor'] = category['color'].toString();
+            doya['jsonFile'] = category['jsonFile']; // JSON file যোগ করা
           }
           allDoyas.addAll(convertedData);
         } catch (e) {
@@ -322,12 +323,18 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
+  // আপডেট করা মেথড: সরাসরি দোয়া ওপেন করবে
   void _navigateToSearchedDoya(BuildContext context, Map<String, String> doya) {
     final category = categories.firstWhere(
       (cat) => cat['title'] == doya['category'],
       orElse: () => categories.last,
     );
 
+    // দোয়া কার্ড ওপেন হলে parent কে নোটিফাই করুন
+    _incrementDoyaCardCount();
+
+    // সরাসরি DoyaDetailPage-এ নিয়ে যান (আপনার যদি থাকে) অথবা
+    // DoyaListPage-এ নিয়ে গিয়ে সরাসরি সেই দোয়াটি হাইলাইট/এক্সপ্যান্ড করুন
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -336,6 +343,9 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           jsonFile: category['jsonFile'],
           categoryColor: category['color'],
           initialSearchQuery: doya['title'],
+          // সার্চ কোয়েরি পাঠানো
+          preSelectedDoyaTitle: doya['title'],
+          // নতুন প্যারামিটার - সরাসরি দোয়া সিলেক্ট করার জন্য
           onDoyaCardOpen: _incrementDoyaCardCount,
         ),
       ),
@@ -481,6 +491,18 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
               ),
         centerTitle: false,
         elevation: 0,
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
         actions: [
           _isSearching
               ? IconButton(

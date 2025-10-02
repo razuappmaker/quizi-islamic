@@ -5,12 +5,14 @@ class PrayerTimeAdjustmentModal extends StatefulWidget {
   final Map<String, int> prayerTimeAdjustments;
   final Function(String, int) onAdjustmentChanged;
   final VoidCallback onResetAll;
+  final VoidCallback onSaveAdjustments; // নতুন সেভ ফাংশন
 
   const PrayerTimeAdjustmentModal({
     Key? key,
     required this.prayerTimeAdjustments,
     required this.onAdjustmentChanged,
     required this.onResetAll,
+    required this.onSaveAdjustments, // নতুন প্যারামিটার
   }) : super(key: key);
 
   @override
@@ -41,6 +43,10 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
     });
     // Reset করতে 0-বর্তমান মান পাঠানো
     widget.onAdjustmentChanged(prayerName, -_currentAdjustments[prayerName]!);
+  }
+
+  bool get _hasAdjustments {
+    return _currentAdjustments.values.any((value) => value != 0);
   }
 
   @override
@@ -92,9 +98,9 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                   ),
                 ),
               ),
-              IconButton(
-                icon: Icon(Icons.refresh, color: Colors.blue, size: 22),
-                onPressed: () {
+              // Refresh Button with Text
+              InkWell(
+                onTap: () {
                   widget.onResetAll();
                   setState(() {
                     _currentAdjustments = {
@@ -105,8 +111,38 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                       "ইশা": 0,
                     };
                   });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('সময় রিসেট করা হয়েছে'),
+                      duration: Duration(seconds: 2),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
                 },
-                tooltip: "সব রিসেট করুন",
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue.shade100),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.refresh, color: Colors.blue, size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        "সময় রিসেট",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -142,22 +178,73 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
 
           const SizedBox(height: 16),
 
-          // Close Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+          // Save and Close Buttons
+          Row(
+            children: [
+              // Save Button (only visible when there are adjustments)
+              if (_hasAdjustments) ...[
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: Colors.green.shade600,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () {
+                      widget.onSaveAdjustments();
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('সময় সেটিংস সফলভাবে সেভ করা হয়েছে'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.save, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          "সেভ করুন",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+              ],
+
+              // Close Button
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    side: BorderSide(color: Colors.grey.shade400),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "বন্ধ করুন",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
                 ),
               ),
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                "বন্ধ করুন",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-            ),
+            ],
           ),
         ],
       ),

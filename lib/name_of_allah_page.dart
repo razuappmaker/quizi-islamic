@@ -1152,6 +1152,18 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
         ),
         backgroundColor: primaryColor,
         elevation: 2,
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
@@ -1196,112 +1208,209 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
         ],
       ),
       body: SafeArea(
-        bottom: false, // We'll handle bottom padding manually for the ad
+        bottom: true, // We'll handle bottom padding manually for the ad
         child: Column(
           children: [
             // Main content area with safe area padding
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: mediaQuery
-                      .padding
-                      .bottom, // Add bottom padding for system UI
-                ),
-                child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.all(16),
-                  itemCount: totalItems,
-                  itemBuilder: (context, index) {
-                    // প্রতি ৬ নামের পরে adaptive অ্যাড
-                    if ((index + 1) % 6 == 0) {
-                      int adIndex = ((index + 1) / 6).floor() - 1;
-                      if (adIndex < _bannerAds.length &&
-                          _bannerAds[adIndex] != null) {
-                        final banner = _bannerAds[adIndex]!;
-                        return Container(
-                          alignment: Alignment.center,
-                          margin: const EdgeInsets.symmetric(vertical: 16),
-                          child: _buildAdaptiveBannerWidget(banner),
-                        );
-                      }
-                      return const SizedBox.shrink();
+              child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                itemCount: totalItems,
+                itemBuilder: (context, index) {
+                  // প্রতি ৬ নামের পরে adaptive অ্যাড
+                  if ((index + 1) % 6 == 0) {
+                    int adIndex = ((index + 1) / 6).floor() - 1;
+                    if (adIndex < _bannerAds.length &&
+                        _bannerAds[adIndex] != null) {
+                      final banner = _bannerAds[adIndex]!;
+                      return Container(
+                        alignment: Alignment.center,
+                        margin: const EdgeInsets.symmetric(vertical: 16),
+                        child: _buildAdaptiveBannerWidget(banner),
+                      );
                     }
+                    return const SizedBox.shrink();
+                  }
 
-                    int nameIndex = index - (index / 6).floor();
-                    if (nameIndex >= filteredNames.length) {
-                      return const SizedBox.shrink();
-                    }
+                  int nameIndex = index - (index / 6).floor();
+                  if (nameIndex >= filteredNames.length) {
+                    return const SizedBox.shrink();
+                  }
 
-                    final name = filteredNames[nameIndex];
+                  final name = filteredNames[nameIndex];
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      decoration: BoxDecoration(
-                        color: isDarkMode ? Colors.grey[800] : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // নামের হেডার সেকশন
-                            Row(
-                              children: [
-                                // নাম্বার বেজ
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: primaryColor!.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: primaryColor.withOpacity(0.3),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "${nameIndex + 1}",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: primaryColor,
-                                    ),
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.grey[800] : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // নামের হেডার সেকশন
+                          Row(
+                            children: [
+                              // নাম্বার বেজ
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: primaryColor!.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: primaryColor.withOpacity(0.3),
+                                    width: 2,
                                   ),
                                 ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                child: Text(
+                                  "${nameIndex + 1}",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      name.bangla,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                    ),
+                                    Text(
+                                      name.english,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.italic,
+                                        color: isDarkMode
+                                            ? Colors.white70
+                                            : Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+
+                          // আরবি টেক্সট সেকশন
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: isDarkMode
+                                  ? Colors.grey[900]
+                                  : Colors.grey[50],
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDarkMode
+                                    ? Colors.grey[700]!
+                                    : Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                            child: Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: Text(
+                                name.arabic,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: _arabicFontSize,
+                                  fontFamily: 'ScheherazadeNew',
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.black,
+                                  height: 1.8,
+                                  wordSpacing: 2.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // অর্থ সেকশন
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isDarkMode
+                                  ? Colors.green[900]!.withOpacity(0.2)
+                                  : Colors.green[50],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text.rich(
+                                  TextSpan(
                                     children: [
-                                      Text(
-                                        name.bangla,
+                                      TextSpan(
+                                        text: "অর্থ: ",
                                         style: TextStyle(
-                                          fontSize: 20,
                                           fontWeight: FontWeight.bold,
+                                          fontSize: _textFontSize,
                                           color: isDarkMode
-                                              ? Colors.white
-                                              : Colors.black,
+                                              ? Colors.green[200]
+                                              : Colors.green[800],
                                         ),
                                       ),
-                                      Text(
-                                        name.english,
+                                      TextSpan(
+                                        text: name.meaningBn,
                                         style: TextStyle(
-                                          fontSize: 16,
-                                          fontStyle: FontStyle.italic,
+                                          fontSize: _textFontSize,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black87,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Meaning: ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: _textFontSize,
+                                          color: isDarkMode
+                                              ? Colors.green[200]
+                                              : Colors.green[800],
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: name.meaningEn,
+                                        style: TextStyle(
+                                          fontSize: _textFontSize,
                                           color: isDarkMode
                                               ? Colors.white70
-                                              : Colors.grey[700],
+                                              : Colors.black87,
                                         ),
                                       ),
                                     ],
@@ -1309,173 +1418,69 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 20),
+                          ),
+                          const SizedBox(height: 16),
 
-                            // আরবি টেক্সট সেকশন
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
+                          // ফজিলত সেকশন
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isDarkMode
+                                  ? Colors.orange[900]!.withOpacity(0.15)
+                                  : Colors.orange[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
                                 color: isDarkMode
-                                    ? Colors.grey[900]
-                                    : Colors.grey[50],
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: isDarkMode
-                                      ? Colors.grey[700]!
-                                      : Colors.grey[300]!,
-                                  width: 1,
-                                ),
+                                    ? Colors.orange[700]!
+                                    : Colors.orange[300]!,
+                                width: 1,
                               ),
-                              child: Directionality(
-                                textDirection: TextDirection.rtl,
-                                child: Text(
-                                  name.arabic,
-                                  textAlign: TextAlign.center,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "ফজিলত:",
                                   style: TextStyle(
-                                    fontSize: _arabicFontSize,
-                                    fontFamily: 'ScheherazadeNew',
                                     fontWeight: FontWeight.bold,
+                                    fontSize: _textFontSize,
                                     color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                    height: 1.8,
-                                    wordSpacing: 2.5,
+                                        ? Colors.orange[200]
+                                        : Colors.orange[800],
                                   ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-
-                            // অর্থ সেকশন
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: isDarkMode
-                                    ? Colors.green[900]!.withOpacity(0.2)
-                                    : Colors.green[50],
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text.rich(
-                                    TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: "অর্থ: ",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: _textFontSize,
-                                            color: isDarkMode
-                                                ? Colors.green[200]
-                                                : Colors.green[800],
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: name.meaningBn,
-                                          style: TextStyle(
-                                            fontSize: _textFontSize,
-                                            color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.black87,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  name.fazilatBn,
+                                  style: TextStyle(
+                                    fontSize: _textFontSize,
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : Colors.black87,
+                                    height: 1.5,
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text.rich(
-                                    TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: "Meaning: ",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: _textFontSize,
-                                            color: isDarkMode
-                                                ? Colors.green[200]
-                                                : Colors.green[800],
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: name.meaningEn,
-                                          style: TextStyle(
-                                            fontSize: _textFontSize,
-                                            color: isDarkMode
-                                                ? Colors.white70
-                                                : Colors.black87,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-
-                            // ফজিলত সেকশন
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: isDarkMode
-                                    ? Colors.orange[900]!.withOpacity(0.15)
-                                    : Colors.orange[50],
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isDarkMode
-                                      ? Colors.orange[700]!
-                                      : Colors.orange[300]!,
-                                  width: 1,
                                 ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "ফজিলত:",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: _textFontSize,
-                                      color: isDarkMode
-                                          ? Colors.orange[200]
-                                          : Colors.orange[800],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    name.fazilatBn,
-                                    style: TextStyle(
-                                      fontSize: _textFontSize,
-                                      color: isDarkMode
-                                          ? Colors.white70
-                                          : Colors.black87,
-                                      height: 1.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ),
 
-            // নিচের adaptive ব্যানার অ্যাড - safe area consideration
+            // নিচের adaptive ব্যানার অ্যাড - শুধুমাত্র প্রয়োজনীয় margin
             if (_isBottomBannerAdReady && _bottomBanner != null)
               Container(
                 width: screenWidth,
                 height: _bottomBanner!.size.height.toDouble(),
                 alignment: Alignment.center,
                 color: Colors.transparent,
-                // Add bottom padding to account for system navigation bar
-                margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
+                // শুধুমাত্র top margin দিন যদি প্রয়োজন হয়, bottom margin দেবেন না
+                margin: EdgeInsets.only(top: 8),
+                // Optional: সামান্য spacing
                 child: _buildAdaptiveBannerWidget(_bottomBanner!),
               ),
           ],
