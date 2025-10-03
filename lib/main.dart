@@ -64,11 +64,36 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<ThemeProvider, LanguageProvider>(
       builder: (context, themeProvider, languageProvider, child) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (languageProvider.currentLanguage.isEmpty) {
-            languageProvider.loadLanguage();
-          }
-        });
+        // Language লোডিং স্টেট handle করুন
+        if (languageProvider.currentLanguage.isEmpty ||
+            languageProvider.isLoading) {
+          return MaterialApp(
+            home: Scaffold(
+              backgroundColor: Colors.green[50],
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.green[700]!,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'লোড হচ্ছে...',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.green[800],
+                        fontFamily: 'HindSiliguri',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
 
         return MaterialApp(
           title: languageProvider.isEnglish
@@ -76,6 +101,7 @@ class MyApp extends StatelessWidget {
               : 'ইসলামিক ডে - বৈশ্বিক বাংলাদেশী',
           debugShowCheckedModeBanner: false,
           themeMode: themeProvider.themeMode,
+
           theme: ThemeData(
             primarySwatch: Colors.green,
             brightness: Brightness.light,
@@ -376,10 +402,25 @@ class _HomePageState extends State<HomePage>
                   color: Colors.white,
                 ),
           actions: [
+            // Language toggle button-এ
             ResponsiveIconButton(
               icon: Icons.language,
               iconSize: 28,
-              onPressed: () => languageProvider.toggleLanguage(),
+              onPressed: () async {
+                // ✅ প্রথমে selectedCategory reset করুন
+                if (mounted) {
+                  setState(() {
+                    selectedCategory = null;
+                  });
+                }
+
+                // তারপর language toggle করুন
+                final languageProvider = Provider.of<LanguageProvider>(
+                  context,
+                  listen: false,
+                );
+                await languageProvider.toggleLanguage();
+              },
               color: Colors.white,
             ),
             ResponsiveIconButton(
@@ -522,9 +563,28 @@ class _HomePageState extends State<HomePage>
 
   Widget _buildCategorySelector(bool isDarkMode) {
     final languageProvider = Provider.of<LanguageProvider>(context);
+
+    // Loading state check
+    if (languageProvider.isLoading ||
+        languageProvider.currentLanguage.isEmpty) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     final categories = languageProvider.isEnglish
         ? _categoriesEn
         : _categoriesBn;
+
+    // ✅ selectedCategory validate করুন
+    if (selectedCategory != null && !categories.contains(selectedCategory)) {
+      // যদি selectedCategory available items-এ না থাকে, null set করুন
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            selectedCategory = null;
+          });
+        }
+      });
+    }
 
     return ResponsivePadding(
       horizontal: isTablet(context) ? 16 : 12,
@@ -562,6 +622,7 @@ class _HomePageState extends State<HomePage>
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: selectedCategory,
+                    // ✅ এটি এখন validated
                     hint: Row(
                       children: [
                         Icon(
