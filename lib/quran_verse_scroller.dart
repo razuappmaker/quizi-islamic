@@ -1,5 +1,7 @@
-// lib/widgets/quran_verse_scroller.dart
+// lib/widgets/quran_verse_scroller.dart - SIMPLIFIED VERSION
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class QuranVerseScroller extends StatefulWidget {
   final bool isDarkMode;
@@ -19,21 +21,46 @@ class QuranVerseScroller extends StatefulWidget {
 
 class _QuranVerseScrollerState extends State<QuranVerseScroller> {
   final ScrollController _scrollController = ScrollController();
-  final List<String> _quranVerses = [
-    "إِنَّ مَعَ الْعُسْرِ يُسْرًا - নিশ্চয় কষ্টের সাথে স্বস্তি আছে (সূরা আল-ইনশিরাহ: ৬)",
-    "وَتَوَ كَّلْ عَلَى اللَّهِ - আর আল্লাহর উপর ভরসা করুন (সূরা আলে-ইমরান: ১৫৯)",
-    "رَبِّ زِدْنِي عِلْمًا - হে আমার রব, আমার জ্ঞান বৃদ্ধি করুন (সূরা ত্ব-হা: ১১৪)",
-    "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا - নিশ্চয় কষ্টের সাথে স্বস্তি আছে (সূরা আল-ইনশিরাহ: ৫)",
-    "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا - আল্লাহ কোন প্রাণকে তার সামর্থ্যের অতিরিক্ত দায়িত্ব দেন না (সূরা আল-বাকারা: ২৮৬)",
-    "وَاصْبِرْ فَإِنَّ اللَّهَ لَا يُضِيعُ أَجْرَ الْمُحْسِنِينَ - ধৈর্য ধারণ করুন, নিশ্চয় আল্লাহ সৎকর্মশীলদের সওয়াব নষ্ট করেন না (সূরা হুদ: ১১৫)",
-    "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ - নিশ্চয় আল্লাহ ধৈর্যশীলদের সাথে আছেন (সূরা আল-বাকারা: ১৫৩)",
-    "وَعَسَىٰ أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ - হতে পারে তোমরা কোন কিছু অপছন্দ কর, অথচ তা তোমাদের জন্য কল্যাণকর (সূরা আল-বাকারা: ২১৬)",
+
+  // Arabic verses (always show)
+  final List<String> _arabicVerses = [
+    "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+    "وَتَوَ كَّلْ عَلَى اللَّهِ",
+    "رَبِّ زِدْنِي عِلْمًا",
+    "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
+    "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
+    "وَاصْبِرْ فَإِنَّ اللَّهَ لَا يُضِيعُ أَجْرَ الْمُحْسِنِينَ",
+    "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
+    "وَعَسَىٰ أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ",
+  ];
+
+  // English translations
+  final List<String> _englishTranslations = [
+    "Indeed, with hardship comes ease (Al-Inshirah- 94:6)",
+    "And rely upon Allah (3:159)",
+    "My Lord, increase me in knowledge (20:114)",
+    "Indeed, with hardship comes ease (94:5)",
+    "Allah does not burden a soul beyond that it can bear (2:286)",
+    "Be patient, for indeed Allah does not allow the reward of the good-doers to be lost (11:115)",
+    "Indeed, Allah is with the patient (2:153)",
+    "But perhaps you hate a thing and it is good for you (2:216)",
+  ];
+
+  // Bengali translations
+  final List<String> _bengaliTranslations = [
+    "নিশ্চয় কষ্টের সাথে স্বস্তি আছে (সূরা: সূরা আল-ইনশিরাহ ৯৪:৬)",
+    "আর আল্লাহর উপর ভরসা করুন (৩:১৫৯)",
+    "হে আমার রব, আমার জ্ঞান বৃদ্ধি করুন (২০:১১৪)",
+    "নিশ্চয় কষ্টের সাথে স্বস্তি আছে (৯৪:৫)",
+    "আল্লাহ কোন প্রাণকে তার সামর্থ্যের অতিরিক্ত দায়িত্ব দেন না (২:২৮৬)",
+    "ধৈর্য ধারণ করুন, নিশ্চয় আল্লাহ সৎকর্মশীলদের সওয়াব নষ্ট করেন না (১১:১১৫)",
+    "নিশ্চয় আল্লাহ ধৈর্যশীলদের সাথে আছেন (২:১৫৩)",
+    "হতে পারে তোমরা কোন কিছু অপছন্দ কর, অথচ তা তোমাদের জন্য কল্যাণকর (২:২১৬)",
   ];
 
   @override
   void initState() {
     super.initState();
-    // অটো স্ক্রল শুরু করুন
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startAutoScroll();
     });
@@ -41,22 +68,20 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
 
   void _startAutoScroll() {
     Future.delayed(Duration(seconds: 1), () {
-      if (_scrollController.hasClients) {
+      if (_scrollController.hasClients && mounted) {
         final maxScroll = _scrollController.position.maxScrollExtent;
         final currentScroll = _scrollController.offset;
 
         if (currentScroll >= maxScroll) {
-          // শেষে পৌঁছে গেলে শুরুতে ফিরে যান
           _scrollController.jumpTo(0);
         } else {
-          // ডান থেকে বামে স্ক্রল করুন
           _scrollController.animateTo(
             currentScroll + 100,
             duration: Duration(seconds: 10),
             curve: Curves.linear,
           );
         }
-        _startAutoScroll(); // পুনরাবৃত্তি করুন
+        _startAutoScroll();
       }
     });
   }
@@ -69,7 +94,7 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final languageProvider = Provider.of<LanguageProvider>(context);
 
     return Container(
       width: double.infinity,
@@ -92,18 +117,15 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
           controller: _scrollController,
           scrollDirection: Axis.horizontal,
           physics: const NeverScrollableScrollPhysics(),
-          // ম্যানুয়াল স্ক্রল বন্ধ
           child: Row(
             children: [
               SizedBox(width: 16),
-              // আয়াতগুলি হরিজন্টালি显示
               Row(
-                children: _quranVerses.map((verse) {
+                children: List.generate(_arabicVerses.length, (index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        // ইসলামিক ডেকোরেশন আইকন
                         Icon(
                           Icons.mosque,
                           color: widget.isDarkMode
@@ -112,16 +134,18 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
                           size: widget.isTablet ? 20 : 16,
                         ),
                         SizedBox(width: 8),
-                        // আয়াত টেক্সট
+                        // 🔥 UPDATED: Single line display with language support
                         Text(
-                          verse,
+                          "${_arabicVerses[index]} - ${languageProvider.isEnglish ? _englishTranslations[index] : _bengaliTranslations[index]}",
                           style: TextStyle(
-                            fontSize: widget.isTablet ? 16 : 14,
+                            fontSize: widget.isTablet ? 14 : 12,
                             fontWeight: FontWeight.w500,
                             color: widget.isDarkMode
                                 ? Colors.green[100]
                                 : Colors.green[800],
-                            fontFamily: 'SolaimanLipi', // বাংলা ফন্ট (ঐচ্ছিক)
+                            fontFamily: languageProvider.isEnglish
+                                ? 'Roboto'
+                                : 'HindSiliguri',
                           ),
                         ),
                         SizedBox(width: 8),
@@ -135,7 +159,7 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
                       ],
                     ),
                   );
-                }).toList(),
+                }),
               ),
               SizedBox(width: 16),
             ],

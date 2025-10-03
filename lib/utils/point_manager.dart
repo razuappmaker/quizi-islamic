@@ -1,4 +1,4 @@
-// utils/point_manager.dart - UPDATED WITH DAILY LIMITS
+// utils/point_manager.dart - UPDATED WITH PROFILE FEATURES
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -11,6 +11,113 @@ class PointManager {
   static const String _rechargeHistoryKey = 'recharge_history';
   static const String _dailyQuizHistoryKey = 'daily_quiz_history';
   static const String _userDeviceIdKey = 'user_device_id';
+
+  // 🔥 NEW: Profile related keys
+  static const String _userNameKey = 'user_name';
+  static const String _userMobileKey = 'user_mobile';
+  static const String _profileImageKey = 'profile_image';
+
+  // 🔥 NEW: Save profile data method
+  static Future<void> saveProfileData(
+    String userName,
+    String userMobile,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_userNameKey, userName);
+      await prefs.setString(_userMobileKey, userMobile);
+      print('Profile data saved: $userName, $userMobile');
+    } catch (e) {
+      print('Error saving profile data: $e');
+      throw e;
+    }
+  }
+
+  // 🔥 NEW: Save profile image
+  static Future<void> saveProfileImage(String imagePath) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_profileImageKey, imagePath);
+      print('Profile image saved: $imagePath');
+    } catch (e) {
+      print('Error saving profile image: $e');
+      throw e;
+    }
+  }
+
+  // 🔥 NEW: Get profile image
+  static Future<String?> getProfileImage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_profileImageKey);
+    } catch (e) {
+      print('Error getting profile image: $e');
+      return null;
+    }
+  }
+
+  // 🔥 UPDATED: getUserData method with profile data
+  static Future<Map<String, dynamic>> getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'pendingPoints': prefs.getInt(_pendingPointsKey) ?? 0,
+      'totalPoints': prefs.getInt(_totalPointsKey) ?? 0,
+      'totalQuizzes': prefs.getInt(_totalQuizzesKey) ?? 0,
+      'totalCorrectAnswers': prefs.getInt(_totalCorrectKey) ?? 0,
+      'userEmail': prefs.getString(_userEmailKey) ?? 'ইসলামিক কুইজ ইউজার',
+      'userName': prefs.getString(_userNameKey) ?? 'ইসলামিক কুইজ ইউজার',
+      // 🔥 NEW
+      'userMobile': prefs.getString(_userMobileKey) ?? '',
+      // 🔥 NEW
+      'profileImage': prefs.getString(_profileImageKey),
+      // 🔥 NEW
+      'todayRewards': await getTodayRewards(),
+      'deviceId': await getDeviceId(),
+    };
+  }
+
+  // 🔥 NEW: Reset profile data
+  static Future<void> resetProfileData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_userNameKey);
+      await prefs.remove(_userMobileKey);
+      await prefs.remove(_profileImageKey);
+      print('Profile data reset successfully');
+    } catch (e) {
+      print('Error resetting profile data: $e');
+      throw e;
+    }
+  }
+
+  // 🔥 NEW: Complete user data reset
+  static Future<void> completeReset() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // Points and stats
+      await prefs.setInt(_pendingPointsKey, 0);
+      await prefs.setInt(_totalPointsKey, 0);
+      await prefs.setInt(_totalQuizzesKey, 0);
+      await prefs.setInt(_totalCorrectKey, 0);
+
+      // Profile data
+      await prefs.remove(_userNameKey);
+      await prefs.remove(_userMobileKey);
+      await prefs.remove(_profileImageKey);
+
+      // History
+      await prefs.remove(_rechargeHistoryKey);
+      await prefs.remove(_dailyQuizHistoryKey);
+
+      print('Complete reset successful');
+    } catch (e) {
+      print('Error in complete reset: $e');
+      throw e;
+    }
+  }
+
+  // Existing methods remain the same...
 
   // 🔥 ডেইলি কুইজ লিমিট চেক
   static Future<bool> canPlayQuizToday(String quizId) async {
@@ -132,18 +239,6 @@ class PointManager {
     await prefs.setInt(_totalQuizzesKey, currentQuizzes + 1);
     final currentCorrect = prefs.getInt(_totalCorrectKey) ?? 0;
     await prefs.setInt(_totalCorrectKey, currentCorrect + correctAnswers);
-  }
-
-  static Future<Map<String, dynamic>> getUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    return {
-      'pendingPoints': prefs.getInt(_pendingPointsKey) ?? 0,
-      'totalPoints': prefs.getInt(_totalPointsKey) ?? 0,
-      'totalQuizzes': prefs.getInt(_totalQuizzesKey) ?? 0,
-      'totalCorrectAnswers': prefs.getInt(_totalCorrectKey) ?? 0,
-      'userEmail': prefs.getString(_userEmailKey) ?? 'ইসলামিক কুইজ ইউজার',
-      'deviceId': await getDeviceId(),
-    };
   }
 
   //--------------------------------------------------------
@@ -309,8 +404,54 @@ class PointManager {
     final history = await getRechargeHistory();
     print('=== রিচার্জ রিকোয়েস্ট ডিবাগ ===');
     for (int i = 0; i < history.length; i++) {
-      print('Request $i: $history[i]');
+      print('Request $i: ${history[i]}');
     }
     print('=============================');
+  }
+
+  static Future<void> updateTodayRewards(int todayRewards) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final now = DateTime.now();
+      final todayKey = 'today_rewards_${now.year}-${now.month}-${now.day}';
+
+      await prefs.setInt(todayKey, todayRewards);
+      print('আজকের রিওয়ার্ড আপডেট হয়েছে: $todayRewards');
+    } catch (e) {
+      print('আজকের রিওয়ার্ড আপডেট করতে ত্রুটি: $e');
+      throw e;
+    }
+  }
+
+  static Future<int> getTodayRewards() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final now = DateTime.now();
+      final todayKey = 'today_rewards_${now.year}-${now.month}-${now.day}';
+
+      return prefs.getInt(todayKey) ?? 0;
+    } catch (e) {
+      print('আজকের রিওয়ার্ড পড়তে ত্রুটি: $e');
+      return 0;
+    }
+  }
+
+  // 🔥 NEW: Get user profile completeness percentage
+  static Future<int> getProfileCompleteness() async {
+    final userData = await getUserData();
+    int completeness = 0;
+
+    if ((userData['userName'] ?? '').isNotEmpty &&
+        userData['userName'] != 'ইসলামিক কুইজ ইউজার') {
+      completeness += 40;
+    }
+    if ((userData['userMobile'] ?? '').isNotEmpty) {
+      completeness += 30;
+    }
+    if ((userData['profileImage'] ?? '').isNotEmpty) {
+      completeness += 30;
+    }
+
+    return completeness;
   }
 }

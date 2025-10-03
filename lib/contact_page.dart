@@ -47,10 +47,26 @@ class ContactPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('যোগাযোগ'),
+        title: const Text(
+          'যোগাযোগ',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         backgroundColor: greenColor,
+        foregroundColor: Colors.white,
         centerTitle: true,
         elevation: 2,
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
@@ -92,7 +108,10 @@ class ContactPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                   ),
                   onPressed: () => _makePhoneCall('+8801724184271'),
                 ),
@@ -126,7 +145,10 @@ class ContactPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                   ),
                   onPressed: () => _sendEmail('razu.appmaker@gmail.com.com'),
                 ),
@@ -151,7 +173,9 @@ class ContactPage extends StatelessWidget {
                   'ঠিকানা',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
-                subtitle: const Text('হাউজঃ ১৪৭/৭, রোডঃ ১০, ইসিবি চত্বর, ক্যান্টনমেন্ট, ঢাকা, বাংলাদেশ'),
+                subtitle: const Text(
+                  'হাউজঃ ১৪৭/৭, রোডঃ ১০, ইসিবি চত্বর, ক্যান্টনমেন্ট, ঢাকা, বাংলাদেশ',
+                ),
               ),
             ),
 
@@ -173,19 +197,24 @@ class ContactPage extends StatelessWidget {
                 const SizedBox(width: 40),
                 _socialIcon(
                   url: 'https://www.facebook.com/RazuInspires',
-                  iconUrl: 'https://img.icons8.com/color/48/000000/facebook-new.png',
+                  iconUrl:
+                      'https://img.icons8.com/color/48/000000/facebook-new.png',
                   onTap: _openUrl,
                 ),
                 const SizedBox(width: 60),
                 _socialIcon(
-                  url: 'https://wa.me/8801724184271?text=Assalamu%20Alaikum%20Bhai',
+                  url:
+                      'https://wa.me/8801724184271?text=Assalamu%20Alaikum%20Bhai',
                   iconUrl: 'https://img.icons8.com/color/48/000000/whatsapp',
                   onTap: _openUrl,
                 ),
                 const SizedBox(width: 60),
                 _socialIcon(
-                  url: 'https://m.me/RazuInspires',  // Messenger প্রোফাইল লিঙ্ক
-                  iconUrl: 'https://img.icons8.com/color/48/000000/facebook-messenger.png',  // Messenger আইকন URL
+                  url: 'https://m.me/RazuInspires',
+                  // Messenger প্রোফাইল লিঙ্ক
+                  iconUrl:
+                      'https://img.icons8.com/color/48/000000/facebook-messenger.png',
+                  // Messenger আইকন URL
                   onTap: _openUrl,
                 ),
               ],

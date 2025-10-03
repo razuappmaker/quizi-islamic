@@ -1,5 +1,5 @@
 // Admin Recherche screen
-// admin_recharge_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:islamicquiz/utils/admin_checker.dart'; // ✅ সঠিক import
 import 'package:islamicquiz/utils/point_manager.dart';
@@ -54,7 +54,7 @@ class _AdminRechargeScreenState extends State<AdminRechargeScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print("রিচার্জ রিকোয়েস্ট লোড করতে ত্রুটি: $e");
+      print("গিফট রিকোয়েস্ট লোড করতে ত্রুটি: $e");
       setState(() {
         _isLoading = false;
       });
@@ -166,7 +166,7 @@ class _AdminRechargeScreenState extends State<AdminRechargeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("রিচার্জ রিকোয়েস্ট (এডমিন)"),
+        title: const Text("গিফট রিকোয়েস্ট (এডমিন)"),
         backgroundColor: Colors.green[800],
         foregroundColor: Colors.white,
         actions: [
@@ -330,7 +330,7 @@ class _AdminRechargeScreenState extends State<AdminRechargeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("রিচার্জ রিকোয়েস্ট ডিটেইলস"),
+        title: const Text("গিফট রিকোয়েস্ট ডিটেইলস"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,7 +375,7 @@ class _AdminRechargeScreenState extends State<AdminRechargeScreen> {
                   _showRechargeCompletedDialog(request);
                 }
               },
-              child: const Text("রিচার্জ সম্পন্ন"),
+              child: const Text("গিফট সম্পন্ন"),
             ),
           ],
           TextButton(
@@ -391,23 +391,23 @@ class _AdminRechargeScreenState extends State<AdminRechargeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("✅ রিচার্জ সম্পন্ন"),
+        title: const Text("✅ গিফট সম্পন্ন"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("আপনি এই ইউজারকে রিচার্জ দিয়ে দিয়েছেন?"),
+            const Text("আপনি এই ইউজারকে গিফট দিয়ে দিয়েছেন?"),
             const SizedBox(height: 10),
             Text(
               "মোবাইল: ${request['mobileNumber']}",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(
-              "পরিমাণ: ৫০ টাকা",
+              "পরিমাণ: বিশেষ পুরুস্কার",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             const Text(
-              "রিমাইন্ডার: ইউজারকে নোটিফাই করুন যে রিচার্জ করা হয়েছে",
+              "রিমাইন্ডার: ইউজারকে নোটিফাই করুন যে গিফট প্রদান করা হয়েছে",
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],

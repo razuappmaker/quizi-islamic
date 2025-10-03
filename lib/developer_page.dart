@@ -49,23 +49,40 @@ class DeveloperPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ডেভেলপার'),
+        title: const Text(
+          'ডেভেলপার',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         backgroundColor: isDark ? Colors.black : Colors.green.shade900,
+        foregroundColor: Colors.white,
         centerTitle: true,
         elevation: 4,
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
       ),
       body: Container(
         decoration: isDark
             ? const BoxDecoration(
-          color: Colors.black, // Dark mode এ শুধু solid কালো ব্যাকগ্রাউন্ড
-        )
+                color:
+                    Colors.black, // Dark mode এ শুধু solid কালো ব্যাকগ্রাউন্ড
+              )
             : BoxDecoration(
-          gradient: LinearGradient(
-            colors: [backgroundStart, backgroundEnd],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+                gradient: LinearGradient(
+                  colors: [backgroundStart, backgroundEnd],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
         child: SingleChildScrollView(
           child: Column(
@@ -98,11 +115,7 @@ class DeveloperPage extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 aboutDeveloper,
-                style: TextStyle(
-                  fontSize: 18,
-                  color: bodyColor,
-                  height: 1.4,
-                ),
+                style: TextStyle(fontSize: 18, color: bodyColor, height: 1.4),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 30),
@@ -133,8 +146,10 @@ class DeveloperPage extends StatelessWidget {
                     elevation: 6,
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
-                      leading: Icon(Icons.apps,
-                          color: isDark ? Colors.green : Colors.white),
+                      leading: Icon(
+                        Icons.apps,
+                        color: isDark ? Colors.green : Colors.white,
+                      ),
                       title: Text(
                         appName,
                         style: TextStyle(
@@ -143,8 +158,10 @@ class DeveloperPage extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      trailing: Icon(Icons.chevron_right,
-                          color: isDark ? Colors.white54 : Colors.white70),
+                      trailing: Icon(
+                        Icons.chevron_right,
+                        color: isDark ? Colors.white54 : Colors.white70,
+                      ),
                       onTap: () {
                         // নেভিগেশন
                       },

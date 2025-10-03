@@ -73,111 +73,111 @@ class ProhibitedTimeSection extends StatelessWidget {
           // Left Section - Prohibited Times
           Expanded(
             flex: 3,
-            child: Container(
-              padding: EdgeInsets.all(paddingSize),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[850] : Colors.white,
-                borderRadius: BorderRadius.circular(
-                  isVerySmallScreen
-                      ? 8
-                      : isSmallScreen
-                      ? 9
-                      : 10,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: isVerySmallScreen
-                        ? 2
-                        : isSmallScreen
-                        ? 2.5
-                        : 3,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+            child: GestureDetector(
+              onTap: () => _showBottomSheet(
+                context,
+                "সালাতের নিষিদ্ধ সময় সম্পর্কে",
+                prohibitedTimeService.getProhibitedTimeInfo(),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  // Header Row - এখন একই ফন্ট সাইজ
-                  Container(
-                    width: double.infinity,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "নিষিদ্ধ সময়",
-                            style: TextStyle(
-                              fontSize: titleFontSize,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : Colors.black87,
+              child: Container(
+                padding: EdgeInsets.all(paddingSize),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(
+                    isVerySmallScreen
+                        ? 8
+                        : isSmallScreen
+                        ? 9
+                        : 10,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: isVerySmallScreen
+                          ? 2
+                          : isSmallScreen
+                          ? 2.5
+                          : 3,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    // Header Row - এখন একই ফন্ট সাইজ
+                    Container(
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "নিষিদ্ধ সময়",
+                              style: TextStyle(
+                                fontSize: titleFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: paddingSize * 0.5),
-                        GestureDetector(
-                          onTap: () => _showBottomSheet(
-                            context,
-                            "সালাতের নিষিদ্ধ সময় সম্পর্কে",
-                            prohibitedTimeService.getProhibitedTimeInfo(),
-                          ),
-                          child: Icon(
+                          SizedBox(width: paddingSize * 0.5),
+                          Icon(
                             Icons.info_outline,
                             color: isDark ? Colors.blue[200] : Colors.blue[700],
                             size: iconSize,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: paddingSize * 0.5),
-
-                  // Prohibited Times Content
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.zero,
-                      child: Table(
-                        columnWidths: {
-                          0: FixedColumnWidth(30), // আইকন কলাম
-                          1: FixedColumnWidth(40), // লেবেল কলাম
-                          2: FlexColumnWidth(), // সময় কলাম (বাকি সব)
-                        },
-                        defaultVerticalAlignment:
-                            TableCellVerticalAlignment.middle,
-                        children: [
-                          _buildTableTimeRow(
-                            icon: Icons.wb_twilight,
-                            label: "ভোর",
-                            time: prohibitedTimeService
-                                .calculateSunriseProhibitedTime(prayerTimes),
-                            fontSize: timeFontSize,
-                            isDark: isDark,
-                          ),
-                          _buildTableTimeRow(
-                            icon: Icons.light_mode,
-                            label: "দুপুর",
-                            time: prohibitedTimeService
-                                .calculateDhuhrProhibitedTime(prayerTimes),
-                            fontSize: timeFontSize,
-                            isDark: isDark,
-                          ),
-                          _buildTableTimeRow(
-                            icon: Icons.nightlight,
-                            label: "সন্ধ্যা",
-                            time: prohibitedTimeService
-                                .calculateSunsetProhibitedTime(prayerTimes),
-                            fontSize: timeFontSize,
-                            isDark: isDark,
-                          ),
                         ],
                       ),
                     ),
-                  ),
-                ],
+
+                    SizedBox(height: paddingSize * 0.5),
+
+                    // Prohibited Times Content
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.zero,
+                        child: Table(
+                          columnWidths: {
+                            0: FixedColumnWidth(30), // আইকন কলাম
+                            1: FixedColumnWidth(40), // লেবেল কলাম
+                            2: FlexColumnWidth(), // সময় কলাম (বাকি সব)
+                          },
+                          defaultVerticalAlignment:
+                              TableCellVerticalAlignment.middle,
+                          children: [
+                            _buildTableTimeRow(
+                              icon: Icons.wb_twilight,
+                              label: "ভোর",
+                              time: prohibitedTimeService
+                                  .calculateSunriseProhibitedTime(prayerTimes),
+                              fontSize: timeFontSize,
+                              isDark: isDark,
+                            ),
+                            _buildTableTimeRow(
+                              icon: Icons.light_mode,
+                              label: "দুপুর",
+                              time: prohibitedTimeService
+                                  .calculateDhuhrProhibitedTime(prayerTimes),
+                              fontSize: timeFontSize,
+                              isDark: isDark,
+                            ),
+                            _buildTableTimeRow(
+                              icon: Icons.nightlight,
+                              label: "সন্ধ্যা",
+                              time: prohibitedTimeService
+                                  .calculateSunsetProhibitedTime(prayerTimes),
+                              fontSize: timeFontSize,
+                              isDark: isDark,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

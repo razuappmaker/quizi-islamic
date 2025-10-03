@@ -1,12 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/premium_manager.dart'; // এই লাইনটি যোগ করুন
 
 class AdHelper {
   static bool _isAdInitialized = false;
   static final AdLimitManager _adLimitManager = AdLimitManager();
 
-  // Initialize Google Mobile Ads SDK
+  // 🔥 Google Mobile Ads SDK ইনিশিয়ালাইজ করুন
   static Future<void> initialize() async {
     if (_isAdInitialized) return;
 
@@ -14,13 +15,24 @@ class AdHelper {
       await MobileAds.instance.initialize();
       _isAdInitialized = true;
       preloadInterstitialAd();
-      print('AdMob initialized successfully');
+      print('AdMob সফলভাবে ইনিশিয়ালাইজ হয়েছে');
     } catch (e) {
-      print('Failed to initialize AdMob: $e');
+      print('AdMob ইনিশিয়ালাইজ করতে ব্যর্থ: $e');
     }
   }
 
-  // Banner Ad Unit ID
+  // 🔥 প্রিমিয়াম ইউজার চেক - সকল অ্যাড শো করার আগে এই চেক ব্যবহার করুন
+  static Future<bool> get shouldShowAds async {
+    try {
+      final isPremium = await PremiumManager().isPremiumUser;
+      return !isPremium;
+    } catch (e) {
+      print('প্রিমিয়াম স্ট্যাটাস চেক করতে ত্রুটি: $e');
+      return true; // এরর হলে অ্যাড দেখান
+    }
+  }
+
+  // 🔥 ব্যানার অ্যাড ইউনিট ID
   static String get bannerAdUnitId {
     if (const bool.fromEnvironment('dart.vm.product')) {
       return 'ca-app-pub-3940256099942544/6300978111'; // আপনার প্রোডাকশন ID দিন
@@ -29,7 +41,7 @@ class AdHelper {
     }
   }
 
-  // Interstitial Ad Unit ID
+  // 🔥 ইন্টারস্টিশিয়াল অ্যাড ইউনিট ID
   static String get interstitialAdUnitId {
     if (const bool.fromEnvironment('dart.vm.product')) {
       return 'ca-app-pub-3940256099942544/1033173712'; // আপনার প্রোডাকশন ID দিন
@@ -38,7 +50,36 @@ class AdHelper {
     }
   }
 
-  // Create standard banner ad - Version 6.0.0 compatible
+  // 🔥 রিওয়ার্ডেড অ্যাড ইউনিট ID
+  static String get rewardedAdUnitId {
+    if (const bool.fromEnvironment('dart.vm.product')) {
+      return 'ca-app-pub-3940256099942544/5224354917'; // আপনার প্রোডাকশন ID দিন
+    } else {
+      return 'ca-app-pub-3940256099942544/5224354917'; // টেস্ট ID
+    }
+  }
+
+  // 🔥 ব্যানার অ্যাড দেখানো যাবে কিনা চেক করুন (প্রিমিয়াম ইউজার চেক সহ)
+  static Future<bool> canShowBannerAd() async {
+    final shouldShow = await shouldShowAds;
+    if (!shouldShow) {
+      print('প্রিমিয়াম ইউজার, ব্যানার অ্যাড দেখানো হবে না');
+      return false;
+    }
+    return await _adLimitManager.canShowBannerAd();
+  }
+
+  // 🔥 ইন্টারস্টিশিয়াল অ্যাড দেখানো যাবে কিনা চেক করুন (প্রিমিয়াম ইউজার চেক সহ)
+  static Future<bool> canShowInterstitialAd() async {
+    final shouldShow = await shouldShowAds;
+    if (!shouldShow) {
+      print('প্রিমিয়াম ইউজার, ইন্টারস্টিশিয়াল অ্যাড দেখানো হবে না');
+      return false;
+    }
+    return await _adLimitManager.canShowInterstitialAd();
+  }
+
+  // 🔥 স্ট্যান্ডার্ড ব্যানার অ্যাড তৈরি করুন - Version 6.0.0 কম্প্যাটিবল
   static BannerAd createBannerAd(AdSize adSize, {BannerAdListener? listener}) {
     return BannerAd(
       adUnitId: bannerAdUnitId,
@@ -47,22 +88,22 @@ class AdHelper {
       listener:
           listener ??
           BannerAdListener(
-            onAdLoaded: (Ad ad) => print('Ad loaded'),
+            onAdLoaded: (Ad ad) => print('অ্যাড লোড হয়েছে'),
             onAdFailedToLoad: (Ad ad, LoadAdError error) =>
-                print('Ad failed to load: $error'),
+                print('অ্যাড লোড হতে ব্যর্থ: $error'),
           ),
     );
   }
 
-  // Create adaptive banner ad with fallback mechanism - Version 6.0.0 compatible
+  // 🔥 অ্যাডাপ্টিভ ব্যানার অ্যাড তৈরি করুন ফ্যালব্যাক মেকানিজম সহ
   static Future<BannerAd> createAdaptiveBannerAdWithFallback(
     BuildContext context, {
-    int? width, // যদি এই parameter না থাকে
+    int? width,
     BannerAdListener? listener,
     Orientation orientation = Orientation.portrait,
   }) async {
     try {
-      // First try to create adaptive banner
+      // প্রথমে অ্যাডাপ্টিভ ব্যানার তৈরি করার চেষ্টা করুন
       final AdSize adSize = await _getAdaptiveAdSize(context, orientation);
       return BannerAd(
         adUnitId: bannerAdUnitId,
@@ -71,14 +112,16 @@ class AdHelper {
         listener:
             listener ??
             BannerAdListener(
-              onAdLoaded: (Ad ad) => print('Adaptive ad loaded'),
+              onAdLoaded: (Ad ad) => print('অ্যাডাপ্টিভ অ্যাড লোড হয়েছে'),
               onAdFailedToLoad: (Ad ad, LoadAdError error) =>
-                  print('Adaptive ad failed: $error'),
+                  print('অ্যাডাপ্টিভ অ্যাড ব্যর্থ: $error'),
             ),
       );
     } catch (e) {
-      // Fallback to standard banner if adaptive fails
-      print('Adaptive banner failed, falling back to standard banner: $e');
+      // অ্যাডাপ্টিভ ব্যর্থ হলে স্ট্যান্ডার্ড ব্যানারে ফ্যালব্যাক করুন
+      print(
+        'অ্যাডাপ্টিভ ব্যানার ব্যর্থ, স্ট্যান্ডার্ড ব্যানারে ফ্যালব্যাক: $e',
+      );
       return BannerAd(
         adUnitId: bannerAdUnitId,
         size: AdSize.banner,
@@ -88,7 +131,7 @@ class AdHelper {
     }
   }
 
-  // Get adaptive ad size - Manual calculation
+  // 🔥 অ্যাডাপ্টিভ অ্যাড সাইজ পান - ম্যানুয়াল ক্যালকুলেশন
   static Future<AdSize> _getAdaptiveAdSize(
     BuildContext context,
     Orientation orientation,
@@ -96,30 +139,30 @@ class AdHelper {
     try {
       final width = MediaQuery.of(context).size.width;
 
-      // Screen width based adaptive sizing
+      // স্ক্রিন প্রস্থ ভিত্তিক অ্যাডাপ্টিভ সাইজিং
       if (width < 400) {
-        // Small screens (phones)
+        // ছোট স্ক্রিন (ফোন)
         return orientation == Orientation.portrait
             ? AdSize(width: width.truncate(), height: 50)
             : AdSize(width: width.truncate(), height: 90);
       } else if (width < 720) {
-        // Medium screens (large phones, small tablets)
+        // মাঝারি স্ক্রিন (বড় ফোন, ছোট ট্যাবলেট)
         return orientation == Orientation.portrait
             ? AdSize(width: width.truncate(), height: 90)
             : AdSize(width: width.truncate(), height: 90);
       } else {
-        // Large screens (tablets)
+        // বড় স্ক্রিন (ট্যাবলেট)
         return orientation == Orientation.portrait
             ? AdSize(width: width.truncate(), height: 90)
             : AdSize(width: width.truncate(), height: 90);
       }
     } catch (e) {
-      print('Error getting adaptive ad size: $e');
-      return AdSize.banner; // Fallback to standard banner size
+      print('অ্যাডাপ্টিভ অ্যাড সাইজ পেতে ত্রুটি: $e');
+      return AdSize.banner; // স্ট্যান্ডার্ড ব্যানার সাইজে ফ্যালব্যাক
     }
   }
 
-  // Reload banner on orientation change - Version 6.0.0 compatible
+  // 🔥 ওরিয়েন্টেশন পরিবর্তনে ব্যানার রিলোড করুন
   static Future<BannerAd> reloadBannerOnOrientationChange(
     BuildContext context,
     Orientation currentOrientation, {
@@ -132,19 +175,19 @@ class AdHelper {
     );
   }
 
-  // Interstitial ad management - Version 6.0.0 compatible
+  // 🔥 ইন্টারস্টিশিয়াল অ্যাড ম্যানেজমেন্ট
   static InterstitialAd? _interstitialAd;
   static bool _isInterstitialAdLoaded = false;
   static int _interstitialLoadAttempts = 0;
   static const int _maxInterstitialLoadAttempts = 3;
 
-  // Load interstitial ad with retry mechanism
+  // 🔥 ইন্টারস্টিশিয়াল অ্যাড লোড করুন রিট্রাই মেকানিজম সহ
   static void loadInterstitialAd({
     VoidCallback? onAdLoaded,
     VoidCallback? onAdFailedToLoad,
   }) {
     if (_interstitialLoadAttempts >= _maxInterstitialLoadAttempts) {
-      print('Max interstitial load attempts reached');
+      print('ইন্টারস্টিশিয়াল লোডের সর্বোচ্চ চেষ্টা সীমা শেষ');
       onAdFailedToLoad?.call();
       return;
     }
@@ -157,17 +200,17 @@ class AdHelper {
           _interstitialAd = ad;
           _isInterstitialAdLoaded = true;
           _interstitialLoadAttempts = 0;
-          print('Interstitial ad loaded successfully');
+          print('ইন্টারস্টিশিয়াল অ্যাড সফলভাবে লোড হয়েছে');
           onAdLoaded?.call();
         },
         onAdFailedToLoad: (LoadAdError error) {
           _interstitialLoadAttempts++;
           _isInterstitialAdLoaded = false;
           print(
-            'Interstitial ad failed to load: $error. Attempt $_interstitialLoadAttempts',
+            'ইন্টারস্টিশিয়াল অ্যাড লোড হতে ব্যর্থ: $error। চেষ্টা $_interstitialLoadAttempts',
           );
 
-          // Retry after delay
+          // বিলম্ব后 আবার চেষ্টা করুন
           Future.delayed(Duration(seconds: 2 * _interstitialLoadAttempts), () {
             loadInterstitialAd(
               onAdLoaded: onAdLoaded,
@@ -181,26 +224,33 @@ class AdHelper {
     );
   }
 
-  // Preload interstitial ads
+  // 🔥 ইন্টারস্টিশিয়াল অ্যাড প্রিলোড করুন
   static void preloadInterstitialAd() {
     loadInterstitialAd();
   }
 
-  // Show interstitial ad with comprehensive error handling
+  // 🔥 ইন্টারস্টিশিয়াল অ্যাড দেখান (প্রিমিয়াম ইউজার চেক সহ)
   static Future<void> showInterstitialAd({
     VoidCallback? onAdShowed,
     VoidCallback? onAdDismissed,
     VoidCallback? onAdFailedToShow,
-    String? adContext, // For tracking where ad was called from
+    String? adContext, // ট্র্যাকিং এর জন্য
   }) async {
-    try {
-      print('Attempting to show interstitial ad from: $adContext');
+    final shouldShow = await shouldShowAds;
+    if (!shouldShow) {
+      print('প্রিমিয়াম ইউজার, অ্যাড স্কিপ করা হয়েছে');
+      onAdDismissed?.call();
+      return;
+    }
 
-      // Check if we can show ad based on limits
+    try {
+      print('ইন্টারস্টিশিয়াল অ্যাড দেখানোর চেষ্টা করা হচ্ছে: $adContext');
+
+      // লিমিট based এ অ্যাড দেখানো যাবে কিনা চেক করুন
       bool canShowAd = await _adLimitManager.canShowInterstitialAd();
 
       if (!canShowAd) {
-        print('Cannot show interstitial ad due to limits');
+        print('লিমিট এর কারণে ইন্টারস্টিশিয়াল অ্যাড দেখানো যাবে না');
         onAdFailedToShow?.call();
         return;
       }
@@ -210,65 +260,60 @@ class AdHelper {
 
         _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
           onAdShowedFullScreenContent: (InterstitialAd ad) {
-            print('Interstitial ad showed successfully');
+            print('ইন্টারস্টিশিয়াল অ্যাড সফলভাবে দেখানো হয়েছে');
             onAdShowed?.call();
           },
           onAdDismissedFullScreenContent: (InterstitialAd ad) {
-            print('Interstitial ad dismissed');
+            print('ইন্টারস্টিশিয়াল অ্যাড dismiss করা হয়েছে');
             ad.dispose();
             _isInterstitialAdLoaded = false;
             onAdDismissed?.call();
-            loadInterstitialAd(); // Preload next ad
+            loadInterstitialAd(); // পরবর্তী অ্যাড প্রিলোড করুন
           },
           onAdFailedToShowFullScreenContent:
               (InterstitialAd ad, AdError error) {
-                print('Interstitial ad failed to show: $error');
+                print('ইন্টারস্টিশিয়াল অ্যাড দেখাতে ব্যর্থ: $error');
                 ad.dispose();
                 _isInterstitialAdLoaded = false;
                 onAdFailedToShow?.call();
-                loadInterstitialAd(); // Preload next ad
+                loadInterstitialAd(); // পরবর্তী অ্যাড প্রিলোড করুন
               },
         );
 
         _interstitialAd!.show();
-        _interstitialAd = null; // Prevent reuse
+        _interstitialAd = null; // পুনরায় ব্যবহার প্রতিরোধ
       } else {
-        print('Interstitial ad not loaded, attempting to load');
+        print('ইন্টারস্টিশিয়াল অ্যাড লোড হয়নি, লোড করার চেষ্টা করা হচ্ছে');
         onAdFailedToShow?.call();
-        loadInterstitialAd(); // Try to load for next time
+        loadInterstitialAd(); // পরবর্তী বার জন্য লোড করুন
       }
     } catch (e) {
-      print('Error showing interstitial ad: $e');
+      print('ইন্টারস্টিশিয়াল অ্যাড দেখাতে ত্রুটি: $e');
       onAdFailedToShow?.call();
     }
   }
 
-  // Check if we can show banner ad
-  static Future<bool> canShowBannerAd() async {
-    return await _adLimitManager.canShowBannerAd();
-  }
-
-  // Record banner ad shown
+  // 🔥 ব্যানার অ্যাড দেখানোর রেকর্ড করুন
   static Future<void> recordBannerAdShown() async {
     await _adLimitManager.recordBannerAdShown();
   }
 
-  // Check if user can click ad
+  // 🔥 অ্যাড ক্লিক করা যাবে কিনা চেক করুন
   static Future<bool> canClickAd() async {
     return await _adLimitManager.canClickAd();
   }
 
-  // Record ad click
+  // 🔥 অ্যাড ক্লিক রেকর্ড করুন
   static Future<void> recordAdClick() async {
     await _adLimitManager.recordAdClick();
   }
 
-  // Get ad stats
+  // 🔥 অ্যাড স্ট্যাটস পান
   static Future<Map<String, int>> getAdStats() async {
     return await _adLimitManager.getAdStats();
   }
 
-  // Reset ad limits (for testing or special cases)
+  // 🔥 অ্যাড লিমিট রিসেট করুন (টেস্টিং বা বিশেষ ক্ষেত্রে)
   static Future<void> resetAdLimits() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('first_ad_today');
@@ -277,12 +322,10 @@ class AdHelper {
     await prefs.remove('minute_impressions');
     await prefs.remove('banner_impressions');
     await prefs.remove('interstitial_impressions');
-    print('Ad limits reset successfully');
+    print('অ্যাড লিমিট সফলভাবে রিসেট হয়েছে');
   }
 
-  // AdHelper ক্লাসে এই মেথডগুলো যোগ করুন
-
-  // Get anchored adaptive banner size
+  // 🔥 অ্যাঙ্করড অ্যাডাপ্টিভ ব্যানার সাইজ পান
   static Future<AnchoredAdaptiveBannerAdSize?> getAnchoredAdaptiveBannerAdSize(
     BuildContext context,
   ) async {
@@ -291,12 +334,12 @@ class AdHelper {
         MediaQuery.of(context).size.width.toInt(),
       );
     } catch (e) {
-      print('Error getting anchored adaptive banner size: $e');
+      print('অ্যাঙ্করড অ্যাডাপ্টিভ ব্যানার সাইজ পেতে ত্রুটি: $e');
       return null;
     }
   }
 
-  // Create anchored banner ad //-----------ancor ads end=----------
+  // 🔥 অ্যাঙ্করড ব্যানার অ্যাড তৈরি করুন
   static Future<BannerAd?> createAnchoredBannerAd(
     BuildContext context, {
     BannerAdListener? listener,
@@ -305,14 +348,14 @@ class AdHelper {
       bool canShowAd = await canShowBannerAd();
 
       if (!canShowAd) {
-        print('Banner ad limit reached, not showing anchored ad');
+        print('ব্যানার অ্যাড লিমিট রিচড, অ্যাঙ্করড অ্যাড দেখানো হবে না');
         return null;
       }
 
       final adSize = await getAnchoredAdaptiveBannerAdSize(context);
 
       if (adSize == null) {
-        print('Could not get anchored adaptive banner size');
+        print('অ্যাঙ্করড অ্যাডাপ্টিভ ব্যানার সাইজ পাওয়া যায়নি');
         return null;
       }
 
@@ -323,25 +366,25 @@ class AdHelper {
             listener ??
             BannerAdListener(
               onAdLoaded: (Ad ad) {
-                print('Anchored Banner ad loaded successfully.');
+                print('অ্যাঙ্করড ব্যানার অ্যাড সফলভাবে লোড হয়েছে।');
                 recordBannerAdShown();
               },
               onAdFailedToLoad: (Ad ad, LoadAdError error) {
-                print('Anchored Banner ad failed to load: $error');
+                print('অ্যাঙ্করড ব্যানার অ্যাড লোড হতে ব্যর্থ: $error');
                 ad.dispose();
               },
               onAdOpened: (Ad ad) {
                 canClickAd().then((canClick) {
                   if (canClick) {
                     recordAdClick();
-                    print('Anchored Banner ad clicked.');
+                    print('অ্যাঙ্করড ব্যানার অ্যাড ক্লিক করা হয়েছে।');
                   } else {
-                    print('Ad click limit reached');
+                    print('অ্যাড ক্লিক লিমিট রিচড');
                   }
                 });
               },
               onAdClosed: (Ad ad) {
-                print('Anchored Banner ad closed by user.');
+                print('অ্যাঙ্করড ব্যানার অ্যাড ইউজার বন্ধ করেছেন।');
               },
             ),
         request: const AdRequest(),
@@ -350,36 +393,31 @@ class AdHelper {
       await bannerAd.load();
       return bannerAd;
     } catch (e) {
-      print('Error creating anchored banner ad: $e');
+      print('অ্যাঙ্করড ব্যানার অ্যাড তৈরি করতে ত্রুটি: $e');
       return null;
     }
   }
 
-  //-----------ancor ads end=----------
-  // Dispose methods
+  // 🔥 ডিসপোজ মেথড
   static void disposeInterstitialAd() {
     _interstitialAd?.dispose();
     _isInterstitialAdLoaded = false;
     _interstitialLoadAttempts = 0;
   }
 
-  // Check if ads are initialized
+  // 🔥 অ্যাডস ইনিশিয়ালাইজ হয়েছে কিনা চেক করুন
   static bool get isInitialized => _isAdInitialized;
 }
 
-//------------------------------------------==============Must be change
-//------------------------------------------==============Must be change
-//------------------------------------------==============Must be change
-//------------------------------------------==============Must be change
-//------------------------------------------==============Must be change
-
-// Ad limit management class
+// ==================== অ্যাড লিমিট ম্যানেজমেন্ট ক্লাস ====================
 class AdLimitManager {
-  static const int maxDailyImpressions = 400; // will be 20
+  static const int maxDailyImpressions = 400; // production এ 20 হবে
   static const int maxDailyClicks = 5;
-  static const int maxImpressionsPerMinute = 30; // will be 3
-  static const int maxBannerAdsPerHour = 100; //  will be 10
-  static const int maxInterstitialAdsPerHour = 30; // will be 3
+  static const int maxImpressionsPerMinute = 30; // production এ 3 হবে
+  static const int maxBannerAdsPerHour = 100; // production এ 10 হবে
+  static const int maxInterstitialAdsPerHour = 30; // production এ 3 হবে
+
+  // 🔥 ব্যানার অ্যাড দেখানো যাবে কিনা চেক করুন
   Future<bool> canShowBannerAd() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -414,11 +452,12 @@ class AdLimitManager {
 
       return true;
     } catch (e) {
-      print('Error checking banner ad limits: $e');
-      return true; // Allow ads if there's an error in limit checking
+      print('ব্যানার অ্যাড লিমিট চেক করতে ত্রুটি: $e');
+      return true; // লিমিট চেকিং এ এরর হলে অ্যাড allow করুন
     }
   }
 
+  // 🔥 ইন্টারস্টিশিয়াল অ্যাড দেখানো যাবে কিনা চেক করুন
   Future<bool> canShowInterstitialAd() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -444,11 +483,12 @@ class AdLimitManager {
 
       return true;
     } catch (e) {
-      print('Error checking interstitial ad limits: $e');
-      return true; // Allow ads if there's an error in limit checking
+      print('ইন্টারস্টিশিয়াল অ্যাড লিমিট চেক করতে ত্রুটি: $e');
+      return true; // লিমিট চেকিং এ এরর হলে অ্যাড allow করুন
     }
   }
 
+  // 🔥 ব্যানার অ্যাড দেখানোর রেকর্ড করুন
   Future<void> recordBannerAdShown() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -465,10 +505,11 @@ class AdLimitManager {
       bannerImpressions.add('${now.hour}:${now.minute}');
       await prefs.setStringList('banner_impressions', bannerImpressions);
     } catch (e) {
-      print('Error recording banner ad impression: $e');
+      print('ব্যানার অ্যাড ইম্প্রেশন রেকর্ড করতে ত্রুটি: $e');
     }
   }
 
+  // 🔥 ইন্টারস্টিশিয়াল অ্যাড দেখানোর রেকর্ড করুন
   Future<void> recordInterstitialAdShown() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -485,10 +526,11 @@ class AdLimitManager {
         interstitialImpressions,
       );
     } catch (e) {
-      print('Error recording interstitial ad impression: $e');
+      print('ইন্টারস্টিশিয়াল অ্যাড ইম্প্রেশন রেকর্ড করতে ত্রুটি: $e');
     }
   }
 
+  // 🔥 অ্যাড ক্লিক করা যাবে কিনা চেক করুন
   Future<bool> canClickAd() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -497,21 +539,23 @@ class AdLimitManager {
       final dailyClicks = prefs.getInt('daily_clicks') ?? 0;
       return dailyClicks < maxDailyClicks;
     } catch (e) {
-      print('Error checking ad click limits: $e');
-      return true; // Allow clicks if there's an error in limit checking
+      print('অ্যাড ক্লিক লিমিট চেক করতে ত্রুটি: $e');
+      return true; // লিমিট চেকিং এ এরর হলে ক্লিক allow করুন
     }
   }
 
+  // 🔥 অ্যাড ক্লিক রেকর্ড করুন
   Future<void> recordAdClick() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final dailyClicks = (prefs.getInt('daily_clicks') ?? 0) + 1;
       await prefs.setInt('daily_clicks', dailyClicks);
     } catch (e) {
-      print('Error recording ad click: $e');
+      print('অ্যাড ক্লিক রেকর্ড করতে ত্রুটি: $e');
     }
   }
 
+  // 🔥 অ্যাড স্ট্যাটস পান
   Future<Map<String, int>> getAdStats() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -524,7 +568,7 @@ class AdLimitManager {
         'max_daily_clicks': maxDailyClicks,
       };
     } catch (e) {
-      print('Error getting ad stats: $e');
+      print('অ্যাড স্ট্যাটস পেতে ত্রুটি: $e');
       return {
         'daily_impressions': 0,
         'daily_clicks': 0,
@@ -534,6 +578,7 @@ class AdLimitManager {
     }
   }
 
+  // 🔥 নতুন দিন হলে অ্যাড লিমিট রিসেট করুন
   Future<void> _resetIfNewDay(SharedPreferences prefs) async {
     try {
       final firstAdToday = prefs.getString('first_ad_today');
@@ -553,7 +598,49 @@ class AdLimitManager {
         }
       }
     } catch (e) {
-      print('Error resetting ad limits: $e');
+      print('অ্যাড লিমিট রিসেট করতে ত্রুটি: $e');
+    }
+  }
+}
+
+// ==================== প্রিমিয়াম ম্যানেজার ক্লাস (সংক্ষিপ্ত ভার্সন) ====================
+class PremiumManager {
+  static final PremiumManager _instance = PremiumManager._internal();
+
+  factory PremiumManager() => _instance;
+
+  PremiumManager._internal();
+
+  static const String _isPremiumKey = 'is_premium_user';
+  static const String _premiumExpiryKey = 'premium_expiry_date';
+  static const String _lifetimePremiumKey = 'lifetime_premium';
+
+  Future<bool> get isPremiumUser async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // প্রথমে লাইফটাইম প্রিমিয়াম চেক করুন
+      if (prefs.getBool(_lifetimePremiumKey) == true) {
+        return true;
+      }
+
+      // সাবস্ক্রিপশন এক্সপায়ারি চেক করুন
+      final expiryString = prefs.getString(_premiumExpiryKey);
+      if (expiryString != null) {
+        final expiryDate = DateTime.parse(expiryString);
+        if (expiryDate.isAfter(DateTime.now())) {
+          return true;
+        } else {
+          // সাবস্ক্রিপশন এক্সপায়ার্ড
+          await prefs.setBool(_isPremiumKey, false);
+          return false;
+        }
+      }
+
+      return prefs.getBool(_isPremiumKey) ?? false;
+    } catch (e) {
+      print('প্রিমিয়াম স্ট্যাটাস চেক করতে ত্রুটি: $e');
+      return false;
     }
   }
 }
