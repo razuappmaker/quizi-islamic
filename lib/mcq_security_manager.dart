@@ -1,4 +1,5 @@
-// mcq_security_manager.dart - UPDATED & OPTIMIZED Security & Data Management
+// mcq_security_manager.dart - COMPLETELY FIXED VERSION
+// mcq_security_manager.dart - COMPLETELY FIXED VERSION
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class MCQSecurityManager {
   // Quiz Data
   List<dynamic> questions = [];
   int score = 0;
-  bool quizStarted = true;
+  bool quizStarted = false; // 🔧 FIX: Start as false
 
   // Points System
   int _totalEarnedPoints = 0;
@@ -32,9 +33,12 @@ class MCQSecurityManager {
   // Language
   bool _isEnglish = false;
 
-  // Category Mapping for English and Bengali
+  // Current Quiz ID for security tracking
+  String _currentQuizId = '';
+
+  // Category Mapping
   final Map<String, String> _categoryMappings = {
-    // English categories mapping to English JSON keys
+    // English categories
     'Basic Islamic Knowledge': 'Basic Islamic Knowledge',
     'Quran': 'Quran',
     'Prophet Biography': 'Prophet Biography',
@@ -50,7 +54,7 @@ class MCQSecurityManager {
     'Prophets': 'Prophets',
     'Islamic History': 'Islamic History',
 
-    // Bengali categories mapping to Bengali JSON keys
+    // Bengali categories
     'ইসলামী প্রাথমিক জ্ঞান': 'ইসলামী প্রাথমিক জ্ঞান',
     'কোরআন': 'কোরআন',
     'মহানবী সঃ এর জীবনী': 'মহানবী সঃ এর জীবনী',
@@ -67,251 +71,151 @@ class MCQSecurityManager {
     'ইসলামের ইতিহাস': 'ইসলামের ইতিহাস',
   };
 
+  // 🔧 FIXED: Strict initialization with security check
+  // MCQSecurityManager.dart - STRICT INITIALIZATION
+  // MCQSecurityManager.dart - initialize মেথডে এড করুন
   Future<void> initialize({
     required String category,
     required String quizId,
   }) async {
     try {
-      // Use the mapped quizId instead of direct category
-      final String mappedQuizId = _categoryMappings[category] ?? quizId;
+      print('🔄 STRICT QUIZ INITIALIZATION STARTED...');
 
-      print('🔄 Initializing quiz...');
-      print('📝 Original Category: $category');
-      print('🔑 Mapped Quiz ID: $mappedQuizId');
-      print('🌐 Language: ${_isEnglish ? 'English' : 'Bangla'}');
+      // Use consistent quiz ID mapping
+      final String mappedQuizId = getMappedQuizId(category);
+      _currentQuizId = mappedQuizId;
 
+      print('📝 Category: $category');
+      print('🔑 Original Quiz ID: $quizId');
+      print('🗺️ Mapped Quiz ID: $mappedQuizId');
+
+      // 🔒 STRICT SECURITY CHECK with detailed logging
+      print('🔒 Running strict security check...');
+      final canPlayResult = await PointManager.canPlayQuiz(mappedQuizId);
+
+      print('🔍 Security Check Result:');
+      print('   - Can Play: ${canPlayResult['canPlay']}');
+      print('   - Reason: ${canPlayResult['reason']}');
+      print('   - Message: ${canPlayResult['message']}');
+
+      if (!canPlayResult['canPlay']) {
+        final String errorMessage =
+            canPlayResult['message'] ?? 'কুইজ খেলা যাবে না';
+        final String reason = canPlayResult['reason'] ?? 'অজানা কারণ';
+
+        print('🚫 SECURITY BLOCKED: $reason - $errorMessage');
+        throw Exception('$reason: $errorMessage');
+      }
+
+      print('✅ Security check passed, loading questions...');
+
+      // Load questions with consistent ID
       await loadQuestions(mappedQuizId);
+
+      if (questions.isEmpty) {
+        throw Exception('কোন প্রশ্ন লোড করা যায়নি');
+      }
+
+      // 🔥 RECORD QUIZ START IMMEDIATELY
+      await _recordQuizStart();
+
+      // Initialize stats
       await _initializeUserStats();
-      print('✅ MCQ Security Manager initialized successfully');
+
+      // Mark quiz as started ONLY after all checks pass
+      quizStarted = true;
+
+      print('✅ STRICT INITIALIZATION COMPLETED');
+      print('📊 Questions loaded: ${questions.length}');
     } catch (e) {
-      print('❌ Error initializing MCQ Security Manager: $e');
-      questions = _getDefaultQuestions();
-    }
-  }
+      print('❌ STRICT INITIALIZATION FAILED: $e');
 
-  Future<void> loadQuestions(String quizId) async {
-    try {
-      print('🔄 Loading questions for Quiz ID: $quizId');
+      // Clear everything on failure
+      quizStarted = false;
+      questions = [];
+      score = 0;
+      _totalEarnedPoints = 0;
 
-      // Determine which file to load based on language
-      final String fileName = _getQuestionFileName();
-
-      print('📁 Loading from file: $fileName');
-
-      // Try loading from network first
-      try {
-        final List<dynamic> allQuestionsData =
-            await NetworkJsonLoader.loadJsonList(fileName);
-
-        if (allQuestionsData is List && allQuestionsData.isNotEmpty) {
-          Map<dynamic, dynamic> questionsMap = {};
-
-          for (var item in allQuestionsData) {
-            if (item is Map) {
-              questionsMap.addAll(item as Map<dynamic, dynamic>);
-            }
-          }
-
-          _setQuestionsFromMap(questionsMap, quizId);
-          print('✅ Questions loaded successfully from network: $fileName');
-          return;
-        } else if (allQuestionsData is Map) {
-          _setQuestionsFromMap(
-            allQuestionsData as Map<dynamic, dynamic>,
-            quizId,
-          );
-          print('✅ Questions loaded successfully from network: $fileName');
-          return;
-        }
-      } catch (e) {
-        print('❌ Failed to load from network: $e');
-      }
-
-      // Fallback to local asset
-      try {
-        print('🔄 Trying to load from local asset: $fileName');
-        final String localResponse = await rootBundle.loadString(fileName);
-        final Map<dynamic, dynamic> localData =
-            json.decode(localResponse) as Map<dynamic, dynamic>;
-        _setQuestionsFromMap(localData, quizId);
-        print('✅ Questions loaded successfully from local asset: $fileName');
-        return;
-      } catch (e) {
-        print('❌ Failed to load from local asset: $e');
-
-        // If English file fails, try Bangla file as fallback
-        if (fileName == 'assets/enquestions.json') {
-          print('🔄 Falling back to Bangla questions file');
-          await _loadBanglaQuestions(quizId);
-          return;
-        }
-      }
-
-      // Final fallback to direct JSON file
-      try {
-        print('🔄 Trying to load direct JSON file');
-        await _loadFromDirectJsonFile(quizId, fileName);
-        return;
-      } catch (e) {
-        print('❌ Failed to load direct JSON file: $e');
-        questions = _getDefaultQuestions();
-        print('⚠️ Using default questions');
-      }
-    } catch (e) {
-      print('❌ All loading methods failed: $e');
-      questions = _getDefaultQuestions();
-    }
-  }
-
-  String _getQuestionFileName() {
-    return _isEnglish ? 'assets/enquestions.json' : 'assets/questions.json';
-  }
-
-  Future<void> _loadBanglaQuestions(String quizId) async {
-    try {
-      final String localResponse = await rootBundle.loadString(
-        'assets/questions.json',
-      );
-      final Map<String, dynamic> localData = json.decode(localResponse);
-      _setQuestionsFromMap(localData, quizId);
-      print('✅ Questions loaded from Bangla file as fallback');
-    } catch (e) {
-      print('❌ Failed to load Bangla questions: $e');
-      questions = _getDefaultQuestions();
-    }
-  }
-
-  Future<void> _loadFromDirectJsonFile(String quizId, String fileName) async {
-    try {
-      // Try different possible file paths
-      final possiblePaths = [
-        fileName,
-        'assets/quiz/$quizId.json',
-        'assets/questions/$quizId.json',
-        'assets/json/$quizId.json',
-        'assets/$quizId.json',
-      ];
-
-      for (final path in possiblePaths) {
-        try {
-          print('🔄 Trying path: $path');
-          final String data = await rootBundle.loadString(path);
-          final jsonData = json.decode(data);
-
-          if (jsonData is Map && jsonData.containsKey('questions')) {
-            questions = List<Map<String, dynamic>>.from(jsonData['questions']);
-            print('✅ Questions loaded from: $path');
-            return;
-          } else if (jsonData is Map) {
-            _setQuestionsFromMap(jsonData, quizId);
-            print('✅ Questions loaded from: $path');
-            return;
-          }
-        } catch (e) {
-          print('❌ Failed to load from $path: $e');
-          continue;
-        }
-      }
-
-      throw Exception('All direct file paths failed');
-    } catch (e) {
       rethrow;
     }
   }
 
-  void _setQuestionsFromMap(Map<dynamic, dynamic> questionsMap, String quizId) {
-    print('🔍 Searching for quizId: $quizId in questions map');
-
-    // Convert keys to strings for safe access
-    final availableKeys = questionsMap.keys.map((k) => k.toString()).toList();
-    print('📋 Available keys in questions map: $availableKeys');
-
-    // Try the exact quizId first (convert to string for comparison)
-    final quizIdString = quizId.toString();
-    if (questionsMap.containsKey(quizIdString)) {
-      final questionsData = questionsMap[quizIdString];
-      if (questionsData is List) {
-        questions = List<dynamic>.from(questionsData);
-        print(
-          '✅ Found questions with exact key: $quizIdString (${questions.length} questions)',
-        );
+  // MCQSecurityManager.dart - নিচের মেথডটি এড করুন
+  Future<void> _recordQuizStart() async {
+    try {
+      if (_currentQuizId.isEmpty) {
+        print('🚫 Cannot record quiz start: No quiz ID');
         return;
-      } else {
-        print(
-          '❌ Key $quizIdString exists but is not a List: ${questionsData.runtimeType}',
-        );
       }
-    }
 
-    // If no specific key found, try to find any matching category
-    for (final key in questionsMap.keys) {
-      final keyString = key.toString();
-      if (keyString.toLowerCase().contains(quizIdString.toLowerCase()) ||
-          quizIdString.toLowerCase().contains(keyString.toLowerCase())) {
-        final questionsData = questionsMap[key];
-        if (questionsData is List) {
-          questions = List<dynamic>.from(questionsData);
-          print(
-            '✅ Found similar questions with key: $keyString (${questions.length} questions)',
-          );
-          return;
-        }
+      print('📝 Recording quiz START: $_currentQuizId');
+
+      // Record quiz start with 0 points
+      await PointManager.recordQuizPlay(
+        quizId: _currentQuizId,
+        pointsEarned: 0, // Start with 0 points
+        correctAnswers: 0,
+        totalQuestions: questions.length,
+      );
+
+      print('✅ Quiz start recorded successfully');
+    } catch (e) {
+      print('❌ Error recording quiz start: $e');
+    }
+  }
+
+  // 🔥 NEW: IMMEDIATE QUIZ PLAY RECORDING
+  Future<void> _recordQuizPlayImmediately() async {
+    try {
+      if (_currentQuizId.isEmpty) {
+        print('🚫 Cannot record quiz: No quiz ID');
+        return;
       }
+
+      print('📝 IMMEDIATE Quiz play recording: $_currentQuizId');
+
+      // Record with 0 points initially (will update later)
+      await PointManager.recordQuizPlay(
+        quizId: _currentQuizId,
+        pointsEarned: 0, // Initial record
+        correctAnswers: 0,
+        totalQuestions: questions.length,
+      );
+
+      print('✅ IMMEDIATE Quiz play recorded');
+    } catch (e) {
+      print('❌ Error in immediate quiz recording: $e');
     }
-
-    // If still no questions found, use default questions
-    print(
-      '❌ No questions found for quizId: $quizIdString, using default questions',
-    );
-    questions = _getDefaultQuestions();
   }
 
-  // Add a method to set language
-  void setLanguage(bool isEnglish) {
-    _isEnglish = isEnglish;
-    print('🌐 Language set to: ${isEnglish ? 'English' : 'Bangla'}');
-  }
-
-  // ... rest of your existing methods (checkAnswer, _calculatePoints, etc.) remain the same
-  List<dynamic> _getDefaultQuestions() {
-    return [
-      {
-        'question': _isEnglish
-            ? 'What is the first pillar of Islam?'
-            : 'ইসলামের প্রথম রুকন কী?',
-        'options': _isEnglish
-            ? ['Prayer', 'Fasting', 'Shahada', 'Hajj']
-            : ['নামাজ', 'রোজা', 'কালিমা', 'হজ্জ'],
-        'answer': _isEnglish ? 'Shahada' : 'কালিমা',
-        'image': null,
-      },
-      {
-        'question': _isEnglish
-            ? 'How many daily prayers are obligatory?'
-            : 'দৈনিক কত ওয়াক্ত নামাজ ফরজ?',
-        'options': _isEnglish
-            ? ['3 times', '4 times', '5 times', '6 times']
-            : ['৩ ওয়াক্ত', '৪ ওয়াক্ত', '৫ ওয়াক্ত', '৬ ওয়াক্ত'],
-        'answer': _isEnglish ? '5 times' : '৫ ওয়াক্ত',
-        'image': null,
-      },
-    ];
-  }
-
-  // ==================== OPTIMIZED ANSWER VALIDATION & SECURITY ====================
+  // 🔧 FIXED: Answer checking with proper security
   AnswerResult checkAnswer({
     required String selected,
     required int currentQuestionIndex,
     required int timeLeft,
   }) {
-    if (questions.isEmpty || currentQuestionIndex >= questions.length) {
+    // Security checks
+    if (!quizStarted ||
+        questions.isEmpty ||
+        currentQuestionIndex >= questions.length) {
+      print('🚫 Security: Invalid answer attempt');
       return AnswerResult(isCorrect: false, earnedPoints: 0);
     }
 
     final question = questions[currentQuestionIndex];
-    final isCorrect = selected == question['answer'];
 
+    // Validate question format
+    if (!validateAnswerFormat(question)) {
+      print('🚫 Security: Invalid question format');
+      return AnswerResult(isCorrect: false, earnedPoints: 0);
+    }
+
+    final isCorrect = selected == question['answer'];
     int pointsForThisQuestion = _calculatePoints(isCorrect, timeLeft);
+
+    print(
+      '🎯 Answer checked: Correct=$isCorrect, Points=$pointsForThisQuestion',
+    );
 
     if (isCorrect) {
       score++;
@@ -330,6 +234,7 @@ class MCQSecurityManager {
 
     // Mark quiz as completed if it's the last question
     if (currentQuestionIndex == questions.length - 1) {
+      print('🏁 Quiz completed, recording play...');
       _markQuizAsCompleted();
     }
 
@@ -339,24 +244,50 @@ class MCQSecurityManager {
     );
   }
 
+  // 🔧 FIXED: Mark quiz as completed with proper recording
+  Future<void> _markQuizAsCompleted() async {
+    try {
+      if (_currentQuizId.isEmpty) {
+        print('🚫 Cannot mark quiz completed: No quiz ID');
+        return;
+      }
+
+      print('📝 Recording quiz completion: $_currentQuizId');
+
+      await PointManager.recordQuizPlay(
+        quizId: _currentQuizId,
+        pointsEarned: _totalEarnedPoints,
+        correctAnswers: score,
+        totalQuestions: questions.length,
+      );
+
+      print(
+        '✅ Quiz marked as completed: $_totalEarnedPoints points, $score correct',
+      );
+    } catch (e) {
+      print('❌ Error marking quiz as completed: $e');
+      // Don't throw - we don't want to break the UI flow
+    }
+  }
+
+  // 🔧 FIXED: Points calculation
   int _calculatePoints(bool isCorrect, int timeLeft) {
     if (!isCorrect) {
       return 1; // Participation points
     }
 
     // Points based on time left
-    if (timeLeft >= 15) {
+    if (timeLeft >= 15)
       return 10;
-    } else if (timeLeft >= 10) {
+    else if (timeLeft >= 10)
       return 8;
-    } else if (timeLeft >= 5) {
+    else if (timeLeft >= 5)
       return 5;
-    } else {
+    else
       return 3;
-    }
   }
 
-  // ==================== OPTIMIZED POINTS MANAGEMENT ====================
+  // 🔧 FIXED: Add points with validation
   Future<void> _addPointsToUser(int earnedPoints) async {
     try {
       // Security check: Validate points amount
@@ -366,15 +297,13 @@ class MCQSecurityManager {
       }
 
       await PointManager.addPoints(earnedPoints);
-      print("✅ $earnedPoints points added successfully!");
-
-      // Use a callback instead of setState
-      pointsAdded = true;
+      print("✅ $earnedPoints points added to user account");
     } catch (e) {
       print("❌ Error adding points: $e");
     }
   }
 
+  // 🔧 FIXED: Update user stats
   Future<void> _updateUserStats() async {
     try {
       await PointManager.updateQuizStats(score);
@@ -384,22 +313,14 @@ class MCQSecurityManager {
     }
   }
 
-  Future<void> _markQuizAsCompleted() async {
-    try {
-      // You can add quizId parameter when needed
-      await PointManager.markQuizPlayed('default_quiz_id', _totalEarnedPoints);
-      print('✅ Quiz marked as completed with $_totalEarnedPoints points');
-    } catch (e) {
-      print('❌ Error marking quiz: $e');
-    }
-  }
-
+  // 🔧 FIXED: Initialize user stats
   Future<void> _initializeUserStats() async {
     try {
-      // Initialize user statistics
       _totalQuestionsAnswered = 0;
       _totalCorrectAnswers = 0;
       _totalPointsEarned = 0;
+      score = 0;
+      _totalEarnedPoints = 0;
 
       print('✅ User stats initialized');
     } catch (e) {
@@ -407,7 +328,88 @@ class MCQSecurityManager {
     }
   }
 
-  // ==================== SECURITY CHECKS ====================
+  // Existing methods remain but ensure they don't bypass security
+  Future<void> loadQuestions(String quizId) async {
+    try {
+      print('🔄 Loading questions for: $quizId');
+
+      final String fileName = _isEnglish
+          ? 'assets/enquestions.json'
+          : 'assets/questions.json';
+      print('📁 Loading from: $fileName');
+
+      // Try network first
+      try {
+        final List<dynamic> allQuestionsData =
+            await NetworkJsonLoader.loadJsonList(fileName);
+        if (allQuestionsData is List && allQuestionsData.isNotEmpty) {
+          Map<dynamic, dynamic> questionsMap = {};
+          for (var item in allQuestionsData) {
+            if (item is Map) questionsMap.addAll(item as Map<dynamic, dynamic>);
+          }
+          _setQuestionsFromMap(questionsMap, quizId);
+          print('✅ Questions loaded from network');
+          return;
+        }
+      } catch (e) {
+        print('❌ Network load failed: $e');
+      }
+
+      // Fallback to local
+      try {
+        final String localResponse = await rootBundle.loadString(fileName);
+        final Map<dynamic, dynamic> localData = json.decode(localResponse);
+        _setQuestionsFromMap(localData, quizId);
+        print('✅ Questions loaded from local');
+        return;
+      } catch (e) {
+        print('❌ Local load failed: $e');
+      }
+
+      // If all loading methods fail, throw exception
+      throw Exception('প্রশ্ন লোড করা যায়নি');
+    } catch (e) {
+      print('❌ All question loading methods failed: $e');
+      rethrow;
+    }
+  }
+
+  void _setQuestionsFromMap(Map<dynamic, dynamic> questionsMap, String quizId) {
+    print('🔍 Searching for quiz: $quizId');
+
+    final quizIdString = quizId.toString();
+    final availableKeys = questionsMap.keys.map((k) => k.toString()).toList();
+    print('📋 Available keys: $availableKeys');
+
+    // Try exact match first
+    if (questionsMap.containsKey(quizIdString)) {
+      final questionsData = questionsMap[quizIdString];
+      if (questionsData is List) {
+        questions = List<dynamic>.from(questionsData);
+        print('✅ Exact match found: ${questions.length} questions');
+        return;
+      }
+    }
+
+    // Try partial match
+    for (final key in questionsMap.keys) {
+      final keyString = key.toString();
+      if (keyString.toLowerCase().contains(quizIdString.toLowerCase()) ||
+          quizIdString.toLowerCase().contains(keyString.toLowerCase())) {
+        final questionsData = questionsMap[key];
+        if (questionsData is List) {
+          questions = List<dynamic>.from(questionsData);
+          print('✅ Partial match found: ${questions.length} questions');
+          return;
+        }
+      }
+    }
+
+    // No questions found
+    throw Exception('এই ক্যাটাগরির জন্য কোন প্রশ্ন পাওয়া যায়নি');
+  }
+
+  // Security validation methods
   bool validateQuestionIndex(int index) {
     return index >= 0 && index < questions.length;
   }
@@ -418,7 +420,6 @@ class MCQSecurityManager {
     if (question['options'] is! List<dynamic>) return false;
     if (question['answer'] is! String) return false;
 
-    // Check if answer is in options
     final options = List<String>.from(question['options']);
     return options.contains(question['answer']);
   }
@@ -505,13 +506,13 @@ class MCQSecurityManager {
   }
 
   // ==================== GETTERS ====================
+  // Getters
   int get totalQuestions => questions.length;
 
   int get totalScore => score;
 
   int calculateTotalPoints() => _totalEarnedPoints;
 
-  // For statistics
   int get totalQuestionsAnswered => _totalQuestionsAnswered;
 
   int get totalCorrectAnswers => _totalCorrectAnswers;
@@ -534,11 +535,12 @@ class MCQSecurityManager {
   }
 
   // ==================== CLEANUP ====================
+  // Cleanup
   void dispose() {
-    // Clean up any resources if needed
     questions.clear();
     score = 0;
     _totalEarnedPoints = 0;
     pointsAdded = false;
+    quizStarted = false;
   }
 }

@@ -10,6 +10,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:islamicquiz/utils/point_manager.dart';
 import 'result_page.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'ad_helper.dart';
@@ -90,37 +91,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     if (newOrientation != _currentOrientation) {
       _currentOrientation = newOrientation;
       _reloadBannerOnOrientationChange();
-    }
-  }
-
-  Future<void> _initializeQuiz() async {
-    try {
-      // Initialize security manager and load questions
-      await _securityManager.initialize(
-        category: widget.category,
-        quizId: widget.quizId,
-      );
-
-      // Load ads
-      AdHelper.loadInterstitialAd();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _loadAdaptiveBanner();
-      });
-
-      // Start timer if questions are loaded
-      if (_securityManager.questions.isNotEmpty &&
-          _securityManager.quizStarted) {
-        startTimer();
-      }
-
-      // অপ্টিমাইজড ভার্সন - শুধুমাত্র প্রয়োজন时才 সেটস্টেট
-      void _safeSetState(VoidCallback callback) {
-        if (mounted) {
-          setState(callback);
-        }
-      }
-    } catch (e) {
-      print('কুইজ ইনিশিয়ালাইজেশনে ত্রুটি: $e');
     }
   }
 
@@ -577,6 +547,207 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 question,
               ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // MCQPage.dart - Call immediate recording
+  // MCQPage.dart - _initializeQuiz মেথডে এড করুন
+  Future<void> _initializeQuiz() async {
+    try {
+      // Initialize security manager and load questions
+      await _securityManager.initialize(
+        category: widget.category,
+        quizId: widget.quizId,
+      );
+
+      // 🔥 DEBUG SECURITY STATUS
+      await PointManager.debugSecurityStatus(widget.quizId);
+
+      // Load ads
+      AdHelper.loadInterstitialAd();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadAdaptiveBanner();
+      });
+
+      // Start timer if questions are loaded
+      if (_securityManager.questions.isNotEmpty &&
+          _securityManager.quizStarted) {
+        startTimer();
+      }
+    } catch (e) {
+      print('❌ কুইজ ইনিশিয়ালাইজেশনে ত্রুটি: $e');
+      _showErrorDialog(e.toString());
+    }
+  }
+
+  /*void _showErrorDialog(String message) {
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber, color: Colors.orange),
+            SizedBox(width: 10),
+            Text("একটু অপেক্ষা করুন"),
+          ],
+        ),
+        content: Text(message, style: TextStyle(fontSize: 16, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Go back to previous screen
+            },
+            child: const Text("ঠিক আছে", style: TextStyle(fontSize: 16)),
+          ),
+        ],
+      ),
+    );
+  }*/
+  void _showErrorDialog(String message) {
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.85,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header Section
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Animated Icon
+                    Container(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        color: Colors.orange[100],
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.hourglass_top_rounded,
+                        color: Colors.orange,
+                        size: 40,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    // Title
+                    const Text(
+                      "একটু অপেক্ষা করুন",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepOrange,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content Section
+              Padding(
+                padding: const EdgeInsets.all(25),
+                child: Column(
+                  children: [
+                    Text(
+                      message,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        height: 1.5,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 25),
+
+                    // Progress Indicator
+                    SizedBox(
+                      height: 4,
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.orange[400]!,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Button Section
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                        ),
+                        child: const Text(
+                          "ঠিক আছে",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
