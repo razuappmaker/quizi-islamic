@@ -1,3 +1,6 @@
+// main.dart
+//main.dart Trying to dropdown
+
 // main.dart - COMPLETE OPTIMIZED VERSION
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -605,22 +608,38 @@ class _HomePageState extends State<HomePage>
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: selectedCategory,
-                    hint: Row(
-                      children: [
-                        Icon(
-                          Icons.search,
-                          size: responsiveValue(context, 16),
-                          color: isDarkMode ? Colors.white : Colors.green[700],
-                        ),
-                        SizedBox(width: responsiveValue(context, 6)),
-                        ResponsiveText(
-                          languageProvider.isEnglish
-                              ? 'Select Category'
-                              : 'বিষয় বেছে নিন',
-                          fontSize: 12,
-                          color: isDarkMode ? Colors.white70 : Colors.black54,
-                        ),
-                      ],
+                    hint: Container(
+                      // Container ব্যবহার করুন Row এর পরিবর্তে
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        // এটি গুরুত্বপূর্ণ
+                        children: [
+                          Icon(
+                            Icons.search,
+                            size: responsiveValue(context, 16),
+                            color: isDarkMode
+                                ? Colors.white
+                                : Colors.green[700],
+                          ),
+                          SizedBox(width: responsiveValue(context, 6)),
+                          Expanded(
+                            // Text কে Expanded দিয়ে wrap করুন
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: ResponsiveText(
+                                languageProvider.isEnglish
+                                    ? 'Select Category'
+                                    : 'বিষয় বেছে নিন',
+                                fontSize: 12,
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.black54,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     style: TextStyle(
                       fontSize: responsiveValue(context, 12),
@@ -635,6 +654,34 @@ class _HomePageState extends State<HomePage>
                     dropdownColor: isDarkMode
                         ? Colors.green[800]
                         : Colors.white,
+
+                    // ড্রপডাউনের সর্বোচ্চ উচ্চতা সীমিত (স্ক্রিনের ৫০%)
+                    menuMaxHeight: MediaQuery.of(context).size.height * 0.5,
+
+                    // ড্রপডাউন নিচের দিকেই খুলবে
+                    alignment: Alignment.bottomCenter,
+
+                    // সিলেক্টেড আইটেমের স্টাইল
+                    selectedItemBuilder: (BuildContext context) {
+                      return categories.map<Widget>((String item) {
+                        return Container(
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            item,
+                            style: TextStyle(
+                              fontSize: responsiveValue(context, 12),
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : Colors.green[800],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }).toList();
+                    },
+
                     onChanged: (String? newValue) {
                       if (mounted) {
                         setState(() {
@@ -642,34 +689,89 @@ class _HomePageState extends State<HomePage>
                         });
                       }
                     },
+
                     items: categories.map((String category) {
                       return DropdownMenuItem<String>(
                         value: category,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.bookmark_border,
-                              size: responsiveValue(context, 14),
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.green[700],
-                            ),
-                            SizedBox(width: responsiveValue(context, 6)),
-                            Expanded(
-                              child: ResponsiveText(
-                                category,
-                                fontSize: 12,
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                                overflow: TextOverflow.ellipsis,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: responsiveValue(context, 8),
+                            horizontal: responsiveValue(context, 4),
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.grey[300]!.withOpacity(0.3),
+                                width: 0.5,
                               ),
                             ),
-                          ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(
+                                  responsiveValue(context, 6),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.bookmark_border,
+                                  size: responsiveValue(context, 14),
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.green[700],
+                                ),
+                              ),
+                              SizedBox(width: responsiveValue(context, 10)),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      category,
+                                      style: TextStyle(
+                                        fontSize: responsiveValue(context, 12),
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black87,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                    SizedBox(
+                                      height: responsiveValue(context, 2),
+                                    ),
+                                    Text(
+                                      'কুইজ: ${categories.indexOf(category) + 1}',
+                                      style: TextStyle(
+                                        fontSize: responsiveValue(context, 9),
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white60
+                                            : Colors.grey[600],
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (selectedCategory == category)
+                                Icon(
+                                  Icons.check_circle_rounded,
+                                  size: responsiveValue(context, 16),
+                                  color: Colors.green,
+                                ),
+                              SizedBox(width: responsiveValue(context, 4)),
+                            ],
+                          ),
                         ),
                       );
                     }).toList(),

@@ -1,10 +1,3 @@
-// MCQ.dart
-// mcc Optimised
-// MCQ Page Fully OK trying to Final Optimise
-
-// MCQ Page size increases 10 %
-
-// MCQ Page
 // mcq_page.dart - Main UI Component
 import 'dart:async';
 import 'dart:math' as math;
