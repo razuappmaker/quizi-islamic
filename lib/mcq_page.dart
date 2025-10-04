@@ -1,3 +1,4 @@
+// MCQ.dart
 // mcc Optimised
 // MCQ Page Fully OK trying to Final Optimise
 
@@ -1353,7 +1354,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       left: 0,
       right: 0,
       child: Align(
-        alignment: Alignment.topRight,
+        alignment: Alignment.topCenter,
         child: Container(
           margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.11),
           padding: EdgeInsets.symmetric(

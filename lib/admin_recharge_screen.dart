@@ -48,7 +48,7 @@ class _AdminRechargeScreenState extends State<AdminRechargeScreen> {
 
   Future<void> _loadRechargeRequests() async {
     try {
-      final requests = await PointManager.getRechargeHistory();
+      final requests = await PointManager.getGiftHistory();
       setState(() {
         _rechargeRequests = requests;
         _isLoading = false;
@@ -131,7 +131,7 @@ class _AdminRechargeScreenState extends State<AdminRechargeScreen> {
   // রিচার্জ রিকোয়েস্ট স্ট্যাটাস আপডেট
   Future<void> _updateRequestStatus(String requestId, String newStatus) async {
     try {
-      await PointManager.updateRechargeStatus(requestId, newStatus);
+      await PointManager.updateGiftStatus(requestId, newStatus);
       await _loadRechargeRequests();
 
       ScaffoldMessenger.of(context).showSnackBar(

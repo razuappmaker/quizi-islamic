@@ -316,7 +316,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       await PointManager.deductPoints(5000);
-      await PointManager.saveRechargeRequest(mobileNumber, _userEmail);
+      await PointManager.saveGiftRequest(mobileNumber, _userEmail);
       await _loadUserData();
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -474,7 +474,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // 🔥 রিচার্জ হিস্ট্রি দেখানোর ফাংশন
   Future<void> _showRechargeHistory() async {
-    final history = await PointManager.getRechargeHistory();
+    final history = await PointManager.getGiftHistory();
 
     showDialog(
       context: context,
@@ -639,7 +639,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      "নিজের ইসলামী জ্ঞান যাচাই করে নিন। সাথে রয়েছে রিয়েল গিফট!",
+                      "নিজের ইসলামী জ্ঞান যাচাই করে নিন। সাথে রয়েছে রিয়েল গিফট! ২৪ ঘণ্টার মধ্যে পাবেন ইনশাল্লাহ",
                       style: TextStyle(
                         fontSize: isSmallScreen ? 11 : 13,
                         color: Colors.green[800],
@@ -650,61 +650,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 12),
-
-            // গিফট বাটন
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _navigateToGift,
-                icon: const Icon(Icons.card_giftcard, size: 20),
-                label: Text(
-                  "রিয়েল গিফট নিন",
-                  style: TextStyle(
-                    fontSize: isSmallScreen ? 14 : 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.purple[700],
-                  side: BorderSide(color: Colors.purple[400]!),
-                  padding: EdgeInsets.symmetric(
-                    vertical: isSmallScreen ? 14 : 16,
-                    horizontal: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 8),
-
-            // গিফট ডেস্ক্রিপশন
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.purple[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.purple[200]!),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.star, color: Colors.purple[700], size: 16),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      "৫০০০ পয়েন্ট জমা করে আকর্ষণীয় গিফট পান। এখনই শুরু করুন!",
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 11 : 13,
-                        color: Colors.purple[800],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            //SizedBox(height: 12),
           ],
         ),
       ),

@@ -5,7 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
-// আপনার existing imports
+// Your existing imports
 import 'package:islamicquiz/screens/reward_screen.dart';
 import 'package:islamicquiz/ifter_time_page.dart';
 import 'package:islamicquiz/profile_screen.dart';
@@ -57,6 +57,7 @@ void main() async {
   );
 }
 
+// main.dart এ MyApp widget আপডেট করুন
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -64,35 +65,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<ThemeProvider, LanguageProvider>(
       builder: (context, themeProvider, languageProvider, child) {
-        // Language লোডিং স্টেট handle করুন
-        if (languageProvider.currentLanguage.isEmpty ||
-            languageProvider.isLoading) {
-          return MaterialApp(
-            home: Scaffold(
-              backgroundColor: Colors.green[50],
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.green[700]!,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      'লোড হচ্ছে...',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.green[800],
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
+        // Handle language loading state - শুধু প্রথম লোডিং এর জন্য
+        if (languageProvider.currentLanguage.isEmpty) {
+          return _buildLoadingScreen();
         }
 
         return MaterialApp(
@@ -101,66 +76,69 @@ class MyApp extends StatelessWidget {
               : 'ইসলামিক ডে - বৈশ্বিক বাংলাদেশী',
           debugShowCheckedModeBanner: false,
           themeMode: themeProvider.themeMode,
-
-          theme: ThemeData(
-            primarySwatch: Colors.green,
-            brightness: Brightness.light,
-            fontFamily: languageProvider.isEnglish ? 'Roboto' : 'HindSiliguri',
-            textTheme: const TextTheme(
-              bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              bodyMedium: TextStyle(fontSize: 14),
-              headlineSmall: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 3,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 16,
-                ),
-              ),
-            ),
-          ),
-          darkTheme: ThemeData(
-            primarySwatch: Colors.green,
-            brightness: Brightness.dark,
-            fontFamily: languageProvider.isEnglish ? 'Roboto' : 'HindSiliguri',
-            scaffoldBackgroundColor: Colors.grey[900],
-            appBarTheme: const AppBarTheme(backgroundColor: Colors.green),
-            textTheme: const TextTheme(
-              bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              bodyMedium: TextStyle(fontSize: 14),
-              headlineSmall: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 3,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 16,
-                ),
-              ),
-            ),
-          ),
+          theme: _buildTheme(languageProvider.isEnglish, Brightness.light),
+          darkTheme: _buildTheme(languageProvider.isEnglish, Brightness.dark),
           home: SplashScreen(),
         );
       },
+    );
+  }
+
+  Widget _buildLoadingScreen() {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.green[50],
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.green[700]!),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'লোড হচ্ছে...',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.green[800],
+                  fontFamily: 'HindSiliguri',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  ThemeData _buildTheme(bool isEnglish, Brightness brightness) {
+    return ThemeData(
+      primarySwatch: Colors.green,
+      brightness: brightness,
+      fontFamily: isEnglish ? 'Roboto' : 'HindSiliguri',
+      scaffoldBackgroundColor: brightness == Brightness.dark
+          ? Colors.grey[900]
+          : Colors.white,
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.green[800],
+        elevation: 4,
+      ),
+      textTheme: const TextTheme(
+        bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        bodyMedium: TextStyle(fontSize: 14),
+        headlineSmall: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 3,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        ),
+      ),
     );
   }
 }
@@ -182,7 +160,6 @@ class _HomePageState extends State<HomePage>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   int _currentBottomNavIndex = 0;
-  bool _isFirstLaunch = true;
 
   final List<String> _categoriesBn = [
     'ইসলামী প্রাথমিক জ্ঞান',
@@ -382,39 +359,28 @@ class _HomePageState extends State<HomePage>
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
-          //centerTitle: true,
           backgroundColor: isDarkMode ? Colors.green[900] : Colors.green[800],
           elevation: 4,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
           ),
-          leading: tablet
-              ? ResponsiveIconButton(
-                  icon: Icons.menu,
-                  iconSize: 28,
-                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                  color: Colors.white,
-                )
-              : ResponsiveIconButton(
-                  icon: Icons.menu,
-                  iconSize: 28,
-                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                  color: Colors.white,
-                ),
+          leading: ResponsiveIconButton(
+            icon: Icons.menu,
+            iconSize: 28,
+            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+            color: Colors.white,
+          ),
           actions: [
-            // Language toggle button-এ
             ResponsiveIconButton(
               icon: Icons.language,
               iconSize: 28,
               onPressed: () async {
-                // ✅ প্রথমে selectedCategory reset করুন
                 if (mounted) {
                   setState(() {
                     selectedCategory = null;
                   });
                 }
 
-                // তারপর language toggle করুন
                 final languageProvider = Provider.of<LanguageProvider>(
                   context,
                   listen: false,
@@ -567,16 +533,33 @@ class _HomePageState extends State<HomePage>
     // Loading state check
     if (languageProvider.isLoading ||
         languageProvider.currentLanguage.isEmpty) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
 
-    final categories = languageProvider.isEnglish
-        ? _categoriesEn
-        : _categoriesBn;
+    // Always use Bengali categories for the dropdown, regardless of language setting
+    final categories = _categoriesBn;
 
-    // ✅ selectedCategory validate করুন
+    // Define category mappings to quiz IDs/file paths
+    final Map<String, String> categoryMappings = {
+      // Bengali categories mapping (your existing working ones)
+      'ইসলামী প্রাথমিক জ্ঞান': 'islamic_basic_knowledge',
+      'কোরআন': 'quran',
+      'মহানবী সঃ এর জীবনী': 'prophet_biography',
+      'ইবাদত': 'worship',
+      'আখিরাত': 'hereafter',
+      'বিচার দিবস': 'judgment_day',
+      'নারী ও ইসলাম': 'women_in_islam',
+      'ইসলামী নৈতিকতা ও আচার': 'islamic_ethics',
+      'ধর্মীয় আইন(বিবাহ-বিচ্ছেদ)': 'religious_law',
+      'শিষ্টাচার': 'etiquette',
+      'দাম্পত্য ও পারিবারিক সম্পর্ক': 'family_relations',
+      'হাদিস': 'hadith',
+      'নবী-রাসূল': 'prophets',
+      'ইসলামের ইতিহাস': 'islamic_history',
+    };
+
+    // Validate selectedCategory
     if (selectedCategory != null && !categories.contains(selectedCategory)) {
-      // যদি selectedCategory available items-এ না থাকে, null set করুন
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           setState(() {
@@ -622,7 +605,6 @@ class _HomePageState extends State<HomePage>
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: selectedCategory,
-                    // ✅ এটি এখন validated
                     hint: Row(
                       children: [
                         Icon(
@@ -702,12 +684,20 @@ class _HomePageState extends State<HomePage>
                       ? null
                       : () {
                           if (mounted) {
+                            // Get the correct quiz ID from the mapping
+                            final String quizId =
+                                categoryMappings[selectedCategory!] ??
+                                selectedCategory!;
+
+                            print('Selected Category: $selectedCategory');
+                            print('Mapped Quiz ID: $quizId');
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => MCQPage(
                                   category: selectedCategory!,
-                                  quizId: selectedCategory!,
+                                  quizId: quizId, // Use mapped quiz ID
                                 ),
                               ),
                             );
@@ -759,7 +749,6 @@ class _HomePageState extends State<HomePage>
     final textColor = isDarkMode ? Colors.white : Colors.green[900]!;
     final secondaryTextColor = isDarkMode ? Colors.white70 : Colors.green[600]!;
     final iconColor = isDarkMode ? Colors.white : Colors.green[700]!;
-    final backgroundColor = isDarkMode ? Colors.grey[900]! : Colors.green[100]!;
 
     return Container(
       margin: EdgeInsets.symmetric(
@@ -1068,7 +1057,7 @@ class _HomePageState extends State<HomePage>
               ? 'Prophet Biography'
               : 'মুহাম্মাদ (সঃ) জীবনী',
           onTap: () {
-            _showMoreOptions(context); // ✅ এই লাইন যোগ করুন
+            _showMoreOptions(context);
           },
         ),
       ],
@@ -1088,7 +1077,7 @@ class _HomePageState extends State<HomePage>
     bool isDarkMode,
     bool isTablet, {
     String? description,
-    Function()? onTap, // ✅ এই লাইন যোগ করুন
+    Function()? onTap,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -1109,7 +1098,6 @@ class _HomePageState extends State<HomePage>
         onTap:
             onTap ??
             () {
-              // ✅ onTap ব্যবহার করুন
               if (page != null && mounted) {
                 Navigator.push(
                   context,
@@ -1205,7 +1193,7 @@ class _HomePageState extends State<HomePage>
     final languageProvider = Provider.of<LanguageProvider>(
       context,
       listen: false,
-    ); // ✅ listen: false যোগ করুন
+    );
 
     showModalBottomSheet(
       context: context,
@@ -1458,7 +1446,6 @@ class _HomePageState extends State<HomePage>
                   languageProvider.isEnglish
                       ? 'Islamic Day - Global Bangladeshi'
                       : 'ইসলামিক ডে - বৈশ্বিক বাংলাদেশী',
-
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,

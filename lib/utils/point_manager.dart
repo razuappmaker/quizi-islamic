@@ -8,7 +8,7 @@ class PointManager {
   static const String _totalQuizzesKey = 'total_quizzes';
   static const String _totalCorrectKey = 'total_correct';
   static const String _userEmailKey = 'user_email';
-  static const String _rechargeHistoryKey = 'recharge_history';
+  static const String _giftHistoryKey = 'gift_history'; // 🔁 UPDATED
   static const String _dailyQuizHistoryKey = 'daily_quiz_history';
   static const String _userDeviceIdKey = 'user_device_id';
 
@@ -107,7 +107,7 @@ class PointManager {
       await prefs.remove(_profileImageKey);
 
       // History
-      await prefs.remove(_rechargeHistoryKey);
+      await prefs.remove(_giftHistoryKey); // 🔁 UPDATED
       await prefs.remove(_dailyQuizHistoryKey);
 
       print('Complete reset successful');
@@ -197,15 +197,15 @@ class PointManager {
     return result.toString();
   }
 
-  // 🔥 স্প্যাম ডিটেকশন (একই ডিভাইস থেকে অনেক রিচার্জ)
+  // 🔥 স্প্যাম ডিটেকশন (একই ডিভাইস থেকে অনেক গিফ্ট)
   static Future<bool> isSuspiciousActivity() async {
     final prefs = await SharedPreferences.getInstance();
-    final history = await getRechargeHistory();
+    final history = await getGiftHistory(); // 🔁 UPDATED
     final deviceId = await getDeviceId();
 
-    // গত 24 ঘন্টার রিচার্জ কাউন্ট
+    // গত 24 ঘন্টার গিফ্ট কাউন্ট
     final now = DateTime.now();
-    final recentRecharges = history.where((request) {
+    final recentGifts = history.where((request) {
       try {
         final requestedAt = DateTime.parse(request['requestedAt']);
         return now.difference(requestedAt).inHours <= 24;
@@ -214,15 +214,15 @@ class PointManager {
       }
     }).length;
 
-    // 24 ঘন্টায় 3 টার বেশি রিচার্জ সাসপিশিয়াস
-    if (recentRecharges > 3) {
+    // 24 ঘন্টায় 3 টার বেশি গিফ্ট সাসপিশিয়াস
+    if (recentGifts > 3) {
       return true;
     }
 
     return false;
   }
 
-  // পয়েন্ট কাটার মেথড (রিচার্জের জন্য)
+  // পয়েন্ট কাটার মেথড (গিফ্টের জন্য)
   static Future<void> deductPoints(int points) async {
     final prefs = await SharedPreferences.getInstance();
     final currentPending = prefs.getInt(_pendingPointsKey) ?? 0;
@@ -242,13 +242,15 @@ class PointManager {
   }
 
   //--------------------------------------------------------
-  // 🔥 রিচার্জ রিকোয়েস্ট সেভ করার মেথড - COMPLETELY FIXED
-  static Future<void> saveRechargeRequest(
+  // 🔥 গিফ্ট রিকোয়েস্ট সেভ করার মেথড - COMPLETELY FIXED
+  static Future<void> saveGiftRequest(
+    // 🔁 UPDATED
     String mobileNumber,
     String userEmail,
   ) async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String> history = prefs.getStringList(_rechargeHistoryKey) ?? [];
+    final List<String> history =
+        prefs.getStringList(_giftHistoryKey) ?? []; // 🔁 UPDATED
 
     final newRequest = {
       'id': DateTime.now().millisecondsSinceEpoch.toString(),
@@ -262,24 +264,29 @@ class PointManager {
 
     // JSON encode ব্যবহার করুন
     history.add(jsonEncode(newRequest));
-    await prefs.setStringList(_rechargeHistoryKey, history);
+    await prefs.setStringList(_giftHistoryKey, history); // 🔁 UPDATED
   }
 
-  // 🔥 রিচার্জ হিস্ট্রি পাওয়ার মেথড - COMPLETELY FIXED
-  static Future<List<Map<String, dynamic>>> getRechargeHistory() async {
+  // 🔥 গিফ্ট হিস্ট্রি পাওয়ার মেথড - COMPLETELY FIXED
+  static Future<List<Map<String, dynamic>>> getGiftHistory() async {
+    // 🔁 UPDATED
     final prefs = await SharedPreferences.getInstance();
     final List<String> historyStrings =
-        prefs.getStringList(_rechargeHistoryKey) ?? [];
+        prefs.getStringList(_giftHistoryKey) ?? []; // 🔁 UPDATED
     final List<Map<String, dynamic>> history = [];
 
     for (String item in historyStrings) {
       try {
-        final Map<String, dynamic> request = _safeParseRechargeRequest(item);
+        final Map<String, dynamic> request = _safeParseGiftRequest(
+          item,
+        ); // 🔁 UPDATED
         if (request.isNotEmpty) {
           history.add(request);
         }
       } catch (e) {
-        print('রিচার্জ রিকোয়েস্ট পার্স করতে ত্রুটি: $e - Item: $item');
+        print(
+          'গিফ্ট রিকোয়েস্ট পার্স করতে ত্রুটি: $e - Item: $item',
+        ); // 🔁 UPDATED
       }
     }
 
@@ -294,7 +301,8 @@ class PointManager {
   }
 
   // 🔥 সেফ পার্সিং মেথড - COMPLETELY FIXED
-  static Map<String, dynamic> _safeParseRechargeRequest(String item) {
+  static Map<String, dynamic> _safeParseGiftRequest(String item) {
+    // 🔁 UPDATED
     try {
       // প্রথমে JSON decode চেষ্টা করুন
       final decoded = jsonDecode(item);
@@ -359,19 +367,22 @@ class PointManager {
     return 200;
   }
 
-  // 🔥 রিচার্জ রিকোয়েস্ট আপডেট করার মেথড - FIXED
-  static Future<void> updateRechargeStatus(
+  // 🔥 গিফ্ট রিকোয়েস্ট আপডেট করার মেথড - FIXED
+  static Future<void> updateGiftStatus(
+    // 🔁 UPDATED
     String requestId,
     String newStatus,
   ) async {
     final prefs = await SharedPreferences.getInstance();
     final List<String> historyStrings =
-        prefs.getStringList(_rechargeHistoryKey) ?? [];
+        prefs.getStringList(_giftHistoryKey) ?? []; // 🔁 UPDATED
     final List<String> updatedHistory = [];
 
     for (String item in historyStrings) {
       try {
-        Map<String, dynamic> request = _safeParseRechargeRequest(item);
+        Map<String, dynamic> request = _safeParseGiftRequest(
+          item,
+        ); // 🔁 UPDATED
 
         if (request['id']?.toString() == requestId) {
           request['status'] = newStatus;
@@ -384,25 +395,27 @@ class PointManager {
       }
     }
 
-    await prefs.setStringList(_rechargeHistoryKey, updatedHistory);
+    await prefs.setStringList(_giftHistoryKey, updatedHistory); // 🔁 UPDATED
   }
 
-  // 🔥 পেন্ডিং রিচার্জ রিকোয়েস্ট কাউন্ট
-  static Future<int> getPendingRechargeCount() async {
-    final history = await getRechargeHistory();
+  // 🔥 পেন্ডিং গিফ্ট রিকোয়েস্ট কাউন্ট
+  static Future<int> getPendingGiftCount() async {
+    // 🔁 UPDATED
+    final history = await getGiftHistory(); // 🔁 UPDATED
     return history.where((request) => request['status'] == 'pending').length;
   }
 
   // 🔥 সব ডাটা রিসেট (যদি প্রয়োজন হয়)
-  static Future<void> clearRechargeHistory() async {
+  static Future<void> clearGiftHistory() async {
+    // 🔁 UPDATED
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_rechargeHistoryKey);
+    await prefs.remove(_giftHistoryKey); // 🔁 UPDATED
   }
 
-  // 🔥 ডেবাগিং: সব রিচার্জ রিকোয়েস্ট প্রিন্ট করুন
+  // 🔥 ডেবাগিং: সব গিফ্ট রিকোয়েস্ট প্রিন্ট করুন
   static Future<void> debugPrintAllRequests() async {
-    final history = await getRechargeHistory();
-    print('=== রিচার্জ রিকোয়েস্ট ডিবাগ ===');
+    final history = await getGiftHistory(); // 🔁 UPDATED
+    print('=== গিফ্ট রিকোয়েস্ট ডিবাগ ==='); // 🔁 UPDATED
     for (int i = 0; i < history.length; i++) {
       print('Request $i: ${history[i]}');
     }

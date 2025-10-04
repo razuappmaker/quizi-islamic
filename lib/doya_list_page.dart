@@ -541,35 +541,35 @@ class _DoyaListPageState extends State<DoyaListPage> {
   }
 
   // ✅ Adaptive Inline Banner Ad বিল্ড করার মেথড
+  // ✅ Adaptive Inline Banner Ad বিল্ড করার মেথড - FIXED VERSION
   Widget _buildInlineBanner(String adKey) {
     final bannerAd = _inlineBannerAds[adKey];
     final isReady = _inlineBannerAdReady[adKey] ?? false;
 
-    if (bannerAd == null) {
-      // প্রথমবার লোড শুরু করুন কিন্তু immediately placeholder return না করুন
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _loadInlineBannerAd(adKey);
-      });
-      return const SizedBox.shrink(); // প্রথমে hide করুন
-    }
-
-    if (!isReady) {
+    // যদি অ্যাড ইতিমধ্যে লোড হয়ে থাকে এবং ready হয়
+    if (bannerAd != null && isReady) {
       return Container(
-        height: 50,
         margin: const EdgeInsets.symmetric(vertical: 12),
-        child: const Center(child: CircularProgressIndicator()),
+        height: bannerAd.size.height.toDouble(),
+        alignment: Alignment.center,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[900]
+            : Colors.white,
+        child: AdWidget(ad: bannerAd),
       );
     }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
-      height: bannerAd.size.height.toDouble(),
-      alignment: Alignment.center,
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[900]
-          : Colors.white,
-      child: AdWidget(ad: bannerAd),
-    );
+    // যদি অ্যাড এখনও লোড না হয়ে থাকে, তবে লোড শুরু করুন কিন্তু UI show না করুন
+    if (bannerAd == null && !_inlineBannerAdReady.containsKey(adKey)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_inlineBannerAdReady.containsKey(adKey)) {
+          _loadInlineBannerAd(adKey);
+        }
+      });
+    }
+
+    // লোডিং অবস্থায় অথবা অ্যাড না থাকলে সম্পূর্ণ hide করুন (সাইজ ০)
+    return const SizedBox.shrink();
   }
 
   // দোয়া কার্ড বিল্ড করার মেথড - রেসপনসিভ

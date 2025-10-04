@@ -1,10 +1,15 @@
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 import '../utils/language_manager.dart';
 
 class LanguageProvider with ChangeNotifier {
   String _currentLanguage = 'bn';
   bool _isEnglish = false;
   bool _isLoading = false;
+  Timer? _debounceTimer;
+
+  // Debounce duration
+  static const Duration _debounceDuration = Duration(milliseconds: 300);
 
   String get currentLanguage => _currentLanguage;
 
@@ -32,52 +37,68 @@ class LanguageProvider with ChangeNotifier {
     }
   }
 
-  // ভাষা টগল করুন - Safe version
+  // ভাষা টগল করুন - Debounce সহ
   Future<void> toggleLanguage() async {
     if (_isLoading) return;
 
-    try {
-      _isLoading = true;
-      notifyListeners();
+    // Debounce: যদি আগের রিকোয়েস্ট চলমান থাকে, তা বাতিল করুন
+    _debounceTimer?.cancel();
 
-      // ✅ প্রথমে locally update করুন
-      _isEnglish = !_isEnglish;
-      _currentLanguage = _isEnglish ? 'en' : 'bn';
+    _debounceTimer = Timer(_debounceDuration, () async {
+      try {
+        _isLoading = true;
+        notifyListeners();
 
-      // তারপর SharedPreferences-এ save করুন
-      await LanguageManager.setLanguage(_currentLanguage);
+        // ✅ প্রথমে locally update করুন
+        _isEnglish = !_isEnglish;
+        _currentLanguage = _isEnglish ? 'en' : 'bn';
 
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      print('Language toggle error: $e');
-      // ✅ Error হলে revert করুন
-      _isEnglish = !_isEnglish;
-      _currentLanguage = _isEnglish ? 'en' : 'bn';
-      _isLoading = false;
-      notifyListeners();
-    }
+        // তারপর SharedPreferences-এ save করুন
+        await LanguageManager.setLanguage(_currentLanguage);
+
+        _isLoading = false;
+        notifyListeners();
+      } catch (e) {
+        print('Language toggle error: $e');
+        // ✅ Error হলে revert করুন
+        _isEnglish = !_isEnglish;
+        _currentLanguage = _isEnglish ? 'en' : 'bn';
+        _isLoading = false;
+        notifyListeners();
+      }
+    });
   }
 
-  // নির্দিষ্ট ভাষা সেট করুন
+  // নির্দিষ্ট ভাষা সেট করুন - Debounce সহ
   Future<void> setLanguage(String languageCode) async {
     if (_isLoading) return;
 
-    try {
-      _isLoading = true;
-      notifyListeners();
+    // Debounce: যদি আগের রিকোয়েস্ট চলমান থাকে, তা বাতিল করুন
+    _debounceTimer?.cancel();
 
-      _currentLanguage = languageCode;
-      _isEnglish = languageCode == 'en';
+    _debounceTimer = Timer(_debounceDuration, () async {
+      try {
+        _isLoading = true;
+        notifyListeners();
 
-      await LanguageManager.setLanguage(languageCode);
+        _currentLanguage = languageCode;
+        _isEnglish = languageCode == 'en';
 
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      print('Language set error: $e');
-      _isLoading = false;
-      notifyListeners();
-    }
+        await LanguageManager.setLanguage(languageCode);
+
+        _isLoading = false;
+        notifyListeners();
+      } catch (e) {
+        print('Language set error: $e');
+        _isLoading = false;
+        notifyListeners();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 }

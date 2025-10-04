@@ -177,158 +177,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  // 🔥 পয়েন্ট দিয়ে কেনার কার্ড - সম্পূর্ণ রেসপনসিভ
-  Widget _buildPointsPurchaseCard(
-    String premiumType,
-    Map<String, dynamic> config,
-  ) {
-    final hasEnoughPoints = _userPoints >= config['points'];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final cardWidth = constraints.maxWidth;
-        final isVerySmall = cardWidth < 150;
-        final isSmall = cardWidth < 200;
-
-        return ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: isVerySmall ? 180 : (isSmall ? 200 : 220),
-            maxHeight: isVerySmall ? 220 : (isSmall ? 240 : 260),
-          ),
-          child: Card(
-            elevation: 3,
-            margin: EdgeInsets.all(4),
-            color: Colors.purple[50],
-            child: Padding(
-              padding: EdgeInsets.all(isVerySmall ? 8 : (isSmall ? 10 : 12)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Top Content - Icon and Text
-                  Flexible(
-                    flex: 2,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.emoji_events,
-                          color: Colors.purple,
-                          size: isVerySmall ? 24 : (isSmall ? 28 : 32),
-                        ),
-                        SizedBox(height: isVerySmall ? 4 : 6),
-                        Flexible(
-                          child: Text(
-                            config['name'],
-                            style: TextStyle(
-                              fontSize: isVerySmall ? 10 : (isSmall ? 12 : 14),
-                              fontWeight: FontWeight.bold,
-                              color: Colors.purple[800],
-                              height: 1.2,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          config['duration'],
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: isVerySmall ? 8 : (isSmall ? 9 : 10),
-                            height: 1.1,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                        ),
-                        SizedBox(height: isVerySmall ? 4 : 6),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            '${config['points']} পয়েন্ট',
-                            style: TextStyle(
-                              fontSize: isVerySmall ? 12 : (isSmall ? 14 : 16),
-                              fontWeight: FontWeight.bold,
-                              color: Colors.purple,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Bottom Content - Button
-                  Flexible(
-                    flex: 1,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: hasEnoughPoints && !_isProcessing
-                                ? () => _purchaseWithPoints(premiumType)
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.purple,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(
-                                vertical: isVerySmall ? 6 : (isSmall ? 8 : 10),
-                                horizontal: 4,
-                              ),
-                              minimumSize: Size(0, isVerySmall ? 28 : 32),
-                            ),
-                            child: _isProcessing
-                                ? SizedBox(
-                                    width: isVerySmall ? 12 : 14,
-                                    height: isVerySmall ? 12 : 14,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1.5,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      hasEnoughPoints ? 'কিনুন' : 'পয়েন্ট নেই',
-                                      style: TextStyle(
-                                        fontSize: isVerySmall
-                                            ? 10
-                                            : (isSmall ? 11 : 12),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        if (!hasEnoughPoints) ...[
-                          SizedBox(height: 4),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              '${config['points'] - _userPoints} পয়েন্ট প্রয়োজন',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: isVerySmall ? 8 : 9,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   // 🔥 টাকা দিয়ে কেনার কার্ড - সম্পূর্ণ রেসপনসিভ
   Widget _buildMoneyPurchaseCard(
     String productId,
@@ -497,36 +345,59 @@ class _PremiumScreenState extends State<PremiumScreen> {
       appBar: AppBar(
         title: Text(
           'প্রিমিয়াম সাবস্ক্রিপশন',
-          style: TextStyle(fontSize: isSmallScreen ? 16 : 18),
+          style: TextStyle(
+            fontSize: isSmallScreen ? 16 : 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: Colors.blue[800],
         foregroundColor: Colors.white,
+        centerTitle: true,
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+            splashRadius: 20,
+          ),
+        ),
         actions: [if (isPremium) _buildPremiumBadge()],
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : isPremium
-          ? _buildPremiumUserScreen(premiumSource, screenWidth)
-          : _buildPurchaseScreen(screenWidth, areProductsAvailable),
+      body: SafeArea(
+        bottom: true, // ✅ Bottom safe area ensure
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : isPremium
+            ? _buildPremiumUserScreen(premiumSource, screenWidth)
+            : _buildPurchaseScreen(screenWidth, areProductsAvailable),
+      ),
     );
   }
 
   Widget _buildPurchaseScreen(double screenWidth, bool areProductsAvailable) {
-    return Column(
-      children: [
-        // User Points Info
-        _buildPointsInfo(screenWidth),
+    return SafeArea(
+      bottom: true, // ✅ Additional safety
+      child: Column(
+        children: [
+          // User Points Info
+          _buildPointsInfo(screenWidth),
 
-        // Tab Bar
-        _buildTabBar(),
+          // Tab Bar
+          _buildTabBar(),
 
-        // Tab Content
-        Expanded(
-          child: _currentTabIndex == 0
-              ? _buildPointsTab(screenWidth)
-              : _buildMoneyTab(screenWidth, areProductsAvailable),
-        ),
-      ],
+          // Tab Content
+          Expanded(
+            child: _currentTabIndex == 0
+                ? _buildPointsTab(screenWidth)
+                : _buildMoneyTab(screenWidth, areProductsAvailable),
+          ),
+        ],
+      ),
     );
   }
 
@@ -627,23 +498,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
+  // 🔥 FIXED: পয়েন্ট দিয়ে কেনার ট্যাব - মোবাইল ও ট্যাবলেট ফ্রেন্ডলি
   Widget _buildPointsTab(double screenWidth) {
     final pointsOptions = PremiumManager.getPremiumPointsRequirements();
-    final crossAxisCount = screenWidth < 300
-        ? 2
-        : screenWidth < 400
-        ? 2
-        : screenWidth < 600
-        ? 3
-        : 4;
 
-    final childAspectRatio = screenWidth < 300
-        ? 0.7
-        : screenWidth < 400
-        ? 0.75
-        : screenWidth < 600
-        ? 0.8
-        : 0.85;
+    // Responsive grid configuration
+    final crossAxisCount = screenWidth < 600 ? 2 : 4;
+    final childAspectRatio = screenWidth < 600
+        ? 0.85
+        : 1.0; // Reduced aspect ratio
 
     final isSmallScreen = screenWidth < 380;
 
@@ -664,40 +527,29 @@ class _PremiumScreenState extends State<PremiumScreen> {
             ),
           ),
           SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: crossAxisCount,
+
+          GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              childAspectRatio: childAspectRatio,
+              crossAxisSpacing: 8, // Reduced spacing
+              mainAxisSpacing: 8,
+            ),
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            childAspectRatio: childAspectRatio,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            padding: EdgeInsets.all(4),
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) => _buildPointsPurchaseCard(
-                  'monthly',
-                  pointsOptions['monthly']!,
-                ),
-              ),
-              LayoutBuilder(
-                builder: (context, constraints) => _buildPointsPurchaseCard(
-                  'yearly',
-                  pointsOptions['yearly']!,
-                ),
-              ),
-              LayoutBuilder(
-                builder: (context, constraints) => _buildPointsPurchaseCard(
-                  'lifetime',
-                  pointsOptions['lifetime']!,
-                ),
-              ),
-              LayoutBuilder(
-                builder: (context, constraints) => _buildPointsPurchaseCard(
-                  'remove_ads',
-                  pointsOptions['remove_ads']!,
-                ),
-              ),
-            ],
+            padding: EdgeInsets.all(8),
+            itemCount: pointsOptions.length,
+            itemBuilder: (context, index) {
+              final keys = pointsOptions.keys.toList();
+              final premiumType = keys[index];
+              final config = pointsOptions[premiumType]!;
+
+              return _buildFlexiblePointsCard(
+                premiumType,
+                config,
+                isSmallScreen,
+              );
+            },
           ),
           SizedBox(height: 16),
           _buildFeaturesSection(isSmallScreen),
@@ -706,24 +558,169 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _buildMoneyTab(double screenWidth, bool areProductsAvailable) {
-    final crossAxisCount = screenWidth < 300
-        ? 2
-        : screenWidth < 400
-        ? 2
-        : screenWidth < 600
-        ? 3
-        : 4;
+  // 🔥 FIXED: Removed Flexible and fixed overflow issues
+  Widget _buildFlexiblePointsCard(
+    String premiumType,
+    Map<String, dynamic> config,
+    bool isSmallScreen,
+  ) {
+    final hasEnoughPoints = _userPoints >= config['points'];
 
-    final childAspectRatio = screenWidth < 300
-        ? 0.7
-        : screenWidth < 400
-        ? 0.75
-        : screenWidth < 600
-        ? 0.8
-        : 0.85;
+    return Card(
+      elevation: 3,
+      margin: EdgeInsets.zero,
+      color: Colors.purple[50],
+      child: Container(
+        padding: EdgeInsets.all(isSmallScreen ? 8 : 12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Top Content - Icon and Title
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.emoji_events,
+                  color: Colors.purple,
+                  size: isSmallScreen ? 22 : 28,
+                ),
+                SizedBox(height: isSmallScreen ? 4 : 6),
+                Text(
+                  config['name'],
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 11 : 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple[800],
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 2),
+                Text(
+                  config['duration'],
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: isSmallScreen ? 8 : 10,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                ),
+              ],
+            ),
+
+            SizedBox(height: isSmallScreen ? 6 : 8),
+
+            // Middle Content - Points
+            FittedBox(
+              child: Text(
+                '${config['points']} পয়েন্ট',
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 12 : 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+            SizedBox(height: isSmallScreen ? 6 : 8),
+
+            // Bottom Content - Button
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: hasEnoughPoints && !_isProcessing
+                        ? () => _purchaseWithPoints(premiumType)
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        vertical: isSmallScreen ? 4 : 6,
+                        horizontal: 4,
+                      ),
+                      minimumSize: Size(0, isSmallScreen ? 28 : 32),
+                    ),
+                    child: _isProcessing
+                        ? SizedBox(
+                            width: isSmallScreen ? 12 : 14,
+                            height: isSmallScreen ? 12 : 14,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              hasEnoughPoints ? 'কিনুন' : 'পয়েন্ট নেই',
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 10 : 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+                if (!hasEnoughPoints) ...[
+                  SizedBox(height: 2),
+                  FittedBox(
+                    child: Text(
+                      '${config['points'] - _userPoints} পয়েন্ট প্রয়োজন',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: isSmallScreen ? 7 : 9,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 🔥 FIXED: টাকা দিয়ে কেনার ট্যাব - মোবাইল ও ট্যাবলেট ফ্রেন্ডলি
+  Widget _buildMoneyTab(double screenWidth, bool areProductsAvailable) {
+    // Responsive grid configuration
+    final crossAxisCount = screenWidth < 600 ? 2 : 4;
+    final childAspectRatio = screenWidth < 600 ? 0.85 : 0.9;
 
     final isSmallScreen = screenWidth < 380;
+
+    // Product configurations
+    final productConfigs = [
+      {
+        'id': PremiumManager.monthlyPremiumId,
+        'name': 'মাসিক প্রিমিয়াম',
+        'description': '১ মাসের জন্য অ্যাড-ফ্রি',
+      },
+      {
+        'id': PremiumManager.yearlyPremiumId,
+        'name': 'বার্ষিক প্রিমিয়াম',
+        'description': '১ বছরের জন্য অ্যাড-ফ্রি',
+      },
+      {
+        'id': PremiumManager.lifetimePremiumId,
+        'name': 'লাইফটাইম প্রিমিয়াম',
+        'description': 'আজীবন অ্যাড-ফ্রি',
+      },
+      {
+        'id': PremiumManager.removeAdsId,
+        'name': 'অ্যাড রিমুভাল',
+        'description': 'স্থায়ীভাবে অ্যাড মুছুন',
+      },
+    ];
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(isSmallScreen ? 8 : 12),
@@ -733,44 +730,26 @@ class _PremiumScreenState extends State<PremiumScreen> {
           if (!areProductsAvailable) _buildComingSoonMessage(),
 
           SizedBox(height: 16),
-          GridView.count(
-            crossAxisCount: crossAxisCount,
+
+          // 🔥 FIXED: Responsive Grid with proper height
+          GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              childAspectRatio: childAspectRatio,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            childAspectRatio: childAspectRatio,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
             padding: EdgeInsets.all(4),
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) =>
-                    _buildMoneyPurchaseCard(PremiumManager.monthlyPremiumId, {
-                      'name': 'মাসিক প্রিমিয়াম',
-                      'description': '১ মাসের জন্য অ্যাড-ফ্রি',
-                    }),
-              ),
-              LayoutBuilder(
-                builder: (context, constraints) =>
-                    _buildMoneyPurchaseCard(PremiumManager.yearlyPremiumId, {
-                      'name': 'বার্ষিক প্রিমিয়াম',
-                      'description': '১ বছরের জন্য অ্যাড-ফ্রি',
-                    }),
-              ),
-              LayoutBuilder(
-                builder: (context, constraints) =>
-                    _buildMoneyPurchaseCard(PremiumManager.lifetimePremiumId, {
-                      'name': 'লাইফটাইম প্রিমিয়াম',
-                      'description': 'আজীবন অ্যাড-ফ্রি',
-                    }),
-              ),
-              LayoutBuilder(
-                builder: (context, constraints) =>
-                    _buildMoneyPurchaseCard(PremiumManager.removeAdsId, {
-                      'name': 'অ্যাড রিমুভাল',
-                      'description': 'স্থায়ীভাবে অ্যাড মুছুন',
-                    }),
-              ),
-            ],
+            itemCount: productConfigs.length,
+            itemBuilder: (context, index) {
+              final config = productConfigs[index];
+              return _buildMoneyPurchaseCard(config['id']!, {
+                'name': config['name'],
+                'description': config['description'],
+              });
+            },
           ),
 
           SizedBox(height: 20),
