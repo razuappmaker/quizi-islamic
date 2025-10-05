@@ -17,8 +17,8 @@ class _RewardScreenState extends State<RewardScreen> {
   bool _isRewardedAdLoaded = false;
   bool _isLoadingAd = false;
   int _todayRewards = 0;
-  int _maxDailyRewards = 5;
-  int _pointsPerReward = 10;
+  int _maxDailyRewards = 5; // how many time ads
+  int _pointsPerReward = 10; // per ads points
   int _pendingPoints = 0;
   bool _isLoading = true;
 

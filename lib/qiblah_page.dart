@@ -350,7 +350,7 @@ class _QiblaPageState extends State<QiblaPage>
             color: Colors.white,
           ),
         ),
-        centerTitle: true,
+        //centerTitle: true,
         backgroundColor: Colors.green[700],
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),

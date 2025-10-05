@@ -854,7 +854,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
             ? Text(
                 widget.categoryTitle,
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   fontSize: _isTablet ? 22 : 20,
                   color: Colors.white,
                 ),

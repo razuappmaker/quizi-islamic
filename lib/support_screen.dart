@@ -11,6 +11,17 @@ class SupportScreen extends StatefulWidget {
 
 class _SupportScreenState extends State<SupportScreen> {
   bool _isEnglish = false;
+  final List<Map<String, String>> _recentDonations = [
+    {'name': 'রাজু', 'amount': 'USD 59', 'currency': 'USD'},
+    {'name': 'কুদদুস', 'amount': 'SAR 29.99', 'currency': 'SAR'},
+    {'name': 'أحمد', 'amount': 'دينار 300', 'currency': 'Dinar'},
+    {'name': 'মোহাম্মদ', 'amount': 'USD 25', 'currency': 'USD'},
+    {'name': 'ইব্রাহিম', 'amount': 'BDT 500', 'currency': 'BDT'},
+    {'name': 'فاطمة', 'amount': 'دينار 150', 'currency': 'Dinar'},
+    {'name': 'আয়েশা', 'amount': 'SAR 50', 'currency': 'SAR'},
+    {'name': 'Yusuf', 'amount': 'USD 35', 'currency': 'USD'},
+    {'name': 'মারিয়া', 'amount': 'BDT 300', 'currency': 'BDT'},
+  ];
 
   void _toggleLanguage() {
     setState(() {
@@ -44,6 +55,92 @@ class _SupportScreenState extends State<SupportScreen> {
     );
   }
 
+  void _showExternalDonationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          _isEnglish ? 'Visit Our Website' : 'আমাদের ওয়েবসাইট ভিজিট করুন',
+          style: TextStyle(color: Colors.green[800]),
+        ),
+        content: Text(
+          _isEnglish
+              ? 'For more donation options and detailed information, please visit our official website. We appreciate your support!'
+              : 'আরও ডোনেশন অপশন এবং বিস্তারিত তথ্যের জন্য আমাদের অফিসিয়াল ওয়েবসাইট ভিজিট করুন। আমরা আপনার সাপোর্টের জন্য কৃতজ্ঞ!',
+          style: TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(_isEnglish ? 'Cancel' : 'বাতিল'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              _launchURL('https://www.islamicquiz.com/donate');
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
+            child: Text(_isEnglish ? 'Visit Website' : 'ওয়েবসাইট ভিজিট করুন'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDonationItem(Map<String, String> donation, int index) {
+    return Container(
+      width: 160,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: index % 2 == 0 ? Colors.green[50] : Colors.blue[50],
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.green[100],
+            radius: 20,
+            child: Text(
+              donation['name']!.substring(0, 1),
+              style: TextStyle(
+                color: Colors.green[800],
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            donation['name']!,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.green[800],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              donation['amount']!,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 11,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,24 +148,31 @@ class _SupportScreenState extends State<SupportScreen> {
         backgroundColor: Colors.green[800],
         title: Text(
           _isEnglish ? 'Support Us' : 'আমাদের সাপোর্ট করুন',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         leading: Container(
-          margin: EdgeInsets.all(8),
+          margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
             onPressed: () => Navigator.of(context).pop(),
             splashRadius: 20,
           ),
         ),
         actions: [
           Container(
-            margin: EdgeInsets.all(8),
+            margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
@@ -86,30 +190,212 @@ class _SupportScreenState extends State<SupportScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Section
-            _buildHeaderSection(),
-            const SizedBox(height: 30),
+      body: SafeArea(
+        bottom: true,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Section
+              _buildHeaderSection(),
+              const SizedBox(height: 24),
 
-            // Why Support Section
-            _buildWhySupportSection(),
-            const SizedBox(height: 30),
+              // Recent Supporters Section - Horizontal Scrolling
+              // Recent Supporters Section - Scrolling Text
+              // Recent Supporters Section - Marquee Scrolling Text
+              // Recent Supporters Section - Simple Scrolling Text
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.people,
+                            size: 20,
+                            color: Colors.green[800],
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _isEnglish
+                                ? 'Recent Supporters'
+                                : 'সাম্প্রতিক সাপোর্টার্স',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[800],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.green[50],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _recentDonations.length,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            itemBuilder: (context, index) {
+                              final donation = _recentDonations[index];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '🎉 ',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.green[700],
+                                      ),
+                                    ),
+                                    Text(
+                                      '${donation['name']!} ',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.green[900],
+                                      ),
+                                    ),
+                                    Text(
+                                      _isEnglish ? 'donated' : 'ডোনেট করেছেন',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                    Text(
+                                      ' ${donation['amount']!} • ',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green[800],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
 
-            // Support Methods Section
-            _buildSupportMethodsSection(),
-            const SizedBox(height: 30),
+              // Why Support Section
+              _buildWhySupportSection(),
+              const SizedBox(height: 24),
 
-            // Contact Section
-            _buildContactSection(),
-            const SizedBox(height: 20),
+              // Support Buttons Section
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Text(
+                        _isEnglish ? 'Make a Difference' : 'একটি পরিবর্তন আনুন',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green[800],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
 
-            // Footer Note
-            _buildFooterNote(),
-          ],
+                      // Google Play Donation Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // Implement Google Play Billing
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  _isEnglish
+                                      ? 'Google Play Billing will be implemented here'
+                                      : 'গুগল প্লে বিলিং এখানে ইমপ্লিমেন্ট করা হবে',
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.shopping_cart, size: 20),
+                          label: Text(
+                            _isEnglish
+                                ? 'Support via Google Play'
+                                : 'গুগল প্লে এর মাধ্যমে সাপোর্ট করুন',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Website Donation Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: _showExternalDonationDialog,
+                          icon: const Icon(Icons.language, size: 20),
+                          label: Text(
+                            _isEnglish
+                                ? 'Donate via Website'
+                                : 'ওয়েবসাইট এর মাধ্যমে ডোনেট করুন',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.green[800],
+                            side: BorderSide(color: Colors.green[800]!),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Contact Section
+              _buildContactSection(),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -117,34 +403,45 @@ class _SupportScreenState extends State<SupportScreen> {
 
   Widget _buildHeaderSection() {
     return Card(
-      elevation: 4,
-      color: Colors.green[50],
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Icon(Icons.volunteer_activism, size: 60, color: Colors.green[800]),
-            const SizedBox(height: 16),
-            Text(
-              _isEnglish
-                  ? '🌟 Support Islamic Education'
-                  : '🌟 ইসলামিক শিক্ষাকে সাপোর্ট করুন',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green[100],
+                shape: BoxShape.circle,
               ),
-              textAlign: TextAlign.center,
+              child: Icon(
+                Icons.volunteer_activism,
+                size: 36,
+                color: Colors.green[800],
+              ),
             ),
             const SizedBox(height: 12),
             Text(
               _isEnglish
-                  ? 'Your support helps us maintain and improve this Islamic learning app for millions of users worldwide.'
-                  : 'আপনার সাপোর্ট আমাদের লক্ষাধিক ব্যবহারকারীর জন্য এই ইসলামিক লার্নিং অ্যাপটি উন্নত এবং সচল রাখতে সাহায্য করে।',
+                  ? 'Support Islamic Education'
+                  : 'ইসলামিক শিক্ষাকে সাপোর্ট করুন',
               style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[700],
-                height: 1.5,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[800],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _isEnglish
+                  ? 'Your support helps us maintain and improve this app for millions of users worldwide'
+                  : 'আপনার সাপোর্ট লক্ষাধিক ব্যবহারকারীর জন্য এই অ্যাপটি উন্নত এবং সচল রাখতে সাহায্য করে',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                height: 1.4,
               ),
               textAlign: TextAlign.center,
             ),
@@ -156,7 +453,8 @@ class _SupportScreenState extends State<SupportScreen> {
 
   Widget _buildWhySupportSection() {
     return Card(
-      elevation: 3,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -164,12 +462,12 @@ class _SupportScreenState extends State<SupportScreen> {
           children: [
             Text(
               _isEnglish
-                  ? '🤲 Why Your Support Matters'
-                  : '🤲 আপনার সাপোর্ট কেন গুরুত্বপূর্ণ',
-              style: const TextStyle(
-                fontSize: 20,
+                  ? 'Why Your Support Matters'
+                  : 'আপনার সাপোর্ট কেন গুরুত্বপূর্ণ',
+              style: TextStyle(
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: Colors.green[800],
               ),
             ),
             const SizedBox(height: 16),
@@ -177,29 +475,22 @@ class _SupportScreenState extends State<SupportScreen> {
               Icons.cloud_upload,
               _isEnglish ? 'Server & Hosting Costs' : 'সার্ভার ও হোস্টিং খরচ',
               _isEnglish
-                  ? 'Monthly server maintenance and cloud hosting expenses'
-                  : 'মাসিক সার্ভার মেইন্টেনেন্স এবং ক্লাউড হোস্টিং খরচ',
+                  ? 'Monthly server maintenance and cloud hosting'
+                  : 'মাসিক সার্ভার মেইন্টেনেন্স এবং ক্লাউড হোস্টিং',
             ),
             _buildReasonItem(
               Icons.developer_mode,
               _isEnglish ? 'App Development' : 'অ্যাপ ডেভেলপমেন্ট',
               _isEnglish
-                  ? 'Continuous improvement and new feature development'
-                  : 'অ্যাপের উন্নতি এবং নতুন ফিচার যোগ করা',
+                  ? 'New features and regular updates'
+                  : 'নতুন ফিচার এবং নিয়মিত আপডেট',
             ),
             _buildReasonItem(
               Icons.security,
-              _isEnglish ? 'Security & Updates' : 'সিকিউরিটি ও আপডেট',
+              _isEnglish ? 'Security & Performance' : 'সিকিউরিটি ও পারফরমেন্স',
               _isEnglish
-                  ? 'Regular security updates and bug fixes'
-                  : 'নিয়মিত সিকিউরিটি আপডেট এবং বাগ ফিক্স',
-            ),
-            _buildReasonItem(
-              Icons.ads_click,
-              _isEnglish ? 'Ad-Free Experience' : 'এড-ফ্রি এক্সপেরিয়েন্স',
-              _isEnglish
-                  ? 'Reducing ads and providing better user experience'
-                  : 'অ্যাড কমিয়ে ইউজার এক্সপেরিয়েন্স উন্নত করা',
+                  ? 'Security updates and performance improvements'
+                  : 'সিকিউরিটি আপডেট এবং পারফরমেন্স উন্নতি',
             ),
           ],
         ),
@@ -208,12 +499,19 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   Widget _buildReasonItem(IconData icon, String title, String description) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.green, size: 24),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Colors.green[100],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: Colors.green[800], size: 18),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -222,286 +520,57 @@ class _SupportScreenState extends State<SupportScreen> {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   description,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSupportMethodsSection() {
-    return Card(
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              _isEnglish ? '💳 Support Methods' : '💳 সাপোর্ট করার পদ্ধতি',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Google Pay
-            _buildSupportMethodCard(
-              'Google Pay',
-              'গুগল পে',
-              'Send support via Google Pay',
-              'গুগল পে এর মাধ্যমে সাপোর্ট পাঠান',
-              'https://pay.google.com',
-              Icons.payment,
-              Colors.blue,
-            ),
-            const SizedBox(height: 12),
-
-            // Bank Transfer
-            _buildSupportMethodCard(
-              'Bank Transfer',
-              'ব্যাংক ট্রান্সফার',
-              'Direct bank transfer details',
-              'সরাসরি ব্যাংক ট্রান্সফার',
-              '',
-              Icons.account_balance,
-              Colors.green,
-            ),
-            const SizedBox(height: 12),
-
-            // bKash
-            _buildSupportMethodCard(
-              'bKash',
-              'বিকাশ',
-              'Send via bKash mobile banking',
-              'বিকাশ মোবাইল ব্যাংকিং এর মাধ্যমে পাঠান',
-              'https://bkash.com',
-              Icons.phone_android,
-              Colors.red,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSupportMethodCard(
-    String englishTitle,
-    String banglaTitle,
-    String englishDesc,
-    String banglaDesc,
-    String url,
-    IconData icon,
-    Color color,
-  ) {
-    return Card(
-      elevation: 2,
-      color: color.withOpacity(0.1),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: color, size: 28),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _isEnglish ? englishTitle : banglaTitle,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: color,
-                        ),
-                      ),
-                      Text(
-                        _isEnglish ? englishDesc : banglaDesc,
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            if (url.isNotEmpty)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => _launchURL(url),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: color,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: Text(_isEnglish ? 'Donate Now' : 'এখনই ডোনেট করুন'),
-                ),
-              )
-            else
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _isEnglish
-                          ? 'Contact for bank details:'
-                          : 'ব্যাংক ডিটেইলসের জন্য যোগাযোগ করুন:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange[800],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _isEnglish
-                          ? 'Email: support@islamicquiz.com\nPhone: +880 XXXX-XXXXXX'
-                          : 'ইমেইল: support@islamicquiz.com\nফোন: +৮৮০ XXXX-XXXXXX',
-                      style: TextStyle(color: Colors.orange[700]),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ),
       ),
     );
   }
 
   Widget _buildContactSection() {
     return Card(
-      elevation: 3,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _isEnglish ? '📞 Contact Information' : '📞 যোগাযোগের তথ্য',
-              style: const TextStyle(
-                fontSize: 20,
+              _isEnglish ? 'Contact Information' : 'যোগাযোগের তথ্য',
+              style: TextStyle(
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: Colors.green[800],
               ),
             ),
             const SizedBox(height: 16),
-            _buildContactItem(
-              Icons.email,
-              _isEnglish ? 'Email' : 'ইমেইল',
-              'support@islamicquiz.com',
-              'mailto:support@islamicquiz.com',
-            ),
-            _buildContactItem(
-              Icons.phone,
-              _isEnglish ? 'Phone' : 'ফোন',
-              '+880 XXXX-XXXXXX',
-              'tel:+880XXXXXXXXX',
-            ),
-            _buildContactItem(
-              Icons.web,
-              _isEnglish ? 'Website' : 'ওয়েবসাইট',
-              'www.islamicquiz.com',
-              'https://www.islamicquiz.com',
-            ),
+            _buildContactItem(Icons.email, 'support@islamicquiz.com'),
+            _buildContactItem(Icons.language, 'www.islamicquiz.com'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContactItem(
-    IconData icon,
-    String title,
-    String value,
-    String url,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+  Widget _buildContactItem(IconData icon, String value) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icon, color: Colors.green, size: 24),
+          Icon(icon, color: Colors.green, size: 20),
           const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                GestureDetector(
-                  onTap: () => _launchURL(url),
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      color: Colors.blue[700],
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFooterNote() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue[200]!),
-      ),
-      child: Column(
-        children: [
-          Icon(Icons.favorite, color: Colors.red, size: 30),
-          const SizedBox(height: 8),
-          Text(
-            _isEnglish
-                ? '💝 May Allah reward you for your support and generosity. Your contribution helps spread Islamic knowledge to millions.'
-                : '💝 আল্লাহ আপনার সাপোর্ট এবং দানশীলতার জন্য আপনাকে উত্তম প্রতিদান দিন। আপনার অবদান লক্ষাধিক মানুষের মধ্যে ইসলামিক জ্ঞান ছড়িয়ে দিতে সাহায্য করে।',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.blue[800],
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _isEnglish
-                ? 'JazakAllah Khairan for your support!'
-                : 'আপনার সাপোর্টের জন্য জাযাকাল্লাহু খাইরান!',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.green,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 15))),
         ],
       ),
     );

@@ -13,6 +13,7 @@ import 'package:islamicquiz/screens/reward_screen.dart';
 import 'package:islamicquiz/ifter_time_page.dart';
 import 'package:islamicquiz/profile_screen.dart';
 import 'package:islamicquiz/qiblah_page.dart';
+import 'package:islamicquiz/utils/data_deletion_manager.dart';
 import 'mcq_page.dart';
 import 'islamic_history_page.dart';
 import 'prophet_biography_page.dart';
@@ -1626,6 +1627,17 @@ class _HomePageState extends State<HomePage>
             null,
             url: 'https://sites.google.com/view/islamicquize/home',
           ),
+          // পরিবর্তন করে এভাবে করুন:
+          _buildDrawerItem(
+            context,
+            Icons.delete_forever,
+            languageProvider.isEnglish ? 'Delete All Data' : 'সব তথ্য মুছুন',
+            null,
+            onTap: () => DataDeletionManager.showDeleteDataDialog(
+              context,
+            ), // নতুনভাবে কল করুন
+          ),
+
           Divider(
             color: Colors.green.shade200,
             indent: responsiveValue(context, 16),
@@ -1666,6 +1678,7 @@ class _HomePageState extends State<HomePage>
     String title,
     Widget? page, {
     String? url,
+    Function()? onTap, // ✅ এই লাইনটি যোগ করুন
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -1686,34 +1699,37 @@ class _HomePageState extends State<HomePage>
         size: responsiveValue(context, 16),
         color: Colors.green[700],
       ),
-      onTap: () async {
-        Navigator.pop(context);
-        if (url != null) {
-          try {
-            final Uri uri = Uri.parse(url);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            }
-          } catch (e) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: ResponsiveText(
-                    'Could not open link',
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
+      onTap:
+          onTap ??
+          () async {
+            // ✅ onTap ব্যবহার করুন
+            Navigator.pop(context);
+            if (url != null) {
+              try {
+                final Uri uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: ResponsiveText(
+                        'Could not open link',
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                  );
+                }
+              }
+            } else if (page != null && mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => page),
               );
             }
-          }
-        } else if (page != null && mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          );
-        }
-      },
+          },
     );
   }
 

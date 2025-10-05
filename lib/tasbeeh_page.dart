@@ -264,13 +264,13 @@ class _TasbeehPageState extends State<TasbeehPage> {
           title: const Text(
             "ডিজিটাল তসবীহ",
             style: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               fontSize: 18,
               color: Colors.white,
             ),
           ),
           backgroundColor: Colors.green[800],
-          centerTitle: true,
+          //centerTitle: true,
           elevation: 2,
           leading: Container(
             margin: EdgeInsets.all(8),

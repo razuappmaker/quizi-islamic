@@ -135,9 +135,9 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
         backgroundColor: Colors.green[700],
         title: const Text(
           'কোরআন শিক্ষা',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
         ),
-        centerTitle: true,
+        //centerTitle: true,
         leading: Container(
           margin: EdgeInsets.all(8),
           decoration: BoxDecoration(

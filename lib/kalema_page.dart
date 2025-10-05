@@ -213,7 +213,7 @@ class _KalemaPageState extends State<KalemaPage> {
         title: const Text(
           "কালেমা সমূহ",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: 20,
             color: Colors.white,
           ),

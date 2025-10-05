@@ -1145,7 +1145,7 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
         title: const Text(
           "আল্লাহর ৯৯ নাম",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: 20,
             color: Colors.white,
           ),

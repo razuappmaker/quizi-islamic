@@ -683,7 +683,7 @@ class _IfterTimePageState extends State<IfterTimePage>
       title: const Text(
         "ইফতার ও সেহরি",
         style: TextStyle(
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
           fontSize: 18,
           color: Colors.white,
         ),

@@ -578,79 +578,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildAdditionalFeaturesSection(bool isSmallScreen) {
     return Card(
       elevation: 3,
+      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 8 : 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
+        padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
         child: Column(
           children: [
-            Text(
-              "🚀 আরও পয়েন্ট নিতে",
-              style: TextStyle(
-                fontSize: isSmallScreen ? 16 : 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.purple,
-              ),
+            // কমপ্যাক্ট হেডার
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.auto_awesome, color: Colors.green[700], size: 18),
+                SizedBox(width: 6),
+                Text(
+                  "পছন্দের ক্যাটাগরি থেকে পয়েন্ট অর্জন",
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 15 : 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[800],
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 12),
 
-            // ইসলামী কুইজ বাটন
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _navigateToQuiz,
-                icon: const Icon(Icons.quiz, size: 20),
-                label: Text(
-                  "ইসলামী জ্ঞানের কুইজ খেলুন",
-                  style: TextStyle(
-                    fontSize: isSmallScreen ? 14 : 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                    vertical: isSmallScreen ? 14 : 16,
-                    horizontal: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                ),
-              ),
-            ),
-            SizedBox(height: 8),
-
-            // বাটন ডেস্ক্রিপশন
+            // প্রফেশনাল বাটন
             Container(
-              padding: EdgeInsets.all(12),
+              width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.green[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green[200]!),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.lightbulb_outline,
-                    color: Colors.green[700],
-                    size: 16,
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      "নিজের ইসলামী জ্ঞান যাচাই করে নিন। সাথে রয়েছে রিয়েল গিফট! ২৪ ঘণ্টার মধ্যে পাবেন ইনশাল্লাহ",
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 11 : 13,
-                        color: Colors.green[800],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                gradient: LinearGradient(
+                  colors: [Colors.green[600]!, Colors.green[700]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.withOpacity(0.4),
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
                   ),
                 ],
               ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: isSmallScreen ? 14 : 16,
+                      horizontal: 16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.quiz, color: Colors.white, size: 20),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "কুইজ খেলুন",
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 15 : 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                "ইসলামী জ্ঞান বৃদ্ধি করুন",
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 12 : 13,
+                                  color: Colors.white.withOpacity(0.9),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-            //SizedBox(height: 12),
           ],
         ),
       ),
@@ -746,27 +765,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
-                          // SECTION 2: পয়েন্ট ও স্ট্যাটাস
+                          // SECTION 2: পয়েন্ট ও স্ট্যাটাস আমার শ্তাটিক্স
                           _buildPointsStatsSection(isTablet, isSmallScreen),
-
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
-                          // SECTION 3: ভিডিও রিওয়ার্ড সেকশন
+                          // SECTION 3: রিয়েল গিফট সেকশন
+                          _buildGiftSection(isTablet, isSmallScreen),
+                          SizedBox(height: isSmallScreen ? 16 : 20),
+
+                          // SECTION 4: ভিডিও রিওয়ার্ড সেকশন
                           _buildVideoRewardSection(isTablet, isSmallScreen),
 
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
-                          // 🔥 SECTION 4: ADDITIONAL FEATURES SECTION
+                          // SECTION 5: ADDITIONAL FEATURES SECTION পয়েন্ট অর্জন
                           _buildAdditionalFeaturesSection(isSmallScreen),
-
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
-                          // SECTION 5: প্রিমিয়াম ও গিফট সেকশন
-                          _buildPremiumGiftSection(isTablet, isSmallScreen),
-
+                          // SECTION 6: প্রিমিয়াম সেকশন
+                          _buildPremiumSection(isTablet, isSmallScreen),
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
-                          // SECTION 6: তথ্য বক্স
+                          // SECTION 7: তথ্য বক্স
                           _buildInfoSection(isTablet, isSmallScreen),
 
                           // Bottom spacer for banner ad
@@ -946,7 +966,94 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // SECTION 3: ভিডিও রিওয়ার্ড সেকশন
+  // SECTION 3: রিয়েল গিফট সেকশন
+  Widget _buildGiftSection(bool isTablet, bool isSmallScreen) {
+    return Card(
+      elevation: 3,
+      child: Padding(
+        padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.card_giftcard,
+                  color: Colors.purple,
+                  size: isSmallScreen ? 20 : 24,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  "🎁 রিয়েল গিফট পান",
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 16 : 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Text(
+              "৫০০০ পয়েন্ট জমা করে আকর্ষণীয় গিফট জিতুন",
+              style: TextStyle(
+                fontSize: isSmallScreen ? 12 : 14,
+                color: Colors.purple.shade800,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _pendingPoints >= 5000 ? _requestRecharge : null,
+                icon: const Icon(Icons.redeem),
+                label: Text(
+                  _pendingPoints >= 5000
+                      ? "গিফট নিন (প্রস্তুত)"
+                      : "গিফট নিন (${5000 - _pendingPoints} পয়েন্ট বাকি)",
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 13 : 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(
+                    vertical: isSmallScreen ? 12 : 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+            if (_pendingPoints < 5000) ...[
+              SizedBox(height: 8),
+              LinearProgressIndicator(
+                value: _pendingPoints / 5000,
+                backgroundColor: Colors.purple.shade200,
+                color: Colors.purple,
+                minHeight: 6,
+              ),
+              SizedBox(height: 4),
+              Text(
+                "${_pendingPoints}/5000 পয়েন্ট সংগ্রহ হয়েছে",
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 10 : 12,
+                  color: Colors.purple.shade700,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // SECTION 4: ভিডিও রিওয়ার্ড সেকশন
   Widget _buildVideoRewardSection(bool isTablet, bool isSmallScreen) {
     return Card(
       elevation: 3,
@@ -1012,203 +1119,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // SECTION 4: প্রিমিয়াম ও গিফট সেকশন
-  Widget _buildPremiumGiftSection(bool isTablet, bool isSmallScreen) {
+  // SECTION 6: প্রিমিয়াম সেকশন
+  Widget _buildPremiumSection(bool isTablet, bool isSmallScreen) {
     return Card(
       elevation: 3,
       child: Padding(
         padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
         child: Column(
           children: [
-            // 🔥 গিফট সেকশন - সম্পূর্ণ আলাদা
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.purple.shade50, Colors.purple.shade100],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.workspace_premium,
+                  color: Colors.amber,
+                  size: isSmallScreen ? 20 : 24,
                 ),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.purple.shade200),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.card_giftcard,
-                        color: Colors.purple,
-                        size: isSmallScreen ? 20 : 24,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        "🎁 রিয়েল গিফট পান",
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 16 : 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.purple,
-                        ),
-                      ),
-                    ],
+                SizedBox(width: 8),
+                Text(
+                  "⭐ প্রিমিয়াম এক্সপেরিয়েন্স",
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 16 : 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    "৫০০০ পয়েন্ট জমা করে আকর্ষণীয় গিফট জিতুন",
-                    style: TextStyle(
-                      fontSize: isSmallScreen ? 12 : 14,
-                      color: Colors.purple.shade800,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _pendingPoints >= 5000
-                          ? _requestRecharge
-                          : null,
-                      icon: const Icon(Icons.redeem),
-                      label: Text(
-                        _pendingPoints >= 5000
-                            ? "গিফট নিন (প্রস্তুত)"
-                            : "গিফট নিন (${5000 - _pendingPoints} পয়েন্ট বাকি)",
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 13 : 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(
-                          vertical: isSmallScreen ? 12 : 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (_pendingPoints < 5000) ...[
-                    SizedBox(height: 8),
-                    LinearProgressIndicator(
-                      value: _pendingPoints / 5000,
-                      backgroundColor: Colors.purple.shade200,
-                      color: Colors.purple,
-                      minHeight: 6,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "${_pendingPoints}/5000 পয়েন্ট সংগ্রহ হয়েছে",
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 10 : 12,
-                        color: Colors.purple.shade700,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+                ),
+              ],
             ),
-
-            SizedBox(height: isSmallScreen ? 12 : 16),
-
-            // 🔥 প্রিমিয়াম সেকশন - সম্পূর্ণ আলাদা
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue.shade50, Colors.cyan.shade50],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blue.shade200),
+            SizedBox(height: 8),
+            Text(
+              "এক্সক্লুসিভ ফিচার এবং এড-ফ্রি এক্সপেরিয়েন্স",
+              style: TextStyle(
+                fontSize: isSmallScreen ? 12 : 14,
+                color: Colors.blue.shade800,
+                fontWeight: FontWeight.w500,
               ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.workspace_premium,
-                        color: Colors.amber,
-                        size: isSmallScreen ? 20 : 24,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        "⭐ প্রিমিয়াম এক্সপেরিয়েন্স",
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 16 : 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade800,
-                        ),
-                      ),
-                    ],
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12),
+            // প্রিমিয়াম ফিচার লিস্ট
+            Column(
+              children: [
+                _buildPremiumFeature(
+                  "এড-ফ্রি ব্যবহার",
+                  Icons.block,
+                  isSmallScreen,
+                ),
+                _buildPremiumFeature(
+                  "এক্সক্লুসিভ কুইজ",
+                  Icons.quiz,
+                  isSmallScreen,
+                ),
+                _buildPremiumFeature(
+                  "প্রায়োরিটি সাপোর্ট",
+                  Icons.support_agent,
+                  isSmallScreen,
+                ),
+                _buildPremiumFeature("ডাবল পয়েন্ট", Icons.bolt, isSmallScreen),
+              ],
+            ),
+            SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _navigateToPremium,
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text(
+                  "প্রিমিয়াম দেখুন",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.blue.shade800,
+                  side: BorderSide(color: Colors.blue.shade600),
+                  padding: EdgeInsets.symmetric(
+                    vertical: isSmallScreen ? 12 : 14,
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    "এক্সক্লুসিভ ফিচার এবং এড-ফ্রি এক্সপেরিয়েন্স",
-                    style: TextStyle(
-                      fontSize: isSmallScreen ? 12 : 14,
-                      color: Colors.blue.shade800,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  SizedBox(height: 8),
-                  // প্রিমিয়াম ফিচার লিস্ট
-                  Column(
-                    children: [
-                      _buildPremiumFeature(
-                        "এড-ফ্রি ব্যবহার",
-                        Icons.block,
-                        isSmallScreen,
-                      ),
-                      _buildPremiumFeature(
-                        "এক্সক্লুসিভ কুইজ",
-                        Icons.quiz,
-                        isSmallScreen,
-                      ),
-                      _buildPremiumFeature(
-                        "প্রায়োরিটি সাপোর্ট",
-                        Icons.support_agent,
-                        isSmallScreen,
-                      ),
-                      _buildPremiumFeature(
-                        "ডাবল পয়েন্ট",
-                        Icons.bolt,
-                        isSmallScreen,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _navigateToPremium,
-                      icon: const Icon(Icons.arrow_forward),
-                      label: const Text(
-                        "প্রিমিয়াম দেখুন",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.blue.shade800,
-                        side: BorderSide(color: Colors.blue.shade600),
-                        padding: EdgeInsets.symmetric(
-                          vertical: isSmallScreen ? 12 : 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ],
@@ -1217,38 +1206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // 🔥 প্রিমিয়াম ফিচার আইটেম উইজেট
-  Widget _buildPremiumFeature(
-    String feature,
-    IconData icon,
-    bool isSmallScreen,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.green, size: isSmallScreen ? 16 : 18),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              feature,
-              style: TextStyle(
-                fontSize: isSmallScreen ? 12 : 14,
-                color: Colors.blue.shade700,
-              ),
-            ),
-          ),
-          Icon(
-            Icons.check_circle,
-            color: Colors.green,
-            size: isSmallScreen ? 16 : 18,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // SECTION 6: তথ্য বক্স
+  // SECTION 7: তথ্য বক্স
   Widget _buildInfoSection(bool isTablet, bool isSmallScreen) {
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 10 : (isTablet ? 16 : 12)),
@@ -1310,6 +1268,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontWeight: FontWeight.bold,
               color: color,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 🔥 প্রিমিয়াম ফিচার আইটেম উইজেট
+  Widget _buildPremiumFeature(
+    String feature,
+    IconData icon,
+    bool isSmallScreen,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.green, size: isSmallScreen ? 16 : 18),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              feature,
+              style: TextStyle(
+                fontSize: isSmallScreen ? 12 : 14,
+                color: Colors.blue.shade700,
+              ),
+            ),
+          ),
+          Icon(
+            Icons.check_circle,
+            color: Colors.green,
+            size: isSmallScreen ? 16 : 18,
           ),
         ],
       ),

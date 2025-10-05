@@ -177,13 +177,13 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
         title: const Text(
           'ইসলামের সংক্ষিপ্ত ইতিহাস',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: 18,
             letterSpacing: 0.5,
             color: Colors.white,
           ),
         ),
-        centerTitle: true,
+        //centerTitle: true,
         leading: Container(
           margin: EdgeInsets.all(8),
           decoration: BoxDecoration(

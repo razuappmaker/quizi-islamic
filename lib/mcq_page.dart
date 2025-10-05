@@ -1,3 +1,4 @@
+//mcq page
 // mcq_page.dart - Main UI Component
 import 'dart:async';
 import 'dart:math' as math;
@@ -556,8 +557,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       );
 
       // 🔥 DEBUG SECURITY STATUS
-      await PointManager.debugSecurityStatus(widget.quizId);
-
+      //await PointManager.debugSecurityStatus(widget.quizId);
+      // আপনার অ্যাপে কোথাও কল করুন
+      //------------------------
       // Load ads
       AdHelper.loadInterstitialAd();
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -575,33 +577,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     }
   }
 
-  /*void _showErrorDialog(String message) {
-    if (!mounted) return;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber, color: Colors.orange),
-            SizedBox(width: 10),
-            Text("একটু অপেক্ষা করুন"),
-          ],
-        ),
-        content: Text(message, style: TextStyle(fontSize: 16, height: 1.4)),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop(); // Go back to previous screen
-            },
-            child: const Text("ঠিক আছে", style: TextStyle(fontSize: 16)),
-          ),
-        ],
-      ),
-    );
-  }*/
   void _showErrorDialog(String message) {
     if (!mounted) return;
 
@@ -658,7 +633,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     const SizedBox(height: 15),
                     // Title
                     const Text(
-                      "একটু অপেক্ষা করুন",
+                      "অপেক্ষা করুন",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

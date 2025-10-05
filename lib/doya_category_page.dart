@@ -484,7 +484,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
             : const Text(
                 'দুআর সংকলন (অর্থসহ)',
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   fontSize: 20,
                   color: Colors.white,
                 ),

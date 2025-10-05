@@ -1,5 +1,4 @@
-// mcq_security_manager.dart - COMPLETELY FIXED VERSION
-// mcq_security_manager.dart - COMPLETELY FIXED VERSION
+// mcq_security_manager.dart - FINAL CLEAN VERSION
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -16,27 +15,28 @@ class AnswerResult {
 }
 
 class MCQSecurityManager {
-  // Quiz Data
+  // ==================== QUIZ DATA ====================
   List<dynamic> questions = [];
   int score = 0;
-  bool quizStarted = false; // 🔧 FIX: Start as false
+  bool quizStarted = false;
 
-  // Points System
+  // ==================== POINTS SYSTEM ====================
   int _totalEarnedPoints = 0;
   bool pointsAdded = false;
+  bool _quizRecorded = false;
 
-  // User Statistics
+  // ==================== USER STATISTICS ====================
   int _totalQuestionsAnswered = 0;
   int _totalCorrectAnswers = 0;
   int _totalPointsEarned = 0;
 
-  // Language
+  // ==================== LANGUAGE ====================
   bool _isEnglish = false;
 
-  // Current Quiz ID for security tracking
+  // ==================== CURRENT QUIZ ID ====================
   String _currentQuizId = '';
 
-  // Category Mapping
+  // ==================== CATEGORY MAPPING ====================
   final Map<String, String> _categoryMappings = {
     // English categories
     'Basic Islamic Knowledge': 'Basic Islamic Knowledge',
@@ -71,124 +71,60 @@ class MCQSecurityManager {
     'ইসলামের ইতিহাস': 'ইসলামের ইতিহাস',
   };
 
-  // 🔧 FIXED: Strict initialization with security check
-  // MCQSecurityManager.dart - STRICT INITIALIZATION
-  // MCQSecurityManager.dart - initialize মেথডে এড করুন
+  // ==================== INITIALIZATION ====================
+
+  /// কুইজ ইনিশিয়ালাইজেশন মেথড
   Future<void> initialize({
     required String category,
     required String quizId,
   }) async {
     try {
-      print('🔄 STRICT QUIZ INITIALIZATION STARTED...');
+      print('🔄 QUIZ INITIALIZATION STARTED...');
 
-      // Use consistent quiz ID mapping
       final String mappedQuizId = getMappedQuizId(category);
       _currentQuizId = mappedQuizId;
 
-      print('📝 Category: $category');
-      print('🔑 Original Quiz ID: $quizId');
-      print('🗺️ Mapped Quiz ID: $mappedQuizId');
+      print('📝 Category: $category → Mapped: $mappedQuizId');
 
-      // 🔒 STRICT SECURITY CHECK with detailed logging
-      print('🔒 Running strict security check...');
+      // Security check
       final canPlayResult = await PointManager.canPlayQuiz(mappedQuizId);
 
       print('🔍 Security Check Result:');
       print('   - Can Play: ${canPlayResult['canPlay']}');
       print('   - Reason: ${canPlayResult['reason']}');
-      print('   - Message: ${canPlayResult['message']}');
+      print('   - Remaining Points: ${canPlayResult['remainingPoints']}');
 
       if (!canPlayResult['canPlay']) {
         final String errorMessage =
             canPlayResult['message'] ?? 'কুইজ খেলা যাবে না';
         final String reason = canPlayResult['reason'] ?? 'অজানা কারণ';
-
-        print('🚫 SECURITY BLOCKED: $reason - $errorMessage');
         throw Exception('$reason: $errorMessage');
       }
 
-      print('✅ Security check passed, loading questions...');
-
-      // Load questions with consistent ID
+      // Load questions
       await loadQuestions(mappedQuizId);
 
       if (questions.isEmpty) {
         throw Exception('কোন প্রশ্ন লোড করা যায়নি');
       }
 
-      // 🔥 RECORD QUIZ START IMMEDIATELY
-      await _recordQuizStart();
-
       // Initialize stats
       await _initializeUserStats();
 
-      // Mark quiz as started ONLY after all checks pass
       quizStarted = true;
+      _quizRecorded = false;
 
-      print('✅ STRICT INITIALIZATION COMPLETED');
-      print('📊 Questions loaded: ${questions.length}');
+      print('✅ INITIALIZATION COMPLETED - Questions: ${questions.length}');
     } catch (e) {
-      print('❌ STRICT INITIALIZATION FAILED: $e');
-
-      // Clear everything on failure
-      quizStarted = false;
-      questions = [];
-      score = 0;
-      _totalEarnedPoints = 0;
-
+      print('❌ INITIALIZATION FAILED: $e');
+      _resetQuizState();
       rethrow;
     }
   }
 
-  // MCQSecurityManager.dart - নিচের মেথডটি এড করুন
-  Future<void> _recordQuizStart() async {
-    try {
-      if (_currentQuizId.isEmpty) {
-        print('🚫 Cannot record quiz start: No quiz ID');
-        return;
-      }
+  // ==================== ANSWER CHECKING ====================
 
-      print('📝 Recording quiz START: $_currentQuizId');
-
-      // Record quiz start with 0 points
-      await PointManager.recordQuizPlay(
-        quizId: _currentQuizId,
-        pointsEarned: 0, // Start with 0 points
-        correctAnswers: 0,
-        totalQuestions: questions.length,
-      );
-
-      print('✅ Quiz start recorded successfully');
-    } catch (e) {
-      print('❌ Error recording quiz start: $e');
-    }
-  }
-
-  // 🔥 NEW: IMMEDIATE QUIZ PLAY RECORDING
-  Future<void> _recordQuizPlayImmediately() async {
-    try {
-      if (_currentQuizId.isEmpty) {
-        print('🚫 Cannot record quiz: No quiz ID');
-        return;
-      }
-
-      print('📝 IMMEDIATE Quiz play recording: $_currentQuizId');
-
-      // Record with 0 points initially (will update later)
-      await PointManager.recordQuizPlay(
-        quizId: _currentQuizId,
-        pointsEarned: 0, // Initial record
-        correctAnswers: 0,
-        totalQuestions: questions.length,
-      );
-
-      print('✅ IMMEDIATE Quiz play recorded');
-    } catch (e) {
-      print('❌ Error in immediate quiz recording: $e');
-    }
-  }
-
-  // 🔧 FIXED: Answer checking with proper security
+  /// উত্তর চেক করার মেথড
   AnswerResult checkAnswer({
     required String selected,
     required int currentQuestionIndex,
@@ -198,25 +134,21 @@ class MCQSecurityManager {
     if (!quizStarted ||
         questions.isEmpty ||
         currentQuestionIndex >= questions.length) {
-      print('🚫 Security: Invalid answer attempt');
       return AnswerResult(isCorrect: false, earnedPoints: 0);
     }
 
     final question = questions[currentQuestionIndex];
 
-    // Validate question format
     if (!validateAnswerFormat(question)) {
-      print('🚫 Security: Invalid question format');
       return AnswerResult(isCorrect: false, earnedPoints: 0);
     }
 
     final isCorrect = selected == question['answer'];
     int pointsForThisQuestion = _calculatePoints(isCorrect, timeLeft);
 
-    print(
-      '🎯 Answer checked: Correct=$isCorrect, Points=$pointsForThisQuestion',
-    );
+    print('🎯 Answer: Correct=$isCorrect, Points=$pointsForThisQuestion');
 
+    // Update scores
     if (isCorrect) {
       score++;
       _totalCorrectAnswers++;
@@ -226,16 +158,22 @@ class MCQSecurityManager {
     _totalEarnedPoints += pointsForThisQuestion;
     _totalPointsEarned += pointsForThisQuestion;
 
-    // Add points to user account
-    _addPointsToUser(pointsForThisQuestion);
+    // 🔥 CRITICAL FIX: Record quiz play ONLY on first answer
+    if (!_quizRecorded) {
+      _recordQuizPlay();
+      _quizRecorded = true;
+    } else {
+      // 🔥 শুধুমাত্র আপডেট করবে, নতুন করে পয়েন্ট যোগ করবে না
+      _updateQuizRecord();
+    }
 
-    // Update quiz stats
+    // Add points and update stats
+    //_addPointsToUser(pointsForThisQuestion);
     _updateUserStats();
 
-    // Mark quiz as completed if it's the last question
+    // Finalize if last question
     if (currentQuestionIndex == questions.length - 1) {
-      print('🏁 Quiz completed, recording play...');
-      _markQuizAsCompleted();
+      _finalizeQuiz();
     }
 
     return AnswerResult(
@@ -244,33 +182,9 @@ class MCQSecurityManager {
     );
   }
 
-  // 🔧 FIXED: Mark quiz as completed with proper recording
-  Future<void> _markQuizAsCompleted() async {
-    try {
-      if (_currentQuizId.isEmpty) {
-        print('🚫 Cannot mark quiz completed: No quiz ID');
-        return;
-      }
+  // ==================== POINTS MANAGEMENT ====================
 
-      print('📝 Recording quiz completion: $_currentQuizId');
-
-      await PointManager.recordQuizPlay(
-        quizId: _currentQuizId,
-        pointsEarned: _totalEarnedPoints,
-        correctAnswers: score,
-        totalQuestions: questions.length,
-      );
-
-      print(
-        '✅ Quiz marked as completed: $_totalEarnedPoints points, $score correct',
-      );
-    } catch (e) {
-      print('❌ Error marking quiz as completed: $e');
-      // Don't throw - we don't want to break the UI flow
-    }
-  }
-
-  // 🔧 FIXED: Points calculation
+  /// পয়েন্ট ক্যালকুলেশন মেথড
   int _calculatePoints(bool isCorrect, int timeLeft) {
     if (!isCorrect) {
       return 1; // Participation points
@@ -287,68 +201,150 @@ class MCQSecurityManager {
       return 3;
   }
 
-  // 🔧 FIXED: Add points with validation
-  Future<void> _addPointsToUser(int earnedPoints) async {
+  /// ইউজার অ্যাকাউন্টে পয়েন্ট যোগ করার মেথড
+  /*Future<void> _addPointsToUser(int earnedPoints) async {
     try {
-      // Security check: Validate points amount
-      if (earnedPoints < 0 || earnedPoints > 100) {
-        print('⚠️ Suspicious points amount: $earnedPoints');
+      // Security checks
+      if (earnedPoints <= 0 || earnedPoints > 100) {
+        print('⚠️ Invalid points amount: $earnedPoints');
         return;
       }
 
-      await PointManager.addPoints(earnedPoints);
-      print("✅ $earnedPoints points added to user account");
+      // 🔥 Check daily limit BEFORE adding points
+      final totalPointsToday = await PointManager.getTotalPointsToday();
+      if (totalPointsToday >= PointManager.MAX_POINTS_PER_DAY) {
+        print('🚫 Daily points limit reached, skipping points addition');
+        return;
+      }
+
+      // 🔥 Ensure we don't exceed daily limit
+      int pointsToAdd = earnedPoints;
+      if (totalPointsToday + earnedPoints > PointManager.MAX_POINTS_PER_DAY) {
+        pointsToAdd = PointManager.MAX_POINTS_PER_DAY - totalPointsToday;
+        print(
+          '🎯 Capping points: $earnedPoints → $pointsToAdd (to stay within daily limit)',
+        );
+      }
+
+      // Add points
+      if (pointsToAdd > 0) {
+        await PointManager.addPoints(pointsToAdd);
+        print("✅ $pointsToAdd points added to user account");
+      } else {
+        print('⏭️ No points added (Daily limit reached)');
+      }
     } catch (e) {
       print("❌ Error adding points: $e");
     }
+  }*/
+
+  // ==================== QUIZ RECORDING ====================
+
+  /// কুইজ খেলা রেকর্ড করার মেথড
+  Future<void> _recordQuizPlay() async {
+    try {
+      if (_currentQuizId.isEmpty) return;
+
+      await PointManager.recordQuizPlay(
+        quizId: _currentQuizId,
+        pointsEarned: _totalEarnedPoints,
+        correctAnswers: score,
+        totalQuestions: questions.length,
+      );
+
+      print('✅ Quiz play recorded with ${_totalEarnedPoints} points');
+    } catch (e) {
+      print('❌ Error recording quiz play: $e');
+    }
   }
 
-  // 🔧 FIXED: Update user stats
+  /// কুইজ রেকর্ড আপডেট করার মেথড
+  Future<void> _updateQuizRecord() async {
+    try {
+      if (_currentQuizId.isEmpty || !_quizRecorded) return;
+
+      await PointManager.recordQuizPlay(
+        quizId: _currentQuizId,
+        pointsEarned: _totalEarnedPoints,
+        correctAnswers: score,
+        totalQuestions: questions.length,
+      );
+
+      print('✅ Quiz record updated with ${_totalEarnedPoints} points');
+    } catch (e) {
+      print('❌ Error updating quiz record: $e');
+    }
+  }
+
+  /// কুইজ ফাইনালাইজ করার মেথড
+  Future<void> _finalizeQuiz() async {
+    try {
+      if (_currentQuizId.isEmpty) return;
+
+      await PointManager.recordQuizPlay(
+        quizId: _currentQuizId,
+        pointsEarned: _totalEarnedPoints,
+        correctAnswers: score,
+        totalQuestions: questions.length,
+      );
+
+      print(
+        '✅ Quiz finalized - Total Points: $_totalEarnedPoints, Correct: $score',
+      );
+    } catch (e) {
+      print('❌ Error finalizing quiz: $e');
+    }
+  }
+
+  // ==================== USER STATS MANAGEMENT ====================
+
+  /// ইউজার স্ট্যাটস আপডেট করার মেথড
   Future<void> _updateUserStats() async {
     try {
       await PointManager.updateQuizStats(score);
-      print("✅ Quiz stats updated: $score correct answers");
     } catch (e) {
       print("❌ Error updating stats: $e");
     }
   }
 
-  // 🔧 FIXED: Initialize user stats
+  /// ইউজার স্ট্যাটস ইনিশিয়ালাইজ করার মেথড
   Future<void> _initializeUserStats() async {
-    try {
-      _totalQuestionsAnswered = 0;
-      _totalCorrectAnswers = 0;
-      _totalPointsEarned = 0;
-      score = 0;
-      _totalEarnedPoints = 0;
-
-      print('✅ User stats initialized');
-    } catch (e) {
-      print('❌ Error initializing user stats: $e');
-    }
+    _totalQuestionsAnswered = 0;
+    _totalCorrectAnswers = 0;
+    _totalPointsEarned = 0;
+    score = 0;
+    _totalEarnedPoints = 0;
+    _quizRecorded = false;
   }
 
-  // Existing methods remain but ensure they don't bypass security
+  /// কুইজ স্টেট রিসেট করার মেথড
+  void _resetQuizState() {
+    quizStarted = false;
+    questions = [];
+    score = 0;
+    _totalEarnedPoints = 0;
+    _quizRecorded = false;
+  }
+
+  // ==================== QUESTION LOADING ====================
+
+  /// প্রশ্ন লোড করার মেথড
   Future<void> loadQuestions(String quizId) async {
     try {
-      print('🔄 Loading questions for: $quizId');
-
       final String fileName = _isEnglish
           ? 'assets/enquestions.json'
           : 'assets/questions.json';
-      print('📁 Loading from: $fileName');
 
       // Try network first
       try {
         final List<dynamic> allQuestionsData =
             await NetworkJsonLoader.loadJsonList(fileName);
-        if (allQuestionsData is List && allQuestionsData.isNotEmpty) {
+        if (allQuestionsData.isNotEmpty) {
           Map<dynamic, dynamic> questionsMap = {};
           for (var item in allQuestionsData) {
             if (item is Map) questionsMap.addAll(item as Map<dynamic, dynamic>);
           }
           _setQuestionsFromMap(questionsMap, quizId);
-          print('✅ Questions loaded from network');
           return;
         }
       } catch (e) {
@@ -360,13 +356,11 @@ class MCQSecurityManager {
         final String localResponse = await rootBundle.loadString(fileName);
         final Map<dynamic, dynamic> localData = json.decode(localResponse);
         _setQuestionsFromMap(localData, quizId);
-        print('✅ Questions loaded from local');
         return;
       } catch (e) {
         print('❌ Local load failed: $e');
       }
 
-      // If all loading methods fail, throw exception
       throw Exception('প্রশ্ন লোড করা যায়নি');
     } catch (e) {
       print('❌ All question loading methods failed: $e');
@@ -374,24 +368,21 @@ class MCQSecurityManager {
     }
   }
 
+  /// ম্যাপ থেকে প্রশ্ন সেট করার মেথড
   void _setQuestionsFromMap(Map<dynamic, dynamic> questionsMap, String quizId) {
-    print('🔍 Searching for quiz: $quizId');
-
     final quizIdString = quizId.toString();
     final availableKeys = questionsMap.keys.map((k) => k.toString()).toList();
-    print('📋 Available keys: $availableKeys');
 
-    // Try exact match first
+    // Exact match
     if (questionsMap.containsKey(quizIdString)) {
       final questionsData = questionsMap[quizIdString];
       if (questionsData is List) {
         questions = List<dynamic>.from(questionsData);
-        print('✅ Exact match found: ${questions.length} questions');
         return;
       }
     }
 
-    // Try partial match
+    // Partial match
     for (final key in questionsMap.keys) {
       final keyString = key.toString();
       if (keyString.toLowerCase().contains(quizIdString.toLowerCase()) ||
@@ -399,21 +390,22 @@ class MCQSecurityManager {
         final questionsData = questionsMap[key];
         if (questionsData is List) {
           questions = List<dynamic>.from(questionsData);
-          print('✅ Partial match found: ${questions.length} questions');
           return;
         }
       }
     }
 
-    // No questions found
     throw Exception('এই ক্যাটাগরির জন্য কোন প্রশ্ন পাওয়া যায়নি');
   }
 
-  // Security validation methods
+  // ==================== VALIDATION METHODS ====================
+
+  /// প্রশ্ন ইন্ডেক্স ভ্যালিডেশন মেথড
   bool validateQuestionIndex(int index) {
     return index >= 0 && index < questions.length;
   }
 
+  /// উত্তর ফরম্যাট ভ্যালিডেশন মেথড
   bool validateAnswerFormat(dynamic question) {
     if (question is! Map<String, dynamic>) return false;
     if (question['question'] is! String) return false;
@@ -425,6 +417,8 @@ class MCQSecurityManager {
   }
 
   // ==================== EXTERNAL SERVICES ====================
+
+  /// গুগলে সার্চ করার মেথড
   Future<void> searchOnGoogle({
     required BuildContext context,
     required String question,
@@ -433,32 +427,15 @@ class MCQSecurityManager {
       final bool? shouldSearch = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text(
-            'গুগলে সার্চ করুন',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            'আপনি কি "$question" প্রশ্নটি গুগলে সার্চ করতে চান?',
-            style: const TextStyle(fontSize: 14, height: 1.4),
-            textAlign: TextAlign.center,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          title: const Text('গুগলে সার্চ করুন'),
+          content: Text('আপনি কি "$question" প্রশ্নটি গুগলে সার্চ করতে চান?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('বাতিল', style: TextStyle(color: Colors.grey)),
+              child: const Text('বাতিল'),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
               child: const Text('সার্চ করুন'),
             ),
           ],
@@ -481,37 +458,39 @@ class MCQSecurityManager {
     }
   }
 
+  /// এরর স্ন্যাকবার দেখানোর মেথড
   void _showErrorSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red[700],
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
 
-  // ==================== CATEGORY MAPPING UTILITIES ====================
+  // ==================== CATEGORY UTILITIES ====================
+
+  /// ক্যাটাগরি ম্যাপিং মেথড
   String getMappedQuizId(String category) {
     return _categoryMappings[category] ?? category;
   }
 
+  /// ভ্যালিড ক্যাটাগরি চেক মেথড
   bool isValidCategory(String category) {
     return _categoryMappings.containsKey(category);
   }
 
+  /// অ্যাভেইলেবল ক্যাটাগরি লিস্ট মেথড
   List<String> getAvailableCategories() {
     return _categoryMappings.keys.toList();
   }
 
   // ==================== GETTERS ====================
-  // Getters
+
   int get totalQuestions => questions.length;
 
   int get totalScore => score;
-
-  int calculateTotalPoints() => _totalEarnedPoints;
 
   int get totalQuestionsAnswered => _totalQuestionsAnswered;
 
@@ -519,11 +498,28 @@ class MCQSecurityManager {
 
   int get totalPointsEarned => _totalPointsEarned;
 
+  int calculateTotalPoints() => _totalEarnedPoints;
+
   double get accuracyRate => _totalQuestionsAnswered > 0
       ? (_totalCorrectAnswers / _totalQuestionsAnswered) * 100
       : 0.0;
 
   // ==================== DEBUGGING UTILITIES ====================
+
+  // TODO: Remove debug methods after testing
+  /*
+  Future<void> _debugPointsStatus() async {
+    try {
+      final totalPointsToday = await PointManager.getTotalPointsToday();
+      print('🔍 DEBUG POINTS STATUS:');
+      print('   - MAX_POINTS_PER_DAY: ${PointManager.MAX_POINTS_PER_DAY}');
+      print('   - Total Points Today: $totalPointsToday');
+      print('   - Remaining Points: ${PointManager.MAX_POINTS_PER_DAY - totalPointsToday}');
+    } catch (e) {
+      print('❌ Error checking points status: $e');
+    }
+  }
+
   void printDebugInfo(String category, String quizId) {
     print('=== MCQ SECURITY MANAGER DEBUG INFO ===');
     print('📝 Category: $category');
@@ -531,16 +527,22 @@ class MCQSecurityManager {
     print('🗺️ Mapped Quiz ID: ${getMappedQuizId(category)}');
     print('📊 Questions Loaded: ${questions.length}');
     print('✅ Valid Category: ${isValidCategory(category)}');
+    print('🎯 Quiz Started: $quizStarted');
+    print('📝 Quiz Recorded: $_quizRecorded');
+    print('💰 Total Earned Points: $_totalEarnedPoints');
     print('=== END DEBUG INFO ===');
   }
+  */
 
   // ==================== CLEANUP ====================
-  // Cleanup
+
+  /// ডিসপোজ মেথড
   void dispose() {
     questions.clear();
     score = 0;
     _totalEarnedPoints = 0;
     pointsAdded = false;
     quizStarted = false;
+    _quizRecorded = false;
   }
 }

@@ -157,12 +157,12 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
         title: const Text(
           'মহানবী (সা.)-এর সংক্ষিপ্ত জীবনী',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: 18,
             color: Colors.white,
           ),
         ),
-        centerTitle: true,
+        //centerTitle: true,
         backgroundColor: isDarkMode ? Colors.green[800] : Colors.green[700],
         leading: Container(
           margin: EdgeInsets.all(8),

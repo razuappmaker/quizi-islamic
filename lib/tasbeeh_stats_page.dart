@@ -242,11 +242,12 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
       appBar: AppBar(
         foregroundColor: Colors.white,
         title: const Text(
-          "মোট তাসবিহ",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          "সর্বমোট তাসবিহ গণনা",
+          style: TextStyle(fontWeight: FontWeight.w600),
         ),
         backgroundColor: Colors.green[800],
-        centerTitle: true,
+
+        //centerTitle: true,
         leading: Container(
           margin: EdgeInsets.all(8),
           decoration: BoxDecoration(
