@@ -1,4 +1,4 @@
-// word_by_word_quran_page.dart (আপডেটেড - Anchor Ads সহ)
+// word_by_word_quran_page.dart (ফিক্সড - Anchor Ads সহ এবং বটম প্যাডিং ইস্যু সমাধান)
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'json_loader.dart';
@@ -780,8 +780,6 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: _getPrimaryColor(context),
@@ -806,15 +804,14 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
           ),
         ),
       ),
-      body: Container(
-        color: _getBackgroundColor(context),
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: _showAnchorAd ? 0 : bottomPadding,
-                ),
+      body: SafeArea(
+        // Main SafeArea to handle system UI
+        bottom: true,
+        child: Container(
+          color: _getBackgroundColor(context),
+          child: Column(
+            children: [
+              Expanded(
                 child: _isLoading
                     ? Center(
                         child: Column(
@@ -861,14 +858,10 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                             buildWordSura(wordSuras[index], index),
                       ),
               ),
-            ),
 
-            // Anchor Ad Section - Minimal Design
-            // Anchor Ad Section - Minimal Design
-            if (_isAnchorAdReady && _showAnchorAd && _anchorAd != null)
-              SafeArea(
-                top: false,
-                child: Container(
+              // Anchor Ad Section - Fixed with proper bottom padding
+              if (_isAnchorAdReady && _showAnchorAd && _anchorAd != null)
+                Container(
                   width: double.infinity,
                   color: _getCardColor(context),
                   child: Stack(
@@ -911,11 +904,11 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                       ),
                     ],
                   ),
-                ),
-              )
-            else
-              const SizedBox.shrink(),
-          ],
+                )
+              else
+                const SizedBox.shrink(),
+            ],
+          ),
         ),
       ),
     );

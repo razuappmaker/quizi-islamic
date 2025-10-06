@@ -1,7 +1,4 @@
-// main.dart
-//main.dart Trying to dropdown
-
-// main.dart - COMPLETE OPTIMIZED VERSION
+// main.dart - CLEAN VERSION
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -9,20 +6,15 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
 // Your existing imports
-import 'package:islamicquiz/screens/reward_screen.dart';
 import 'package:islamicquiz/ifter_time_page.dart';
 import 'package:islamicquiz/profile_screen.dart';
 import 'package:islamicquiz/qiblah_page.dart';
-import 'package:islamicquiz/utils/data_deletion_manager.dart';
 import 'mcq_page.dart';
 import 'islamic_history_page.dart';
 import 'prophet_biography_page.dart';
 import 'prayer_time_page.dart';
 import 'doya_category_page.dart';
 import 'nadiyatul_quran.dart';
-import 'about_page.dart';
-import 'contact_page.dart';
-import 'developer_page.dart';
 import 'sura_page.dart';
 import 'name_of_allah_page.dart';
 import 'kalema_page.dart';
@@ -35,9 +27,8 @@ import 'providers/language_provider.dart';
 import 'utils/responsive_utils.dart';
 import 'utils/in_app_purchase_manager.dart';
 import 'widgets/bottom_nav_bar.dart';
-import 'screens/admin_login_screen.dart';
+import 'widgets/drawer_menu.dart'; // Import the new drawer
 import 'quran_verse_scroller.dart';
-import 'support_screen.dart';
 import 'word_by_word_quran_page.dart';
 
 void main() async {
@@ -61,7 +52,6 @@ void main() async {
   );
 }
 
-// main.dart এ MyApp widget আপডেট করুন
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -69,7 +59,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<ThemeProvider, LanguageProvider>(
       builder: (context, themeProvider, languageProvider, child) {
-        // Handle language loading state - শুধু প্রথম লোডিং এর জন্য
         if (languageProvider.currentLanguage.isEmpty) {
           return _buildLoadingScreen();
         }
@@ -402,7 +391,8 @@ class _HomePageState extends State<HomePage>
             ),
           ],
         ),
-        drawer: _buildAppDrawer(context, themeProvider),
+        drawer: DrawerMenu(scaffoldKey: _scaffoldKey),
+        // Clean drawer usage
         body: _buildBody(isDarkMode, tablet, landscape),
         bottomNavigationBar: CustomBottomNavBar(
           isDarkMode: isDarkMode,
@@ -534,18 +524,14 @@ class _HomePageState extends State<HomePage>
   Widget _buildCategorySelector(bool isDarkMode) {
     final languageProvider = Provider.of<LanguageProvider>(context);
 
-    // Loading state check
     if (languageProvider.isLoading ||
         languageProvider.currentLanguage.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // Always use Bengali categories for the dropdown, regardless of language setting
     final categories = _categoriesBn;
 
-    // Define category mappings to quiz IDs/file paths
     final Map<String, String> categoryMappings = {
-      // Bengali categories mapping (your existing working ones)
       'ইসলামী প্রাথমিক জ্ঞান': 'islamic_basic_knowledge',
       'কোরআন': 'quran',
       'মহানবী সঃ এর জীবনী': 'prophet_biography',
@@ -562,7 +548,6 @@ class _HomePageState extends State<HomePage>
       'ইসলামের ইতিহাস': 'islamic_history',
     };
 
-    // Validate selectedCategory
     if (selectedCategory != null && !categories.contains(selectedCategory)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -610,11 +595,9 @@ class _HomePageState extends State<HomePage>
                   child: DropdownButton<String>(
                     value: selectedCategory,
                     hint: Container(
-                      // Container ব্যবহার করুন Row এর পরিবর্তে
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        // এটি গুরুত্বপূর্ণ
                         children: [
                           Icon(
                             Icons.search,
@@ -625,7 +608,6 @@ class _HomePageState extends State<HomePage>
                           ),
                           SizedBox(width: responsiveValue(context, 6)),
                           Expanded(
-                            // Text কে Expanded দিয়ে wrap করুন
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: ResponsiveText(
@@ -655,14 +637,8 @@ class _HomePageState extends State<HomePage>
                     dropdownColor: isDarkMode
                         ? Colors.green[800]
                         : Colors.white,
-
-                    // ড্রপডাউনের সর্বোচ্চ উচ্চতা সীমিত (স্ক্রিনের ৫০%)
                     menuMaxHeight: MediaQuery.of(context).size.height * 0.5,
-
-                    // ড্রপডাউন নিচের দিকেই খুলবে
                     alignment: Alignment.bottomCenter,
-
-                    // সিলেক্টেড আইটেমের স্টাইল
                     selectedItemBuilder: (BuildContext context) {
                       return categories.map<Widget>((String item) {
                         return Container(
@@ -682,7 +658,6 @@ class _HomePageState extends State<HomePage>
                         );
                       }).toList();
                     },
-
                     onChanged: (String? newValue) {
                       if (mounted) {
                         setState(() {
@@ -690,7 +665,6 @@ class _HomePageState extends State<HomePage>
                         });
                       }
                     },
-
                     items: categories.map((String category) {
                       return DropdownMenuItem<String>(
                         value: category,
@@ -787,7 +761,6 @@ class _HomePageState extends State<HomePage>
                       ? null
                       : () {
                           if (mounted) {
-                            // Get the correct quiz ID from the mapping
                             final String quizId =
                                 categoryMappings[selectedCategory!] ??
                                 selectedCategory!;
@@ -800,7 +773,7 @@ class _HomePageState extends State<HomePage>
                               MaterialPageRoute(
                                 builder: (context) => MCQPage(
                                   category: selectedCategory!,
-                                  quizId: quizId, // Use mapped quiz ID
+                                  quizId: quizId,
                                 ),
                               ),
                             );
@@ -837,6 +810,9 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
+
+  // ... Rest of the methods remain the same (_buildQuickAccess, _buildAdditionalFeatures, etc.)
+  // These methods are unchanged from your original code
 
   Widget _buildQuickAccess(
     BuildContext context,
@@ -1508,254 +1484,6 @@ class _HomePageState extends State<HomePage>
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAppDrawer(BuildContext context, ThemeProvider themeProvider) {
-    final languageProvider = Provider.of<LanguageProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-    final tablet = isTablet(context);
-
-    return Drawer(
-      width: tablet ? MediaQuery.of(context).size.width * 0.4 : null,
-      backgroundColor: isDarkMode ? Colors.green[900] : Colors.white,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          Container(
-            height: responsiveValue(context, tablet ? 120 : 140),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDarkMode
-                    ? [Colors.green[900]!, Colors.green[700]!]
-                    : [Colors.green[600]!, Colors.green[400]!],
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: responsiveValue(context, tablet ? 25 : 30),
-                  backgroundColor: Colors.white,
-                  child: Icon(
-                    Icons.menu_book,
-                    size: responsiveValue(context, tablet ? 30 : 34),
-                    color: Colors.green[800],
-                  ),
-                ),
-                ResponsiveSizedBox(height: 10),
-                ResponsiveText(
-                  languageProvider.isEnglish
-                      ? 'Islamic Day - Global Bangladeshi'
-                      : 'ইসলামিক ডে - বৈশ্বিক বাংলাদেশী',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                if (!tablet)
-                  ResponsiveText(
-                    languageProvider.isEnglish
-                        ? 'For the Global Bangladeshi Community'
-                        : 'বিশ্বব্যাপী বাংলাদেশী কমিউনিটির জন্য',
-                    fontSize: 12,
-                    color: Colors.white70,
-                  ),
-              ],
-            ),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.book,
-            languageProvider.isEnglish ? 'Prayers' : 'দুআ',
-            const DoyaCategoryPage(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.mosque,
-            languageProvider.isEnglish ? 'Prayer Time' : 'নামাজের সময়',
-            const PrayerTimePage(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.mosque,
-            languageProvider.isEnglish ? 'Nearby Mosques' : 'নিকটবর্তী মসজিদ',
-            null,
-            url: 'https://www.google.com/maps/search/?api=1&query=মসজিদ',
-          ),
-          _buildDrawerLanguageItem(context, languageProvider),
-          _buildDrawerItem(
-            context,
-            Icons.volunteer_activism,
-            languageProvider.isEnglish ? 'Support Us' : 'সাপোর্ট করুন',
-            const SupportScreen(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.info,
-            languageProvider.isEnglish ? 'About Us' : 'আমাদের সম্বন্ধে',
-            const AboutPage(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.developer_mode,
-            languageProvider.isEnglish ? 'Developer' : 'ডেভেলপার',
-            DeveloperPage(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.contact_page,
-            languageProvider.isEnglish ? 'Contact' : 'যোগাযোগ',
-            const ContactPage(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.person,
-            languageProvider.isEnglish ? 'Rewards' : 'পুরস্কার',
-            RewardScreen(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.admin_panel_settings,
-            languageProvider.isEnglish ? 'Admin Panel' : 'এডমিন প্যানেল',
-            const AdminLoginScreen(),
-          ),
-          _buildDrawerItem(
-            context,
-            Icons.privacy_tip,
-            'Privacy Policy',
-            null,
-            url: 'https://sites.google.com/view/islamicquize/home',
-          ),
-          // পরিবর্তন করে এভাবে করুন:
-          _buildDrawerItem(
-            context,
-            Icons.delete_forever,
-            languageProvider.isEnglish ? 'Delete All Data' : 'সব তথ্য মুছুন',
-            null,
-            onTap: () => DataDeletionManager.showDeleteDataDialog(
-              context,
-            ), // নতুনভাবে কল করুন
-          ),
-
-          Divider(
-            color: Colors.green.shade200,
-            indent: responsiveValue(context, 16),
-            endIndent: responsiveValue(context, 16),
-          ),
-          ResponsivePadding(
-            horizontal: 12,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.brightness_6,
-                  color: Colors.green[700],
-                  size: responsiveValue(context, 24),
-                ),
-                ResponsiveSizedBox(width: 10),
-                ResponsiveText(
-                  languageProvider.isEnglish ? 'Dark Mode' : 'ডার্ক মোড',
-                  fontSize: 16,
-                ),
-                const Spacer(),
-                Switch(
-                  value: themeProvider.isDarkMode,
-                  onChanged: (value) => themeProvider.toggleTheme(value),
-                  activeColor: Colors.green[700],
-                  activeTrackColor: Colors.green[300],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDrawerItem(
-    BuildContext context,
-    IconData icon,
-    String title,
-    Widget? page, {
-    String? url,
-    Function()? onTap, // ✅ এই লাইনটি যোগ করুন
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: isDark ? Colors.white70 : Colors.green[700],
-        size: responsiveValue(context, 24),
-      ),
-      title: ResponsiveText(
-        title,
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: isDark ? Colors.white : Colors.black87,
-      ),
-      trailing: Icon(
-        Icons.arrow_forward_ios,
-        size: responsiveValue(context, 16),
-        color: Colors.green[700],
-      ),
-      onTap:
-          onTap ??
-          () async {
-            // ✅ onTap ব্যবহার করুন
-            Navigator.pop(context);
-            if (url != null) {
-              try {
-                final Uri uri = Uri.parse(url);
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: ResponsiveText(
-                        'Could not open link',
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                  );
-                }
-              }
-            } else if (page != null && mounted) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => page),
-              );
-            }
-          },
-    );
-  }
-
-  Widget _buildDrawerLanguageItem(
-    BuildContext context,
-    LanguageProvider languageProvider,
-  ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ListTile(
-      leading: Icon(
-        Icons.language,
-        color: isDark ? Colors.white70 : Colors.green[700],
-        size: responsiveValue(context, 24),
-      ),
-      title: ResponsiveText(
-        languageProvider.isEnglish ? 'Language' : 'ভাষা',
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: isDark ? Colors.white : Colors.black87,
-      ),
-      trailing: Switch(
-        value: languageProvider.isEnglish,
-        onChanged: (value) => languageProvider.toggleLanguage(),
-        activeColor: Colors.green[700],
-        activeTrackColor: Colors.green[300],
       ),
     );
   }

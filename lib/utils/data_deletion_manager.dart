@@ -7,16 +7,13 @@ import 'package:islamicquiz/utils/point_manager.dart';
 class DataDeletionManager {
   // Delete All Data Dialog Show করার মেথড
   static void showDeleteDataDialog(BuildContext context) {
-    // প্রথমে drawer বন্ধ করুন
-    Navigator.pop(context);
-
-    // LanguageProvider access
+    // LanguageProvider access - FIRST get the provider
     final languageProvider = Provider.of<LanguageProvider>(
       context,
       listen: false,
     );
 
-    // তারপর dialog show করুন
+    // তারপর dialog show করুন - NO Navigator.pop here
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -83,10 +80,10 @@ class DataDeletionManager {
             ],
           ),
           actions: [
-            // Cancel Button
+            // Cancel Button - শুধু Dialog বন্ধ করবে
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // শুধু Dialog বন্ধ
               },
               child: Text(
                 languageProvider.isEnglish ? 'Cancel' : 'বাতিল',
@@ -123,7 +120,7 @@ class DataDeletionManager {
   // সকল ইউজার ডাটা ডিলিট করার মেথড
   static Future<void> _deleteAllUserData(BuildContext context) async {
     try {
-      // Dialog বন্ধ করুন
+      // প্রথমে Main Dialog বন্ধ করুন
       Navigator.of(context).pop();
 
       // LanguageProvider access
@@ -165,7 +162,9 @@ class DataDeletionManager {
       _showSuccessMessage(context);
     } catch (e) {
       // Error হলে loading dialog বন্ধ করুন
-      Navigator.of(context).pop();
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
 
       // Error message show করুন
       _showErrorMessage(context, e.toString());
@@ -204,7 +203,7 @@ class DataDeletionManager {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // শুধু Success Dialog বন্ধ
               },
               child: Text(
                 languageProvider.isEnglish ? 'OK' : 'ঠিক আছে',
@@ -252,7 +251,7 @@ class DataDeletionManager {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // শুধু Error Dialog বন্ধ
               },
               child: Text(languageProvider.isEnglish ? 'OK' : 'ঠিক আছে'),
             ),

@@ -1,4 +1,4 @@
-// lib/widgets/quran_verse_scroller.dart - SIMPLIFIED VERSION
+// lib/widgets/quran_verse_scroller.dart - IMPROVED VERSION
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -21,6 +21,7 @@ class QuranVerseScroller extends StatefulWidget {
 
 class _QuranVerseScrollerState extends State<QuranVerseScroller> {
   final ScrollController _scrollController = ScrollController();
+  bool _isScrolling = true;
 
   // Arabic verses (always show)
   final List<String> _arabicVerses = [
@@ -67,8 +68,10 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
   }
 
   void _startAutoScroll() {
+    if (!_isScrolling || !mounted) return;
+
     Future.delayed(Duration(seconds: 1), () {
-      if (_scrollController.hasClients && mounted) {
+      if (_scrollController.hasClients && mounted && _isScrolling) {
         final maxScroll = _scrollController.position.maxScrollExtent;
         final currentScroll = _scrollController.offset;
 
@@ -86,8 +89,24 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
     });
   }
 
+  void _pauseScrolling() {
+    setState(() {
+      _isScrolling = false;
+    });
+  }
+
+  void _resumeScrolling() {
+    if (!_isScrolling && mounted) {
+      setState(() {
+        _isScrolling = true;
+      });
+      _startAutoScroll();
+    }
+  }
+
   @override
   void dispose() {
+    _isScrolling = false;
     _scrollController.dispose();
     super.dispose();
   }
@@ -113,56 +132,65 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          scrollDirection: Axis.horizontal,
-          physics: const NeverScrollableScrollPhysics(),
-          child: Row(
-            children: [
-              SizedBox(width: 16),
-              Row(
-                children: List.generate(_arabicVerses.length, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.mosque,
-                          color: widget.isDarkMode
-                              ? Colors.green[300]
-                              : Colors.green[600],
-                          size: widget.isTablet ? 20 : 16,
+        child: MouseRegion(
+          onEnter: (_) => _pauseScrolling(),
+          onExit: (_) => _resumeScrolling(),
+          child: GestureDetector(
+            onTapDown: (_) => _pauseScrolling(),
+            onTapCancel: _resumeScrolling,
+            onTapUp: (_) => _resumeScrolling(),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              child: Row(
+                children: [
+                  SizedBox(width: 16),
+                  Row(
+                    children: List.generate(_arabicVerses.length, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.mosque,
+                              color: widget.isDarkMode
+                                  ? Colors.green[300]
+                                  : Colors.green[600],
+                              size: widget.isTablet ? 20 : 16,
+                            ),
+                            SizedBox(width: 8),
+                            // 🔥 UPDATED: Single line display with language support
+                            Text(
+                              "${_arabicVerses[index]} - ${languageProvider.isEnglish ? _englishTranslations[index] : _bengaliTranslations[index]}",
+                              style: TextStyle(
+                                fontSize: widget.isTablet ? 14 : 12,
+                                fontWeight: FontWeight.w500,
+                                color: widget.isDarkMode
+                                    ? Colors.green[100]
+                                    : Colors.green[800],
+                                fontFamily: languageProvider.isEnglish
+                                    ? 'Roboto'
+                                    : 'HindSiliguri',
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(
+                              Icons.star,
+                              color: widget.isDarkMode
+                                  ? Colors.green[300]
+                                  : Colors.green[600],
+                              size: widget.isTablet ? 16 : 12,
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 8),
-                        // 🔥 UPDATED: Single line display with language support
-                        Text(
-                          "${_arabicVerses[index]} - ${languageProvider.isEnglish ? _englishTranslations[index] : _bengaliTranslations[index]}",
-                          style: TextStyle(
-                            fontSize: widget.isTablet ? 14 : 12,
-                            fontWeight: FontWeight.w500,
-                            color: widget.isDarkMode
-                                ? Colors.green[100]
-                                : Colors.green[800],
-                            fontFamily: languageProvider.isEnglish
-                                ? 'Roboto'
-                                : 'HindSiliguri',
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Icon(
-                          Icons.star,
-                          color: widget.isDarkMode
-                              ? Colors.green[300]
-                              : Colors.green[600],
-                          size: widget.isTablet ? 16 : 12,
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                      );
+                    }),
+                  ),
+                  SizedBox(width: 16),
+                ],
               ),
-              SizedBox(width: 16),
-            ],
+            ),
           ),
         ),
       ),

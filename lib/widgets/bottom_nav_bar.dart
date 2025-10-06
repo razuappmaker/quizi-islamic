@@ -31,8 +31,8 @@ class CustomBottomNavBar extends StatelessWidget {
       ),
       BottomNavItem(
         icon: Icons.menu_book_rounded,
-        labelBn: 'শব্দে শব্দে কুরআন',
-        labelEn: 'Word by Word Quran',
+        labelBn: 'শব্দে সূরা',
+        labelEn: 'Surah by Word',
         index: 2,
       ),
       BottomNavItem(

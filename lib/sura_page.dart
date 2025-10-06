@@ -1,5 +1,5 @@
-// Sura page
-// sura_page.dart (আপডেটেড প্রফেশনাল ডিজাইন - ইম্প্রুভড কালার স্কিম)
+// Sura page - Fixed bottom padding issue
+// sura_page.dart (আপডেটেড - ফিক্সড বটম প্যাডিং ইস্যু)
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'json_loader.dart';
@@ -146,8 +146,6 @@ class _SuraPageState extends State<SuraPage> {
     _showFullWarning.clear();
     super.dispose();
   }
-
-  // sura_page.dart (আপডেটেড - লাইট মোডে কার্ড সাদা এবং UI এডজাস্টেড)
 
   // কালার হেল্পার মেথড - ইম্প্রুভড
   Color _getPrimaryColor(BuildContext context) {
@@ -407,18 +405,13 @@ class _SuraPageState extends State<SuraPage> {
           );
   }
 
-  // হেডার সেকশন আপডেট
-  // হেডার সেকশন আপডেট
-  // হেডার সেকশন আপডেট
   Widget _buildSuraHeader(Map<String, dynamic> sura, int index) {
     final serial = sura['serial'] ?? (index + 1);
     final type = sura['type'] ?? 'মাক্কি';
     final ayatCount =
         sura['ayat_count'] ?? (sura['ayat'] as List?)?.length ?? 0;
     final title = sura['title'] ?? '';
-    final bool isExpanded = expandedIndices.contains(
-      index,
-    ); // ← index ব্যবহার করুন
+    final bool isExpanded = expandedIndices.contains(index);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -603,7 +596,7 @@ class _SuraPageState extends State<SuraPage> {
                     }
                   });
                 },
-                child: _buildSuraHeader(sura, index), // ← index পাস করুন
+                child: _buildSuraHeader(sura, index),
               ),
 
               // কন্টেন্ট সেকশন
@@ -743,7 +736,7 @@ class _SuraPageState extends State<SuraPage> {
                               ),
                             ),
 
-                            // আয়াতসমূহ- আয়াত কন্টেইনারের ব্যাকগ্রাউন্ড কালার আপডেট
+                            // আয়াতসমূহ
                             ...List<Widget>.from(
                               (sura['ayat'] as List<dynamic>).map(
                                 (ay) => Container(
@@ -981,15 +974,14 @@ class _SuraPageState extends State<SuraPage> {
           const SizedBox(width: 8),
         ],
       ),
-      body: Container(
-        color: _getBackgroundColor(context),
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: _showAnchorAd ? 0 : bottomPadding,
-                ),
+      body: SafeArea(
+        // Main SafeArea to handle system UI
+        bottom: true,
+        child: Container(
+          color: _getBackgroundColor(context),
+          child: Column(
+            children: [
+              Expanded(
                 child: _isLoading
                     ? Center(
                         child: Column(
@@ -1036,14 +1028,10 @@ class _SuraPageState extends State<SuraPage> {
                             buildSura(dailySuras[index], index),
                       ),
               ),
-            ),
 
-            // Anchor Ad Section
-            // Anchor Ad Section - Minimal Design
-            if (_isAnchorAdReady && _showAnchorAd && _anchorAd != null)
-              SafeArea(
-                top: false,
-                child: Container(
+              // Anchor Ad Section - Fixed with proper bottom padding
+              if (_isAnchorAdReady && _showAnchorAd && _anchorAd != null)
+                Container(
                   width: double.infinity,
                   color: _getCardColor(context),
                   child: Stack(
@@ -1086,11 +1074,11 @@ class _SuraPageState extends State<SuraPage> {
                       ),
                     ],
                   ),
-                ),
-              )
-            else
-              const SizedBox.shrink(),
-          ],
+                )
+              else
+                const SizedBox.shrink(),
+            ],
+          ),
         ),
       ),
     );
