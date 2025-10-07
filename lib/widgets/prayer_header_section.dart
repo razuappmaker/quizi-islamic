@@ -1,6 +1,8 @@
 // widgets/prayer_header_section.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../prayer_time_service.dart';
+import '../providers/language_provider.dart';
 
 class PrayerHeaderSection extends StatelessWidget {
   final String? cityName;
@@ -10,8 +12,8 @@ class PrayerHeaderSection extends StatelessWidget {
   final Map<String, String> prayerTimes;
   final bool isSmallScreen;
   final bool isVerySmallScreen;
-  final bool isTablet; // Added parameter
-  final bool isSmallPhone; // Added parameter
+  final bool isTablet;
+  final bool isSmallPhone;
   final PrayerTimeService prayerTimeService;
   final VoidCallback onRefresh;
   final bool useManualLocation;
@@ -25,12 +27,153 @@ class PrayerHeaderSection extends StatelessWidget {
     required this.prayerTimes,
     required this.isSmallScreen,
     required this.isVerySmallScreen,
-    required this.isTablet, // Added parameter
-    required this.isSmallPhone, // Added parameter
+    required this.isTablet,
+    required this.isSmallPhone,
     required this.prayerTimeService,
     required this.onRefresh,
     required this.useManualLocation,
   }) : super(key: key);
+
+  // Make texts static const
+  static const Map<String, Map<String, String>> _texts = {
+    'youAreAt': {'en': 'You are currently at', 'bn': 'আপনি এখন অবস্থান করছেন'},
+    'manual': {'en': 'Manual', 'bn': 'মানুয়াল'},
+    'refresh': {'en': 'Refresh', 'bn': 'রিফ্রেশ করুন'},
+    'nextPrayer': {'en': 'Next Prayer', 'bn': 'পরবর্তী নামাজ'},
+    'loading': {'en': 'Loading...', 'bn': 'লোড হচ্ছে...'},
+    'hours': {'en': 'Hours', 'bn': 'ঘণ্টা'},
+    'minutes': {'en': 'Minutes', 'bn': 'মিনিট'},
+    'seconds': {'en': 'Seconds', 'bn': 'সেকেন্ড'},
+    'startingSoon': {'en': 'Starting Soon', 'bn': 'শীঘ্রই শুরু'},
+    'verySoon': {'en': 'Very Soon', 'bn': 'খুব শীঘ্রই'},
+    'soon': {'en': 'Soon', 'bn': 'শীঘ্রই'},
+    'littleTime': {'en': 'Little Time', 'bn': 'অল্প সময়'},
+    'timeLeft': {'en': 'Time Left', 'bn': 'সময় বাকি'},
+    'sunrise': {'en': 'Sunrise', 'bn': 'সূর্যোদয়'},
+    'sunset': {'en': 'Sunset', 'bn': 'সূর্যাস্ত'},
+    'currentLocation': {'en': 'Current Location', 'bn': 'বর্তমান অবস্থান'},
+    'unknownCountry': {'en': 'Unknown Country', 'bn': 'অজানা দেশ'},
+  };
+
+  // Helper method to get text based on current language
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
+  // Get prayer name based on language
+  String _getPrayerName(String prayerName, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    if (languageProvider.isEnglish) {
+      switch (prayerName) {
+        case 'ফজর':
+          return 'Fajr';
+        case 'যোহর':
+          return 'Dhuhr';
+        case 'আসর':
+          return 'Asr';
+        case 'মাগরিব':
+          return 'Maghrib';
+        case 'ইশা':
+          return 'Isha';
+        case 'সূর্যোদয়':
+          return 'Sunrise';
+        case 'সূর্যাস্ত':
+          return 'Sunset';
+        default:
+          return prayerName;
+      }
+    }
+    return prayerName;
+  }
+
+  // Get location name based on language
+  String _getLocationName(String? location, BuildContext context) {
+    if (location == null) return '';
+
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+
+    // যদি ইংরেজি ভাষা সিলেক্ট করা থাকে, তাহলে ইংরেজি নামে কনভার্ট করুন
+    if (languageProvider.isEnglish) {
+      // বাংলা লোকেশন নামগুলোর ইংরেজি ভার্সন
+      Map<String, String> locationTranslations = {
+        'বর্তমান অবস্থান': 'Current Location',
+        'অজানা দেশ': 'Unknown Country',
+        'ঢাকা': 'Dhaka',
+        'চট্টগ্রাম': 'Chittagong',
+        'রাজশাহী': 'Rajshahi',
+        'খুলনা': 'Khulna',
+        'বরিশাল': 'Barisal',
+        'সিলেট': 'Sylhet',
+        'কুমিল্লা': 'Comilla',
+        'নারায়ণগঞ্জ': 'Narayanganj',
+        'গাজীপুর': 'Gazipur',
+        'বাংলাদেশ': 'Bangladesh',
+        'ভারত': 'India',
+        'পাকিস্তান': 'Pakistan',
+        'যুক্তরাষ্ট্র': 'United States',
+        'যুক্তরাজ্য': 'United Kingdom',
+        'কানাডা': 'Canada',
+        'অস্ট্রেলিয়া': 'Australia',
+        'মালয়েশিয়া': 'Malaysia',
+        'সিঙ্গাপুর': 'Singapore',
+        'সৌদি আরব': 'Saudi Arabia',
+        'কুয়েত': 'Kuwait',
+        'কাতার': 'Qatar',
+        'ওমান': 'Oman',
+        'বাহরাইন': 'Bahrain',
+        'সংযুক্ত আরব আমিরাত': 'United Arab Emirates',
+        'দুবাই': 'Dubai',
+        'আবুধাবি': 'Abu Dhabi',
+        'রিয়াদ': 'Riyadh',
+        'জেদ্দা': 'Jeddah',
+        'মক্কা': 'Mecca',
+        'মদিনা': 'Medina',
+        'দাম্মাম': 'Dammam',
+        'খোবার': 'Khobar',
+        'মাউন্টেন ভিউ': 'Mountain View',
+        'সান ফ্রান্সিস্কো': 'San Francisco',
+        'লস এঞ্জেলেস': 'Los Angeles',
+        'নিউ ইয়র্ক': 'New York',
+        'লন্ডন': 'London',
+        'টরন্টো': 'Toronto',
+        'সিডনি': 'Sydney',
+        'মেলবোর্ন': 'Melbourne',
+        'কুয়ালালামপুর': 'Kuala Lumpur',
+      };
+
+      // পুরো টেক্সট ট্রান্সলেট করার চেষ্টা করুন
+      if (locationTranslations.containsKey(location)) {
+        return locationTranslations[location]!;
+      }
+
+      // শব্দ ভেঙ্গে ট্রান্সলেট করার চেষ্টা করুন
+      String translatedLocation = location;
+      for (var entry in locationTranslations.entries) {
+        if (translatedLocation.contains(entry.key)) {
+          translatedLocation = translatedLocation.replaceAll(
+            entry.key,
+            entry.value,
+          );
+        }
+      }
+
+      return translatedLocation;
+    }
+
+    // বাংলা ভাষা হলে অরিজিনাল নাম রিটার্ন করুন
+    return location;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +182,10 @@ class PrayerHeaderSection extends StatelessWidget {
 
     // Calculate dynamic heights based on screen size
     final double headerHeight = isVerySmallScreen
-        ? 140 // ছোট স্ক্রিনে ১৫% কম
+        ? 140
         : isSmallScreen
-        ? 160 // মাঝারি স্ক্রিনে ১০% কম
-        : 180; // বড় স্ক্রিনে মূল সাইজ
+        ? 160
+        : 180;
 
     final double fontSize = isVerySmallScreen
         ? 12
@@ -75,16 +218,8 @@ class PrayerHeaderSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [
-                  Color(0xFF0D4A3A), // Deep teal green
-                  Color(0xFF1A6B52), // Medium teal
-                  Color(0xFF2A8C6E), // Bright teal
-                ]
-              : [
-                  Color(0xFFE8F5E8), // Very light mint
-                  Color(0xFFC8E6C9), // Light mint
-                  Color(0xFFA5D6A7), // Soft green
-                ],
+              ? [Color(0xFF0D4A3A), Color(0xFF1A6B52), Color(0xFF2A8C6E)]
+              : [Color(0xFFE8F5E8), Color(0xFFC8E6C9), Color(0xFFA5D6A7)],
           stops: const [0.0, 0.5, 1.0],
         ),
         borderRadius: const BorderRadius.only(
@@ -105,6 +240,7 @@ class PrayerHeaderSection extends StatelessWidget {
         children: [
           // Top Section - Location and Refresh (Compact)
           _buildCompactLocationSection(
+            context,
             isDark,
             isVerySmallScreen,
             isSmallScreen,
@@ -122,6 +258,7 @@ class PrayerHeaderSection extends StatelessWidget {
 
           // Bottom Section - Prayer Info and Sun Times (Compact)
           _buildCompactPrayerSunSection(
+            context,
             isDark,
             isVerySmallScreen,
             isSmallScreen,
@@ -134,6 +271,7 @@ class PrayerHeaderSection extends StatelessWidget {
   }
 
   Widget _buildCompactLocationSection(
+    BuildContext context,
     bool isDark,
     bool isVerySmallScreen,
     bool isSmallScreen,
@@ -226,14 +364,13 @@ class PrayerHeaderSection extends StatelessWidget {
                 ? 6
                 : 8,
           ),
-
-          // Location Text with prefix
+          // widgets/prayer_header_section.dart - _buildCompactLocationSection-এর লোকেশন টেক্সট অংশ
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "আপনি এখন অবস্থান করছেন",
+                  _text('youAreAt', context),
                   style: TextStyle(
                     fontSize: isVerySmallScreen
                         ? 7
@@ -248,14 +385,15 @@ class PrayerHeaderSection extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "$cityName, $countryName",
+                  _getLocationName(cityName, context),
+                  // শুধু cityName ব্যবহার করুন, countryName আলাদা দেখানোর দরকার নেই
                   style: TextStyle(
                     fontSize: textFontSize,
                     color: isDark ? Colors.white : Color(0xFF1B5E20),
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.05,
                   ),
-                  maxLines: 1,
+                  maxLines: 2, // 2 লাইনে দেখানোর সুযোগ দিন
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -292,7 +430,7 @@ class PrayerHeaderSection extends StatelessWidget {
                 ),
               ),
               child: Text(
-                "মানুয়াল",
+                _text('manual', context),
                 style: TextStyle(
                   fontSize: badgeFontSize,
                   color: isDark
@@ -350,7 +488,7 @@ class PrayerHeaderSection extends StatelessWidget {
                     ? 24
                     : 28,
               ),
-              tooltip: "রিফ্রেশ করুন",
+              tooltip: _text('refresh', context),
               splashRadius: refreshSplashRadius,
             ),
           ),
@@ -359,7 +497,10 @@ class PrayerHeaderSection extends StatelessWidget {
     );
   }
 
+  // ... বাকি মেথডগুলো একই থাকবে, শুধু লোকেশন ডিসপ্লে সংশোধন করা হয়েছে
+
   Widget _buildCompactPrayerSunSection(
+    BuildContext context,
     bool isDark,
     bool isVerySmallScreen,
     bool isSmallScreen,
@@ -372,6 +513,7 @@ class PrayerHeaderSection extends StatelessWidget {
         Expanded(
           flex: 10,
           child: _buildCompactPrayerCard(
+            context,
             isDark,
             isVerySmallScreen,
             isSmallScreen,
@@ -392,6 +534,7 @@ class PrayerHeaderSection extends StatelessWidget {
         Expanded(
           flex: 4,
           child: _buildCompactSunTimesCard(
+            context,
             isDark,
             isVerySmallScreen,
             isSmallScreen,
@@ -404,6 +547,7 @@ class PrayerHeaderSection extends StatelessWidget {
   }
 
   Widget _buildCompactPrayerCard(
+    BuildContext context,
     bool isDark,
     bool isVerySmallScreen,
     bool isSmallScreen,
@@ -476,7 +620,7 @@ class PrayerHeaderSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "পরবর্তী নামাজ",
+                  _text('nextPrayer', context),
                   style: TextStyle(
                     fontSize: titleFontSize,
                     color: isDark
@@ -493,7 +637,9 @@ class PrayerHeaderSection extends StatelessWidget {
                       : 4,
                 ),
                 Text(
-                  nextPrayer.isNotEmpty ? nextPrayer : "লোড হচ্ছে...",
+                  nextPrayer.isNotEmpty
+                      ? _getPrayerName(nextPrayer, context)
+                      : _text('loading', context),
                   style: TextStyle(
                     fontSize: prayerFontSize,
                     fontWeight: FontWeight.w800,
@@ -558,7 +704,7 @@ class PrayerHeaderSection extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _buildTimeUnit(
-                        "ঘণ্টা",
+                        _text('hours', context),
                         countdown.inHours,
                         timeUnitFontSize,
                         timeLabelFontSize,
@@ -566,7 +712,7 @@ class PrayerHeaderSection extends StatelessWidget {
                       ),
                       _buildDivider(isVerySmallScreen, isSmallScreen, isDark),
                       _buildTimeUnit(
-                        "মিনিট",
+                        _text('minutes', context),
                         countdown.inMinutes % 60,
                         timeUnitFontSize,
                         timeLabelFontSize,
@@ -574,7 +720,7 @@ class PrayerHeaderSection extends StatelessWidget {
                       ),
                       _buildDivider(isVerySmallScreen, isSmallScreen, isDark),
                       _buildTimeUnit(
-                        "সেকেন্ড",
+                        _text('seconds', context),
                         countdown.inSeconds % 60,
                         timeUnitFontSize,
                         timeLabelFontSize,
@@ -591,7 +737,7 @@ class PrayerHeaderSection extends StatelessWidget {
                   ),
                   // Countdown status text
                   Text(
-                    _getCountdownStatus(countdown),
+                    _getCountdownStatus(countdown, context),
                     style: TextStyle(
                       fontSize: statusFontSize,
                       color: _getCountdownTextColor(countdown, isDark),
@@ -607,59 +753,48 @@ class PrayerHeaderSection extends StatelessWidget {
     );
   }
 
-  // Dynamic border color based on remaining time
+  // ... বাকি সব হেল্পার মেথডগুলো একই থাকবে
   Color _getCountdownBorderColor(Duration countdown) {
     final totalSeconds = countdown.inSeconds;
-
-    if (totalSeconds <= 300) {
-      return Color(0xFFE53935); // Red
-    } else if (totalSeconds <= 1800) {
-      return Color(0xFFFB8C00); // Orange
-    } else if (totalSeconds <= 3600) {
-      return Color(0xFFFDD835); // Yellow
-    } else {
-      return Color(0xFF43A047); // Green
-    }
+    if (totalSeconds <= 300)
+      return Color(0xFFE53935);
+    else if (totalSeconds <= 1800)
+      return Color(0xFFFB8C00);
+    else if (totalSeconds <= 3600)
+      return Color(0xFFFDD835);
+    else
+      return Color(0xFF43A047);
   }
 
-  // Better text color for countdown status - Updated for light mode
   Color _getCountdownTextColor(Duration countdown, bool isDark) {
-    // Light mode-এ সাদা, Dark mode-এ আগের মতো
-    if (!isDark) {
-      return Colors.white; // Light mode-এ সাদা
-    }
-
-    // Dark mode-এর জন্য আগের colors
+    if (!isDark) return Colors.white;
     final totalSeconds = countdown.inSeconds;
-    if (totalSeconds <= 300) {
-      return Color(0xFFFFCDD2); // Light red
-    } else if (totalSeconds <= 1800) {
-      return Color(0xFFFFE0B2); // Light orange
-    } else if (totalSeconds <= 3600) {
-      return Color(0xFFFFF9C4); // Light yellow
-    } else {
-      return Color(0xFFC8E6C9); // Light green
-    }
+    if (totalSeconds <= 300)
+      return Color(0xFFFFCDD2);
+    else if (totalSeconds <= 1800)
+      return Color(0xFFFFE0B2);
+    else if (totalSeconds <= 3600)
+      return Color(0xFFFFF9C4);
+    else
+      return Color(0xFFC8E6C9);
   }
 
-  // Countdown status text
-  String _getCountdownStatus(Duration countdown) {
+  String _getCountdownStatus(Duration countdown, BuildContext context) {
     final totalSeconds = countdown.inSeconds;
-
-    if (totalSeconds <= 60) {
-      return "শীঘ্রই শুরু";
-    } else if (totalSeconds <= 300) {
-      return "খুব শীঘ্রই";
-    } else if (totalSeconds <= 1800) {
-      return "শীঘ্রই";
-    } else if (totalSeconds <= 3600) {
-      return "অল্প সময়";
-    } else {
-      return "সময় বাকি";
-    }
+    if (totalSeconds <= 60)
+      return _text('startingSoon', context);
+    else if (totalSeconds <= 300)
+      return _text('verySoon', context);
+    else if (totalSeconds <= 1800)
+      return _text('soon', context);
+    else if (totalSeconds <= 3600)
+      return _text('littleTime', context);
+    else
+      return _text('timeLeft', context);
   }
 
   Widget _buildCompactSunTimesCard(
+    BuildContext context,
     bool isDark,
     bool isVerySmallScreen,
     bool isSmallScreen,
@@ -694,14 +829,8 @@ class PrayerHeaderSection extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: isDark
-              ? [
-                  Color(0xFFE65100), // Deep orange
-                  Color(0xFFEF6C00), // Medium orange
-                ]
-              : [
-                  Color(0xFFFFCC80), // Light orange
-                  Color(0xFFFFB74D), // Medium light orange
-                ],
+              ? [Color(0xFFE65100), Color(0xFFEF6C00)]
+              : [Color(0xFFFFCC80), Color(0xFFFFB74D)],
         ),
         borderRadius: BorderRadius.circular(
           isVerySmallScreen
@@ -727,17 +856,16 @@ class PrayerHeaderSection extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // সূর্যোদয় with text
           _buildCompactSunItemWithText(
+            context,
             icon: Icons.wb_twilight,
-            label: "সূর্যোদয়",
+            label: _text('sunrise', context),
             time: prayerTimes["সূর্যোদয়"],
             iconSize: iconSize,
             labelFontSize: labelFontSize,
             timeFontSize: timeFontSize,
             isDark: isDark,
           ),
-
           Container(
             height: 1.0,
             margin: EdgeInsets.symmetric(
@@ -751,11 +879,10 @@ class PrayerHeaderSection extends StatelessWidget {
                 ? Colors.white.withOpacity(0.3)
                 : Colors.orange.withOpacity(0.4),
           ),
-
-          // সূর্যাস্ত with text
           _buildCompactSunItemWithText(
+            context,
             icon: Icons.nightlight_round,
-            label: "সূর্যাস্ত",
+            label: _text('sunset', context),
             time: prayerTimes["সূর্যাস্ত"],
             iconSize: iconSize,
             labelFontSize: labelFontSize,
@@ -767,7 +894,8 @@ class PrayerHeaderSection extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactSunItemWithText({
+  Widget _buildCompactSunItemWithText(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required String? time,

@@ -55,8 +55,17 @@ class PrayerTimeService {
         // ম্যানুয়াল লোকেশন ব্যবহার
         latitude = manualLatitude;
         longitude = manualLongitude;
-        cityName = manualCityName ?? "মানুয়াল লোকেশন";
-        countryName = manualCountryName ?? "";
+
+        // ম্যানুয়াল লোকেশনের জন্য _getImprovedLocationInfo কল করুন
+        Map<String, String> locationInfo = await _getImprovedLocationInfo(
+          latitude,
+          longitude,
+          isManual: true,
+          manualCity: manualCityName,
+          manualCountry: manualCountryName,
+        );
+        cityName = locationInfo['city']!;
+        countryName = locationInfo['country']!;
 
         print('Using manual location: $latitude, $longitude');
         print('Manual city: $cityName, country: $countryName');
@@ -261,13 +270,32 @@ class PrayerTimeService {
     }
   }
 
-  // উন্নত লোকেশন তথ্য পাওয়া
+  // prayer_time_service.dart - _getImprovedLocationInfo মেথডটি রিপ্লেস করুন
   Future<Map<String, String>> _getImprovedLocationInfo(
     double lat,
-    double lng,
-  ) async {
+    double lng, {
+    bool isManual = false,
+    String? manualCity,
+    String? manualCountry,
+  }) async {
+    // যদি ম্যানুয়াল লোকেশন হয়
+    if (isManual && manualCity != null) {
+      String finalLocation = manualCity;
+
+      // দেশের নাম যোগ করুন
+      if (manualCountry != null && manualCountry.isNotEmpty) {
+        finalLocation = "$finalLocation, $manualCountry";
+      } else {
+        finalLocation = "$finalLocation, বাংলাদেশ"; // ডিফল্ট দেশ
+      }
+
+      return {'city': finalLocation, 'country': manualCountry ?? "বাংলাদেশ"};
+    }
+
+    // বাকি কোড অটোমেটিক লোকেশনের জন্য একই থাকবে
     String city = "বর্তমান অবস্থান";
-    String country = "অজানা দেশ";
+    String country = "বাংলাদেশ";
+    String area = "";
 
     try {
       final placemarks = await placemarkFromCoordinates(
@@ -278,61 +306,62 @@ class PrayerTimeService {
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
 
-        // শহরের নাম প্রায়োরিটি অনুযায়ী নিন
-        city =
-            place.locality ??
-            place.subLocality ??
-            place.subAdministrativeArea ??
-            place.administrativeArea ??
-            "বর্তমান অবস্থান";
+        // আপনার আগের ডিটেইলড লোকেশন লজিক
+        String locality = place.locality ?? "";
+        String subLocality = place.subLocality ?? "";
+        String administrativeArea = place.administrativeArea ?? "";
+        String subAdministrativeArea = place.subAdministrativeArea ?? "";
+        String thoroughfare = place.thoroughfare ?? "";
 
-        country = place.country ?? "অজানা দেশ";
+        country = place.country ?? "বাংলাদেশ";
+
+        // এলাকা/এরিয়া নির্ধারণ
+        if (subLocality.isNotEmpty) {
+          area = subLocality;
+        } else if (thoroughfare.isNotEmpty) {
+          area = thoroughfare;
+        } else if (subAdministrativeArea.isNotEmpty) {
+          area = subAdministrativeArea;
+        }
+
+        // শহরের নাম নির্ধারণ
+        if (locality.isNotEmpty) {
+          city = locality;
+        } else if (subAdministrativeArea.isNotEmpty) {
+          city = subAdministrativeArea;
+        } else if (administrativeArea.isNotEmpty) {
+          city = administrativeArea;
+        }
+
+        // ফাইনাল লোকেশন স্ট্রিং তৈরি - "গুলশান, ঢাকা, বাংলাদেশ" ফরম্যাটে
+        String finalLocation = "";
+
+        if (area.isNotEmpty && area != city) {
+          finalLocation = "$area, $city";
+        } else {
+          finalLocation = city;
+        }
+
+        // দেশের নাম যোগ করুন
+        if (country.isNotEmpty) {
+          finalLocation = "$finalLocation, $country";
+        }
 
         // খুব দীর্ঘ নাম সংক্ষিপ্ত করুন
-        if (city.length > 20) {
-          city = city.substring(0, 20) + '...';
+        if (finalLocation.length > 35) {
+          finalLocation = finalLocation.substring(0, 35) + '...';
         }
 
-        // ইংরেজি নাম বাংলায় কনভার্ট করার চেষ্টা করুন
-        city = await _translateToBengali(city);
-        country = await _translateToBengali(country);
+        print('Detailed Location: $finalLocation');
+        print('Country: $country');
 
-        print('Improved location: $city, $country');
+        return {'city': finalLocation, 'country': country};
       }
     } catch (e) {
-      print('Error getting improved location: $e');
-      // ফallback হিসেবে জিওকোডিং API ব্যবহার করুন
-      try {
-        final response = await http
-            .get(
-              Uri.parse(
-                'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng&zoom=10',
-              ),
-            )
-            .timeout(Duration(seconds: 5));
-
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final address = data['address'];
-          if (address != null) {
-            city =
-                address['city'] ??
-                address['town'] ??
-                address['village'] ??
-                "বর্তমান অবস্থান";
-            country = address['country'] ?? "অজানা দেশ";
-
-            // বাংলা অনুবাদ
-            city = await _translateToBengali(city);
-            country = await _translateToBengali(country);
-          }
-        }
-      } catch (e2) {
-        print('Fallback geocoding also failed: $e2');
-      }
+      print('Error getting location: $e');
     }
 
-    return {'city': city, 'country': country};
+    return {'city': "বর্তমান অবস্থান, বাংলাদেশ", 'country': "বাংলাদেশ"};
   }
 
   // নামাজের সময় কনভার্সন (সরলীকৃত)

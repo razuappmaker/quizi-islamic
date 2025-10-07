@@ -116,6 +116,7 @@ flutter:
     - assets/fasting_doyas.json
     - assets/misc_doyas.json
     - assets/wordquran.json
+    - assets/districts.json
 
 
   fonts:

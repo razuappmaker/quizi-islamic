@@ -1,7 +1,10 @@
 // widgets/location_modal.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class LocationModal extends StatefulWidget {
   final String currentLocationMode;
@@ -20,324 +23,208 @@ class LocationModal extends StatefulWidget {
 
 class _LocationModalState extends State<LocationModal> {
   bool _isLoading = false;
+  bool _isLoadingLocations = false;
   String _searchQuery = '';
+  List<Map<String, dynamic>> _locations = [];
 
-  // দেশ ও শহরের লিস্ট
-  final List<Map<String, dynamic>> _locations = [
-    // বাংলাদেশের শহরগুলো
-    {
-      "country": "বাংলাদেশ",
-      "city": "ঢাকা",
-      "lat": 23.8103,
-      "lon": 90.4125,
-      "flag": Colors.green,
+  // Language Texts
+  static const Map<String, Map<String, String>> _texts = {
+    'changeLocation': {'en': 'Change Location', 'bn': 'লোকেশন পরিবর্তন করুন'},
+    'autoLocation': {'en': 'Automatic Location', 'bn': 'অটোমেটিক লোকেশন'},
+    'autoLocationDesc': {
+      'en': 'Use your current location',
+      'bn': 'আপনার বর্তমান লোকেশন ব্যবহার করুন',
     },
-    {
-      "country": "বাংলাদেশ",
-      "city": "চট্টগ্রাম",
-      "lat": 22.3569,
-      "lon": 91.7832,
-      "flag": Colors.green,
+    'manualLocation': {'en': 'Manual Location', 'bn': 'ম্যানুয়াল লোকেশন'},
+    'manualLocationDesc': {
+      'en': 'Select country and city from list',
+      'bn': 'লিস্ট থেকে দেশ ও শহর নির্বাচন করুন',
     },
-    {
-      "country": "বাংলাদেশ",
-      "city": "খুলনা",
-      "lat": 22.8456,
-      "lon": 89.5403,
-      "flag": Colors.green,
+    'selectCountryCity': {
+      'en': 'Select Country & City',
+      'bn': 'দেশ ও শহর নির্বাচন করুন',
     },
-    {
-      "country": "বাংলাদেশ",
-      "city": "রাজশাহী",
-      "lat": 24.3745,
-      "lon": 88.6042,
-      "flag": Colors.green,
+    'searchPlaceholder': {
+      'en': 'Search country or city...',
+      'bn': 'দেশ বা শহর খুঁজুন...',
     },
-    {
-      "country": "বাংলাদেশ",
-      "city": "সিলেট",
-      "lat": 24.8949,
-      "lon": 91.8687,
-      "flag": Colors.green,
+    'resultsFound': {'en': 'results found', 'bn': 'টি ফলাফল'},
+    'noResults': {'en': 'No results found', 'bn': 'কোন ফলাফল পাওয়া যায়নি'},
+    'locationInfo': {
+      'en': 'Changing location will automatically update prayer times',
+      'bn': 'লোকেশন পরিবর্তন করলে নামাজের সময় স্বয়ংক্রিয়ভাবে আপডেট হবে',
     },
-    {
-      "country": "বাংলাদেশ",
-      "city": "বরিশাল",
-      "lat": 22.7010,
-      "lon": 90.3535,
-      "flag": Colors.green,
+    'cancel': {'en': 'Cancel', 'bn': 'বাতিল'},
+    'locationPermission': {
+      'en': 'Location permission required',
+      'bn': 'লোকেশন পারমিশন প্রয়োজন',
     },
-    {
-      "country": "বাংলাদেশ",
-      "city": "রংপুর",
-      "lat": 25.7439,
-      "lon": 89.2752,
-      "flag": Colors.green,
+    'grantPermission': {
+      'en': 'Grant location permission from settings',
+      'bn': 'সেটিংস থেকে লোকেশন পারমিশন দিন',
     },
+    'locationSet': {
+      'en': 'Current location set',
+      'bn': 'বর্তমান লোকেশন সেট করা হয়েছে',
+    },
+    'locationNotFound': {
+      'en': 'Location not found: ',
+      'bn': 'লোকেশন পাওয়া যায়নি: ',
+    },
+    'detectingLocation': {
+      'en': 'Detecting location...',
+      'bn': 'লোকেশন ডিটেক্ট করা হচ্ছে...',
+    },
+    'locationSelected': {'en': 'selected', 'bn': 'সেট করা হয়েছে'},
+    'loadingLocations': {
+      'en': 'Loading locations...',
+      'bn': 'লোকেশন লোড হচ্ছে...',
+    },
+    'errorLoadingLocations': {
+      'en': 'Error loading locations',
+      'bn': 'লোকেশন লোড করতে সমস্যা',
+    },
+  };
 
-    // সৌদি আরব
-    {
-      "country": "সৌদি আরব",
-      "city": "রিয়াদ",
-      "lat": 24.7136,
-      "lon": 46.6753,
-      "flag": Colors.green,
-    },
-    {
-      "country": "সৌদি আরব",
-      "city": "জেদ্দা",
-      "lat": 21.4858,
-      "lon": 39.1925,
-      "flag": Colors.green,
-    },
-    {
-      "country": "সৌদি আরব",
-      "city": "মক্কা",
-      "lat": 21.4225,
-      "lon": 39.8262,
-      "flag": Colors.green,
-    },
-    {
-      "country": "সৌদি আরব",
-      "city": "মদিনা",
-      "lat": 24.5247,
-      "lon": 39.5692,
-      "flag": Colors.green,
-    },
+  @override
+  void initState() {
+    super.initState();
+    _loadLocationsFromJson();
+  }
 
-    // সংযুক্ত আরব আমিরাত
-    {
-      "country": "সংযুক্ত আরব আমিরাত",
-      "city": "দুবাই",
-      "lat": 25.2048,
-      "lon": 55.2708,
-      "flag": Colors.red,
-    },
-    {
-      "country": "সংযুক্ত আরব আমিরাত",
-      "city": "আবুধাবি",
-      "lat": 24.4539,
-      "lon": 54.3773,
-      "flag": Colors.red,
-    },
-    {
-      "country": "সংযুক্ত আরব আমিরাত",
-      "city": "শারজাহ",
-      "lat": 25.3463,
-      "lon": 55.4209,
-      "flag": Colors.red,
-    },
+  // Helper method to get text based on current language
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
 
-    // কুয়েত
-    {
-      "country": "কুয়েত",
-      "city": "কুয়েত সিটি",
-      "lat": 29.3759,
-      "lon": 47.9774,
-      "flag": Colors.green,
-    },
-    {
-      "country": "কুয়েত",
-      "city": "আল-জাহরা",
-      "lat": 29.3720,
-      "lon": 47.9781,
-      "flag": Colors.green,
-    },
-    {
-      "country": "কুয়েত",
-      "city": "হাওলি",
-      "lat": 29.3378,
-      "lon": 48.0173,
-      "flag": Colors.green,
-    },
+  // JSON থেকে লোকেশন লোড করা
+  Future<void> _loadLocationsFromJson() async {
+    setState(() {
+      _isLoadingLocations = true;
+    });
 
-    // কাতার
-    {
-      "country": "কাতার",
-      "city": "দোহা",
-      "lat": 25.2854,
-      "lon": 51.5310,
-      "flag": Colors.brown,
-    },
-    {
-      "country": "কাতার",
-      "city": "আল খোর",
-      "lat": 25.6523,
-      "lon": 51.5261,
-      "flag": Colors.brown,
-    },
-    // ওমান
-    {
-      "country": "ওমান",
-      "city": "মাস্কাট",
-      "lat": 23.5859,
-      "lon": 58.4059,
-      "flag": Colors.green,
-    },
+    try {
+      // JSON ফাইল লোড করুন
+      String data = await DefaultAssetBundle.of(
+        context,
+      ).loadString('assets/districts.json');
 
-    // বাহরাইন
-    {
-      "country": "বাহরাইন",
-      "city": "মানামা",
-      "lat": 26.2285,
-      "lon": 50.5860,
-      "flag": Colors.red,
-    },
+      final jsonResult = jsonDecode(data);
 
-    // জর্ডান
-    {
-      "country": "জর্ডান",
-      "city": "আম্মান",
-      "lat": 31.9454,
-      "lon": 35.9284,
-      "flag": Colors.red,
-    },
+      // JSON ডাটা প্রসেস করুন
+      List<Map<String, dynamic>> loadedLocations = [];
 
-    // লেবানন
-    {
-      "country": "লেবানন",
-      "city": "বেইরুট",
-      "lat": 33.8938,
-      "lon": 35.5018,
-      "flag": Colors.red,
-    },
+      if (jsonResult is List) {
+        for (var item in jsonResult) {
+          loadedLocations.add({
+            "country": item['country'] ?? "Bangladesh",
+            "countryBn": item['countryBn'] ?? "বাংলাদেশ",
+            "city": item['city'] ?? "",
+            "cityBn": item['cityBn'] ?? "",
+            "lat": item['lat'] ?? 23.8103,
+            "lon": item['lon'] ?? 90.4125,
+            "flag": _getFlagColor(item['country'] ?? "Bangladesh"),
+          });
+        }
+      }
 
-    // ইতালি
-    {
-      "country": "ইতালি",
-      "city": "রোম",
-      "lat": 41.9028,
-      "lon": 12.4964,
-      "flag": Colors.green,
-    },
+      setState(() {
+        _locations = loadedLocations;
+        _isLoadingLocations = false;
+      });
+    } catch (e) {
+      print("Error loading locations from JSON: $e");
 
-    // গ্রিস
-    {
-      "country": "গ্রিস",
-      "city": "এথেন্স",
-      "lat": 37.9838,
-      "lon": 23.7275,
-      "flag": Colors.blue,
-    },
+      // Fallback: যদি JSON লোড না হয় তাহলে ডিফল্ট লোকেশন ব্যবহার করুন
+      _loadDefaultLocations();
+    }
+  }
 
-    // দক্ষিণ কোরিয়া
-    {
-      "country": "দক্ষিণ কোরিয়া",
-      "city": "সিউল",
-      "lat": 37.5665,
-      "lon": 126.9780,
-      "flag": Colors.red,
-    },
+  // ডিফল্ট লোকেশন লোড করা (যদি JSON ফেইল হয়)
+  void _loadDefaultLocations() {
+    setState(() {
+      _locations = [
+        {
+          "country": "Bangladesh",
+          "countryBn": "বাংলাদেশ",
+          "city": "Dhaka",
+          "cityBn": "ঢাকা",
+          "lat": 23.8103,
+          "lon": 90.4125,
+          "flag": Colors.green,
+        },
+        {
+          "country": "Bangladesh",
+          "countryBn": "বাংলাদেশ",
+          "city": "Chittagong",
+          "cityBn": "চট্টগ্রাম",
+          "lat": 22.3569,
+          "lon": 91.7832,
+          "flag": Colors.green,
+        },
+        {
+          "country": "Bangladesh",
+          "countryBn": "বাংলাদেশ",
+          "city": "Khulna",
+          "cityBn": "খুলনা",
+          "lat": 22.8456,
+          "lon": 89.5403,
+          "flag": Colors.green,
+        },
+      ];
+      _isLoadingLocations = false;
+    });
+  }
 
-    // মালদ্বীপ
-    {
-      "country": "মালদ্বীপ",
-      "city": "মালে",
-      "lat": 4.1755,
-      "lon": 73.5093,
-      "flag": Colors.red,
-    },
+  // দেশ অনুযায়ী ফ্ল্যাগ কালার
+  Color _getFlagColor(String country) {
+    switch (country) {
+      case "Bangladesh":
+        return Colors.green;
+      case "Saudi Arabia":
+        return Colors.green;
+      case "United Arab Emirates":
+        return Colors.red;
+      case "India":
+        return Colors.orange;
+      case "Pakistan":
+        return Colors.green;
+      case "United States":
+        return Colors.blue;
+      case "United Kingdom":
+        return Colors.blue;
+      case "Turkey":
+        return Colors.red;
+      case "Malaysia":
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
 
-    // অন্যান্য দেশ
-    {
-      "country": "মালয়েশিয়া",
-      "city": "কুয়ালালামপুর",
-      "lat": 3.1390,
-      "lon": 101.6869,
-      "flag": Colors.red,
-    },
-    {
-      "country": "যুক্তরাষ্ট্র",
-      "city": "নিউ ইয়র্ক",
-      "lat": 40.7128,
-      "lon": -74.0060,
-      "flag": Colors.blue,
-    },
-    {
-      "country": "যুক্তরাষ্ট্র",
-      "city": "লস অ্যাঞ্জেলেস",
-      "lat": 34.0522,
-      "lon": -118.2437,
-      "flag": Colors.blue,
-    },
-    {
-      "country": "যুক্তরাজ্য",
-      "city": "লন্ডন",
-      "lat": 51.5074,
-      "lon": -0.1278,
-      "flag": Colors.blue,
-    },
-    {
-      "country": "কানাডা",
-      "city": "টরন্টো",
-      "lat": 43.6532,
-      "lon": -79.3832,
-      "flag": Colors.red,
-    },
-    {
-      "country": "ভারত",
-      "city": "মুম্বাই",
-      "lat": 19.0760,
-      "lon": 72.8777,
-      "flag": Colors.orange,
-    },
-    {
-      "country": "ভারত",
-      "city": "দিল্লী",
-      "lat": 28.6139,
-      "lon": 77.2090,
-      "flag": Colors.orange,
-    },
-    {
-      "country": "পাকিস্তান",
-      "city": "করাচি",
-      "lat": 24.8607,
-      "lon": 67.0011,
-      "flag": Colors.green,
-    },
-    {
-      "country": "তুরস্ক",
-      "city": "ইস্তানবুল",
-      "lat": 41.0082,
-      "lon": 28.9784,
-      "flag": Colors.red,
-    },
-    {
-      "country": "ইন্দোনেশিয়া",
-      "city": "জাকার্তা",
-      "lat": -6.2088,
-      "lon": 106.8456,
-      "flag": Colors.red,
-    },
-    {
-      "country": "সিঙ্গাপুর",
-      "city": "সিঙ্গাপুর",
-      "lat": 1.3521,
-      "lon": 103.8198,
-      "flag": Colors.red,
-    },
-    {
-      "country": "জাপান",
-      "city": "টোকিও",
-      "lat": 35.6762,
-      "lon": 139.6503,
-      "flag": Colors.red,
-    },
-    {
-      "country": "চীন",
-      "city": "বেইজিং",
-      "lat": 39.9042,
-      "lon": 116.4074,
-      "flag": Colors.red,
-    },
-    {
-      "country": "অস্ট্রেলিয়া",
-      "city": "সিডনি",
-      "lat": -33.8688,
-      "lon": 151.2093,
-      "flag": Colors.blue,
-    },
-  ];
+  // Get city and country name based on language
+  String _getCityName(Map<String, dynamic> location, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    return languageProvider.isEnglish ? location['city'] : location['cityBn'];
+  }
+
+  String _getCountryName(Map<String, dynamic> location, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    return languageProvider.isEnglish
+        ? location['country']
+        : location['countryBn'];
+  }
 
   // সার্চ করা লোকেশন ফিল্টার করা
   List<Map<String, dynamic>> get _filteredLocations {
@@ -346,9 +233,15 @@ class _LocationModalState extends State<LocationModal> {
     }
     return _locations.where((location) {
       final country = location['country'].toString().toLowerCase();
+      final countryBn = location['countryBn'].toString().toLowerCase();
       final city = location['city'].toString().toLowerCase();
+      final cityBn = location['cityBn'].toString().toLowerCase();
       final query = _searchQuery.toLowerCase();
-      return country.contains(query) || city.contains(query);
+
+      return country.contains(query) ||
+          countryBn.contains(query) ||
+          city.contains(query) ||
+          cityBn.contains(query);
     }).toList();
   }
 
@@ -363,9 +256,9 @@ class _LocationModalState extends State<LocationModal> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text("লোকেশন পারমিশন প্রয়োজন")));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(_text('locationPermission', context))),
+          );
           setState(() {
             _isLoading = false;
           });
@@ -375,7 +268,7 @@ class _LocationModalState extends State<LocationModal> {
 
       if (permission == LocationPermission.deniedForever) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("সেটিংস থেকে লোকেশন পারমিশন দিন")),
+          SnackBar(content: Text(_text('grantPermission', context))),
         );
         setState(() {
           _isLoading = false;
@@ -389,8 +282,8 @@ class _LocationModalState extends State<LocationModal> {
       );
 
       // রিভার্স জিওকোডিং করে ঠিকানা পাওয়া
-      String cityName = "বর্তমান অবস্থান";
-      String countryName = "অজানা দেশ";
+      String cityName = _text('currentLocation', context);
+      String countryName = _text('unknownCountry', context);
 
       try {
         List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -404,8 +297,8 @@ class _LocationModalState extends State<LocationModal> {
               placemark.locality ??
               placemark.subAdministrativeArea ??
               placemark.administrativeArea ??
-              "বর্তমান অবস্থান";
-          countryName = placemark.country ?? "অজানা দেশ";
+              _text('currentLocation', context);
+          countryName = placemark.country ?? _text('unknownCountry', context);
 
           // খুব দীর্ঘ নাম সংক্ষিপ্ত করুন
           if (cityName.length > 20) {
@@ -415,8 +308,8 @@ class _LocationModalState extends State<LocationModal> {
       } catch (e) {
         print("Geocoding error: $e");
         // জিওকোডিং ফেইল করলে ডিফল্ট ভ্যালু ব্যবহার করুন
-        cityName = "বর্তমান অবস্থান";
-        countryName = "অজানা দেশ";
+        cityName = _text('currentLocation', context);
+        countryName = _text('unknownCountry', context);
       }
 
       // লোকেশন মোড পরিবর্তন
@@ -432,11 +325,13 @@ class _LocationModalState extends State<LocationModal> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("বর্তমান লোকেশন সেট করা হয়েছে")));
+      ).showSnackBar(SnackBar(content: Text(_text('locationSet', context))));
     } catch (e) {
       print("Location error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("লোকেশন পাওয়া যায়নি: ${e.toString()}")),
+        SnackBar(
+          content: Text("${_text('locationNotFound', context)}${e.toString()}"),
+        ),
       );
     } finally {
       setState(() {
@@ -495,7 +390,7 @@ class _LocationModalState extends State<LocationModal> {
                       children: [
                         Expanded(
                           child: Text(
-                            "দেশ ও শহর নির্বাচন করুন",
+                            _text('selectCountryCity', context),
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -539,7 +434,7 @@ class _LocationModalState extends State<LocationModal> {
                               });
                             },
                             decoration: InputDecoration(
-                              hintText: "দেশ বা শহর খুঁজুন...",
+                              hintText: _text('searchPlaceholder', context),
                               border: InputBorder.none,
                               hintStyle: TextStyle(color: Colors.grey.shade600),
                             ),
@@ -568,7 +463,7 @@ class _LocationModalState extends State<LocationModal> {
                       child: Row(
                         children: [
                           Text(
-                            "${_filteredLocations.length}টি ফলাফল",
+                            "${_filteredLocations.length} ${_text('resultsFound', context)}",
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey.shade600,
@@ -580,9 +475,32 @@ class _LocationModalState extends State<LocationModal> {
 
                   const SizedBox(height: 8),
 
-                  // দেশের লিস্ট
+                  // লোকেশন লোডিং বা লিস্ট
                   Expanded(
-                    child: _filteredLocations.isEmpty
+                    child: _isLoadingLocations
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 32,
+                                  height: 32,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _text('loadingLocations', context),
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : _filteredLocations.isEmpty
                         ? Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -594,7 +512,7 @@ class _LocationModalState extends State<LocationModal> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  "কোন ফলাফল পাওয়া যায়নি",
+                                  _text('noResults', context),
                                   style: TextStyle(
                                     color: Colors.grey.shade600,
                                     fontSize: 14,
@@ -609,11 +527,7 @@ class _LocationModalState extends State<LocationModal> {
                               final location = _filteredLocations[index];
                               return _buildLocationItem(
                                 context: context,
-                                countryName: location['country'],
-                                cityName: location['city'],
-                                latitude: location['lat'],
-                                longitude: location['lon'],
-                                flagColor: location['flag'],
+                                location: location,
                               );
                             },
                           ),
@@ -634,7 +548,7 @@ class _LocationModalState extends State<LocationModal> {
                         side: BorderSide(color: Colors.grey.shade300),
                       ),
                       child: Text(
-                        "বাতিল",
+                        _text('cancel', context),
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontWeight: FontWeight.w500,
@@ -654,12 +568,14 @@ class _LocationModalState extends State<LocationModal> {
   // লোকেশন আইটেম বিল্ড করার জন্য হেল্পার মেথড
   Widget _buildLocationItem({
     required BuildContext context,
-    required String countryName,
-    required String cityName,
-    required double latitude,
-    required double longitude,
-    required Color flagColor,
+    required Map<String, dynamic> location,
   }) {
+    final cityName = _getCityName(location, context);
+    final countryName = _getCountryName(location, context);
+
+    // সম্পূর্ণ লোকেশন স্ট্রিং তৈরি করুন - "খুলনা, বাংলাদেশ" ফরম্যাটে
+    String fullLocationName = "$cityName, $countryName";
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       child: Card(
@@ -670,11 +586,11 @@ class _LocationModalState extends State<LocationModal> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: flagColor.withOpacity(0.1),
+              color: location['flag'].withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: flagColor.withOpacity(0.3)),
+              border: Border.all(color: location['flag'].withOpacity(0.3)),
             ),
-            child: Icon(Icons.location_on, color: flagColor, size: 20),
+            child: Icon(Icons.location_on, color: location['flag'], size: 20),
           ),
           title: Text(
             cityName,
@@ -698,16 +614,21 @@ class _LocationModalState extends State<LocationModal> {
           ),
           onTap: () {
             Navigator.pop(context); // দেশ সিলেক্ট মডাল বন্ধ
+
+            // সম্পূর্ণ লোকেশন স্ট্রিং পাঠান - "খুলনা, বাংলাদেশ"
             widget.onLocationModeChanged(
               'manual',
-              latitude,
-              longitude,
-              cityName,
+              location['lat'],
+              location['lon'],
+              fullLocationName, // "খুলনা, বাংলাদেশ" ফরম্যাটে
               countryName,
             );
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text("$cityName, $countryName সেট করা হয়েছে"),
+                content: Text(
+                  "$fullLocationName ${_text('locationSelected', context)}",
+                ),
                 duration: Duration(seconds: 2),
               ),
             );
@@ -755,7 +676,7 @@ class _LocationModalState extends State<LocationModal> {
 
           // Header
           Text(
-            "লোকেশন পরিবর্তন করুন",
+            _text('changeLocation', context),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -791,7 +712,7 @@ class _LocationModalState extends State<LocationModal> {
                 child: Icon(Icons.my_location, color: Colors.blue, size: 20),
               ),
               title: Text(
-                "অটোমেটিক লোকেশন",
+                _text('autoLocation', context),
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: widget.currentLocationMode == 'auto'
@@ -800,7 +721,7 @@ class _LocationModalState extends State<LocationModal> {
                 ),
               ),
               subtitle: Text(
-                "আপনার বর্তমান লোকেশন ব্যবহার করুন",
+                _text('autoLocationDesc', context),
                 style: TextStyle(fontSize: 12),
               ),
               trailing: widget.currentLocationMode == 'auto'
@@ -835,7 +756,7 @@ class _LocationModalState extends State<LocationModal> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    "লোকেশন ডিটেক্ট করা হচ্ছে...",
+                    _text('detectingLocation', context),
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.blue.shade800,
@@ -875,7 +796,7 @@ class _LocationModalState extends State<LocationModal> {
                 child: Icon(Icons.map, color: Colors.orange, size: 20),
               ),
               title: Text(
-                "ম্যানুয়াল লোকেশন",
+                _text('manualLocation', context),
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: widget.currentLocationMode == 'manual'
@@ -884,7 +805,7 @@ class _LocationModalState extends State<LocationModal> {
                 ),
               ),
               subtitle: Text(
-                "লিস্ট থেকে দেশ ও শহর নির্বাচন করুন",
+                _text('manualLocationDesc', context),
                 style: TextStyle(fontSize: 12),
               ),
               trailing: widget.currentLocationMode == 'manual'
@@ -919,7 +840,7 @@ class _LocationModalState extends State<LocationModal> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    "লোকেশন পরিবর্তন করলে নামাজের সময় স্বয়ংক্রিয়ভাবে আপডেট হবে",
+                    _text('locationInfo', context),
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.blue.shade800,
@@ -946,7 +867,7 @@ class _LocationModalState extends State<LocationModal> {
               ),
               onPressed: () => Navigator.pop(context),
               child: Text(
-                "বাতিল",
+                _text('cancel', context),
                 style: TextStyle(
                   color: Colors.grey.shade700,
                   fontWeight: FontWeight.w500,

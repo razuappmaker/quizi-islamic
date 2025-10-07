@@ -1,18 +1,20 @@
 // widgets/prayer_time_adjustment_modal.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class PrayerTimeAdjustmentModal extends StatefulWidget {
   final Map<String, int> prayerTimeAdjustments;
   final Function(String, int) onAdjustmentChanged;
   final VoidCallback onResetAll;
-  final VoidCallback onSaveAdjustments; // নতুন সেভ ফাংশন
+  final VoidCallback onSaveAdjustments;
 
   const PrayerTimeAdjustmentModal({
     Key? key,
     required this.prayerTimeAdjustments,
     required this.onAdjustmentChanged,
     required this.onResetAll,
-    required this.onSaveAdjustments, // নতুন প্যারামিটার
+    required this.onSaveAdjustments,
   }) : super(key: key);
 
   @override
@@ -22,6 +24,49 @@ class PrayerTimeAdjustmentModal extends StatefulWidget {
 
 class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
   Map<String, int> _currentAdjustments = {};
+
+  // Language Texts
+  static const Map<String, Map<String, String>> _texts = {
+    'adjustPrayerTimes': {
+      'en': 'Adjust Prayer Times',
+      'bn': 'নামাজের সময় সামঞ্জস্য করুন',
+    },
+    'adjustDescription': {
+      'en':
+          'Adjust according to local mosque timing\nUse (+/-) buttons to adjust by 1 minute',
+      'bn':
+          'স্থানীয় মসজিদের সময়ের সাথে মিলিয়ে নিন\n(+/-) বাটন দিয়ে ১ মিনিট করে সামঞ্জস্য করুন',
+    },
+    'resetTime': {'en': 'Reset Time', 'bn': 'সময় রিসেট'},
+    'timeReset': {
+      'en': 'Time reset successfully',
+      'bn': 'সময় রিসেট করা হয়েছে',
+    },
+    'saveSettings': {
+      'en': 'Time settings saved successfully',
+      'bn': 'সময় সেটিংস সফলভাবে সেভ করা হয়েছে',
+    },
+    'save': {'en': 'Save', 'bn': 'সেভ করুন'},
+    'close': {'en': 'Close', 'bn': 'বন্ধ করুন'},
+    'minutes': {'en': 'minutes', 'bn': 'মিনিট'},
+    'zeroMinutes': {'en': '0 minutes', 'bn': '০ মিনিট'},
+    'resetTooltip': {'en': 'Reset', 'bn': 'রিসেট করুন'},
+    'fajr': {'en': 'Fajr', 'bn': 'ফজর'},
+    'dhuhr': {'en': 'Dhuhr', 'bn': 'যোহর'},
+    'asr': {'en': 'Asr', 'bn': 'আসর'},
+    'maghrib': {'en': 'Maghrib', 'bn': 'মাগরিব'},
+    'isha': {'en': 'Isha', 'bn': 'ইশা'},
+  };
+
+  // Helper method to get text based on current language
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
 
   @override
   void initState() {
@@ -41,7 +86,6 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
     setState(() {
       _currentAdjustments[prayerName] = 0;
     });
-    // Reset করতে 0-বর্তমান মান পাঠানো
     widget.onAdjustmentChanged(prayerName, -_currentAdjustments[prayerName]!);
   }
 
@@ -53,6 +97,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final bottomPadding = mediaQuery.padding.bottom;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: EdgeInsets.only(
@@ -90,7 +135,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
             children: [
               Expanded(
                 child: Text(
-                  "নামাজের সময় সামঞ্জস্য করুন",
+                  _text('adjustPrayerTimes', context),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -104,16 +149,16 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                   widget.onResetAll();
                   setState(() {
                     _currentAdjustments = {
-                      "ফজর": 0,
-                      "যোহর": 0,
-                      "আসর": 0,
-                      "মাগরিব": 0,
-                      "ইশা": 0,
+                      _text('fajr', context): 0,
+                      _text('dhuhr', context): 0,
+                      _text('asr', context): 0,
+                      _text('maghrib', context): 0,
+                      _text('isha', context): 0,
                     };
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('সময় রিসেট করা হয়েছে'),
+                      content: Text(_text('timeReset', context)),
                       duration: Duration(seconds: 2),
                       backgroundColor: Colors.green,
                     ),
@@ -133,7 +178,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                       Icon(Icons.refresh, color: Colors.blue, size: 18),
                       SizedBox(width: 6),
                       Text(
-                        "সময় রিসেট",
+                        _text('resetTime', context),
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -149,8 +194,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
 
           const SizedBox(height: 8),
           Text(
-            "স্থানীয় মসজিদের সময়ের সাথে মিলিয়ে নিন\n"
-            "(+/-) বাটন দিয়ে ১ মিনিট করে সামঞ্জস্য করুন",
+            _text('adjustDescription', context),
             style: TextStyle(
               color: Colors.grey.shade600,
               fontSize: 13,
@@ -163,15 +207,13 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
           // Adjustment List with reduced height
           ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight:
-                  MediaQuery.of(context).size.height *
-                  0.3, // 25% reduced from 0.4 to 0.3
+              maxHeight: MediaQuery.of(context).size.height * 0.3,
             ),
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: _buildAdjustmentList(),
+                children: _buildAdjustmentList(context),
               ),
             ),
           ),
@@ -198,7 +240,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('সময় সেটিংস সফলভাবে সেভ করা হয়েছে'),
+                          content: Text(_text('saveSettings', context)),
                           duration: Duration(seconds: 2),
                           backgroundColor: Colors.green,
                         ),
@@ -210,7 +252,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                         Icon(Icons.save, size: 18),
                         SizedBox(width: 8),
                         Text(
-                          "সেভ করুন",
+                          _text('save', context),
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -235,7 +277,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                   ),
                   onPressed: () => Navigator.pop(context),
                   child: Text(
-                    "বন্ধ করুন",
+                    _text('close', context),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -251,15 +293,21 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
     );
   }
 
-  List<Widget> _buildAdjustmentList() {
-    final prayers = ["ফজর", "যোহর", "আসর", "মাগরিব", "ইশা"];
+  List<Widget> _buildAdjustmentList(BuildContext context) {
+    final prayers = [
+      _text('fajr', context),
+      _text('dhuhr', context),
+      _text('asr', context),
+      _text('maghrib', context),
+      _text('isha', context),
+    ];
 
     return prayers.map((prayerName) {
       final adjustment = _currentAdjustments[prayerName] ?? 0;
 
       return Container(
-        margin: const EdgeInsets.only(bottom: 8), // Reduced margin
-        padding: const EdgeInsets.all(10), // Reduced padding
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(10),
@@ -276,10 +324,14 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
           children: [
             // Prayer Name
             SizedBox(
-              width: 60, // Fixed width for prayer names
+              width: 60,
               child: Text(
                 prayerName,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
               ),
             ),
 
@@ -305,10 +357,10 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
               ),
               child: Text(
                 adjustment == 0
-                    ? "০ মিনিট"
+                    ? _text('zeroMinutes', context)
                     : adjustment > 0
-                    ? "+$adjustment মিনিট"
-                    : "$adjustment মিনিট",
+                    ? "+$adjustment ${_text('minutes', context)}"
+                    : "$adjustment ${_text('minutes', context)}",
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -379,7 +431,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                   icon: Icon(Icons.refresh, color: Colors.blue, size: 14),
                   onPressed: () => _resetAdjustment(prayerName),
                   padding: EdgeInsets.zero,
-                  tooltip: "রিসেট করুন",
+                  tooltip: _text('resetTooltip', context),
                   style: IconButton.styleFrom(
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),

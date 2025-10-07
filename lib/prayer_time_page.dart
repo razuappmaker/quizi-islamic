@@ -1,5 +1,5 @@
 // Prayer Time
-// prayer_time_page.dart - Final Version
+// prayer_time_page.dart - Final Version with Dual Language Support
 
 import 'dart:async';
 import 'dart:convert';
@@ -8,14 +8,16 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'ad_helper.dart';
-import 'prayer_time_service.dart';
-import 'prohibited_time_service.dart';
-import 'widgets/prayer_header_section.dart';
-import 'widgets/prayer_list_section.dart';
-import 'widgets/prohibited_time_section.dart';
-import 'widgets/location_modal.dart';
-import 'widgets/prayer_time_adjustment_modal.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
+import '../ad_helper.dart';
+import '../prayer_time_service.dart';
+import '../prohibited_time_service.dart';
+import '../widgets/prayer_header_section.dart';
+import '../widgets/prayer_list_section.dart';
+import '../widgets/prohibited_time_section.dart';
+import '../widgets/location_modal.dart';
+import '../widgets/prayer_time_adjustment_modal.dart';
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -27,7 +29,7 @@ class PrayerTimePage extends StatefulWidget {
 class _PrayerTimePageState extends State<PrayerTimePage> {
   // ---------- Services ----------
   final PrayerTimeService _prayerTimeService = PrayerTimeService();
-  final ProhibitedTimeService _prohibitedTimeService = ProhibitedTimeService();
+  ProhibitedTimeService? _prohibitedTimeService;
 
   // ---------- Prayer Times ----------
   String? cityName = "Loading...";
@@ -67,6 +69,43 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     "ইশা": 0,
   };
 
+  // Language Texts
+  final Map<String, Map<String, String>> _texts = {
+    'title': {'en': 'Prayer Times', 'bn': 'নামাজের সময়'},
+    'loading': {'en': 'Loading...', 'bn': 'লোড হচ্ছে...'},
+    'unknown': {'en': 'Unknown', 'bn': 'অজানা'},
+    'auto': {'en': 'Auto', 'bn': 'অটো'},
+    'manual': {'en': 'Manual', 'bn': 'মানুয়াল'},
+    'timeSettings': {'en': 'Time Settings', 'bn': 'সময় সেটিং'},
+    'offlineMode': {
+      'en': 'Offline Mode - Saved Data',
+      'bn': 'অফলাইন মোড - সেভ করা ডেটা',
+    },
+    'noInternet': {
+      'en': 'No internet connection. Showing saved times.',
+      'bn': 'ইন্টারনেট সংযোগ নেই। সেভ করা সময় দেখানো হচ্ছে।',
+    },
+    'dataLoadError': {
+      'en': 'Error loading data: ',
+      'bn': 'ডেটা লোড করতে সমস্যা: ',
+    },
+    'resetSuccess': {
+      'en': 'All adjustments reset',
+      'bn': 'সব অ্যাডজাস্টমেন্ট রিসেট করা হয়েছে',
+    },
+    'interstitialShown': {
+      'en': 'Fullscreen ad shown',
+      'bn': 'পূর্ণস্ক্রিন অ্যাড দেখানো হয়েছে',
+    },
+    'fajr': {'en': 'Fajr', 'bn': 'ফজর'},
+    'dhuhr': {'en': 'Dhuhr', 'bn': 'যোহর'},
+    'asr': {'en': 'Asr', 'bn': 'আসর'},
+    'maghrib': {'en': 'Maghrib', 'bn': 'মাগরিব'},
+    'isha': {'en': 'Isha', 'bn': 'ইশা'},
+    'ok': {'en': 'OK', 'bn': 'ঠিক আছে'},
+    'manualLocation': {'en': 'Manual Location', 'bn': 'মানুয়াল লোকেশন'},
+  };
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +116,17 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     _loadManualLocation();
     _loadPrayerTimeAdjustments();
     _startInterstitialTimer();
+
+    // ProhibitedTimeService কে পরে initialize করব যখন context available হবে
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // এখন context available, তাই ProhibitedTimeService initialize করতে পারি
+    if (_prohibitedTimeService == null) {
+      _prohibitedTimeService = ProhibitedTimeService(context);
+    }
   }
 
   @override
@@ -86,6 +136,66 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     _bannerAd?.dispose();
     AdHelper.disposeInterstitialAd();
     super.dispose();
+  }
+
+  // Helper method to get text based on current language
+  String _text(String key) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
+  // Get prayer name based on language
+  String _getPrayerName(String prayerName) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    if (languageProvider.isEnglish) {
+      switch (prayerName) {
+        case 'ফজর':
+          return 'Fajr';
+        case 'যোহর':
+          return 'Dhuhr';
+        case 'আসর':
+          return 'Asr';
+        case 'মাগরিব':
+          return 'Maghrib';
+        case 'ইশা':
+          return 'Isha';
+        default:
+          return prayerName;
+      }
+    }
+    return prayerName;
+  }
+
+  // Get prayer adjustment key based on language
+  String _getPrayerAdjustmentKey(String prayerName) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    if (languageProvider.isEnglish) {
+      switch (prayerName) {
+        case 'Fajr':
+          return 'ফজর';
+        case 'Dhuhr':
+          return 'যোহর';
+        case 'Asr':
+          return 'আসর';
+        case 'Maghrib':
+          return 'মাগরিব';
+        case 'Isha':
+          return 'ইশা';
+        default:
+          return prayerName;
+      }
+    }
+    return prayerName;
   }
 
   // ম্যানুয়াল লোকেশন লোড করা
@@ -199,7 +309,10 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     if (useManual) {
       await prefs.setDouble('manual_latitude', lat!);
       await prefs.setDouble('manual_longitude', lng!);
-      await prefs.setString('manual_city_name', city ?? 'মানুয়াল লোকেশন');
+      await prefs.setString(
+        'manual_city_name',
+        city ?? _text('manualLocation'),
+      );
       await prefs.setString('manual_country_name', country ?? '');
     }
 
@@ -254,7 +367,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         prayerTimeAdjustments: _prayerTimeAdjustments,
         onAdjustmentChanged: _adjustPrayerTimeByName,
         onResetAll: _resetAllAdjustments,
-        onSaveAdjustments: _savePrayerTimeAdjustments, //
+        onSaveAdjustments: _savePrayerTimeAdjustments,
       ),
     );
   }
@@ -273,9 +386,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     _savePrayerTimeAdjustments();
     findNextPrayer();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("সব অ্যাডজাস্টমেন্ট রিসেট করা হয়েছে")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(_text('resetSuccess'))));
   }
 
   // নোটিফিকেশন চ্যানেল ইনিশিয়ালাইজেশন
@@ -448,7 +561,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       // ইউজারকে জানানো (ঐচ্ছিক)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('পূর্ণস্ক্রিন অ্যাড দেখানো হয়েছে'),
+          content: Text(_text('interstitialShown')),
           duration: Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
@@ -508,8 +621,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   Future<void> _loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      cityName = prefs.getString("cityName") ?? "অজানা";
-      countryName = prefs.getString("countryName") ?? "অজানা";
+      cityName = prefs.getString("cityName") ?? _text('unknown');
+      countryName = prefs.getString("countryName") ?? _text('unknown');
       _locationPermissionGranted = prefs.getBool('locationPermission') ?? false;
       _notificationPermissionGranted =
           prefs.getBool('notificationPermission') ?? false;
@@ -529,11 +642,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       setState(() {
         _isOnline = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("ইন্টারনেট সংযোগ নেই। সেভ করা সময় দেখানো হচ্ছে।"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_text('noInternet'))));
       await _scheduleAllNotifications();
       return;
     }
@@ -571,7 +682,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       print("Location fetch error: $e");
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("ডেটা লোড করতে সমস্যা: $e")));
+      ).showSnackBar(SnackBar(content: Text("${_text('dataLoadError')}$e")));
     }
   }
 
@@ -606,7 +717,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       });
     } else {
       setState(() {
-        nextPrayer = "লোড হচ্ছে...";
+        nextPrayer = _text('loading');
         countdown = Duration.zero;
       });
     }
@@ -647,8 +758,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           content: NotificationContent(
             id: prayerName.hashCode,
             channelKey: 'prayer_reminder_channel',
-            title: 'নামাজের সময়',
-            body: '$prayerName আযান শুরু হওয়ার ১০ মিনিট বাকি',
+            title: _text('title'),
+            body: '${_getPrayerName(prayerName)} ${_getNotificationBody()}',
             notificationLayout: NotificationLayout.Default,
           ),
           schedule: NotificationCalendar(
@@ -668,8 +779,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           content: NotificationContent(
             id: prayerName.hashCode,
             channelKey: 'prayer_reminder_channel',
-            title: 'নামাজের সময়',
-            body: '$prayerName নামাজ শুরু হওয়ার ১০ মিনিট বাকি',
+            title: _text('title'),
+            body: '${_getPrayerName(prayerName)} ${_getNotificationBody()}',
             notificationLayout: NotificationLayout.Default,
           ),
           schedule: NotificationCalendar(
@@ -685,6 +796,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     } catch (e) {
       print("Error scheduling notification for $prayerName: $e");
     }
+  }
+
+  String _getNotificationBody() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    return languageProvider.isEnglish
+        ? 'prayer starts in 10 minutes'
+        : 'নামাজ শুরু হওয়ার ১০ মিনিট বাকি';
   }
 
   // Prayer time detail dialog
@@ -706,7 +827,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
               ),
               const SizedBox(height: 16),
               Text(
-                prayerName,
+                _getPrayerName(prayerName),
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -745,9 +866,12 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                     vertical: 12,
                   ),
                 ),
-                child: const Text(
-                  "ঠিক আছে",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                child: Text(
+                  _text('ok'),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -769,7 +893,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           const Icon(Icons.wifi_off, size: 16, color: Colors.white),
           const SizedBox(width: 8),
           Text(
-            "অফলাইন মোড - সেভ করা ডেটা",
+            _text('offlineMode'),
             style: TextStyle(color: Colors.white, fontSize: 12),
           ),
         ],
@@ -779,11 +903,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF2E7D32),
         title: Text(
-          "নামাজের সময়",
+          _text('title'),
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
@@ -849,7 +975,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        _useManualLocation ? "মানুয়াল" : "অটো",
+                        _useManualLocation ? _text('manual') : _text('auto'),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -899,13 +1025,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.edit_calendar_rounded, // ক্যালেন্ডার এডিট আইকন
+                        Icons.edit_calendar_rounded,
                         size: 14,
                         color: Colors.white,
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        "সময় সেটিং",
+                        _text('timeSettings'),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -946,6 +1072,11 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   }
 
   Widget _buildPrayerTab() {
+    // ProhibitedTimeService null check
+    if (_prohibitedTimeService == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxHeight = constraints.maxHeight;
@@ -1003,7 +1134,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       isTablet: isTablet,
                       isSmallPhone: isSmallPhone,
                       prayerTimes: adjustedPrayerTimes,
-                      prohibitedTimeService: _prohibitedTimeService,
+                      prohibitedTimeService: _prohibitedTimeService!,
                       onShowInfo: _showFloatingInfo,
                     ),
                   ],

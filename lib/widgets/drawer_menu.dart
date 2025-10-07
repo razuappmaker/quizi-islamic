@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:share_plus/share_plus.dart'; // ✅ নতুন প্যাকেজ যোগ করুন
+import 'package:share_plus/share_plus.dart';
 
 import '../utils/data_deletion_manager.dart';
 import '../providers/theme_provider.dart';
@@ -34,7 +34,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
       _showAdminPanel = true;
     });
 
-    // 30 মিনিট পর অটো হাইড
     Future.delayed(const Duration(minutes: 30), () {
       if (mounted) {
         setState(() {
@@ -44,7 +43,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
     });
   }
 
-  // ✅ নতুন শেয়ার ফাংশন যোগ করুন
   void _shareApp(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(
       context,
@@ -107,7 +105,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
     final startTime = _pressStartTime;
     if (startTime == null) return;
 
-    // 5 সেকেন্ড পর চেক করুন
     await Future.delayed(const Duration(seconds: 5));
 
     if (_isLongPressing && _pressStartTime == startTime && mounted) {
@@ -123,7 +120,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
     bool isDarkMode,
   ) {
     return Container(
-      height: responsiveValue(context, tablet ? 120 : 140),
+      height: responsiveValue(context, tablet ? 100 : 120), // উচ্চতা কমানো
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDarkMode
@@ -137,45 +134,43 @@ class _DrawerMenuState extends State<DrawerMenu> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: responsiveValue(context, tablet ? 25 : 30),
+                radius: responsiveValue(context, tablet ? 20 : 25), // ছোট করা
                 backgroundColor: Colors.white,
                 child: Icon(
                   Icons.menu_book,
-                  size: responsiveValue(context, tablet ? 30 : 34),
+                  size: responsiveValue(context, tablet ? 25 : 28), // ছোট করা
                   color: Colors.green[800],
                 ),
               ),
-              const ResponsiveSizedBox(height: 10),
-
-              // প্রথম টেক্সট - প্যাডিং সহ
+              const ResponsiveSizedBox(height: 6), // গ্যাপ কমানো
+              // প্রথম টেক্সট
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: responsiveValue(context, 16),
+                  horizontal: responsiveValue(context, 12),
                 ),
                 child: ResponsiveText(
                   languageProvider.isEnglish
                       ? 'Islamic Day - Global Bangladesh'
                       : 'ইসলামিক ডে - Islamic Day',
-                  fontSize: 18, // ফন্ট একটু ছোট করা হলো
+                  fontSize: 14, // ফন্ট সাইজ ছোট করা
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   textAlign: TextAlign.center,
                 ),
               ),
 
-              const ResponsiveSizedBox(height: 8),
-
-              // দ্বিতীয় টেক্সট - শুধু ট্যাবলেট না হলে
+              const ResponsiveSizedBox(height: 4), // গ্যাপ কমানো
+              // দ্বিতীয় টেক্সট
               if (!tablet)
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: responsiveValue(context, 20),
+                    horizontal: responsiveValue(context, 16),
                   ),
                   child: ResponsiveText(
                     languageProvider.isEnglish
                         ? 'For the Global Bangladeshi Community'
                         : 'বিশ্বব্যাপী বাংলাদেশী কমিউনিটির জন্য',
-                    fontSize: 11, // ফন্ট একটু ছোট করা হলো
+                    fontSize: 10, // ফন্ট সাইজ ছোট করা
                     color: Colors.white70,
                     textAlign: TextAlign.center,
                   ),
@@ -194,8 +189,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
   ) {
     return Column(
       children: [
-        // ✅ নতুন শেয়ার বাটন যোগ করুন - প্রথম আইটেম হিসেবে
         _buildShareAppItem(context, languageProvider),
+        _buildDivider(),
 
         _buildDrawerItem(
           context,
@@ -203,6 +198,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
           languageProvider.isEnglish ? 'Prayer Time' : 'নামাজের সময়',
           const PrayerTimePage(),
         ),
+        _buildDivider(),
 
         _buildDrawerItem(
           context,
@@ -211,26 +207,34 @@ class _DrawerMenuState extends State<DrawerMenu> {
           null,
           url: 'https://www.google.com/maps/search/?api=1&query=মসজিদ',
         ),
+        _buildDivider(),
+
         _buildDrawerItem(
           context,
           Icons.person,
           languageProvider.isEnglish ? 'Rewards' : 'পুরস্কার',
           const RewardScreen(),
         ),
-        // drawer_menu.dart - শুধু একটি আইটেম রাখুন
+        _buildDivider(),
+
         _buildDrawerItem(
           context,
-          Icons.contact_page, // অথবা Icons.info
+          Icons.contact_page,
           languageProvider.isEnglish ? 'About & Contact' : 'আমাদের সম্পর্কে',
-          const AboutContactPage(), // নতুন combined page
+          const AboutContactPage(),
         ),
+        _buildDivider(),
+
         _buildLanguageSwitchItem(context, languageProvider),
+        _buildDivider(),
+
         _buildDrawerItem(
           context,
           Icons.volunteer_activism,
           languageProvider.isEnglish ? 'Support Us' : 'সাপোর্ট করুন',
           const SupportScreen(),
         ),
+        _buildDivider(),
 
         _buildDrawerItem(
           context,
@@ -238,8 +242,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
           languageProvider.isEnglish ? 'Developer' : 'ডেভেলপার',
           DeveloperPage(),
         ),
+        _buildDivider(),
 
-        // ✅ শুধুমাত্র লং প্রেস করলে এডমিন প্যানেল দেখাবে
         if (_showAdminPanel) _buildAdminPanelItem(context, languageProvider),
 
         _buildDrawerItem(
@@ -249,13 +253,30 @@ class _DrawerMenuState extends State<DrawerMenu> {
           null,
           url: 'https://sites.google.com/view/islamicquize/home',
         ),
+        _buildDivider(),
+
         _buildDataDeletionItem(context, languageProvider),
+        _buildDivider(),
+
         _buildThemeSwitchItem(context, languageProvider, themeProvider),
       ],
     );
   }
 
-  // ✅ নতুন শেয়ার আইটেম বিল্ডার
+  // ডিভাইডার widget - গ্যাপ কমাতে
+  Widget _buildDivider() {
+    return Divider(
+      height: 1,
+      // উচ্চতা কমানো
+      thickness: 0.5,
+      // পাতলা করা
+      color: Colors.grey.withOpacity(0.2),
+      indent: 16,
+      endIndent: 16,
+    );
+  }
+
+  // শেয়ার আইটেম - কম্প্যাক্ট ভার্সন
   Widget _buildShareAppItem(
     BuildContext context,
     LanguageProvider languageProvider,
@@ -263,46 +284,43 @@ class _DrawerMenuState extends State<DrawerMenu> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListTile(
+      dense: true,
+      // dense=true দিয়ে উচ্চতা কমানো
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: responsiveValue(context, 12),
+        vertical: responsiveValue(context, 4), // ভার্টিকাল প্যাডিং কমানো
+      ),
       leading: Container(
-        padding: EdgeInsets.all(responsiveValue(context, 8)),
+        padding: EdgeInsets.all(responsiveValue(context, 6)), // প্যাডিং কমানো
         decoration: BoxDecoration(
           color: Colors.blue.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
           Icons.share_rounded,
           color: Colors.blue,
-          size: responsiveValue(context, 24),
+          size: responsiveValue(context, 20), // আইকন সাইজ ছোট করা
         ),
       ),
       title: ResponsiveText(
         languageProvider.isEnglish ? 'Share App' : 'অ্যাপ শেয়ার করুন',
-        fontSize: 16,
+        fontSize: 14, // ফন্ট সাইজ ছোট করা
         fontWeight: FontWeight.w500,
         color: isDark ? Colors.white : Colors.black87,
       ),
-      subtitle: Text(
-        languageProvider.isEnglish
-            ? 'Share with friends & family'
-            : 'বন্ধু ও পরিবারের সাথে শেয়ার করুন',
-        style: TextStyle(
-          fontSize: responsiveValue(context, 12),
-          color: isDark ? Colors.white60 : Colors.grey[600],
-        ),
-      ),
       trailing: Icon(
         Icons.arrow_forward_ios,
-        size: responsiveValue(context, 16),
+        size: responsiveValue(context, 14), // ছোট করা
         color: isDark ? Colors.white70 : Colors.green[700]!,
       ),
       onTap: () {
-        Navigator.pop(context); // Drawer বন্ধ করুন
-        _shareApp(context); // শেয়ার ফাংশন কল করুন
+        Navigator.pop(context);
+        _shareApp(context);
       },
     );
   }
 
-  // ✅ এডমিন প্যানেল আইটেম
+  // এডমিন প্যানেল আইটেম - কম্প্যাক্ট
   Widget _buildAdminPanelItem(
     BuildContext context,
     LanguageProvider languageProvider,
@@ -311,31 +329,28 @@ class _DrawerMenuState extends State<DrawerMenu> {
 
     return Column(
       children: [
-        Divider(
-          color: Colors.green.shade200,
-          indent: responsiveValue(context, 16),
-          endIndent: responsiveValue(context, 16),
-        ),
+        _buildDivider(),
         ListTile(
+          dense: true,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: responsiveValue(context, 12),
+            vertical: responsiveValue(context, 4),
+          ),
           leading: Icon(
             Icons.admin_panel_settings,
             color: Colors.green[700],
-            size: responsiveValue(context, 24),
+            size: responsiveValue(context, 20),
           ),
           title: ResponsiveText(
             languageProvider.isEnglish ? 'Admin Panel' : 'এডমিন প্যানেল',
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
-            //color: Colors.green[700],
-          ),
-          subtitle: Text(
-            'Active for 30 minutes',
-            style: TextStyle(fontSize: 12, color: Colors.green[600]),
+            color: isDark ? Colors.white : Colors.black87,
           ),
           trailing: Icon(
             Icons.arrow_forward_ios,
-            size: responsiveValue(context, 16),
-            color: isDark ? Colors.white : Colors.green[700]!,
+            size: responsiveValue(context, 14),
+            color: isDark ? Colors.white70 : Colors.green[700]!,
           ),
           onTap: () {
             Navigator.pop(context);
@@ -345,16 +360,12 @@ class _DrawerMenuState extends State<DrawerMenu> {
             );
           },
         ),
-        Divider(
-          color: Colors.green.shade200,
-          indent: responsiveValue(context, 16),
-          endIndent: responsiveValue(context, 16),
-        ),
+        _buildDivider(),
       ],
     );
   }
 
-  // ... বাকি মেথডগুলো একই থাকবে
+  // মূল ড্রয়ার আইটেম বিল্ডার - সবগুলো একই স্টাইল
   Widget _buildDrawerItem(
     BuildContext context,
     IconData icon,
@@ -366,21 +377,27 @@ class _DrawerMenuState extends State<DrawerMenu> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListTile(
+      dense: true,
+      // dense=true যোগ করা
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: responsiveValue(context, 12),
+        vertical: responsiveValue(context, 4), // ভার্টিকাল প্যাডিং কমানো
+      ),
       leading: Icon(
         icon,
         color: isDark ? Colors.white70 : Colors.green[700],
-        size: responsiveValue(context, 24),
+        size: responsiveValue(context, 20), // আইকন সাইজ ছোট করা
       ),
       title: ResponsiveText(
         title,
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
+        fontSize: 14, // সবগুলোর ফন্ট সাইজ 14
+        fontWeight: FontWeight.w500, // সবগুলোর একই ফন্ট ওয়েট
         color: isDark ? Colors.white : Colors.black87,
       ),
       trailing: Icon(
         Icons.arrow_forward_ios,
-        size: responsiveValue(context, 16),
-        color: isDark ? Colors.white70 : Colors.green[700]!, // ✅ আপডেটেড
+        size: responsiveValue(context, 14), // ছোট করা
+        color: isDark ? Colors.white70 : Colors.green[700]!,
       ),
       onTap: onTap ?? () => _handleDrawerItemTap(context, page, url),
     );
@@ -414,6 +431,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
     }
   }
 
+  // ভাষা সুইচ আইটেম - কম্প্যাক্ট
   Widget _buildLanguageSwitchItem(
     BuildContext context,
     LanguageProvider languageProvider,
@@ -421,15 +439,20 @@ class _DrawerMenuState extends State<DrawerMenu> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: responsiveValue(context, 12),
+        vertical: responsiveValue(context, 4),
+      ),
       leading: Icon(
         Icons.language,
         color: isDark ? Colors.white70 : Colors.green[700],
-        size: responsiveValue(context, 24),
+        size: responsiveValue(context, 20),
       ),
       title: ResponsiveText(
         languageProvider.isEnglish ? 'Language' : 'ভাষা',
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
+        fontSize: 14, // একই ফন্ট সাইজ
+        fontWeight: FontWeight.w500, // একই ফন্ট ওয়েট
         color: isDark ? Colors.white : Colors.black87,
       ),
       trailing: Switch(
@@ -437,10 +460,12 @@ class _DrawerMenuState extends State<DrawerMenu> {
         onChanged: (value) => languageProvider.toggleLanguage(),
         activeColor: Colors.green[700],
         activeTrackColor: Colors.green[300],
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }
 
+  // ডেটা ডিলিশন আইটেম - কম্প্যাক্ট
   Widget _buildDataDeletionItem(
     BuildContext context,
     LanguageProvider languageProvider,
@@ -448,20 +473,25 @@ class _DrawerMenuState extends State<DrawerMenu> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: responsiveValue(context, 12),
+        vertical: responsiveValue(context, 4),
+      ),
       leading: Icon(
         Icons.delete_forever,
         color: isDark ? Colors.white70 : Colors.green[700],
-        size: responsiveValue(context, 24),
+        size: responsiveValue(context, 20),
       ),
       title: ResponsiveText(
         languageProvider.isEnglish ? 'Delete All Data' : 'সব তথ্য মুছুন',
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
+        fontSize: 14, // একই ফন্ট সাইজ
+        fontWeight: FontWeight.w500, // একই ফন্ট ওয়েট
         color: isDark ? Colors.white : Colors.black87,
       ),
       trailing: Icon(
         Icons.arrow_forward_ios,
-        size: responsiveValue(context, 16),
+        size: responsiveValue(context, 14),
         color: Colors.green[700],
       ),
       onTap: () {
@@ -471,46 +501,38 @@ class _DrawerMenuState extends State<DrawerMenu> {
     );
   }
 
+  // থিম সুইচ আইটেম - কম্প্যাক্ট
   Widget _buildThemeSwitchItem(
     BuildContext context,
     LanguageProvider languageProvider,
     ThemeProvider themeProvider,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Column(
-      children: [
-        Divider(
-          color: Colors.green.shade200,
-          indent: responsiveValue(context, 16),
-          endIndent: responsiveValue(context, 16),
-        ),
-        ResponsivePadding(
-          horizontal: 12,
-          child: Row(
-            children: [
-              Icon(
-                Icons.brightness_6,
-                color: isDark ? Colors.white : Colors.green[700]!,
-                size: responsiveValue(context, 24),
-              ),
-              const ResponsiveSizedBox(width: 10),
-              ResponsiveText(
-                languageProvider.isEnglish ? 'Dark Mode' : 'ডার্ক মোড',
-                color: isDark ? Colors.white70 : Colors.green[700]!,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              const Spacer(),
-              Switch(
-                value: themeProvider.isDarkMode,
-                onChanged: (value) => themeProvider.toggleTheme(value),
-                activeColor: Colors.green[700],
-                activeTrackColor: Colors.green[300],
-              ),
-            ],
-          ),
-        ),
-      ],
+
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: responsiveValue(context, 12),
+        vertical: responsiveValue(context, 4),
+      ),
+      leading: Icon(
+        Icons.brightness_6,
+        color: isDark ? Colors.white70 : Colors.green[700]!,
+        size: responsiveValue(context, 20),
+      ),
+      title: ResponsiveText(
+        languageProvider.isEnglish ? 'Dark Mode' : 'ডার্ক মোড',
+        fontSize: 14, // একই ফন্ট সাইজ
+        fontWeight: FontWeight.w500, // একই ফন্ট ওয়েট
+        color: isDark ? Colors.white : Colors.black87,
+      ),
+      trailing: Switch(
+        value: themeProvider.isDarkMode,
+        onChanged: (value) => themeProvider.toggleTheme(value),
+        activeColor: Colors.green[700],
+        activeTrackColor: Colors.green[300],
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
     );
   }
 }

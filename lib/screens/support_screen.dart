@@ -1,6 +1,8 @@
-// support_screen.dart - Updated with Option 4 (Dynamic Daily Data)
+// support_screen.dart - Updated with Language Provider Integration
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class SupportScreen extends StatefulWidget {
   const SupportScreen({Key? key}) : super(key: key);
@@ -10,23 +12,109 @@ class SupportScreen extends StatefulWidget {
 }
 
 class _SupportScreenState extends State<SupportScreen> {
-  bool _isEnglish = false;
   final ScrollController _tickerController = ScrollController();
 
   // ==================== OPTION 4: DYNAMIC DAILY DATA ====================
-  // This will generate different data every day
-  // Replace this with real API/Firebase data in production
   List<Map<String, String>> _recentDonations = [];
   int _todayDonationCount = 0;
-  bool _showDonationTicker =
-      true; // শুধু এই ভেরিয়েবল false করলেই টিকার লুকিয়ে যাবে
+  bool _showDonationTicker = true;
+
+  // Language Texts
+  final Map<String, Map<String, String>> _texts = {
+    'title': {'en': 'Support Us', 'bn': 'আমাদের সাপোর্ট করুন'},
+    'headerTitle': {
+      'en': 'Support Islamic Education',
+      'bn': 'ইসলামিক শিক্ষাকে সাপোর্ট করুন',
+    },
+    'headerSubtitle': {
+      'en':
+          'Your support helps us maintain and improve this app for millions of users worldwide',
+      'bn':
+          'আপনার সাপোর্ট লক্ষাধিক ব্যবহারকারীর জন্য এই অ্যাপটি উন্নত এবং সচল রাখতে সাহায্য করে',
+    },
+    'whySupport': {
+      'en': 'Why Your Support Matters',
+      'bn': 'আপনার সাপোর্ট কেন গুরুত্বপূর্ণ',
+    },
+    'serverCosts': {
+      'en': 'Server & Hosting Costs',
+      'bn': 'সার্ভার ও হোস্টিং খরচ',
+    },
+    'serverDesc': {
+      'en': 'Monthly server maintenance and cloud hosting',
+      'bn': 'মাসিক সার্ভার মেইন্টেনেন্স এবং ক্লাউড হোস্টিং',
+    },
+    'appDevelopment': {'en': 'App Development', 'bn': 'অ্যাপ ডেভেলপমেন্ট'},
+    'appDevDesc': {
+      'en': 'New features and regular updates',
+      'bn': 'নতুন ফিচার এবং নিয়মিত আপডেট',
+    },
+    'security': {
+      'en': 'Security & Performance',
+      'bn': 'সিকিউরিটি ও পারফরমেন্স',
+    },
+    'securityDesc': {
+      'en': 'Security updates and performance improvements',
+      'bn': 'সিকিউরিটি আপডেট এবং পারফরমেন্স উন্নতি',
+    },
+    'makeDifference': {'en': 'Make a Difference', 'bn': 'একটি পরিবর্তন আনুন'},
+    'supportGooglePlay': {
+      'en': 'Support via Google Play',
+      'bn': 'গুগল প্লে এর মাধ্যমে সাপোর্ট করুন',
+    },
+    'donateWebsite': {
+      'en': 'Donate via Website',
+      'bn': 'ওয়েবসাইট এর মাধ্যমে ডোনেট করুন',
+    },
+    'contactInfo': {'en': 'Contact Information', 'bn': 'যোগাযোগের তথ্য'},
+    'liveDonations': {'en': 'LIVE DONATIONS', 'bn': 'লাইভ ডোনেশন'},
+    'supportersToday': {'en': 'Supporters Today', 'bn': 'আজকের সাপোর্টার্স'},
+    'multipleCurrencies': {'en': 'Multiple Currencies', 'bn': 'বহু মুদ্রা'},
+    'hideTicker': {'en': 'Hide Ticker', 'bn': 'টিকার লুকান'},
+    'showTicker': {'en': 'Show Ticker', 'bn': 'টিকার দেখান'},
+    'demoDataInfo': {
+      'en': 'Demo data - changes daily\nTap eye icon to hide',
+      'bn': 'ডেমো ডেটা - প্রতিদিন পরিবর্তন হয়\nআইকন টেপ করে লুকান',
+    },
+    'visitWebsite': {
+      'en': 'Visit Our Website',
+      'bn': 'আমাদের ওয়েবসাইট ভিজিট করুন',
+    },
+    'websiteDialogContent': {
+      'en':
+          'For more donation options and detailed information, please visit our official website. We appreciate your support!',
+      'bn':
+          'আরও ডোনেশন অপশন এবং বিস্তারিত তথ্যের জন্য আমাদের অফিসিয়াল ওয়েবসাইট ভিজিট করুন। আমরা আপনার সাপোর্টের জন্য কৃতজ্ঞ!',
+    },
+    'cancel': {'en': 'Cancel', 'bn': 'বাতিল'},
+    'visitWebsiteBtn': {'en': 'Visit Website', 'bn': 'ওয়েবসাইট ভিজিট করুন'},
+    'linkError': {
+      'en': '❌ Could not open the link',
+      'bn': '❌ লিঙ্কটি খুলতে ব্যর্থ হয়েছে',
+    },
+    'googlePlayMessage': {
+      'en': 'Google Play Billing will be implemented here',
+      'bn': 'গুগল প্লে বিলিং এখানে ইমপ্লিমেন্ট করা হবে',
+    },
+  };
+
   @override
   void initState() {
     super.initState();
-    _generateTodayDonations(); // Generate dynamic data on init
+    _generateTodayDonations();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startAutoScroll();
     });
+  }
+
+  // Helper method to get text based on current language
+  String _text(String key) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? '';
   }
 
   // ==================== DYNAMIC DATA GENERATION ====================
@@ -75,8 +163,7 @@ class _SupportScreenState extends State<SupportScreen> {
     amounts.shuffle();
 
     // Generate different number of donations each day (8-15)
-    // Using day of month to create variation
-    int donationCount = 8 + (now.day % 8); // Changes daily (8-15)
+    int donationCount = 8 + (now.day % 8);
 
     for (int i = 0; i < donationCount; i++) {
       String timeText = _getTimeText(i, now);
@@ -95,13 +182,18 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   String _getTimeText(int index, DateTime now) {
-    // Make times relative to current time for realism
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    bool isEnglish = languageProvider.isEnglish;
+
     int minutesAgo = (index + 1) * 3 + (now.minute % 15);
     if (minutesAgo < 60) {
-      return '$minutesAgo ${_isEnglish ? 'mins ago' : 'মিনিট আগে'}';
+      return '$minutesAgo ${isEnglish ? 'mins ago' : 'মিনিট আগে'}';
     } else {
       int hours = minutesAgo ~/ 60;
-      return '$hours ${_isEnglish ? 'hours ago' : 'ঘন্টা আগে'}';
+      return '$hours ${isEnglish ? 'hours ago' : 'ঘন্টা আগে'}';
     }
   }
 
@@ -132,12 +224,6 @@ class _SupportScreenState extends State<SupportScreen> {
     });
   }
 
-  void _toggleLanguage() {
-    setState(() {
-      _isEnglish = !_isEnglish;
-    });
-  }
-
   Future<void> _launchURL(String url) async {
     try {
       if (await canLaunchUrl(Uri.parse(url))) {
@@ -153,35 +239,32 @@ class _SupportScreenState extends State<SupportScreen> {
 
   void _showErrorSnackbar() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isEnglish
-              ? '❌ Could not open the link'
-              : '❌ লিঙ্কটি খুলতে ব্যর্থ হয়েছে',
-        ),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(_text('linkError')), backgroundColor: Colors.red),
     );
   }
 
   void _showExternalDonationDialog() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    bool isEnglish = languageProvider.isEnglish;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          _isEnglish ? 'Visit Our Website' : 'আমাদের ওয়েবসাইট ভিজিট করুন',
+          _text('visitWebsite'),
           style: TextStyle(color: Colors.green[800]),
         ),
         content: Text(
-          _isEnglish
-              ? 'For more donation options and detailed information, please visit our official website. We appreciate your support!'
-              : 'আরও ডোনেশন অপশন এবং বিস্তারিত তথ্যের জন্য আমাদের অফিসিয়াল ওয়েবসাইট ভিজিট করুন। আমরা আপনার সাপোর্টের জন্য কৃতজ্ঞ!',
+          _text('websiteDialogContent'),
           style: TextStyle(fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(_isEnglish ? 'Cancel' : 'বাতিল'),
+            child: Text(_text('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
@@ -189,7 +272,7 @@ class _SupportScreenState extends State<SupportScreen> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
-            child: Text(_isEnglish ? 'Visit Website' : 'ওয়েবসাইট ভিজিট করুন'),
+            child: Text(_text('visitWebsiteBtn')),
           ),
         ],
       ),
@@ -308,11 +391,14 @@ class _SupportScreenState extends State<SupportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    bool isEnglish = languageProvider.isEnglish;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[800],
         title: Text(
-          _isEnglish ? 'Support Us' : 'আমাদের সাপোর্ট করুন',
+          _text('title'),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -351,26 +437,8 @@ class _SupportScreenState extends State<SupportScreen> {
               ),
               onPressed: _toggleDonationTicker,
               tooltip: _showDonationTicker
-                  ? (_isEnglish ? 'Hide Ticker' : 'টিকার লুকান')
-                  : (_isEnglish ? 'Show Ticker' : 'টিকার দেখান'),
-              splashRadius: 20,
-            ),
-          ),
-          // Language Toggle Button
-          Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: Icon(
-                _isEnglish ? Icons.language : Icons.translate,
-                color: Colors.white,
-                size: 20,
-              ),
-              onPressed: _toggleLanguage,
-              tooltip: _isEnglish ? 'বাংলা' : 'English',
+                  ? _text('hideTicker')
+                  : _text('showTicker'),
               splashRadius: 20,
             ),
           ),
@@ -388,7 +456,6 @@ class _SupportScreenState extends State<SupportScreen> {
               const SizedBox(height: 24),
 
               // ==================== LIVE DONATION TICKER SECTION ====================
-              // This section can be easily hidden by toggling _showDonationTicker
               if (_showDonationTicker) _buildDonationTickerSection(),
 
               // Why Support Section
@@ -445,7 +512,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     ),
                     SizedBox(width: 8),
                     Text(
-                      _isEnglish ? 'LIVE DONATIONS' : 'লাইভ ডোনেশন',
+                      _text('liveDonations'),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -456,9 +523,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     Spacer(),
                     // Info icon showing this is demo data
                     Tooltip(
-                      message: _isEnglish
-                          ? 'Demo data - changes daily\nTap eye icon to hide'
-                          : 'ডেমো ডেটা - প্রতিদিন পরিবর্তন হয়\nআইকন টেপ করে লুকান',
+                      message: _text('demoDataInfo'),
                       child: Icon(
                         Icons.info_outline,
                         color: Colors.green[600],
@@ -519,7 +584,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       ),
                       SizedBox(width: 6),
                       Text(
-                        '$_todayDonationCount+ ${_isEnglish ? 'Supporters Today' : 'আজকের সাপোর্টার্স'}',
+                        '$_todayDonationCount+ ${_text('supportersToday')}',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -534,7 +599,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       ),
                       SizedBox(width: 6),
                       Text(
-                        _isEnglish ? 'Multiple Currencies' : 'বহু মুদ্রা',
+                        _text('multipleCurrencies'),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -575,9 +640,7 @@ class _SupportScreenState extends State<SupportScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              _isEnglish
-                  ? 'Support Islamic Education'
-                  : 'ইসলামিক শিক্ষাকে সাপোর্ট করুন',
+              _text('headerTitle'),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -587,9 +650,7 @@ class _SupportScreenState extends State<SupportScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              _isEnglish
-                  ? 'Your support helps us maintain and improve this app for millions of users worldwide'
-                  : 'আপনার সাপোর্ট লক্ষাধিক ব্যবহারকারীর জন্য এই অ্যাপটি উন্নত এবং সচল রাখতে সাহায্য করে',
+              _text('headerSubtitle'),
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[600],
@@ -613,9 +674,7 @@ class _SupportScreenState extends State<SupportScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _isEnglish
-                  ? 'Why Your Support Matters'
-                  : 'আপনার সাপোর্ট কেন গুরুত্বপূর্ণ',
+              _text('whySupport'),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -625,24 +684,18 @@ class _SupportScreenState extends State<SupportScreen> {
             const SizedBox(height: 16),
             _buildReasonItem(
               Icons.cloud_upload,
-              _isEnglish ? 'Server & Hosting Costs' : 'সার্ভার ও হোস্টিং খরচ',
-              _isEnglish
-                  ? 'Monthly server maintenance and cloud hosting'
-                  : 'মাসিক সার্ভার মেইন্টেনেন্স এবং ক্লাউড হোস্টিং',
+              _text('serverCosts'),
+              _text('serverDesc'),
             ),
             _buildReasonItem(
               Icons.developer_mode,
-              _isEnglish ? 'App Development' : 'অ্যাপ ডেভেলপমেন্ট',
-              _isEnglish
-                  ? 'New features and regular updates'
-                  : 'নতুন ফিচার এবং নিয়মিত আপডেট',
+              _text('appDevelopment'),
+              _text('appDevDesc'),
             ),
             _buildReasonItem(
               Icons.security,
-              _isEnglish ? 'Security & Performance' : 'সিকিউরিটি ও পারফরমেন্স',
-              _isEnglish
-                  ? 'Security updates and performance improvements'
-                  : 'সিকিউরিটি আপডেট এবং পারফরমেন্স উন্নতি',
+              _text('security'),
+              _text('securityDesc'),
             ),
           ],
         ),
@@ -659,7 +712,7 @@ class _SupportScreenState extends State<SupportScreen> {
         child: Column(
           children: [
             Text(
-              _isEnglish ? 'Make a Difference' : 'একটি পরিবর্তন আনুন',
+              _text('makeDifference'),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -672,20 +725,12 @@ class _SupportScreenState extends State<SupportScreen> {
               child: ElevatedButton.icon(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        _isEnglish
-                            ? 'Google Play Billing will be implemented here'
-                            : 'গুগল প্লে বিলিং এখানে ইমপ্লিমেন্ট করা হবে',
-                      ),
-                    ),
+                    SnackBar(content: Text(_text('googlePlayMessage'))),
                   );
                 },
                 icon: const Icon(Icons.shopping_cart, size: 20),
                 label: Text(
-                  _isEnglish
-                      ? 'Support via Google Play'
-                      : 'গুগল প্লে এর মাধ্যমে সাপোর্ট করুন',
+                  _text('supportGooglePlay'),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -708,9 +753,7 @@ class _SupportScreenState extends State<SupportScreen> {
                 onPressed: _showExternalDonationDialog,
                 icon: const Icon(Icons.language, size: 20),
                 label: Text(
-                  _isEnglish
-                      ? 'Donate via Website'
-                      : 'ওয়েবসাইট এর মাধ্যমে ডোনেট করুন',
+                  _text('donateWebsite'),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -781,7 +824,7 @@ class _SupportScreenState extends State<SupportScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _isEnglish ? 'Contact Information' : 'যোগাযোগের তথ্য',
+              _text('contactInfo'),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

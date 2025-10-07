@@ -1,0 +1,821 @@
+[
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Dhaka",
+    "cityBn": "ঢাকা",
+    "lat": 23.8103,
+    "lon": 90.4125,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Gazipur",
+    "cityBn": "গাজীপুর",
+    "lat": 24.0023,
+    "lon": 90.4266,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Narsingdi",
+    "cityBn": "নরসিংদী",
+    "lat": 23.92,
+    "lon": 90.718,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Narayanganj",
+    "cityBn": "নারায়ণগঞ্জ",
+    "lat": 23.6204,
+    "lon": 90.5,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Tangail",
+    "cityBn": "টাঙ্গাইল",
+    "lat": 24.2513,
+    "lon": 89.9167,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Kishoreganj",
+    "cityBn": "কিশোরগঞ্জ",
+    "lat": 24.44,
+    "lon": 90.78,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Manikganj",
+    "cityBn": "মানিকগঞ্জ",
+    "lat": 23.86,
+    "lon": 90,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Munshiganj",
+    "cityBn": "মুন্সীগঞ্জ",
+    "lat": 23.55,
+    "lon": 90.53,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Rajbari",
+    "cityBn": "রাজবাড়ী",
+    "lat": 23.757,
+    "lon": 89.65,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Faridpur",
+    "cityBn": "ফরিদপুর",
+    "lat": 23.607,
+    "lon": 89.842,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Gopalganj",
+    "cityBn": "গোপালগঞ্জ",
+    "lat": 23.008,
+    "lon": 89.826,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Madaripur",
+    "cityBn": "মাদারীপুর",
+    "lat": 23.1667,
+    "lon": 90.2,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Shariatpur",
+    "cityBn": "শরীয়তপুর",
+    "lat": 23.2,
+    "lon": 90.35,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Barisal",
+    "cityBn": "বরিশাল",
+    "lat": 22.701,
+    "lon": 90.3535,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Bhola",
+    "cityBn": "ভোলা",
+    "lat": 22.685,
+    "lon": 90.648,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Patuakhali",
+    "cityBn": "পটুয়াখালী",
+    "lat": 22.3596,
+    "lon": 90.329,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Jhalokathi",
+    "cityBn": "ঝালকাঠি",
+    "lat": 22.64,
+    "lon": 90.2,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Barguna",
+    "cityBn": "বরগুনা",
+    "lat": 22.15,
+    "lon": 90.1333,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Pirojpur",
+    "cityBn": "পিরোজপুর",
+    "lat": 22.5833,
+    "lon": 89.9833,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Khulna",
+    "cityBn": "খুলনা",
+    "lat": 22.8456,
+    "lon": 89.5403,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Bagerhat",
+    "cityBn": "বাগেরহাট",
+    "lat": 22.656,
+    "lon": 89.785,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Satkhira",
+    "cityBn": "সাতক্ষীরা",
+    "lat": 22.7185,
+    "lon": 89.0705,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Jessore",
+    "cityBn": "যশোর",
+    "lat": 23.1707,
+    "lon": 89.202,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Jhenaidah",
+    "cityBn": "ঝিনাইদহ",
+    "lat": 23.5413,
+    "lon": 89.1531,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Magura",
+    "cityBn": "মাগুরা",
+    "lat": 23.4873,
+    "lon": 89.4198,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Narail",
+    "cityBn": "নড়াইল",
+    "lat": 23.1725,
+    "lon": 89.512,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Chuadanga",
+    "cityBn": "চুয়াডাঙ্গা",
+    "lat": 23.64,
+    "lon": 88.841,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Kushtia",
+    "cityBn": "কুষ্টিয়া",
+    "lat": 23.901,
+    "lon": 89.1203,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Meherpur",
+    "cityBn": "মেহেরপুর",
+    "lat": 23.7622,
+    "lon": 88.6318,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Rajshahi",
+    "cityBn": "রাজশাহী",
+    "lat": 24.3745,
+    "lon": 88.6042,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Natore",
+    "cityBn": "নাটোর",
+    "lat": 24.4206,
+    "lon": 89,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Naogaon",
+    "cityBn": "নওগাঁ",
+    "lat": 24.807,
+    "lon": 88.94,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Chapainawabganj",
+    "cityBn": "চাঁপাইনবাবগঞ্জ",
+    "lat": 24.5965,
+    "lon": 88.2775,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Pabna",
+    "cityBn": "পাবনা",
+    "lat": 24,
+    "lon": 89.2333,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Sirajganj",
+    "cityBn": "সিরাজগঞ্জ",
+    "lat": 24.45,
+    "lon": 89.7,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Bogra",
+    "cityBn": "বগুড়া",
+    "lat": 24.85,
+    "lon": 89.37,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Joypurhat",
+    "cityBn": "জয়পুরহাট",
+    "lat": 25.1,
+    "lon": 89.0333,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Rangpur",
+    "cityBn": "রংপুর",
+    "lat": 25.7439,
+    "lon": 89.2752,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Gaibandha",
+    "cityBn": "গাইবান্ধা",
+    "lat": 25.3333,
+    "lon": 89.5167,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Kurigram",
+    "cityBn": "কুড়িগ্রাম",
+    "lat": 25.8,
+    "lon": 89.6333,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Lalmonirhat",
+    "cityBn": "লালমনিরহাট",
+    "lat": 25.9923,
+    "lon": 89.2847,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Nilphamari",
+    "cityBn": "নীলফামারী",
+    "lat": 25.9333,
+    "lon": 88.85,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Panchagarh",
+    "cityBn": "পঞ্চগড়",
+    "lat": 26.3333,
+    "lon": 88.55,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Thakurgaon",
+    "cityBn": "ঠাকুরগাঁও",
+    "lat": 26.0333,
+    "lon": 88.4667,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Sylhet",
+    "cityBn": "সিলেট",
+    "lat": 24.8949,
+    "lon": 91.8687,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Moulvibazar",
+    "cityBn": "মৌলভীবাজার",
+    "lat": 24.4833,
+    "lon": 91.7667,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Habiganj",
+    "cityBn": "হবিগঞ্জ",
+    "lat": 24.38,
+    "lon": 91.4167,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Sunamganj",
+    "cityBn": "সুনামগঞ্জ",
+    "lat": 25.0667,
+    "lon": 91.4167,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Chittagong",
+    "cityBn": "চট্টগ্রাম",
+    "lat": 22.3569,
+    "lon": 91.7832,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Cox's Bazar",
+    "cityBn": "কক্সবাজার",
+    "lat": 21.4272,
+    "lon": 92.0058,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Bandarban",
+    "cityBn": "বান্দরবান",
+    "lat": 22.1953,
+    "lon": 92.2184,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Rangamati",
+    "cityBn": "রাঙামাটি",
+    "lat": 22.655,
+    "lon": 92.175,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Khagrachhari",
+    "cityBn": "খাগড়াছড়ি",
+    "lat": 23.1,
+    "lon": 91.9833,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Noakhali",
+    "cityBn": "নোয়াখালী",
+    "lat": 22.8667,
+    "lon": 91.1,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Feni",
+    "cityBn": "ফেনী",
+    "lat": 23.0186,
+    "lon": 91.4,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Laxmipur",
+    "cityBn": "লক্ষ্মীপুর",
+    "lat": 22.95,
+    "lon": 90.8333,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Comilla",
+    "cityBn": "কুমিল্লা",
+    "lat": 23.46,
+    "lon": 91.18,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Brahmanbaria",
+    "cityBn": "ব্রাহ্মণবাড়িয়া",
+    "lat": 23.9833,
+    "lon": 91.1111,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Chandpur",
+    "cityBn": "চাঁদপুর",
+    "lat": 23.2333,
+    "lon": 90.6667,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Mymensingh",
+    "cityBn": "ময়মনসিংহ",
+    "lat": 24.75,
+    "lon": 90.4167,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Jamalpur",
+    "cityBn": "জামালপুর",
+    "lat": 24.9167,
+    "lon": 89.95,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Sherpur",
+    "cityBn": "শেরপুর",
+    "lat": 25.0167,
+    "lon": 90.0167,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bangladesh",
+    "countryBn": "বাংলাদেশ",
+    "city": "Netrokona",
+    "cityBn": "নেত্রকোণা",
+    "lat": 24.8833,
+    "lon": 90.7167,
+    "flag": "#008000"
+  },
+  {
+    "country": "Saudi Arabia",
+    "countryBn": "সৌদি আরব",
+    "city": "Riyadh",
+    "cityBn": "রিয়াদ",
+    "lat": 24.7136,
+    "lon": 46.6753,
+    "flag": "#008000"
+  },
+  {
+    "country": "Saudi Arabia",
+    "countryBn": "সৌদি আরব",
+    "city": "Jeddah",
+    "cityBn": "জেদ্দা",
+    "lat": 21.4858,
+    "lon": 39.1925,
+    "flag": "#008000"
+  },
+  {
+    "country": "United Arab Emirates",
+    "countryBn": "সংযুক্ত আরব আমিরাত",
+    "city": "Dubai",
+    "cityBn": "দুবাই",
+    "lat": 25.2048,
+    "lon": 55.2708,
+    "flag": "#008000"
+  },
+  {
+    "country": "United Arab Emirates",
+    "countryBn": "সংযুক্ত আরব আমিরাত",
+    "city": "Abu Dhabi",
+    "cityBn": "আবু ধাবি",
+    "lat": 24.4539,
+    "lon": 54.3773,
+    "flag": "#008000"
+  },
+  {
+    "country": "Kuwait",
+    "countryBn": "কুয়েত",
+    "city": "Kuwait City",
+    "cityBn": "কুয়েত সিটি",
+    "lat": 29.3759,
+    "lon": 47.9774,
+    "flag": "#008000"
+  },
+  {
+    "country": "Qatar",
+    "countryBn": "কাতার",
+    "city": "Doha",
+    "cityBn": "দোহা",
+    "lat": 25.2769,
+    "lon": 51.52,
+    "flag": "#008000"
+  },
+  {
+    "country": "Oman",
+    "countryBn": "ওমান",
+    "city": "Muscat",
+    "cityBn": "মাস্কাট",
+    "lat": 23.588,
+    "lon": 58.3829,
+    "flag": "#008000"
+  },
+  {
+    "country": "Bahrain",
+    "countryBn": "বাহরাইন",
+    "city": "Manama",
+    "cityBn": "মানামা",
+    "lat": 26.2235,
+    "lon": 50.5876,
+    "flag": "#008000"
+  },
+  {
+    "country": "Malaysia",
+    "countryBn": "মালয়েশিয়া",
+    "city": "Kuala Lumpur",
+    "cityBn": "কুয়ালালামপুর",
+    "lat": 3.139,
+    "lon": 101.6869,
+    "flag": "#008000"
+  },
+  {
+    "country": "Singapore",
+    "countryBn": "সিঙ্গাপুর",
+    "city": "Singapore",
+    "cityBn": "সিঙ্গাপুর",
+    "lat": 1.3521,
+    "lon": 103.8198,
+    "flag": "#008000"
+  },
+  {
+    "country": "Maldives",
+    "countryBn": "মালদ্বীপ",
+    "city": "Male",
+    "cityBn": "মালে",
+    "lat": 4.1755,
+    "lon": 73.5093,
+    "flag": "#008000"
+  },
+  {
+    "country": "India",
+    "countryBn": "ভারত",
+    "city": "Kolkata",
+    "cityBn": "কলকাতা",
+    "lat": 22.5726,
+    "lon": 88.3639,
+    "flag": "#008000"
+  },
+  {
+    "country": "United Kingdom",
+    "countryBn": "যুক্তরাজ্য",
+    "city": "London",
+    "cityBn": "লন্ডন",
+    "lat": 51.5072,
+    "lon": -0.1276,
+    "flag": "#008000"
+  },
+  {
+    "country": "Italy",
+    "countryBn": "ইতালি",
+    "city": "Rome",
+    "cityBn": "রোম",
+    "lat": 41.9028,
+    "lon": 12.4964,
+    "flag": "#008000"
+  },
+  {
+    "country": "Greece",
+    "countryBn": "গ্রীস",
+    "city": "Athens",
+    "cityBn": "এথেন্স",
+    "lat": 37.9838,
+    "lon": 23.7275,
+    "flag": "#008000"
+  },
+  {
+    "country": "Spain",
+    "countryBn": "স্পেন",
+    "city": "Madrid",
+    "cityBn": "মাদ্রিদ",
+    "lat": 40.4168,
+    "lon": -3.7038,
+    "flag": "#008000"
+  },
+  {
+    "country": "France",
+    "countryBn": "ফ্রান্স",
+    "city": "Paris",
+    "cityBn": "প্যারিস",
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "flag": "#008000"
+  },
+  {
+    "country": "Germany",
+    "countryBn": "জার্মানি",
+    "city": "Berlin",
+    "cityBn": "বার্লিন",
+    "lat": 52.52,
+    "lon": 13.405,
+    "flag": "#008000"
+  },
+  {
+    "country": "United States",
+    "countryBn": "যুক্তরাষ্ট্র",
+    "city": "New York",
+    "cityBn": "নিউ ইয়র্ক",
+    "lat": 40.7128,
+    "lon": -74.006,
+    "flag": "#008000"
+  },
+  {
+    "country": "Canada",
+    "countryBn": "কানাডা",
+    "city": "Toronto",
+    "cityBn": "টরন্টো",
+    "lat": 43.6532,
+    "lon": -79.3832,
+    "flag": "#008000"
+  },
+  {
+    "country": "Australia",
+    "countryBn": "অস্ট্রেলিয়া",
+    "city": "Sydney",
+    "cityBn": "সিডনি",
+    "lat": -33.8688,
+    "lon": 151.2093,
+    "flag": "#008000"
+  },
+  {
+    "country": "Japan",
+    "countryBn": "জাপান",
+    "city": "Tokyo",
+    "cityBn": "টোকিও",
+    "lat": 35.6762,
+    "lon": 139.6503,
+    "flag": "#008000"
+  },
+  {
+    "country": "South Korea",
+    "countryBn": "দক্ষিণ কোরিয়া",
+    "city": "Seoul",
+    "cityBn": "সিওল",
+    "lat": 37.5665,
+    "lon": 126.978,
+    "flag": "#008000"
+  },
+  {
+    "country": "Brunei",
+    "countryBn": "ব্রুনেই",
+    "city": "Bandar Seri Begawan",
+    "cityBn": "বান্দার সেরি বেগাওয়ান",
+    "lat": 4.9031,
+    "lon": 114.9398,
+    "flag": "#008000"
+  },
+  {
+    "country": "Jordan",
+    "countryBn": "জর্ডান",
+    "city": "Amman",
+    "cityBn": "আম্মান",
+    "lat": 31.9454,
+    "lon": 35.9284,
+    "flag": "#008000"
+  },
+  {
+    "country": "Lebanon",
+    "countryBn": "লেবানন",
+    "city": "Beirut",
+    "cityBn": "বেইরুট",
+    "lat": 33.8938,
+    "lon": 35.5018,
+    "flag": "#008000"
+  },
+  {
+    "country": "Libya",
+    "countryBn": "লিবিয়া",
+    "city": "Tripoli",
+    "cityBn": "ত্রিপলি",
+    "lat": 32.8872,
+    "lon": 13.1913,
+    "flag": "#008000"
+  },
+  {
+    "country": "South Africa",
+    "countryBn": "দক্ষিণ আফ্রিকা",
+    "city": "Johannesburg",
+    "cityBn": "জোহানেসবার্গ",
+    "lat": -26.2041,
+    "lon": 28.0473,
+    "flag": "#008000"
+  }
+]

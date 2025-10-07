@@ -1,6 +1,8 @@
 // widgets/prohibited_time_section.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../prohibited_time_service.dart';
+import '../providers/language_provider.dart';
 
 class ProhibitedTimeSection extends StatelessWidget {
   final bool isSmallScreen;
@@ -22,25 +24,56 @@ class ProhibitedTimeSection extends StatelessWidget {
     required this.onShowInfo,
   }) : super(key: key);
 
+  // Language Texts
+  static const Map<String, Map<String, String>> _texts = {
+    'prohibitedTimes': {'en': 'Prohibited Times', 'bn': 'নিষিদ্ধ সময়'},
+    'prohibitedTimesInfo': {
+      'en': 'About Prohibited Prayer Times',
+      'bn': 'সালাতের নিষিদ্ধ সময় সম্পর্কে',
+    },
+    'morning': {'en': 'Dawn', 'bn': 'ভোর'},
+    'noon': {'en': 'Noon', 'bn': 'দুপুর'},
+    'evening': {'en': 'Evening', 'bn': 'সন্ধ্যা'},
+    'nafalPrayer': {'en': 'Nafal Prayer', 'bn': 'নফল সালাত'},
+    'nafalPrayerInfo': {
+      'en': 'Nafal Prayer Times',
+      'bn': 'নফল সালাতের ওয়াক্ত',
+    },
+    'specialFacts': {'en': 'Special Facts', 'bn': 'বিশেষ ফ্যাক্ট'},
+    'specialFactsInfo': {
+      'en': 'Special Facts About Prayer',
+      'bn': 'সালাত সম্পর্কে বিশেষ ফ্যাক্ট',
+    },
+    'understand': {'en': 'Got it', 'bn': 'বুঝেছি'},
+  };
+
+  // Helper method to get text based on current language
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Calculate dynamic heights based on screen size
     final double sectionHeight = isVerySmallScreen
-        ? 80 // ছোট স্ক্রিনে ১৫% কম
+        ? 80
         : isSmallScreen
-        ? 90 // মাঝারি স্ক্রিনে ১০% কম
-        : 100; // বড় স্ক্রিনে মূল সাইজ
+        ? 90
+        : 100;
 
-    // সবগুলোর জন্য একই ফন্ট সাইজ
     final double titleFontSize = isVerySmallScreen
         ? 10
         : isSmallScreen
         ? 12
         : 14;
 
-    // সময়ের জন্য আলাদা ফন্ট সাইজ - বড় স্ক্রিনে একটু ছোট
     final double timeFontSize = isVerySmallScreen
         ? 8
         : isSmallScreen
@@ -76,7 +109,7 @@ class ProhibitedTimeSection extends StatelessWidget {
             child: GestureDetector(
               onTap: () => _showBottomSheet(
                 context,
-                "সালাতের নিষিদ্ধ সময় সম্পর্কে",
+                _text('prohibitedTimesInfo', context),
                 prohibitedTimeService.getProhibitedTimeInfo(),
               ),
               child: Container(
@@ -106,7 +139,7 @@ class ProhibitedTimeSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // Header Row - এখন একই ফন্ট সাইজ
+                    // Header Row
                     Container(
                       width: double.infinity,
                       child: Row(
@@ -115,7 +148,7 @@ class ProhibitedTimeSection extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              "নিষিদ্ধ সময়",
+                              _text('prohibitedTimes', context),
                               style: TextStyle(
                                 fontSize: titleFontSize,
                                 fontWeight: FontWeight.w600,
@@ -141,32 +174,35 @@ class ProhibitedTimeSection extends StatelessWidget {
                         padding: EdgeInsets.zero,
                         child: Table(
                           columnWidths: {
-                            0: FixedColumnWidth(30), // আইকন কলাম
-                            1: FixedColumnWidth(40), // লেবেল কলাম
-                            2: FlexColumnWidth(), // সময় কলাম (বাকি সব)
+                            0: FixedColumnWidth(30), // Icon column
+                            1: FixedColumnWidth(40), // Label column
+                            2: FlexColumnWidth(), // Time column
                           },
                           defaultVerticalAlignment:
                               TableCellVerticalAlignment.middle,
                           children: [
                             _buildTableTimeRow(
+                              context,
                               icon: Icons.wb_twilight,
-                              label: "ভোর",
+                              label: _text('morning', context),
                               time: prohibitedTimeService
                                   .calculateSunriseProhibitedTime(prayerTimes),
                               fontSize: timeFontSize,
                               isDark: isDark,
                             ),
                             _buildTableTimeRow(
+                              context,
                               icon: Icons.light_mode,
-                              label: "দুপুর",
+                              label: _text('noon', context),
                               time: prohibitedTimeService
                                   .calculateDhuhrProhibitedTime(prayerTimes),
                               fontSize: timeFontSize,
                               isDark: isDark,
                             ),
                             _buildTableTimeRow(
+                              context,
                               icon: Icons.nightlight,
-                              label: "সন্ধ্যা",
+                              label: _text('evening', context),
                               time: prohibitedTimeService
                                   .calculateSunsetProhibitedTime(prayerTimes),
                               fontSize: timeFontSize,
@@ -196,8 +232,8 @@ class ProhibitedTimeSection extends StatelessWidget {
                     margin: EdgeInsets.only(bottom: paddingSize * 0.4),
                     child: _buildInfoCard(
                       context,
-                      "নফল সালাত",
-                      "নফল সালাতের ওয়াক্ত",
+                      _text('nafalPrayer', context),
+                      _text('nafalPrayerInfo', context),
                       Colors.blue,
                       prohibitedTimeService.getNafalPrayerInfo(),
                       titleFontSize,
@@ -213,8 +249,8 @@ class ProhibitedTimeSection extends StatelessWidget {
                     margin: EdgeInsets.only(top: paddingSize * 0.4),
                     child: _buildInfoCard(
                       context,
-                      "বিশেষ ফ্যাক্ট",
-                      "সালাত সম্পর্কে বিশেষ ফ্যাক্ট",
+                      _text('specialFacts', context),
+                      _text('specialFactsInfo', context),
                       Colors.orange,
                       prohibitedTimeService.getSpecialFacts(),
                       titleFontSize,
@@ -231,7 +267,8 @@ class ProhibitedTimeSection extends StatelessWidget {
     );
   }
 
-  TableRow _buildTableTimeRow({
+  TableRow _buildTableTimeRow(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required String time,
@@ -240,7 +277,7 @@ class ProhibitedTimeSection extends StatelessWidget {
   }) {
     return TableRow(
       children: [
-        // আইকন
+        // Icon
         Padding(
           padding: EdgeInsets.only(right: 4),
           child: Icon(
@@ -250,7 +287,7 @@ class ProhibitedTimeSection extends StatelessWidget {
           ),
         ),
 
-        // লেবেল
+        // Label
         Padding(
           padding: EdgeInsets.only(right: 4),
           child: Text(
@@ -265,7 +302,7 @@ class ProhibitedTimeSection extends StatelessWidget {
           ),
         ),
 
-        // সময়
+        // Time
         FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
@@ -351,7 +388,7 @@ class ProhibitedTimeSection extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // নিষিদ্ধ সেকশনের আনুমানিক পজিশন (সাধারণত স্ক্রিনের নিচের 1/3 অংশে)
+    // Calculate position for bottom sheet
     final double prohibitedSectionPosition = screenHeight * 0.65;
     final double availableSpace =
         prohibitedSectionPosition - MediaQuery.of(context).padding.top;
@@ -363,10 +400,7 @@ class ProhibitedTimeSection extends StatelessWidget {
       builder: (BuildContext context) {
         return Container(
           margin: EdgeInsets.only(
-            bottom:
-                screenHeight -
-                prohibitedSectionPosition +
-                20, // নিষিদ্ধ সেকশনের 20px উপরে
+            bottom: screenHeight - prohibitedSectionPosition + 20,
           ),
           child: Container(
             decoration: BoxDecoration(
@@ -390,9 +424,7 @@ class ProhibitedTimeSection extends StatelessWidget {
                 ),
               ],
             ),
-            constraints: BoxConstraints(
-              maxHeight: availableSpace * 0.8, // উপরের 80% জায়গা ব্যবহার
-            ),
+            constraints: BoxConstraints(maxHeight: availableSpace * 0.8),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -584,7 +616,7 @@ class ProhibitedTimeSection extends StatelessWidget {
                         elevation: 2,
                       ),
                       child: Text(
-                        "বুঝেছি",
+                        _text('understand', context),
                         style: TextStyle(
                           fontSize: isTablet
                               ? (isVerySmallScreen

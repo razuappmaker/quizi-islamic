@@ -1,9 +1,11 @@
-// reward_screen.dart - PREMIUM REDESIGN
+// reward_screen.dart - PREMIUM REDESIGN WITH DUAL LANGUAGE
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 import '../ad_helper.dart';
 import '../utils/point_manager.dart';
 import 'package:islamicquiz/mcq_page.dart';
+import '../providers/language_provider.dart';
 
 class RewardScreen extends StatefulWidget {
   const RewardScreen({Key? key}) : super(key: key);
@@ -17,16 +19,115 @@ class _RewardScreenState extends State<RewardScreen> {
   bool _isRewardedAdLoaded = false;
   bool _isLoadingAd = false;
   int _todayRewards = 0;
-  int _maxDailyRewards = 5; // how many time ads
-  int _pointsPerReward = 10; // per ads points
+  int _maxDailyRewards = 5;
+  int _pointsPerReward = 10;
   int _pendingPoints = 0;
   bool _isLoading = true;
+
+  // Language Texts - Now initialized in initState
+  late Map<String, Map<String, String>> _texts;
 
   @override
   void initState() {
     super.initState();
+    _initializeTexts();
     _loadUserData();
     _loadRewardedAd();
+  }
+
+  void _initializeTexts() {
+    _texts = {
+      'title': {'en': 'Earn Free Points', 'bn': 'ফ্রি পয়েন্ট জিতুন'},
+      'headerTitle': {
+        'en': 'Watch Ads & Earn Points!',
+        'bn': 'অ্যাড দেখে ফ্রি পয়েন্ট পান!',
+      },
+      'headerSubtitle': {
+        'en': 'Earn $_pointsPerReward points for each ad',
+        'bn': 'প্রতিটি অ্যাড দেখে পান $_pointsPerReward পয়েন্ট',
+      },
+      'todayAds': {'en': "Today's Ads", 'bn': "আজকের অ্যাড দেখা"},
+      'limitReached': {'en': "Limit Reached", 'bn': "লিমিট শেষ"},
+      'remaining': {'en': "remaining", 'bn': "টি বাকি"},
+      'totalPoints': {'en': "Total Points", 'bn': "মোট পয়েন্ট"},
+      'todayEarnings': {'en': "Today's Earnings", 'bn': "আজকের আয়"},
+      'collectPoints': {'en': "Collect Points", 'bn': "পয়েন্ট সংগ্রহ করুন"},
+      'adLoading': {'en': "Loading Ad...", 'bn': "অ্যাড লোড হচ্ছে..."},
+      'adPreparing': {'en': "Preparing Ad...", 'bn': "অ্যাড প্রস্তুত হচ্ছে..."},
+      'getPoints': {
+        'en': "Get $_pointsPerReward Points",
+        'bn': "$_pointsPerReward পয়েন্ট পান",
+      },
+      'dailyLimit': {'en': "Daily Limit Reached", 'bn': "আজকের লিমিট শেষ"},
+      'watchAdDesc': {
+        'en': "Watch a 30-second ad to earn points",
+        'bn': "৩০ সেকেন্ডের অ্যাড দেখে পয়েন্ট সংগ্রহ করুন",
+      },
+      'bonusPoints': {
+        'en': "Earn Bonus Points",
+        'bn': "বোনাস পয়েন্ট অর্জন করুন",
+      },
+      'playQuiz': {'en': "Play Islamic Quiz", 'bn': "ইসলামী কুইজ খেলুন"},
+      'quizTip': {
+        'en': "Test your Islamic knowledge and earn bonus points & gifts!",
+        'bn': "ইসলামী জ্ঞান যাচাই করুন এবং বোনাস পয়েন্ট ও গিফট পান!",
+      },
+      'nextReset': {'en': "Next Reset", 'bn': "পরবর্তী রিসেট"},
+      'dailyOpportunity': {
+        'en': "$_maxDailyRewards ad views daily",
+        'bn': "প্রতিদিন $_maxDailyRewards টি অ্যাড দেখার সুযোগ",
+      },
+      'adNotLoaded': {
+        'en': "❌ Ad not loaded yet, please wait",
+        'bn': "❌ অ্যাড এখনো লোড হয়নি, অনুগ্রহ করে অপেক্ষা করুন",
+      },
+      'maxAdsWatched': {
+        'en': "❌ You've watched maximum $_maxDailyRewards ads today",
+        'bn': "❌ আপনি আজ সর্বোচ্চ $_maxDailyRewards টি অ্যাড দেখেছেন",
+      },
+      'adError': {
+        'en': "❌ Error showing ad",
+        'bn': "❌ অ্যাড দেখাতে সমস্যা হয়েছে",
+      },
+      'pointsAdded': {
+        'en':
+            "✅ $_pointsPerReward points added! Today $_todayRewards/$_maxDailyRewards ads",
+        'bn':
+            "✅ $_pointsPerReward পয়েন্ট যোগ হয়েছে! আজ $_todayRewards/$_maxDailyRewards অ্যাড দেখেছেন",
+      },
+      'pointsError': {
+        'en': "❌ Error adding points",
+        'bn': "❌ পয়েন্ট যোগ করতে সমস্যা হয়েছে",
+      },
+    };
+  }
+
+  // Update texts when data changes
+  void _updateTexts() {
+    setState(() {
+      _texts['headerSubtitle'] = {
+        'en': 'Earn $_pointsPerReward points for each ad',
+        'bn': 'প্রতিটি অ্যাড দেখে পান $_pointsPerReward পয়েন্ট',
+      };
+      _texts['getPoints'] = {
+        'en': "Get $_pointsPerReward Points",
+        'bn': "$_pointsPerReward পয়েন্ট পান",
+      };
+      _texts['dailyOpportunity'] = {
+        'en': "$_maxDailyRewards ad views daily",
+        'bn': "প্রতিদিন $_maxDailyRewards টি অ্যাড দেখার সুযোগ",
+      };
+      _texts['maxAdsWatched'] = {
+        'en': "❌ You've watched maximum $_maxDailyRewards ads today",
+        'bn': "❌ আপনি আজ সর্বোচ্চ $_maxDailyRewards টি অ্যাড দেখেছেন",
+      };
+      _texts['pointsAdded'] = {
+        'en':
+            "✅ $_pointsPerReward points added! Today $_todayRewards/$_maxDailyRewards ads",
+        'bn':
+            "✅ $_pointsPerReward পয়েন্ট যোগ হয়েছে! আজ $_todayRewards/$_maxDailyRewards অ্যাড দেখেছেন",
+      };
+    });
   }
 
   @override
@@ -43,8 +144,9 @@ class _RewardScreenState extends State<RewardScreen> {
         _todayRewards = userData['todayRewards'] ?? 0;
         _isLoading = false;
       });
+      _updateTexts(); // Update texts after loading data
     } catch (e) {
-      print("ডাটা লোড করতে ত্রুটি: $e");
+      print("Data load error: $e");
       setState(() {
         _isLoading = false;
       });
@@ -103,18 +205,12 @@ class _RewardScreenState extends State<RewardScreen> {
 
   Future<void> _showRewardedAd() async {
     if (!_isRewardedAdLoaded || _rewardedAd == null) {
-      _showSnackBar(
-        '❌ অ্যাড এখনো লোড হয়নি, অনুগ্রহ করে অপেক্ষা করুন',
-        Colors.red,
-      );
+      _showSnackBar(_text('adNotLoaded'), Colors.red);
       return;
     }
 
     if (_todayRewards >= _maxDailyRewards) {
-      _showSnackBar(
-        '❌ আপনি আজ সর্বোচ্চ $_maxDailyRewards টি অ্যাড দেখেছেন',
-        Colors.orange,
-      );
+      _showSnackBar(_text('maxAdsWatched'), Colors.orange);
       return;
     }
 
@@ -125,7 +221,7 @@ class _RewardScreenState extends State<RewardScreen> {
         },
       );
     } catch (e) {
-      _showSnackBar('❌ অ্যাড দেখাতে সমস্যা হয়েছে', Colors.red);
+      _showSnackBar(_text('adError'), Colors.red);
     }
   }
 
@@ -136,7 +232,7 @@ class _RewardScreenState extends State<RewardScreen> {
       await _loadUserData();
 
       _showSnackBar(
-        '✅ $_pointsPerReward পয়েন্ট যোগ হয়েছে! আজ $_todayRewards/$_maxDailyRewards অ্যাড দেখেছেন',
+        _text('pointsAdded'),
         Colors.green,
         duration: const Duration(seconds: 3),
       );
@@ -146,7 +242,7 @@ class _RewardScreenState extends State<RewardScreen> {
       });
       _loadRewardedAd();
     } catch (e) {
-      _showSnackBar('❌ পয়েন্ট যোগ করতে সমস্যা হয়েছে', Colors.red);
+      _showSnackBar(_text('pointsError'), Colors.red);
     }
   }
 
@@ -170,31 +266,56 @@ class _RewardScreenState extends State<RewardScreen> {
     final difference = tomorrow.difference(now);
     final hours = difference.inHours;
     final minutes = difference.inMinutes.remainder(60);
-    return '$hours ঘন্টা $minutes মিনিট';
+
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    if (languageProvider.isEnglish) {
+      return '$hours hours $minutes minutes';
+    } else {
+      return '$hours ঘন্টা $minutes মিনিট';
+    }
   }
 
   void _navigateToQuiz() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => MCQPage(
-          category: 'ইসলামী প্রাথমিক জ্ঞান',
+          category: languageProvider.isEnglish
+              ? 'Basic Islamic Knowledge'
+              : 'ইসলামী প্রাথমিক জ্ঞান',
           quizId: 'islamic_basic_knowledge',
         ),
       ),
     );
   }
 
+  String _text(String key) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final isEnglish = languageProvider.isEnglish;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "ফ্রি পয়েন্ট জিতুন",
-          style: TextStyle(
+        title: Text(
+          _text('title'),
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
             fontSize: 18,
@@ -205,13 +326,17 @@ class _RewardScreenState extends State<RewardScreen> {
         centerTitle: true,
         elevation: 0,
         leading: Container(
-          margin: EdgeInsets.all(8),
+          margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
             onPressed: () => Navigator.of(context).pop(),
             splashRadius: 20,
           ),
@@ -225,27 +350,27 @@ class _RewardScreenState extends State<RewardScreen> {
                 child: Column(
                   children: [
                     // Premium Header Section
-                    _buildPremiumHeader(),
+                    _buildPremiumHeader(isEnglish),
 
                     const SizedBox(height: 20),
 
                     // Compact Progress & Stats Row
-                    _buildCompactProgressRow(),
+                    _buildCompactProgressRow(isEnglish),
 
                     const SizedBox(height: 20),
 
                     // Main Reward Button
-                    _buildPremiumRewardButton(),
+                    _buildPremiumRewardButton(isEnglish),
 
                     const SizedBox(height: 20),
 
                     // Quiz Section
-                    _buildPremiumQuizSection(),
+                    _buildPremiumQuizSection(isEnglish),
 
                     const SizedBox(height: 20),
 
                     // Info & Reset Section
-                    _buildPremiumInfoSection(),
+                    _buildPremiumInfoSection(isEnglish),
                   ],
                 ),
               ),
@@ -253,7 +378,7 @@ class _RewardScreenState extends State<RewardScreen> {
     );
   }
 
-  Widget _buildPremiumHeader() {
+  Widget _buildPremiumHeader(bool isEnglish) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -279,8 +404,8 @@ class _RewardScreenState extends State<RewardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "অ্যাড দেখে ফ্রি পয়েন্ট পান!",
-                  style: TextStyle(
+                  _text('headerTitle'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -289,7 +414,7 @@ class _RewardScreenState extends State<RewardScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  "প্রতিটি অ্যাড দেখে পান $_pointsPerReward পয়েন্ট",
+                  _text('headerSubtitle'),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.white.withOpacity(0.9),
@@ -305,14 +430,22 @@ class _RewardScreenState extends State<RewardScreen> {
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.emoji_events, size: 32, color: Colors.white),
+            child: const Icon(
+              Icons.emoji_events,
+              size: 32,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCompactProgressRow() {
+  Widget _buildCompactProgressRow(bool isEnglish) {
+    final remainingText = isEnglish
+        ? "${_maxDailyRewards - _todayRewards} ${_text('remaining')}"
+        : "${_maxDailyRewards - _todayRewards} ${_text('remaining')}";
+
     return Row(
       children: [
         // Today's Progress
@@ -338,7 +471,7 @@ class _RewardScreenState extends State<RewardScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "আজকের অ্যাড দেখা",
+                      _text('todayAds'),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -368,8 +501,8 @@ class _RewardScreenState extends State<RewardScreen> {
                 const SizedBox(height: 6),
                 Text(
                   _todayRewards >= _maxDailyRewards
-                      ? "লিমিট শেষ"
-                      : "${_maxDailyRewards - _todayRewards} টি বাকি",
+                      ? _text('limitReached')
+                      : remainingText,
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
@@ -402,7 +535,7 @@ class _RewardScreenState extends State<RewardScreen> {
                     Icon(Icons.monetization_on, size: 16, color: Colors.green),
                     const SizedBox(width: 4),
                     Text(
-                      "মোট পয়েন্ট",
+                      _text('totalPoints'),
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
@@ -422,7 +555,7 @@ class _RewardScreenState extends State<RewardScreen> {
                     Icon(Icons.today, size: 16, color: Colors.orange),
                     const SizedBox(width: 4),
                     Text(
-                      "আজকের আয়",
+                      _text('todayEarnings'),
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
@@ -444,7 +577,7 @@ class _RewardScreenState extends State<RewardScreen> {
     );
   }
 
-  Widget _buildPremiumRewardButton() {
+  Widget _buildPremiumRewardButton(bool isEnglish) {
     final isMaxReached = _todayRewards >= _maxDailyRewards;
 
     return Container(
@@ -465,7 +598,7 @@ class _RewardScreenState extends State<RewardScreen> {
       child: Column(
         children: [
           Text(
-            "পয়েন্ট সংগ্রহ করুন",
+            _text('collectPoints'),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -507,25 +640,25 @@ class _RewardScreenState extends State<RewardScreen> {
                       ),
                     )
                   else
-                    Icon(Icons.play_arrow_rounded, size: 24),
+                    const Icon(Icons.play_arrow_rounded, size: 24),
                   const SizedBox(width: 12),
                   _isLoadingAd
-                      ? const Text(
-                          'অ্যাড লোড হচ্ছে...',
-                          style: TextStyle(fontSize: 16),
+                      ? Text(
+                          _text('adLoading'),
+                          style: const TextStyle(fontSize: 16),
                         )
                       : !_isRewardedAdLoaded
-                      ? const Text(
-                          'অ্যাড প্রস্তুত হচ্ছে...',
-                          style: TextStyle(fontSize: 16),
+                      ? Text(
+                          _text('adPreparing'),
+                          style: const TextStyle(fontSize: 16),
                         )
                       : isMaxReached
-                      ? const Text(
-                          'আজকের লিমিট শেষ',
-                          style: TextStyle(fontSize: 16),
+                      ? Text(
+                          _text('dailyLimit'),
+                          style: const TextStyle(fontSize: 16),
                         )
                       : Text(
-                          '$_pointsPerReward পয়েন্ট পান',
+                          _text('getPoints'),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -537,7 +670,7 @@ class _RewardScreenState extends State<RewardScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            "৩০ সেকেন্ডের অ্যাড দেখে পয়েন্ট সংগ্রহ করুন",
+            _text('watchAdDesc'),
             style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
         ],
@@ -545,7 +678,7 @@ class _RewardScreenState extends State<RewardScreen> {
     );
   }
 
-  Widget _buildPremiumQuizSection() {
+  Widget _buildPremiumQuizSection(bool isEnglish) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -566,7 +699,7 @@ class _RewardScreenState extends State<RewardScreen> {
               Icon(Icons.rocket_launch, color: Colors.green[700], size: 20),
               const SizedBox(width: 8),
               Text(
-                "বোনাস পয়েন্ট অর্জন করুন",
+                _text('bonusPoints'),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -581,9 +714,12 @@ class _RewardScreenState extends State<RewardScreen> {
             child: ElevatedButton.icon(
               onPressed: _navigateToQuiz,
               icon: const Icon(Icons.quiz_rounded, size: 20),
-              label: const Text(
-                "ইসলামী কুইজ খেলুন",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              label: Text(
+                _text('playQuiz'),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green[700],
@@ -616,7 +752,7 @@ class _RewardScreenState extends State<RewardScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    "ইসলামী জ্ঞান যাচাই করুন এবং বোনাস পয়েন্ট ও গিফট পান!",
+                    _text('quizTip'),
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.green[800],
@@ -632,7 +768,7 @@ class _RewardScreenState extends State<RewardScreen> {
     );
   }
 
-  Widget _buildPremiumInfoSection() {
+  Widget _buildPremiumInfoSection(bool isEnglish) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -654,7 +790,7 @@ class _RewardScreenState extends State<RewardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "পরবর্তী রিসেট: $_nextResetTime",
+                  "${_text('nextReset')}: $_nextResetTime",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -663,7 +799,7 @@ class _RewardScreenState extends State<RewardScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "প্রতিদিন $_maxDailyRewards টি অ্যাড দেখার সুযোগ",
+                  _text('dailyOpportunity'),
                   style: TextStyle(fontSize: 12, color: Colors.blue[600]),
                 ),
               ],
