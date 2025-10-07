@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
+import '../managers/home_page.dart';
 import '../profile_screen.dart';
 import '../providers/language_provider.dart';
 import '../utils/responsive_utils.dart';
