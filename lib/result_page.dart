@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 import 'ad_helper.dart';
 import 'profile_screen.dart';
-import '../screens/reward_screen.dart'; // RewardScreen importardScreen import করুন
+import '../screens/reward_screen.dart';
+import '../providers/language_provider.dart'; // ✅ Language Provider import
 
 class ResultPage extends StatefulWidget {
   final int total;
@@ -21,6 +23,65 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'pageTitle': {'en': 'Your Result', 'bn': 'আপনার ফলাফল'},
+    'score': {'en': 'Score', 'bn': 'স্কোর'},
+    'excellent': {
+      'en': "🌟 Excellent! You're perfect!",
+      'bn': "🌟 অসাধারণ! আপনি একদম নিখুঁত!",
+    },
+    'veryGood': {'en': "✅ Very well done!", 'bn': "✅ খুব ভালো করেছেন!"},
+    'good': {
+      'en': "👍 Good job, but more practice needed.",
+      'bn': "👍 ভালো করেছেন, তবে আরও চর্চা দরকার।",
+    },
+    'keepPracticing': {
+      'en': "📚 Keep practicing!",
+      'bn': "📚 অনুশীলন চালিয়ে যান!",
+    },
+    'totalQuestions': {'en': 'Total Questions', 'bn': 'মোট প্রশ্ন'},
+    'correctAnswers': {'en': 'Correct Answers', 'bn': 'সঠিক উত্তর'},
+    'wrongAnswers': {'en': 'Wrong Answers', 'bn': 'ভুল উত্তর'},
+    'successRate': {'en': 'Success Rate', 'bn': 'সাফল্যের হার'},
+    'pointsEarned': {'en': 'Points Earned', 'bn': 'অর্জিত পয়েন্ট'},
+    'pointsInfo': {
+      'en':
+          'Congratulations! You earned {points} points from this quiz. You can collect points from your profile and get gifts.',
+      'bn':
+          'অভিনন্দন! আপনি এই কুইজ থেকে {points} পয়েন্ট অর্জন করেছেন। প্রোফাইল থেকে পয়েন্ট জমা করে গিফট নিতে পারবেন।',
+    },
+    'tryAgain': {'en': 'Try Again', 'bn': 'আবার চেষ্টা করুন'},
+    'viewProfile': {'en': 'View Profile', 'bn': 'প্রোফাইল দেখুন'},
+    'videoRewardTitle': {
+      'en': '🎬 Earn Points by Watching Ads',
+      'bn': '🎬 ভিডিও দেখে পয়েন্ট অর্জন করুন',
+    },
+    'videoRewardDescription': {
+      'en':
+          'Watch short videos to earn extra points and get ready to receive gifts faster.',
+      'bn':
+          'সংক্ষিপ্ত ভিডিও দেখে অতিরিক্ত পয়েন্ট অর্জন করুন এবং দ্রুত গিফট পেতে প্রস্তুত হোন।',
+    },
+    'watchVideos': {'en': 'Watch Videos', 'bn': 'ভিডিও দেখুন'},
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
+  // পয়েন্ট ইনফো টেক্সট (ডাইনামিক)
+  String _getPointsInfoText(BuildContext context) {
+    final baseText = _text('pointsInfo', context);
+    return baseText.replaceFirst('{points}', widget.totalPoints.toString());
+  }
+
   BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
 
@@ -74,24 +135,24 @@ class _ResultPageState extends State<ResultPage> {
     Color feedbackColor;
 
     if (percentage == 100) {
-      feedback = "🌟 অসাধারণ! আপনি একদম নিখুঁত!";
+      feedback = _text('excellent', context);
       feedbackColor = Colors.amber[700]!;
     } else if (percentage >= 80) {
-      feedback = "✅ খুব ভালো করেছেন!";
+      feedback = _text('veryGood', context);
       feedbackColor = Colors.green[700]!;
     } else if (percentage >= 50) {
-      feedback = "👍 ভালো করেছেন, তবে আরও চর্চা দরকার।";
+      feedback = _text('good', context);
       feedbackColor = Colors.blue[700]!;
     } else {
-      feedback = "📚 অনুশীলন চালিয়ে যান!";
+      feedback = _text('keepPracticing', context);
       feedbackColor = Colors.orange[700]!;
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'আপনার ফলাফল',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        title: Text(
+          _text('pageTitle', context),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         backgroundColor: Colors.green[800],
         centerTitle: true,
@@ -138,7 +199,7 @@ class _ResultPageState extends State<ResultPage> {
                             ),
                           ),
                           Text(
-                            'স্কোর',
+                            _text('score', context),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.green[600],
@@ -197,38 +258,43 @@ class _ResultPageState extends State<ResultPage> {
                         child: Column(
                           children: [
                             _buildStatRow(
-                              'মোট প্রশ্ন',
+                              _text('totalQuestions', context),
                               widget.total.toString(),
                               Icons.assignment,
                               Colors.blue,
+                              context,
                             ),
                             const Divider(height: 24),
                             _buildStatRow(
-                              'সঠিক উত্তর',
+                              _text('correctAnswers', context),
                               widget.correct.toString(),
                               Icons.check_circle,
                               Colors.green,
+                              context,
                             ),
                             const Divider(height: 24),
                             _buildStatRow(
-                              'ভুল উত্তর',
+                              _text('wrongAnswers', context),
                               wrong.toString(),
                               Icons.cancel,
                               Colors.red,
+                              context,
                             ),
                             const Divider(height: 24),
                             _buildStatRow(
-                              'সাফল্যের হার',
+                              _text('successRate', context),
                               '${percentage.toStringAsFixed(1)}%',
                               Icons.emoji_events,
                               Colors.orange,
+                              context,
                             ),
                             const Divider(height: 24),
                             _buildStatRow(
-                              'অর্জিত পয়েন্ট',
-                              '${widget.totalPoints} পয়েন্ট',
+                              _text('pointsEarned', context),
+                              '${widget.totalPoints} ${_text('pointsEarned', context).contains('পয়েন্ট') ? 'পয়েন্ট' : 'Points'}',
                               Icons.monetization_on,
                               Colors.purple,
+                              context,
                             ),
                           ],
                         ),
@@ -237,7 +303,7 @@ class _ResultPageState extends State<ResultPage> {
                     const SizedBox(height: 24),
 
                     // 🔥 NEW: ভিডিও রিওয়ার্ড সেকশন
-                    _buildVideoRewardSection(),
+                    _buildVideoRewardSection(context),
 
                     const SizedBox(height: 24),
 
@@ -263,7 +329,7 @@ class _ResultPageState extends State<ResultPage> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'অভিনন্দন! আপনি এই কুইজ থেকে ${widget.totalPoints} পয়েন্ট অর্জন করেছেন। প্রোফাইল থেকে পয়েন্ট জমা করে গিফট নিতে পারবেন।',
+                                _getPointsInfoText(context),
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.purple[800],
@@ -283,9 +349,9 @@ class _ResultPageState extends State<ResultPage> {
                         // 🔥 UPDATED: আবার চেষ্টা করুন বাটন
                         ElevatedButton.icon(
                           icon: const Icon(Icons.refresh, size: 22),
-                          label: const Text(
-                            'আবার চেষ্টা করুন',
-                            style: TextStyle(
+                          label: Text(
+                            _text('tryAgain', context),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -311,9 +377,9 @@ class _ResultPageState extends State<ResultPage> {
                         // 🔥 UPDATED: প্রোফাইল বাটন
                         ElevatedButton.icon(
                           icon: const Icon(Icons.person, size: 22),
-                          label: const Text(
-                            'প্রোফাইল দেখুন',
-                            style: TextStyle(
+                          label: Text(
+                            _text('viewProfile', context),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -370,7 +436,7 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   // 🔥 NEW: ভিডিও রিওয়ার্ড সেকশন
-  Widget _buildVideoRewardSection() {
+  Widget _buildVideoRewardSection(BuildContext context) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -393,7 +459,7 @@ class _ResultPageState extends State<ResultPage> {
                 Icon(Icons.video_library, color: Colors.red[700], size: 24),
                 const SizedBox(width: 8),
                 Text(
-                  '🎬 ভিডিও দেখে পয়েন্ট অর্জন করুন',
+                  _text('videoRewardTitle', context),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -404,7 +470,7 @@ class _ResultPageState extends State<ResultPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              'সংক্ষিপ্ত ভিডিও দেখে অতিরিক্ত পয়েন্ট অর্জন করুন এবং দ্রুত গিফট পেতে প্রস্তুত হোন।',
+              _text('videoRewardDescription', context),
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.red[700],
@@ -418,9 +484,12 @@ class _ResultPageState extends State<ResultPage> {
               child: ElevatedButton.icon(
                 onPressed: _navigateToReward,
                 icon: const Icon(Icons.play_arrow, size: 20),
-                label: const Text(
-                  'ভিডিও দেখুন',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                label: Text(
+                  _text('watchVideos', context),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red[700],
@@ -443,7 +512,13 @@ class _ResultPageState extends State<ResultPage> {
     );
   }
 
-  Widget _buildStatRow(String title, String value, IconData icon, Color color) {
+  Widget _buildStatRow(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+    BuildContext context,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

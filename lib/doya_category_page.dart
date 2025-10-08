@@ -1,10 +1,12 @@
-// Doya Page - Fixed Version
+// Doya Page - Multi-language Support সহ
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'ad_helper.dart';
 import 'network_json_loader.dart';
 import 'doya_list_page.dart';
+import '../providers/language_provider.dart';
 
 class DoyaCategoryPage extends StatefulWidget {
   const DoyaCategoryPage({Key? key}) : super(key: key);
@@ -14,6 +16,42 @@ class DoyaCategoryPage extends StatefulWidget {
 }
 
 class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'pageTitle': {
+      'en': 'Dua Collection (With Meaning)',
+      'bn': 'দুআর সংকলন (অর্থসহ)',
+    },
+    'searchHint': {'en': 'Search all duas...', 'bn': 'সকল দোয়া খুঁজুন...'},
+    'searching': {
+      'en': 'Type to search duas...',
+      'bn': 'দোয়া খুঁজতে টাইপ করুন...',
+    },
+    'noResults': {'en': 'No results found for', 'bn': 'এর জন্য কোন ফলাফল নেই'},
+    'category': {'en': 'Category', 'bn': 'ক্যাটাগরি'},
+    'salat': {'en': 'Salah-Prayer', 'bn': 'সালাত-নামাজ'},
+    'quranic': {'en': 'From Quran', 'bn': 'কুরআন থেকে'},
+    'marriage': {'en': 'Marriage Life', 'bn': 'দাম্পত্য জীবন'},
+    'morningEvening': {
+      'en': 'Morning-Evening Zikr',
+      'bn': 'সকাল-সন্ধ্যার জিকির',
+    },
+    'dailyLife': {'en': 'Daily Life', 'bn': 'দৈনন্দিন জীবন'},
+    'healing': {'en': 'Healing', 'bn': 'রোগ মুক্তি'},
+    'fasting': {'en': 'Fasting', 'bn': 'সওম-রোজা'},
+    'miscellaneous': {'en': 'Miscellaneous', 'bn': 'বিবিধ'},
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
   // Bottom Banner Ad ভেরিয়েবল
   BannerAd? _bottomBannerAd;
   bool _isBottomBannerAdReady = false;
@@ -24,57 +62,81 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   bool _showInterstitialAds = true;
   int _doyaCardOpenCount = 0;
 
-  // ক্যাটাগরি তালিকা
-  final List<Map<String, dynamic>> categories = [
-    {
-      'title': 'সালাত-নামাজ',
-      'icon': Icons.mosque,
-      'color': Colors.blue,
-      'jsonFile': 'assets/salat_doyas.json',
-    },
-    {
-      'title': 'কুরআন থেকে',
-      'icon': Icons.menu_book,
-      'color': Colors.deepPurple,
-      'jsonFile': 'assets/quranic_doyas.json',
-    },
-    {
-      'title': 'দাম্পত্য জীবন',
-      'icon': Icons.family_restroom,
-      'color': Colors.teal,
-      'jsonFile': 'assets/copple_doya.json',
-    },
-    {
-      'title': 'সকাল-সন্ধ্যার জিকির',
-      'icon': Icons.wb_sunny,
-      'color': Colors.orange,
-      'jsonFile': 'assets/morning_evening_doya.json',
-    },
-    {
-      'title': 'দৈনন্দিন জীবন',
-      'icon': Icons.home,
-      'color': Colors.green,
-      'jsonFile': 'assets/daily_life_doyas.json',
-    },
-    {
-      'title': 'রোগ মুক্তি',
-      'icon': Icons.local_hospital,
-      'color': Colors.red,
-      'jsonFile': 'assets/rog_mukti_doyas.json',
-    },
-    {
-      'title': 'সওম-রোজা',
-      'icon': Icons.nightlight_round,
-      'color': Colors.purple,
-      'jsonFile': 'assets/fasting_doyas.json',
-    },
-    {
-      'title': 'বিবিধ',
-      'icon': Icons.category,
-      'color': Colors.brown,
-      'jsonFile': 'assets/misc_doyas.json',
-    },
-  ];
+  // ক্যাটাগরি তালিকা - ভাষা অনুযায়ী ডাইনামিক
+  List<Map<String, dynamic>> getCategories(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final isEnglish = languageProvider.isEnglish;
+
+    return [
+      {
+        'title': _text('salat', context),
+        'icon': Icons.mosque,
+        'color': Colors.blue,
+        'jsonFile': isEnglish
+            ? 'assets/en_salat_doyas.json'
+            : 'assets/salat_doyas.json',
+      },
+      {
+        'title': _text('quranic', context),
+        'icon': Icons.menu_book,
+        'color': Colors.deepPurple,
+        'jsonFile': isEnglish
+            ? 'assets/en_quranic_doyas.json'
+            : 'assets/quranic_doyas.json',
+      },
+      {
+        'title': _text('marriage', context),
+        'icon': Icons.family_restroom,
+        'color': Colors.teal,
+        'jsonFile': isEnglish
+            ? 'assets/en_copple_doya.json'
+            : 'assets/copple_doya.json',
+      },
+      {
+        'title': _text('morningEvening', context),
+        'icon': Icons.wb_sunny,
+        'color': Colors.orange,
+        'jsonFile': isEnglish
+            ? 'assets/en_morning_evening_doya.json'
+            : 'assets/morning_evening_doya.json',
+      },
+      {
+        'title': _text('dailyLife', context),
+        'icon': Icons.home,
+        'color': Colors.green,
+        'jsonFile': isEnglish
+            ? 'assets/en_daily_life_doyas.json'
+            : 'assets/daily_life_doyas.json',
+      },
+      {
+        'title': _text('healing', context),
+        'icon': Icons.local_hospital,
+        'color': Colors.red,
+        'jsonFile': isEnglish
+            ? 'assets/en_rog_mukti_doyas.json'
+            : 'assets/rog_mukti_doyas.json',
+      },
+      {
+        'title': _text('fasting', context),
+        'icon': Icons.nightlight_round,
+        'color': Colors.purple,
+        'jsonFile': isEnglish
+            ? 'assets/en_fasting_doyas.json'
+            : 'assets/fasting_doyas.json',
+      },
+      {
+        'title': _text('miscellaneous', context),
+        'icon': Icons.category,
+        'color': Colors.brown,
+        'jsonFile': isEnglish
+            ? 'assets/en_misc_doyas.json'
+            : 'assets/misc_doyas.json',
+      },
+    ];
+  }
 
   // গ্লোবাল সার্চ ভেরিয়েবল
   bool _isSearching = false;
@@ -234,6 +296,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     setState(() => _isLoadingAllDoyas = true);
     try {
       List<Map<String, String>> allDoyas = [];
+      final categories = getCategories(context);
+
       for (var category in categories) {
         try {
           final loadedData = await NetworkJsonLoader.loadJsonList(
@@ -325,6 +389,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
   // আপডেট করা মেথড: সরাসরি দোয়া ওপেন করবে
   void _navigateToSearchedDoya(BuildContext context, Map<String, String> doya) {
+    final categories = getCategories(context);
     final category = categories.firstWhere(
       (cat) => cat['title'] == doya['category'],
       orElse: () => categories.last,
@@ -352,7 +417,10 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
-  Widget _buildCategoryCard(Map<String, dynamic> category) {
+  Widget _buildCategoryCard(
+    Map<String, dynamic> category,
+    BuildContext context,
+  ) {
     return Card(
       elevation: 4,
       margin: EdgeInsets.all(_isTablet ? 12 : 8),
@@ -401,7 +469,10 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
-  Widget _buildSearchResultCard(Map<String, String> doya) {
+  Widget _buildSearchResultCard(
+    Map<String, String> doya,
+    BuildContext context,
+  ) {
     Color categoryColor = Colors.teal;
     try {
       categoryColor = Color(int.parse(doya['categoryColor'] ?? '0xFF009688'));
@@ -427,7 +498,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              'ক্যাটাগরি: ${doya['category']}',
+              '${_text('category', context)}: ${doya['category']}',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
@@ -437,8 +508,10 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
-  Widget _buildBodyContent() {
-    return _isSearching ? _buildSearchResults() : _buildCategoryGrid();
+  Widget _buildBodyContent(BuildContext context) {
+    return _isSearching
+        ? _buildSearchResults(context)
+        : _buildCategoryGrid(context);
   }
 
   Widget _buildBottomBannerAd() {
@@ -461,6 +534,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkDeviceType(context);
     });
@@ -472,18 +547,18 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
             ? TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'সকল দোয়া খুঁজুন...',
+                decoration: InputDecoration(
+                  hintText: _text('searchHint', context),
                   border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.white70),
+                  hintStyle: const TextStyle(color: Colors.white70),
                 ),
                 style: const TextStyle(color: Colors.white, fontSize: 18),
                 cursorColor: Colors.white,
                 onChanged: _searchAllDoyas,
               )
-            : const Text(
-                'দুআর সংকলন (অর্থসহ)',
-                style: TextStyle(
+            : Text(
+                _text('pageTitle', context),
+                style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 20,
                   color: Colors.white,
@@ -519,7 +594,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
         child: Column(
           children: [
             // Main Content - সম্পূর্ণ জায়গা নেয়
-            Expanded(child: _buildBodyContent()),
+            Expanded(child: _buildBodyContent(context)),
 
             // Banner Ad - শুধুমাত্র যখন প্রয়োজন
             _buildBottomBannerAd(),
@@ -529,8 +604,9 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
-  Widget _buildCategoryGrid() {
+  Widget _buildCategoryGrid(BuildContext context) {
     final crossAxisCount = _isTablet ? 4 : 2;
+    final categories = getCategories(context);
 
     return GridView.builder(
       padding: EdgeInsets.all(_isTablet ? 20 : 16),
@@ -541,20 +617,21 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
         childAspectRatio: _isTablet ? 0.8 : 0.9,
       ),
       itemCount: categories.length,
-      itemBuilder: (context, index) => _buildCategoryCard(categories[index]),
+      itemBuilder: (context, index) =>
+          _buildCategoryCard(categories[index], context),
     );
   }
 
-  Widget _buildSearchResults() {
+  Widget _buildSearchResults(BuildContext context) {
     if (_isLoadingAllDoyas) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (_searchController.text.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'দোয়া খুঁজতে টাইপ করুন...',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+          _text('searching', context),
+          style: const TextStyle(fontSize: 16, color: Colors.grey),
         ),
       );
     }
@@ -567,7 +644,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
             const Icon(Icons.search_off, size: 60, color: Colors.grey),
             const SizedBox(height: 16),
             Text(
-              '"${_searchController.text}" এর জন্য কোন ফলাফল নেই',
+              '${_text('noResults', context)} "${_searchController.text}"',
               style: const TextStyle(fontSize: 16),
             ),
           ],
@@ -579,7 +656,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       padding: const EdgeInsets.all(8),
       itemCount: _searchResults.length,
       itemBuilder: (context, index) =>
-          _buildSearchResultCard(_searchResults[index]),
+          _buildSearchResultCard(_searchResults[index], context),
     );
   }
 }

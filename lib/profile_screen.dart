@@ -1,11 +1,13 @@
 // profile_screen.dart - উন্নত প্রোফাইল সিস্টেম (আপডেটেড)
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 import '../utils/point_manager.dart';
 import 'ad_helper.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../screens/premium_screen.dart';
-import '../screens/reward_screen.dart'; // RewardScreen import
-import 'mcq_page.dart'; // MCQPage import
+import '../screens/reward_screen.dart';
+import 'mcq_page.dart';
+import '../providers/language_provider.dart'; // ✅ Language Provider import
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -15,16 +17,176 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'pageTitle': {'en': 'My Profile', 'bn': 'আমার প্রোফাইল'},
+    'loadingProfile': {
+      'en': 'Loading profile...',
+      'bn': 'প্রোফাইল লোড হচ্ছে...',
+    },
+    'premiumFeatures': {'en': 'Premium Features', 'bn': 'প্রিমিয়াম ফিচার'},
+    'rewardHistory': {'en': 'Reward History', 'bn': 'রিওয়ার্ড হিস্ট্রি'},
+    'editProfile': {'en': 'Edit Profile', 'bn': 'প্রোফাইল এডিট করুন'},
+    'yourName': {'en': 'Your Name', 'bn': 'আপনার নাম'},
+    'mobileNumber': {'en': 'Mobile Number', 'bn': 'মোবাইল নম্বর'},
+    'cancel': {'en': 'Cancel', 'bn': 'বাতিল'},
+    'save': {'en': 'Save', 'bn': 'সেভ করুন'},
+    'profileSaved': {'en': '✅ Profile saved', 'bn': '✅ প্রোফাইল সেভ করা হয়েছে'},
+    'profileSaveError': {
+      'en': '❌ Problem saving profile:',
+      'bn': '❌ প্রোফাইল সেভ করতে সমস্যা:',
+    },
+    'enterMobile': {'en': 'Enter Mobile Number', 'bn': 'মোবাইল নম্বর দিন'},
+    'mobileHint': {'en': '01XXXXXXXXX', 'bn': '01XXXXXXXXX'},
+    'mobileLabel': {'en': 'Mobile Number', 'bn': 'মোবাইল নম্বর'},
+    'mobileInstruction': {
+      'en': 'Enter your mobile number for gift delivery:',
+      'bn': 'গিফট পাঠানোর জন্য আপনার মোবাইল নম্বরটি দিন:',
+    },
+    'mobileValidation': {
+      'en': 'Please enter valid mobile number (11 digits)',
+      'bn': 'দয়া করে সঠিক মোবাইল নম্বর দিন (11 ডিজিট)',
+    },
+    'next': {'en': 'Next', 'bn': 'পরবর্তী'},
+    'confirmation': {'en': 'Confirmation', 'bn': 'নিশ্চিত করুন'},
+    'confirmRequest': {
+      'en': 'Are you sure you want to request reward?',
+      'bn': 'আপনি কি নিশ্চিত যে রিওয়ার্ড রিকোয়েস্ট করতে চান?',
+    },
+    'pointsDeducted': {
+      'en': 'Points deducted: 5000 points',
+      'bn': 'পয়েন্ট ব্যয়: ৫০০০ পয়েন্ট',
+    },
+    'warning': {
+      'en': '⚠️ Once requested, it cannot be cancelled',
+      'bn': '⚠️ একবার রিকোয়েস্ট করলে এটি বাতিল করা যাবে না',
+    },
+    'confirm': {'en': 'Confirm', 'bn': 'নিশ্চিত করুন'},
+    'close': {'en': 'Close', 'bn': 'বন্ধ করুন'},
+    'myRewardHistory': {
+      'en': 'My Reward History',
+      'bn': 'আমার রিওয়ার্ড হিস্ট্রি',
+    },
+    'noRewardRequests': {
+      'en': 'No reward requests',
+      'bn': 'কোন রিওয়ার্ড রিকোয়েস্ট নেই',
+    },
+    'rewardInstruction': {
+      'en': 'Collect 5000 points to request reward',
+      'bn': '৫০০০ পয়েন্ট জমা করে রিওয়ার্ড রিকোয়েস্ট করুন',
+    },
+    'pending': {'en': 'Pending', 'bn': 'বিচারাধীন'},
+    'completed': {'en': 'Completed', 'bn': 'সম্পন্ন'},
+    'rejected': {'en': 'Rejected', 'bn': 'বাতিল'},
+    'status': {'en': 'Status:', 'bn': 'স্ট্যাটাস:'},
+    'date': {'en': 'Date:', 'bn': 'তারিখ:'},
+    'noDate': {'en': 'No date', 'bn': 'তারিখ নেই'},
+    'earnPointsFromCategories': {
+      'en': 'Earn points from favorite categories',
+      'bn': 'পছন্দের ক্যাটাগরি থেকে পয়েন্ট অর্জন',
+    },
+    'playQuiz': {'en': 'Play Quiz', 'bn': 'কুইজ খেলুন'},
+    'increaseIslamicKnowledge': {
+      'en': 'Increase Islamic knowledge',
+      'bn': 'ইসলামী জ্ঞান বৃদ্ধি করুন',
+    },
+    'myStatistics': {'en': '📊 My Statistics', 'bn': '📊 আমার স্ট্যাটিস্টিক্স'},
+    'pendingPoints': {'en': 'Pending Points', 'bn': 'জমাকৃত পয়েন্ট'},
+    'totalPointsEarned': {
+      'en': 'Total Points Earned',
+      'bn': 'মোট অর্জিত পয়েন্ট',
+    },
+    'totalQuizzesTaken': {'en': 'Total Quizzes Taken', 'bn': 'মোট কুইজ দেওয়া'},
+    'totalCorrectAnswers': {
+      'en': 'Total Correct Answers',
+      'bn': 'মোট সঠিক উত্তর',
+    },
+    'getRealGifts': {'en': '🎁 Get Real Gifts', 'bn': '🎁 রিয়েল গিফট পান'},
+    'giftDescription': {
+      'en': 'Collect 5000 points to win attractive gifts',
+      'bn': '৫০০০ পয়েন্ট জমা করে আকর্ষণীয় গিফট জিতুন',
+    },
+    'getGift': {'en': 'Get Gift', 'bn': 'গিফট নিন'},
+    'getGiftReady': {'en': 'Get Gift (Ready)', 'bn': 'গিফট নিন (প্রস্তুত)'},
+    'pointsRemaining': {'en': 'points remaining', 'bn': 'পয়েন্ট বাকি'},
+    'pointsCollected': {'en': 'points collected', 'bn': 'পয়েন্ট সংগ্রহ হয়েছে'},
+    'earnPointsByWatchingVideos': {
+      'en': '🎬 Earn Points by Watching Videos',
+      'bn': '🎬 ভিডিও দেখে পয়েন্ট অর্জন করুন',
+    },
+    'videoDescription': {
+      'en': 'Watch short videos to earn extra points',
+      'bn': 'সংক্ষিপ্ত ভিডিও দেখে অতিরিক্ত পয়েন্ট অর্জন করুন',
+    },
+    'watchVideos': {'en': 'Watch Videos', 'bn': 'ভিডিও দেখুন'},
+    'premiumExperience': {
+      'en': '⭐ Premium Experience',
+      'bn': '⭐ প্রিমিয়াম এক্সপেরিয়েন্স',
+    },
+    'premiumDescription': {
+      'en': 'Exclusive features and ad-free experience',
+      'bn': 'এক্সক্লুসিভ ফিচার এবং এড-ফ্রি এক্সপেরিয়েন্স',
+    },
+    'adFreeUsage': {'en': 'Ad-free usage', 'bn': 'এড-ফ্রি ব্যবহার'},
+    'exclusiveQuizzes': {'en': 'Exclusive quizzes', 'bn': 'এক্সক্লুসিভ কুইজ'},
+    'prioritySupport': {'en': 'Priority support', 'bn': 'প্রায়োরিটি সাপোর্ট'},
+    'doublePoints': {'en': 'Double points', 'bn': 'ডাবল পয়েন্ট'},
+    'viewPremium': {'en': 'View Premium', 'bn': 'প্রিমিয়াম দেখুন'},
+    'infoTitle': {
+      'en':
+          '5000 points will be deducted for gift request. Your gift will be delivered within 24 hours InshaAllah.',
+      'bn':
+          'গিফট এর জন্য রিকোয়েস্ট করলে ৫০০০ পয়েন্ট কাটা হবে। ২৪ ঘন্টার মধ্যে আপনার গিফট পাঠিয়ে দেয়া হবে ইনশাআল্লাহ ।',
+    },
+    'insufficientPoints': {
+      'en': '❌ Insufficient points! Need {points} more points.',
+      'bn': '❌ পর্যাপ্ত পয়েন্ট নেই! আরও {points} পয়েন্ট প্রয়োজন।',
+    },
+    'requestAccepted': {
+      'en':
+          '✅ Your gift request has been accepted! It will be delivered within 24 hours InshaAllah.',
+      'bn':
+          '✅ আপনার গিফটের জন্য রিকোয়েস্টটি গ্রহণ করা হয়েছে! ২৪ ঘন্টার মধ্যে আপনার কাছে পাঠানো হবে ইনশাল্লাহ ।',
+    },
+    'requestError': {
+      'en': '❌ Problem requesting:',
+      'bn': '❌ রিকোয়েস্ট করতে সমস্যা:',
+    },
+
+    'defaultUserName': {'en': 'Islamic Quiz User', 'bn': 'ইসলামিক কুইজ ইউজার'},
+    'defaultUserEmail': {'en': 'Islamic Quiz User', 'bn': 'ইসলামিক কুইজ ইউজার'},
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
+  // ডাইনামিক টেক্সট হেল্পার মেথড
+  String _getInsufficientPointsText(BuildContext context) {
+    final baseText = _text('insufficientPoints', context);
+    final pointsNeeded = 5000 - _pendingPoints;
+    return baseText.replaceFirst('{points}', pointsNeeded.toString());
+  }
+
   int _pendingPoints = 0;
   int _totalPoints = 0;
   int _totalQuizzes = 0;
   int _totalCorrectAnswers = 0;
-  String _userEmail = "ইসলামিক কুইজ ইউজার";
-  String _userName = "ইসলামিক কুইজ ইউজার";
+  String _userEmail = "";
+  String _userName = "";
   String _userMobile = "";
   bool _isLoading = true;
   bool _isRequesting = false;
   bool _isEditingProfile = false;
+
+  // ✅ নতুন ভেরিয়েবল যোগ করুন
+  //int _profileCompleteness = 0;
 
   // Ad variables
   BannerAd? _bannerAd;
@@ -136,6 +298,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // ✅ CORRECTED: _loadUserData মেথড - ভাষা অনুযায়ী ডিফল্ট ভ্যালু
   Future<void> _loadUserData() async {
     try {
       final userData = await PointManager.getUserData();
@@ -145,16 +308,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _totalPoints = userData['totalPoints'] ?? 0;
         _totalQuizzes = userData['totalQuizzes'] ?? 0;
         _totalCorrectAnswers = userData['totalCorrectAnswers'] ?? 0;
-        _userEmail = userData['userEmail'] ?? 'ইসলামিক কুইজ ইউজার';
-        _userName = userData['userName'] ?? 'ইসলামিক কুইজ ইউজার';
+
+        // ✅ ভাষা অনুযায়ী ডিফল্ট ভ্যালু সেট করুন
+        final defaultName = _text('defaultUserName', context);
+        final defaultEmail = _text('defaultUserEmail', context);
+
+        _userEmail = userData['userEmail'] ?? defaultEmail;
+        _userName = userData['userName'] ?? defaultName;
         _userMobile = userData['userMobile'] ?? '';
         _isLoading = false;
+
+        // ❌ এই লাইনটি ডিলিট করুন
+        // _profileCompleteness = _calculateProfileCompleteness(userData, defaultName);
       });
     } catch (e) {
-      print("ডাটা লোড করতে ত্রুটি: $e");
+      print("Data load error: $e");
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  // ✅ প্রফাইল কমপ্লিটনেস ক্যালকুলেশন মেথড
+
+  // ✅ ADDED: _formatDate মেথড
+  String _formatDate(String dateString) {
+    try {
+      DateTime date = DateTime.parse(dateString);
+      return "${date.day}/${date.month}/${date.year}";
+    } catch (e) {
+      return _text('noDate', context);
     }
   }
 
@@ -178,7 +361,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => MCQPage(
-          category: 'ইসলামী প্রাথমিক জ্ঞান',
+          category: _text('defaultUserName', context),
+          // ভাষা অনুযায়ী ক্যাটাগরি
           quizId: 'islamic_basic_knowledge',
         ),
       ),
@@ -192,9 +376,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            "❌ পর্যাপ্ত পয়েন্ট নেই! আরও ${5000 - _pendingPoints} পয়েন্ট প্রয়োজন।",
-          ),
+          content: Text(_getInsufficientPointsText(context)),
           backgroundColor: Colors.red,
         ),
       );
@@ -209,7 +391,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("প্রোফাইল এডিট করুন"),
+        title: Text(_text('editProfile', context)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -222,10 +404,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: "আপনার নাম",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+                decoration: InputDecoration(
+                  labelText: _text('yourName', context),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.person),
                 ),
               ),
               const SizedBox(height: 12),
@@ -233,10 +415,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 controller: _mobileController,
                 keyboardType: TextInputType.phone,
                 maxLength: 11,
-                decoration: const InputDecoration(
-                  labelText: "মোবাইল নম্বর",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
+                decoration: InputDecoration(
+                  labelText: _text('mobileNumber', context),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.phone),
                   counterText: "",
                 ),
               ),
@@ -246,7 +428,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("বাতিল"),
+            child: Text(_text('cancel', context)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -259,7 +441,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pop(context);
               }
             },
-            child: const Text("সেভ করুন"),
+            child: Text(_text('save', context)),
           ),
         ],
       ),
@@ -269,16 +451,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _saveProfileData() async {
     try {
       await PointManager.saveProfileData(_userName, _userMobile);
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("✅ প্রোফাইল সেভ করা হয়েছে"),
+        SnackBar(
+          content: Text(_text('profileSaved', context)),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("❌ প্রোফাইল সেভ করতে সমস্যা: $e"),
+          content: Text("${_text('profileSaveError', context)} $e"),
           backgroundColor: Colors.red,
         ),
       );
@@ -290,9 +473,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_pendingPoints < 5000) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            "❌ পর্যাপ্ত পয়েন্ট নেই! আরও ${5000 - _pendingPoints} পয়েন্ট প্রয়োজন।",
-          ),
+          content: Text(_getInsufficientPointsText(context)),
           backgroundColor: Colors.red,
         ),
       );
@@ -317,21 +498,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       await PointManager.deductPoints(5000);
       await PointManager.saveGiftRequest(mobileNumber, _userEmail);
-      await _loadUserData();
+      await _loadUserData(); // ✅ আবার ডাটা লোড করুন যাতে আপডেটেড ভ্যালু দেখায়
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "✅ আপনার গিফটের জন্য রিকোয়েস্টটি গ্রহণ করা হয়েছে! ২৪ ঘন্টার মধ্যে আপনার কাছে পাঠানো হবে ইনশাল্লাহ ।",
-          ),
+        SnackBar(
+          content: Text(_text('requestAccepted', context)),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 5),
+          duration: const Duration(seconds: 5),
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("❌ রিকোয়েস্ট করতে সমস্যা: $e"),
+          content: Text("${_text('requestError', context)} $e"),
           backgroundColor: Colors.red,
         ),
       );
@@ -350,29 +529,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            "মোবাইল নম্বর দিন",
+          title: Text(
+            _text('enterMobile', context),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "গিফট পাঠানোর জন্য আপনার মোবাইল নম্বরটি দিন:",
+              Text(
+                _text('mobileInstruction', context),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: mobileController,
                 keyboardType: TextInputType.phone,
                 maxLength: 11,
-                decoration: const InputDecoration(
-                  hintText: "01XXXXXXXXX",
-                  labelText: "মোবাইল নম্বর",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
+                decoration: InputDecoration(
+                  hintText: _text('mobileHint', context),
+                  labelText: _text('mobileLabel', context),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.phone),
                   counterText: "",
                 ),
                 onChanged: (value) {
@@ -385,9 +564,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               ),
               const SizedBox(height: 8),
-              const Text(
-                "নম্বরটি সঠিকভাবে দিন, এই নম্বরেই রিওয়ার্ড পাঠানো হবে",
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+              Text(
+                _text('mobileValidation', context),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -395,7 +574,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("বাতিল"),
+              child: Text(_text('cancel', context)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -404,10 +583,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Navigator.pop(context, mobile);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        "❌ দয়া করে সঠিক মোবাইল নম্বর দিন (11 ডিজিট)",
-                      ),
+                    SnackBar(
+                      content: Text(_text('mobileValidation', context)),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -417,7 +594,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: Colors.green[800],
                 foregroundColor: Colors.white,
               ),
-              child: const Text("পরবর্তী"),
+              child: Text(_text('next', context)),
             ),
           ],
         );
@@ -431,39 +608,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text("নিশ্চিত করুন"),
+              title: Text(_text('confirmation', context)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("আপনি কি নিশ্চিত যে রিওয়ার্ড রিকোয়েস্ট করতে চান?"),
+                  Text(_text('confirmRequest', context)),
                   const SizedBox(height: 10),
                   Text(
-                    "মোবাইল নম্বর: $mobileNumber",
+                    "${_text('mobileNumber', context)}: $mobileNumber",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    "পয়েন্ট ব্যয়: ৫০০০ পয়েন্ট",
+                    _text('pointsDeducted', context),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    "⚠️ একবার রিকোয়েস্ট করলে এটি বাতিল করা যাবে না",
-                    style: TextStyle(color: Colors.orange),
+                  Text(
+                    _text('warning', context),
+                    style: const TextStyle(color: Colors.orange),
                   ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text("বাতিল"),
+                  child: Text(_text('cancel', context)),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context, true),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[800],
                   ),
-                  child: const Text("নিশ্চিত করুন"),
+                  child: Text(_text('confirm', context)),
                 ),
               ],
             );
@@ -479,27 +656,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.history),
-            SizedBox(width: 8),
-            Text("আমার রিওয়ার্ড হিস্ট্রি"),
+            const Icon(Icons.history),
+            const SizedBox(width: 8),
+            Text(_text('myRewardHistory', context)),
           ],
         ),
         content: SizedBox(
           width: double.maxFinite,
           height: 400,
           child: history.isEmpty
-              ? const Center(
+              ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.receipt_long, size: 64, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text("কোন রিওয়ার্ড রিকোয়েস্ট নেই"),
+                      const Icon(
+                        Icons.receipt_long,
+                        size: 64,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(_text('noRewardRequests', context)),
                       Text(
-                        "৫০০০ পয়েন্ট জমা করে রিওয়ার্ড রিকোয়েস্ট করুন",
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        _text('rewardInstruction', context),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -509,14 +693,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   itemCount: history.length,
                   itemBuilder: (context, index) {
                     var request = history[index];
-                    return _buildRechargeHistoryItem(request);
+                    return _buildRechargeHistoryItem(request, context);
                   },
                 ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("বন্ধ করুন"),
+            child: Text(_text('close', context)),
           ),
         ],
       ),
@@ -524,19 +708,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // 🔥 রিচার্জ হিস্ট্রি আইটেম
-  Widget _buildRechargeHistoryItem(Map<String, dynamic> request) {
+  Widget _buildRechargeHistoryItem(
+    Map<String, dynamic> request,
+    BuildContext context,
+  ) {
     Color statusColor = Colors.orange;
     IconData statusIcon = Icons.pending;
-    String statusText = "বিচারাধীন";
+    String statusText = _text('pending', context);
 
     if (request['status'] == 'completed') {
       statusColor = Colors.green;
       statusIcon = Icons.check_circle;
-      statusText = "সম্পন্ন";
+      statusText = _text('completed', context);
     } else if (request['status'] == 'rejected') {
       statusColor = Colors.red;
       statusIcon = Icons.cancel;
-      statusText = "বাতিল";
+      statusText = _text('rejected', context);
     }
 
     final pointsUsed = request['pointsUsed'];
@@ -546,16 +733,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         leading: Icon(statusIcon, color: statusColor),
-        title: Text("৫০০০ পয়েন্ট - ${request['mobileNumber'] ?? 'নাই'}"),
+        title: Text(
+          "5000 ${_text('pointsEarned', context)} - ${request['mobileNumber'] ?? 'N/A'}",
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("স্ট্যাটাস: $statusText"),
-            Text("তারিখ: ${_formatDate(request['requestedAt'])}"),
+            Text("${_text('status', context)} $statusText"),
+            Text(
+              "${_text('date', context)} ${_formatDate(request['requestedAt'])}",
+            ),
           ],
         ),
         trailing: Text(
-          "$pointsText পয়েন্ট",
+          "$pointsText ${_text('pointsEarned', context).contains('পয়েন্ট') ? 'পয়েন্ট' : 'Points'}",
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.green,
@@ -563,15 +754,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
-
-  String _formatDate(String dateString) {
-    try {
-      DateTime date = DateTime.parse(dateString);
-      return "${date.day}/${date.month}/${date.year}";
-    } catch (e) {
-      return "তারিখ নেই";
-    }
   }
 
   // 🔥 NEW: Additional Features Section Widget
@@ -589,9 +771,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.auto_awesome, color: Colors.green[700], size: 18),
-                SizedBox(width: 6),
+                const SizedBox(width: 6),
                 Text(
-                  "পছন্দের ক্যাটাগরি থেকে পয়েন্ট অর্জন",
+                  _text('earnPointsFromCategories', context),
                   style: TextStyle(
                     fontSize: isSmallScreen ? 15 : 16,
                     fontWeight: FontWeight.bold,
@@ -600,7 +782,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
 
             // প্রফেশনাল বাটন
             Container(
@@ -616,7 +798,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   BoxShadow(
                     color: Colors.green.withOpacity(0.4),
                     blurRadius: 6,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -635,14 +817,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.quiz, color: Colors.white, size: 20),
-                        SizedBox(width: 10),
+                        const Icon(Icons.quiz, color: Colors.white, size: 20),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "কুইজ খেলুন",
+                                _text('playQuiz', context),
                                 style: TextStyle(
                                   fontSize: isSmallScreen ? 15 : 16,
                                   fontWeight: FontWeight.w700,
@@ -650,7 +832,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                               Text(
-                                "ইসলামী জ্ঞান বৃদ্ধি করুন",
+                                _text('increaseIslamicKnowledge', context),
                                 style: TextStyle(
                                   fontSize: isSmallScreen ? 12 : 13,
                                   color: Colors.white.withOpacity(0.9),
@@ -659,7 +841,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
                         ),
-                        Icon(
+                        const Icon(
                           Icons.arrow_forward,
                           color: Colors.white,
                           size: 18,
@@ -686,26 +868,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[800],
-        title: const Text(
-          "আমার প্রোফাইল",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        title: Text(
+          _text('pageTitle', context),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         leading: Container(
-          margin: EdgeInsets.all(8),
+          margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
             onPressed: () => Navigator.of(context).pop(),
             splashRadius: 20,
           ),
         ),
         actions: [
           Container(
-            margin: EdgeInsets.all(8),
+            margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
@@ -717,12 +906,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 size: 20,
               ),
               onPressed: _navigateToPremium,
-              tooltip: "প্রিমিয়াম ফিচার",
+              tooltip: _text('premiumFeatures', context),
               splashRadius: 20,
             ),
           ),
           Container(
-            margin: EdgeInsets.all(8),
+            margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
@@ -730,7 +919,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: IconButton(
               icon: const Icon(Icons.history, color: Colors.white, size: 20),
               onPressed: _showRechargeHistory,
-              tooltip: "রিওয়ার্ড হিস্ট্রি",
+              tooltip: _text('rewardHistory', context),
               splashRadius: 20,
             ),
           ),
@@ -739,13 +928,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: SafeArea(
         bottom: true,
         child: _isLoading
-            ? const Center(
+            ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text("প্রোফাইল লোড হচ্ছে..."),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(_text('loadingProfile', context)),
                   ],
                 ),
               )
@@ -761,33 +950,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         children: [
                           // SECTION 1: ইউজার প্রোফাইল কার্ড
-                          _buildUserProfileSection(isTablet, isSmallScreen),
+                          _buildUserProfileSection(
+                            isTablet,
+                            isSmallScreen,
+                            context,
+                          ),
 
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
-                          // SECTION 2: পয়েন্ট ও স্ট্যাটাস আমার শ্তাটিক্স
-                          _buildPointsStatsSection(isTablet, isSmallScreen),
+                          // SECTION 2: পয়েন্ট ও স্ট্যাটাস
+                          _buildPointsStatsSection(
+                            isTablet,
+                            isSmallScreen,
+                            context,
+                          ),
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
                           // SECTION 3: রিয়েল গিফট সেকশন
-                          _buildGiftSection(isTablet, isSmallScreen),
+                          _buildGiftSection(isTablet, isSmallScreen, context),
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
                           // SECTION 4: ভিডিও রিওয়ার্ড সেকশন
-                          _buildVideoRewardSection(isTablet, isSmallScreen),
+                          _buildVideoRewardSection(
+                            isTablet,
+                            isSmallScreen,
+                            context,
+                          ),
 
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
-                          // SECTION 5: ADDITIONAL FEATURES SECTION পয়েন্ট অর্জন
+                          // SECTION 5: ADDITIONAL FEATURES SECTION
                           _buildAdditionalFeaturesSection(isSmallScreen),
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
                           // SECTION 6: প্রিমিয়াম সেকশন
-                          _buildPremiumSection(isTablet, isSmallScreen),
+                          _buildPremiumSection(
+                            isTablet,
+                            isSmallScreen,
+                            context,
+                          ),
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
                           // SECTION 7: তথ্য বক্স
-                          _buildInfoSection(isTablet, isSmallScreen),
+                          _buildInfoSection(isTablet, isSmallScreen, context),
 
                           // Bottom spacer for banner ad
                           SizedBox(
@@ -819,7 +1024,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // SECTION 1: ইউজার প্রোফাইল সেকশন
-  Widget _buildUserProfileSection(bool isTablet, bool isSmallScreen) {
+  Widget _buildUserProfileSection(
+    bool isTablet,
+    bool isSmallScreen,
+    BuildContext context,
+  ) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -862,6 +1071,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
+            SizedBox(height: isSmallScreen ? 12 : (isTablet ? 20 : 16)),
+
+            // ✅ প্রফাইল কমপ্লিটনেস প্রোগ্রেস বার যোগ করুন
             SizedBox(height: isSmallScreen ? 12 : (isTablet ? 20 : 16)),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -907,7 +1119,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // SECTION 2: পয়েন্ট ও স্ট্যাটাস সেকশন
-  Widget _buildPointsStatsSection(bool isTablet, bool isSmallScreen) {
+  Widget _buildPointsStatsSection(
+    bool isTablet,
+    bool isSmallScreen,
+    BuildContext context,
+  ) {
     return Card(
       elevation: 3,
       child: Padding(
@@ -917,7 +1133,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             Text(
-              "📊 আমার স্ট্যাটিস্টিক্স",
+              _text('myStatistics', context),
               style: TextStyle(
                 fontSize: isSmallScreen ? 16 : (isTablet ? 20 : 18),
                 fontWeight: FontWeight.bold,
@@ -926,7 +1142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 12),
             _buildStatItem(
-              "জমাকৃত পয়েন্ট",
+              _text('pendingPoints', context),
               _pendingPoints.toString(),
               Icons.monetization_on,
               Colors.green,
@@ -935,7 +1151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const Divider(height: 1),
             _buildStatItem(
-              "মোট অর্জিত পয়েন্ট",
+              _text('totalPointsEarned', context),
               _totalPoints.toString(),
               Icons.attach_money,
               Colors.blue,
@@ -944,7 +1160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const Divider(height: 1),
             _buildStatItem(
-              "মোট কুইজ দেওয়া",
+              _text('totalQuizzesTaken', context),
               _totalQuizzes.toString(),
               Icons.quiz,
               Colors.orange,
@@ -953,7 +1169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const Divider(height: 1),
             _buildStatItem(
-              "মোট সঠিক উত্তর",
+              _text('totalCorrectAnswers', context),
               _totalCorrectAnswers.toString(),
               Icons.check_circle,
               Colors.purple,
@@ -967,7 +1183,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // SECTION 3: রিয়েল গিফট সেকশন
-  Widget _buildGiftSection(bool isTablet, bool isSmallScreen) {
+  Widget _buildGiftSection(
+    bool isTablet,
+    bool isSmallScreen,
+    BuildContext context,
+  ) {
     return Card(
       elevation: 3,
       child: Padding(
@@ -982,9 +1202,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.purple,
                   size: isSmallScreen ? 20 : 24,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  "🎁 রিয়েল গিফট পান",
+                  _text('getRealGifts', context),
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.bold,
@@ -993,9 +1213,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              "৫০০০ পয়েন্ট জমা করে আকর্ষণীয় গিফট জিতুন",
+              _text('giftDescription', context),
               style: TextStyle(
                 fontSize: isSmallScreen ? 12 : 14,
                 color: Colors.purple.shade800,
@@ -1003,7 +1223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -1011,8 +1231,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: const Icon(Icons.redeem),
                 label: Text(
                   _pendingPoints >= 5000
-                      ? "গিফট নিন (প্রস্তুত)"
-                      : "গিফট নিন (${5000 - _pendingPoints} পয়েন্ট বাকি)",
+                      ? _text('getGiftReady', context)
+                      : "${_text('getGift', context)} (${5000 - _pendingPoints} ${_text('pointsRemaining', context)})",
                   style: TextStyle(
                     fontSize: isSmallScreen ? 13 : 15,
                     fontWeight: FontWeight.bold,
@@ -1031,16 +1251,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             if (_pendingPoints < 5000) ...[
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               LinearProgressIndicator(
                 value: _pendingPoints / 5000,
                 backgroundColor: Colors.purple.shade200,
                 color: Colors.purple,
                 minHeight: 6,
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
-                "${_pendingPoints}/5000 পয়েন্ট সংগ্রহ হয়েছে",
+                "$_pendingPoints/5000 ${_text('pointsCollected', context)}",
                 style: TextStyle(
                   fontSize: isSmallScreen ? 10 : 12,
                   color: Colors.purple.shade700,
@@ -1054,7 +1274,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // SECTION 4: ভিডিও রিওয়ার্ড সেকশন
-  Widget _buildVideoRewardSection(bool isTablet, bool isSmallScreen) {
+  Widget _buildVideoRewardSection(
+    bool isTablet,
+    bool isSmallScreen,
+    BuildContext context,
+  ) {
     return Card(
       elevation: 3,
       child: Padding(
@@ -1068,9 +1292,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.red,
                   size: isSmallScreen ? 20 : 24,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  "🎬 ভিডিও দেখে পয়েন্ট অর্জন করুন",
+                  _text('earnPointsByWatchingVideos', context),
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.bold,
@@ -1079,23 +1303,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
-              "সংক্ষিপ্ত ভিডিও দেখে অতিরিক্ত পয়েন্ট অর্জন করুন",
+              _text('videoDescription', context),
               style: TextStyle(
                 fontSize: isSmallScreen ? 12 : 14,
                 color: Colors.grey,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _navigateToReward,
                 icon: const Icon(Icons.play_arrow),
                 label: Text(
-                  "ভিডিও দেখুন",
+                  _text('watchVideos', context),
                   style: TextStyle(
                     fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.bold,
@@ -1120,7 +1344,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // SECTION 6: প্রিমিয়াম সেকশন
-  Widget _buildPremiumSection(bool isTablet, bool isSmallScreen) {
+  Widget _buildPremiumSection(
+    bool isTablet,
+    bool isSmallScreen,
+    BuildContext context,
+  ) {
     return Card(
       elevation: 3,
       child: Padding(
@@ -1135,9 +1363,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.amber,
                   size: isSmallScreen ? 20 : 24,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  "⭐ প্রিমিয়াম এক্সপেরিয়েন্স",
+                  _text('premiumExperience', context),
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.bold,
@@ -1146,9 +1374,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              "এক্সক্লুসিভ ফিচার এবং এড-ফ্রি এক্সপেরিয়েন্স",
+              _text('premiumDescription', context),
               style: TextStyle(
                 fontSize: isSmallScreen ? 12 : 14,
                 color: Colors.blue.shade800,
@@ -1156,37 +1384,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             // প্রিমিয়াম ফিচার লিস্ট
             Column(
               children: [
                 _buildPremiumFeature(
-                  "এড-ফ্রি ব্যবহার",
+                  _text('adFreeUsage', context),
                   Icons.block,
                   isSmallScreen,
                 ),
                 _buildPremiumFeature(
-                  "এক্সক্লুসিভ কুইজ",
+                  _text('exclusiveQuizzes', context),
                   Icons.quiz,
                   isSmallScreen,
                 ),
                 _buildPremiumFeature(
-                  "প্রায়োরিটি সাপোর্ট",
+                  _text('prioritySupport', context),
                   Icons.support_agent,
                   isSmallScreen,
                 ),
-                _buildPremiumFeature("ডাবল পয়েন্ট", Icons.bolt, isSmallScreen),
+                _buildPremiumFeature(
+                  _text('doublePoints', context),
+                  Icons.bolt,
+                  isSmallScreen,
+                ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: _navigateToPremium,
                 icon: const Icon(Icons.arrow_forward),
-                label: const Text(
-                  "প্রিমিয়াম দেখুন",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Text(
+                  _text('viewPremium', context),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.blue.shade800,
@@ -1207,7 +1439,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // SECTION 7: তথ্য বক্স
-  Widget _buildInfoSection(bool isTablet, bool isSmallScreen) {
+  Widget _buildInfoSection(
+    bool isTablet,
+    bool isSmallScreen,
+    BuildContext context,
+  ) {
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 10 : (isTablet ? 16 : 12)),
       decoration: BoxDecoration(
@@ -1221,7 +1457,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           SizedBox(width: isSmallScreen ? 8 : (isTablet ? 12 : 8)),
           Expanded(
             child: Text(
-              "গিফট এর জন্য রিকোয়েস্ট করলে ৫০০০ পয়েন্ট কাটা হবে। ২৪ ঘন্টার মধ্যে আপনার গিফট পাঠিয়ে দেয়া হবে ইনশাআল্লাহ ।",
+              _text('infoTitle', context),
               style: TextStyle(
                 fontSize: isSmallScreen ? 10 : (isTablet ? 14 : 12),
                 color: Colors.blue,
@@ -1285,7 +1521,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         children: [
           Icon(icon, color: Colors.green, size: isSmallScreen ? 16 : 18),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               feature,

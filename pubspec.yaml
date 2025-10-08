@@ -97,7 +97,9 @@ flutter:
 
   assets:
     - assets/questions.json
+    - assets/en_questions.json
     - assets/daily_suras.json
+    - assets/en_daily_suras.json
     - assets/sounds/correct.mp3
     - assets/sounds/wrong.mp3
     - assets/images/logo.png
@@ -108,6 +110,7 @@ flutter:
     - assets/images/nadiyatul_quran_preview.png
     - assets/images/umrah_guide_preview.png
     - assets/salat_doyas.json
+    - assets/en_salat_doyas.json
     - assets/quranic_doyas.json
     - assets/copple_doya.json
     - assets/morning_evening_doya.json
@@ -116,7 +119,12 @@ flutter:
     - assets/fasting_doyas.json
     - assets/misc_doyas.json
     - assets/wordquran.json
+    - assets/en_wordquran.json
     - assets/districts.json
+    - assets/name_of_allah.json
+    - assets/en_name_of_allah.json
+    - assets/kalema.json
+    - assets/en_kalema.json
 
 
   fonts:

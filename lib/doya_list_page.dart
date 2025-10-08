@@ -1,10 +1,12 @@
-// Doya List Page - Responsive Version for Mobile & Tablet
+// Doya List Page - Multi-language Support সহ
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/services.dart'; // Clipboard এর জন্য
+import 'package:provider/provider.dart';
 import 'ad_helper.dart';
 import 'network_json_loader.dart'; // নতুন নেটওয়ার্ক লোডার
+import '../providers/language_provider.dart';
 
 class DoyaListPage extends StatefulWidget {
   final String categoryTitle;
@@ -29,6 +31,43 @@ class DoyaListPage extends StatefulWidget {
 }
 
 class _DoyaListPageState extends State<DoyaListPage> {
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'loading': {'en': 'Loading duas...', 'bn': 'দোয়া লোড হচ্ছে...'},
+    'noDuaFound': {'en': 'No duas found', 'bn': 'কোন দোয়া পাওয়া যায়নি'},
+    'searchHint': {'en': 'Search duas...', 'bn': 'দোয়া অনুসন্ধান করুন...'},
+    'warning': {'en': 'Warning', 'bn': 'সতর্কবার্তা'},
+    'warningContent': {
+      'en':
+          'When reading Quranic verses or Arabic prayers in Bengali pronunciation, meaning distortion often occurs. So take this pronunciation only as a helper. Let us learn to read the Quran correctly.',
+      'bn':
+          'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে অনেক সময় অর্থের বিকৃতি ঘটে। তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন। আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি।',
+    },
+    'understood': {'en': 'Understood', 'bn': 'বুঝেছি'},
+    'bengaliPronunciation': {
+      'en': 'Bengali Pronunciation',
+      'bn': 'বাংলা উচ্চরণ',
+    },
+    'meaning': {'en': 'Meaning', 'bn': 'অর্থ'},
+    'reference': {'en': 'Reference', 'bn': 'রেফারেন্স'},
+    'copy': {'en': 'Copy', 'bn': 'কপি'},
+    'share': {'en': 'Share', 'bn': 'শেয়ার'},
+    'copied': {'en': 'copied', 'bn': 'কপি করা হয়েছে'},
+    'increaseFont': {'en': 'Increase font', 'bn': 'ফন্ট বড় করুন'},
+    'decreaseFont': {'en': 'Decrease font', 'bn': 'ফন্ট ছোট করুন'},
+    'defaultFont': {'en': 'Default font size', 'bn': 'ডিফল্ট ফন্ট সাইজ'},
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
   List<Map<String, String>> doyas = [];
   List<Map<String, String>> filteredDoyas = [];
   bool _isSearching = false;
@@ -155,12 +194,12 @@ class _DoyaListPageState extends State<DoyaListPage> {
       setState(() {
         doyas = [
           {
-            'title': 'তাকবিরাতুল ইহরাম',
-            'bangla': 'আল্লাহু আকবার',
+            'title': _getFallbackTitle(),
+            'bangla': _getFallbackBangla(),
             'arabic': 'اللهُ أَكْبَرُ',
-            'transliteration': 'আল্লাহু আকবার',
-            'meaning': 'আল্লাহ সর্বশ্রেষ্ঠ',
-            'reference': 'সহীহ বুখারী: 789',
+            'transliteration': _getFallbackTransliteration(),
+            'meaning': _getFallbackMeaning(),
+            'reference': _getFallbackReference(),
             'error': 'Original file failed to load: $e',
           },
         ];
@@ -168,6 +207,51 @@ class _DoyaListPageState extends State<DoyaListPage> {
         _isLoading = false;
       });
     }
+  }
+
+  // Fallback data methods based on language
+  String _getFallbackTitle() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    return languageProvider.isEnglish ? 'Takbiratul Ihram' : 'তাকবিরাতুল ইহরাম';
+  }
+
+  String _getFallbackBangla() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    return languageProvider.isEnglish ? 'Allahu Akbar' : 'আল্লাহু আকবার';
+  }
+
+  String _getFallbackTransliteration() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    return languageProvider.isEnglish ? 'Allahu Akbar' : 'আল্লাহু আকবার';
+  }
+
+  String _getFallbackMeaning() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    return languageProvider.isEnglish
+        ? 'Allah is the Greatest'
+        : 'আল্লাহ সর্বশ্রেষ্ঠ';
+  }
+
+  String _getFallbackReference() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    return languageProvider.isEnglish
+        ? 'Sahih Bukhari: 789'
+        : 'সহীহ বুখারী: 789';
   }
 
   @override
@@ -369,22 +453,34 @@ class _DoyaListPageState extends State<DoyaListPage> {
   }
 
   // ক্লিপবোর্ডে কপি করার মেথড
-  Future<void> _copyToClipboard(Map<String, String> doya) async {
+  Future<void> _copyToClipboard(
+    Map<String, String> doya,
+    BuildContext context,
+  ) async {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final isEnglish = languageProvider.isEnglish;
+
     final String duaTitle = doya['title'] ?? '';
     final String duaArabic = doya['arabic'] ?? '';
     final String duaTransliteration = doya['transliteration'] ?? '';
     final String duaMeaning = doya['meaning'] ?? '';
     final String duaReference = doya['reference'] ?? '';
 
+    final String meaningLabel = isEnglish ? 'Meaning' : 'অর্থ';
+    final String referenceLabel = isEnglish ? 'Reference' : 'রেফারেন্স';
+
     final String copyText =
-        '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\nঅর্থ: $duaMeaning${duaReference.isNotEmpty ? '\n\nরেফারেন্স: $duaReference' : ''}';
+        '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\n$meaningLabel: $duaMeaning${duaReference.isNotEmpty ? '\n\n$referenceLabel: $duaReference' : ''}';
 
     await Clipboard.setData(ClipboardData(text: copyText));
 
     // Snackbar দেখান
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('"$duaTitle" কপি করা হয়েছে'),
+        content: Text('"$duaTitle" ${_text('copied', context)}'),
         duration: const Duration(seconds: 2),
         backgroundColor: Colors.green,
       ),
@@ -392,7 +488,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
   }
 
   // সতর্কবার্তা উইজেট বিল্ড করার মেথড
-  Widget _buildWarningWidget(int index) {
+  Widget _buildWarningWidget(int index, BuildContext context) {
     final showFullWarning = _showFullWarningStates[index] ?? false;
 
     return showFullWarning
@@ -422,7 +518,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'সতর্কবার্তা',
+                      _text('warning', context),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -435,8 +531,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 const SizedBox(height: 10),
 
                 Text(
-                  'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে অনেক সময় অর্থের বিকৃতি ঘটে। '
-                  'তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন। আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি।',
+                  _text('warningContent', context),
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.5,
@@ -471,7 +566,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                         ),
                       ),
                       child: Text(
-                        'বুঝেছি',
+                        _text('understood', context),
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -512,7 +607,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'বাংলা উচ্চরণ',
+                    _text('bengaliPronunciation', context),
                     style: TextStyle(fontSize: 12, color: Colors.orange[800]),
                   ),
                 ],
@@ -540,7 +635,6 @@ class _DoyaListPageState extends State<DoyaListPage> {
     });
   }
 
-  // ✅ Adaptive Inline Banner Ad বিল্ড করার মেথড
   // ✅ Adaptive Inline Banner Ad বিল্ড করার মেথড - FIXED VERSION
   Widget _buildInlineBanner(String adKey) {
     final bannerAd = _inlineBannerAds[adKey];
@@ -573,7 +667,11 @@ class _DoyaListPageState extends State<DoyaListPage> {
   }
 
   // দোয়া কার্ড বিল্ড করার মেথড - রেসপনসিভ
-  Widget _buildDoyaCard(Map<String, String> doya, int index) {
+  Widget _buildDoyaCard(
+    Map<String, String> doya,
+    int index,
+    BuildContext context,
+  ) {
     final bool isExpanded = _expandedDoyaIndices.contains(index);
     final String duaTitle = doya['title'] ?? '';
     // প্রি-সিলেক্টেড দোয়ার জন্য key তৈরি করুন
@@ -651,7 +749,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 const SizedBox(height: 16),
 
                 // Warning message
-                _buildWarningWidget(index),
+                _buildWarningWidget(index, context),
 
                 const SizedBox(height: 16),
 
@@ -690,7 +788,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: SelectableText(
-                    "অর্থ: $duaMeaning",
+                    "${_text('meaning', context)}: $duaMeaning",
                     style: TextStyle(
                       fontSize: _textFontSize,
                       color: isDark ? Colors.white : Colors.black,
@@ -703,7 +801,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 // Reference
                 if (duaReference.isNotEmpty)
                   SelectableText(
-                    "রেফারেন্স: $duaReference",
+                    "${_text('reference', context)}: $duaReference",
                     style: TextStyle(
                       fontSize: 14,
                       color: isDark ? Colors.green[200] : Colors.green[700],
@@ -720,9 +818,9 @@ class _DoyaListPageState extends State<DoyaListPage> {
                   children: [
                     // Copy button
                     ElevatedButton.icon(
-                      onPressed: () => _copyToClipboard(doya),
+                      onPressed: () => _copyToClipboard(doya, context),
                       icon: const Icon(Icons.copy, size: 18),
-                      label: const Text('কপি'),
+                      label: Text(_text('copy', context)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue[700],
                         foregroundColor: Colors.white,
@@ -741,12 +839,22 @@ class _DoyaListPageState extends State<DoyaListPage> {
                     // Share button
                     ElevatedButton.icon(
                       onPressed: () {
+                        final languageProvider = Provider.of<LanguageProvider>(
+                          context,
+                          listen: false,
+                        );
+                        final isEnglish = languageProvider.isEnglish;
+                        final meaningLabel = isEnglish ? 'Meaning' : 'অর্থ';
+                        final referenceLabel = isEnglish
+                            ? 'Reference'
+                            : 'রেফারেন্স';
+
                         Share.share(
-                          '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\nঅর্থ: $duaMeaning\n\nরেফারেন্স: $duaReference',
+                          '$duaTitle\n\n$duaArabic\n\n$duaTransliteration\n\n$meaningLabel: $duaMeaning\n\n$referenceLabel: $duaReference',
                         );
                       },
                       icon: const Icon(Icons.share, size: 18),
-                      label: const Text('শেয়ার'),
+                      label: Text(_text('share', context)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.categoryColor,
                         foregroundColor: Colors.white,
@@ -771,35 +879,35 @@ class _DoyaListPageState extends State<DoyaListPage> {
   }
 
   // লোডিং ইন্ডিকেটর বিল্ড করার মেথড
-  Widget _buildLoadingIndicator() {
-    return const Center(
+  Widget _buildLoadingIndicator(BuildContext context) {
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(),
-          SizedBox(height: 16),
-          Text('দোয়া লোড হচ্ছে...'),
+          const SizedBox(height: 16),
+          Text(_text('loading', context)),
         ],
       ),
     );
   }
 
   // এম্পটি স্টেট বিল্ড করার মেথড
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.search_off, size: 60, color: Colors.grey[400]),
           const SizedBox(height: 16),
-          const Text('কোন দোয়া পাওয়া যায়নি', style: TextStyle(fontSize: 18)),
+          Text(_text('noDuaFound', context), style: TextStyle(fontSize: 18)),
         ],
       ),
     );
   }
 
   // দোয়া লিস্ট বিল্ড করার মেথড
-  Widget _buildDoyaList() {
+  Widget _buildDoyaList(BuildContext context) {
     return ListView.builder(
       padding: EdgeInsets.symmetric(
         vertical: 16,
@@ -810,7 +918,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
         final doya = filteredDoyas[index];
 
         // Cache the widget to avoid rebuilds
-        final doyaCard = _buildDoyaCard(doya, index);
+        final doyaCard = _buildDoyaCard(doya, index, context);
 
         List<Widget> widgets = [doyaCard];
 
@@ -842,6 +950,8 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     // বিল্ড করার সময় ডিভাইস টাইপ চেক করুন
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkDeviceType();
@@ -862,10 +972,10 @@ class _DoyaListPageState extends State<DoyaListPage> {
             : TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'দোয়া অনুসন্ধান করুন...',
+                decoration: InputDecoration(
+                  hintText: _text('searchHint', context),
                   border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.white70),
+                  hintStyle: const TextStyle(color: Colors.white70),
                 ),
                 style: const TextStyle(color: Colors.white, fontSize: 18),
                 cursorColor: Colors.white,
@@ -893,7 +1003,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                   value: 'increase',
                   child: ListTile(
                     leading: const Icon(Icons.zoom_in),
-                    title: const Text('ফন্ট বড় করুন'),
+                    title: Text(_text('increaseFont', context)),
                     onTap: _increaseFontSize,
                   ),
                 ),
@@ -901,7 +1011,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                   value: 'decrease',
                   child: ListTile(
                     leading: const Icon(Icons.zoom_out),
-                    title: const Text('ফন্ট ছোট করুন'),
+                    title: Text(_text('decreaseFont', context)),
                     onTap: _decreaseFontSize,
                   ),
                 ),
@@ -909,7 +1019,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
                   value: 'reset',
                   child: ListTile(
                     leading: const Icon(Icons.restart_alt),
-                    title: const Text('ডিফল্ট ফন্ট সাইজ'),
+                    title: Text(_text('defaultFont', context)),
                     onTap: _resetFontSize,
                   ),
                 ),
@@ -933,10 +1043,10 @@ class _DoyaListPageState extends State<DoyaListPage> {
           children: [
             Expanded(
               child: _isLoading
-                  ? _buildLoadingIndicator()
+                  ? _buildLoadingIndicator(context)
                   : filteredDoyas.isEmpty
-                  ? _buildEmptyState()
-                  : _buildDoyaList(),
+                  ? _buildEmptyState(context)
+                  : _buildDoyaList(context),
             ),
 
             // ✅ Adaptive Bottom Banner Ad - SafeArea এর ভিতরে

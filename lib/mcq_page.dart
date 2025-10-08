@@ -1,4 +1,3 @@
-//mcq page
 // mcq_page.dart - Main UI Component
 import 'dart:async';
 import 'dart:math' as math;
@@ -9,6 +8,8 @@ import 'result_page.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'ad_helper.dart';
 import 'mcq_security_manager.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart'; // ✅ Language Provider import
 
 class MCQPage extends StatefulWidget {
   final String category;
@@ -22,6 +23,41 @@ class MCQPage extends StatefulWidget {
 }
 
 class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'questionProgress': {'en': 'Question', 'bn': 'প্রশ্ন'},
+    'time': {'en': 'Time', 'bn': 'সময়'},
+    'seconds': {'en': 'seconds', 'bn': 'সেকেন্ড'},
+    'questionLabel': {'en': 'Question:', 'bn': 'প্রশ্ন:'},
+    'nextQuestion': {'en': 'Next Question', 'bn': 'পরবর্তী প্রশ্ন'},
+    'viewResults': {'en': 'View Results', 'bn': 'ফলাফল দেখুন'},
+    'verifyAnswer': {'en': 'To verify the answer', 'bn': 'উত্তরটি যাচাই করতে'},
+    'searchGoogle': {'en': 'Search on Google', 'bn': 'গুগলে তথ্য যাচাই করুন'},
+    'timeUp': {'en': 'Time Up', 'bn': 'সময় শেষ'},
+    'timeUpMessage': {
+      'en': 'You could not answer in time.',
+      'bn': 'আপনি সময়মতো উত্তর দিতে পারেননি।',
+    },
+    'pointsEarned': {'en': 'points', 'bn': 'পয়েন্ট'},
+    'loadingQuiz': {'en': 'Loading quiz...', 'bn': 'কুইজ লোড হচ্ছে...'},
+    'loadingQuestions': {
+      'en': 'Loading questions...',
+      'bn': 'প্রশ্নগুলি লোড হচ্ছে...',
+    },
+    'pleaseWait': {'en': 'Please Wait', 'bn': 'অপেক্ষা করুন'},
+    'ok': {'en': 'OK', 'bn': 'ঠিক আছে'},
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
   // Security and Data Manager
   final MCQSecurityManager _securityManager = MCQSecurityManager();
 
@@ -76,6 +112,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     _audioPlayer.dispose();
     _bannerAd?.dispose();
     AdHelper.disposeInterstitialAd();
+    _securityManager.dispose(); // ✅ Security manager dispose করুন
     super.dispose();
   }
 
@@ -107,10 +144,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     });
   }
 
-  // অপ্টিমাইজড ভার্সন
   void _cancelAllTimers() {
     _timer?.cancel();
-    _timer = null; // মেমরি লিক প্রতিরোধ
+    _timer = null;
     _pointsNotificationTimer?.cancel();
     _pointsNotificationTimer = null;
   }
@@ -121,7 +157,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       await _audioPlayer.stop();
       await _audioPlayer.play(AssetSource('sounds/correct.mp3'));
     } catch (e) {
-      print('অডিও প্লেতে ত্রুটি: $e');
+      print('Audio play error: $e');
     }
   }
 
@@ -130,7 +166,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       await _audioPlayer.stop();
       await _audioPlayer.play(AssetSource('sounds/wrong.mp3'));
     } catch (e) {
-      print('অডিও প্লেতে ত্রুটি: $e');
+      print('Audio play error: $e');
     }
   }
 
@@ -201,9 +237,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   }
 
   // ==================== ADS METHODS ====================
-  // অপ্টিমাইজড ভার্সন
   Future<void> _reloadBannerOnOrientationChange() async {
-    // শুধুমাত্র প্রয়োজন时才 রিলোড
     if (_isBannerAdReady && _bannerAd != null) {
       _bannerAd?.dispose();
       _isBannerAdReady = false;
@@ -216,7 +250,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       bool canShowAd = await AdHelper.canShowBannerAd();
 
       if (!canShowAd) {
-        print('ব্যানার এড লিমিট রিচড, এড দেখানো হবে না');
+        print('Banner ad limit reached, not showing ad');
         return;
       }
 
@@ -227,24 +261,23 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             if (!mounted) return;
             setState(() => _isBannerAdReady = true);
             AdHelper.recordBannerAdShown();
-            print('ব্যানার এড সফলভাবে লোড হয়েছে');
+            print('Banner ad loaded successfully');
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
-            print('ব্যানার এড লোড হতে ব্যর্থ: $error');
+            print('Banner ad failed to load: $error');
             ad.dispose();
             if (mounted) {
               setState(() => _isBannerAdReady = false);
             }
-            // Fallback to regular banner
             _loadRegularBanner();
           },
           onAdOpened: (Ad ad) {
             AdHelper.canClickAd().then((canClick) {
               if (canClick) {
                 AdHelper.recordAdClick();
-                print('ব্যানার এড ক্লিক করা হয়েছে');
+                print('Banner ad clicked');
               } else {
-                print('এড ক্লিক লিমিট রিচড');
+                print('Ad click limit reached');
               }
             });
           },
@@ -254,7 +287,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
 
       await _bannerAd?.load();
     } catch (e) {
-      print('অ্যাডাপ্টিভ ব্যানার লোড করতে ত্রুটি: $e');
+      print('Error loading adaptive banner: $e');
       _loadRegularBanner();
     }
   }
@@ -268,10 +301,10 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             if (!mounted) return;
             setState(() => _isBannerAdReady = true);
             AdHelper.recordBannerAdShown();
-            print('নিয়মিত ব্যানার এড সফলভাবে লোড হয়েছে');
+            print('Regular banner ad loaded successfully');
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
-            print('নিয়মিত ব্যানার এড লোড হতে ব্যর্থ: $error');
+            print('Regular banner ad failed to load: $error');
             ad.dispose();
             if (mounted) {
               setState(() => _isBannerAdReady = false);
@@ -281,9 +314,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             AdHelper.canClickAd().then((canClick) {
               if (canClick) {
                 AdHelper.recordAdClick();
-                print('ব্যানার এড ক্লিক করা হয়েছে');
+                print('Banner ad clicked');
               } else {
-                print('এড ক্লিক লিমিট রিচড');
+                print('Ad click limit reached');
               }
             });
           },
@@ -292,21 +325,21 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
 
       _bannerAd?.load();
     } catch (e) {
-      print('নিয়মিত ব্যানার লোড করতে ত্রুটি: $e');
+      print('Error loading regular banner: $e');
     }
   }
 
   void _showInterstitialAd() {
     AdHelper.showInterstitialAd(
       onAdShowed: () {
-        print('অর্ধেক পথে ইন্টারস্টিশিয়াল এড দেখানো হয়েছে');
+        print('Halfway interstitial ad shown');
       },
       onAdDismissed: () {
-        print('ইন্টারস্টিশিয়াল এড dismiss করা হয়েছে');
+        print('Interstitial ad dismissed');
         AdHelper.loadInterstitialAd();
       },
       onAdFailedToShow: () {
-        print('অর্ধেক পথে ইন্টারস্টিশিয়াল এড দেখাতে ব্যর্থ');
+        print('Halfway interstitial ad failed to show');
         AdHelper.loadInterstitialAd();
       },
       adContext: 'MCQPage_Halfway',
@@ -316,7 +349,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   void _showAdThenNavigate() {
     AdHelper.showInterstitialAd(
       onAdShowed: () {
-        print('ফাইনাল ইন্টারস্টিশিয়াল এড দেখানো হয়েছে');
+        print('Final interstitial ad shown');
       },
       onAdDismissed: () {
         if (mounted) {
@@ -357,15 +390,15 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text("সময় শেষ"),
-        content: const Text("আপনি সময়মতো উত্তর দিতে পারেননি।"),
+        title: Text(_text('timeUp', context)),
+        content: Text(_text('timeUpMessage', context)),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               goToNextQuestion();
             },
-            child: const Text("পরবর্তী প্রশ্ন"),
+            child: Text(_text('nextQuestion', context)),
           ),
         ],
       ),
@@ -429,7 +462,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'প্রশ্ন ${currentQuestionIndex + 1}/${_securityManager.questions.length}',
+            '${_text('questionProgress', context)} ${currentQuestionIndex + 1}/${_securityManager.questions.length}',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: screenWidth < 360 ? 14 : 17.6,
@@ -502,7 +535,11 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                           SizedBox(height: screenHeight * 0.022),
 
                           // Next Button - Increased by 10%
-                          _buildNextButton(screenHeight, responsiveFontSize),
+                          _buildNextButton(
+                            screenHeight,
+                            responsiveFontSize,
+                            context,
+                          ),
 
                           SizedBox(height: screenHeight * 0.022),
 
@@ -514,6 +551,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                               screenWidth,
                               responsiveFontSize,
                               question,
+                              context,
                             ),
                         ],
                       ),
@@ -539,6 +577,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 screenHeight,
                 responsiveFontSize,
                 question,
+                context,
               ),
           ],
         ),
@@ -546,38 +585,37 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     );
   }
 
-  // MCQPage.dart - Call immediate recording
-  // MCQPage.dart - _initializeQuiz মেথডে এড করুন
   Future<void> _initializeQuiz() async {
     try {
-      // Initialize security manager and load questions
+      // ✅ PointManager কে current language সেট করুন
+      final languageProvider = Provider.of<LanguageProvider>(
+        context,
+        listen: false,
+      );
+      await PointManager().setLanguage(languageProvider.currentLanguage);
+
       await _securityManager.initialize(
         category: widget.category,
         quizId: widget.quizId,
+        context: context,
       );
 
-      // 🔥 DEBUG SECURITY STATUS
-      //await PointManager.debugSecurityStatus(widget.quizId);
-      // আপনার অ্যাপে কোথাও কল করুন
-      //------------------------
-      // Load ads
       AdHelper.loadInterstitialAd();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _loadAdaptiveBanner();
       });
 
-      // Start timer if questions are loaded
       if (_securityManager.questions.isNotEmpty &&
           _securityManager.quizStarted) {
         startTimer();
       }
     } catch (e) {
-      print('❌ কুইজ ইনিশিয়ালাইজেশনে ত্রুটি: $e');
-      _showErrorDialog(e.toString());
+      print('❌ Quiz initialization error: $e');
+      _showErrorDialog(e.toString(), context);
     }
   }
 
-  void _showErrorDialog(String message) {
+  void _showErrorDialog(String message, BuildContext context) {
     if (!mounted) return;
 
     showDialog(
@@ -616,7 +654,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 ),
                 child: Column(
                   children: [
-                    // Animated Icon
                     Container(
                       width: 70,
                       height: 70,
@@ -631,10 +668,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    // Title
-                    const Text(
-                      "অপেক্ষা করুন",
-                      style: TextStyle(
+                    Text(
+                      _text('pleaseWait', context),
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.deepOrange,
@@ -702,9 +738,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 15),
                         ),
-                        child: const Text(
-                          "ঠিক আছে",
-                          style: TextStyle(
+                        child: Text(
+                          _text('ok', context),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -741,15 +777,15 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 13.2),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 13.2),
             Text(
-              'কুইজ লোড হচ্ছে...',
-              style: TextStyle(
+              _text('loadingQuiz', context),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 15.4,
                 fontWeight: FontWeight.bold,
@@ -764,9 +800,12 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   Widget _buildErrorScreen() {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'লোড হচ্ছে...',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          _text('loadingQuiz', context),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: primaryColor,
         elevation: 0,
@@ -780,15 +819,18 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
+            const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
             ),
-            SizedBox(height: 13.2),
-            Text('প্রশ্নগুলি লোড হচ্ছে...', style: TextStyle(fontSize: 15.4)),
+            const SizedBox(height: 13.2),
+            Text(
+              _text('loadingQuestions', context),
+              style: const TextStyle(fontSize: 15.4),
+            ),
           ],
         ),
       ),
@@ -832,7 +874,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'প্রশ্ন ${currentQuestionIndex + 1}',
+                        '${_text('questionProgress', context)} ${currentQuestionIndex + 1}',
                         style: TextStyle(
                           fontSize: responsiveFontSize,
                           fontWeight: FontWeight.bold,
@@ -840,7 +882,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                         ),
                       ),
                       Text(
-                        '${_securityManager.questions.length} এর ${((currentQuestionIndex + 1) / _securityManager.questions.length * 100).toStringAsFixed(0)}%',
+                        '${((currentQuestionIndex + 1) / _securityManager.questions.length * 100).toStringAsFixed(0)}% of ${_securityManager.questions.length}',
                         style: TextStyle(
                           fontSize: responsiveFontSize - 1,
                           color: primaryColor,
@@ -874,6 +916,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             screenWidth,
             isTablet,
             responsiveFontSize,
+            context,
           ),
         ],
       ),
@@ -885,6 +928,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     double screenWidth,
     bool isTablet,
     double responsiveFontSize,
+    BuildContext context,
   ) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -919,7 +963,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'সময়',
+                    _text('time', context),
                     style: TextStyle(
                       fontSize: isTablet
                           ? responsiveFontSize - 2
@@ -928,7 +972,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     ),
                   ),
                   Text(
-                    '$_timeLeft সেকেন্ড',
+                    '$_timeLeft ${_text('seconds', context)}',
                     style: TextStyle(
                       fontSize: isTablet
                           ? responsiveFontSize
@@ -1056,7 +1100,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
               ],
             ),
             child: Text(
-              'প্রশ্ন:',
+              _text('questionLabel', context),
               style: TextStyle(
                 fontSize: isTablet
                     ? responsiveFontSize + 1
@@ -1075,7 +1119,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
           ),
           Expanded(
             child: Text(
-              question['question'] ?? 'প্রশ্ন লোড হয়নি',
+              question['question'] ?? 'Question not loaded',
               style: TextStyle(
                 fontSize: isTablet
                     ? responsiveFontSize + 0.2
@@ -1107,6 +1151,13 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     bool isSmallPhone,
     double responsiveFontSize,
   ) {
+    // Language provider থেকে ভাষা চেক করুন
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final bool isEnglish = languageProvider.isEnglish;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final double screenHeight = constraints.maxHeight;
@@ -1285,7 +1336,15 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                           ),
                           child: Center(
                             child: Text(
-                              ['ক', 'খ', 'গ', 'ঘ'][index],
+                              isEnglish
+                                  ? [
+                                      'A',
+                                      'B',
+                                      'C',
+                                      'D',
+                                    ][index] // English: A, B, C, D
+                                  : ['ক', 'খ', 'গ', 'ঘ'][index],
+                              // Bengali: ক, খ, গ, ঘ
                               style: TextStyle(
                                 fontSize: isSmallPhone
                                     ? 10
@@ -1358,7 +1417,11 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildNextButton(double screenHeight, double responsiveFontSize) {
+  Widget _buildNextButton(
+    double screenHeight,
+    double responsiveFontSize,
+    BuildContext context,
+  ) {
     final bool isLargeScreen =
         MediaQuery.of(context).size.width > 600 ||
         MediaQuery.of(context).size.height > 700;
@@ -1388,8 +1451,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
           fit: BoxFit.scaleDown,
           child: Text(
             currentQuestionIndex < _securityManager.questions.length - 1
-                ? 'পরবর্তী প্রশ্ন'
-                : 'ফলাফল দেখুন',
+                ? _text('nextQuestion', context)
+                : _text('viewResults', context),
             textAlign: TextAlign.center,
           ),
         ),
@@ -1403,6 +1466,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     double screenWidth,
     double responsiveFontSize,
     dynamic question,
+    BuildContext context,
   ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 13.2),
@@ -1421,7 +1485,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 11),
                   child: Text(
-                    'উত্তরটি যাচাই করতে',
+                    _text('verifyAnswer', context),
                     style: TextStyle(
                       fontSize: responsiveFontSize - 4,
                       fontWeight: FontWeight.w500,
@@ -1474,7 +1538,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 size: responsiveFontSize - 1,
                 color: isDarkMode ? Colors.blue[300] : Colors.blue[600],
               ),
-              label: const Text('গুগলে তথ্য যাচাই করুন'),
+              label: Text(_text('searchGoogle', context)),
             ),
           ),
         ],
@@ -1487,6 +1551,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     double screenHeight,
     double responsiveFontSize,
     dynamic question,
+    BuildContext context,
   ) {
     return Positioned(
       top: MediaQuery.of(context).padding.top + 66,
@@ -1527,8 +1592,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
               SizedBox(width: screenWidth * 0.0165),
               Text(
                 selectedOption == question['answer']
-                    ? '+$_earnedPointsForNotification পয়েন্ট ✅'
-                    : '+$_earnedPointsForNotification পয়েন্ট 👍',
+                    ? '+$_earnedPointsForNotification ${_text('pointsEarned', context)} ✅'
+                    : '+$_earnedPointsForNotification ${_text('pointsEarned', context)} 👍',
                 style: TextStyle(
                   fontSize: responsiveFontSize - 1,
                   fontWeight: FontWeight.bold,

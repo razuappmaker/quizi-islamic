@@ -1,10 +1,11 @@
-// Sura page - Fixed bottom padding issue
-// sura_page.dart (আপডেটেড - ফিক্সড বটম প্যাডিং ইস্যু)
+// sura_page.dart (আপডেটেড - মাল্টি-ল্যাঙ্গুয়েজ সাপোর্ট সহ)
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 import 'json_loader.dart';
 import 'ad_helper.dart';
 import 'word_by_word_quran_page.dart';
+import '../providers/language_provider.dart';
 
 class SuraPage extends StatefulWidget {
   const SuraPage({Key? key}) : super(key: key);
@@ -27,6 +28,59 @@ class _SuraPageState extends State<SuraPage> {
   BannerAd? _anchorAd;
   bool _isAnchorAdReady = false;
   bool _showAnchorAd = true;
+
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'pageTitle': {'en': 'Holy Surahs', 'bn': 'পবিত্র সুরাসমূহ'},
+    'loading': {'en': 'Loading Surahs...', 'bn': 'সুরা লোড হচ্ছে...'},
+    'noSuraFound': {'en': 'No Surahs Found', 'bn': 'কোন সুরা পাওয়া যায়নি'},
+    'wordByWordQuran': {'en': 'Word by Word Quran', 'bn': 'শব্দে শব্দে কুরআন'},
+    'fontSize': {'en': 'Font Size', 'bn': 'ফন্ট সাইজ'},
+    'decreaseFont': {'en': 'Decrease font', 'bn': 'ফন্ট ছোট করুন'},
+    'defaultFont': {'en': 'Default font size', 'bn': 'ডিফল্ট ফন্ট সাইজ'},
+    'increaseFont': {'en': 'Increase font', 'bn': 'ফন্ট বড় করুন'},
+    'importantWarning': {
+      'en': 'Important Warning',
+      'bn': 'গুরুত্বপূর্ণ সতর্কবার্তা',
+    },
+    'warningTitle': {'en': 'Bengali Pronunciation', 'bn': 'বাংলা উচ্চরণ'},
+    'warningContent1': {
+      'en':
+          'When reading Quranic verses or Arabic prayers in Bengali pronunciation, ',
+      'bn': 'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে ',
+    },
+    'warningContent2': {
+      'en': 'meaning distortion often occurs',
+      'bn': 'অনেক সময় অর্থের বিকৃতি ঘটে',
+    },
+    'warningContent3': {
+      'en': '. So take this pronunciation only as a helper.',
+      'bn': '। তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন।',
+    },
+    'warningContent4': {
+      'en':
+          'Let us learn to read the Quran correctly. Learning to read the Quran correctly is obligatory for every Muslim.',
+      'bn':
+          'আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি। শুদ্ধ করে কুরআন শিক্ষা করা প্রত্যেক মুসলিমের উপর ফরজ।',
+    },
+    'understoodThanks': {'en': 'Understood, Thanks', 'bn': 'বুঝেছি, ধন্যবাদ'},
+    'meaning': {'en': 'Meaning', 'bn': 'অর্থ'},
+    'source': {'en': 'Source', 'bn': 'সূত্র'},
+    'makki': {'en': 'Makki', 'bn': 'মাক্কি'},
+    'madani': {'en': 'Madani', 'bn': 'মাদিনী'},
+    'verses': {'en': 'verses', 'bn': 'আয়াত'},
+    'close': {'en': 'Close', 'bn': 'বন্ধ'},
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
 
   @override
   void initState() {
@@ -74,9 +128,17 @@ class _SuraPageState extends State<SuraPage> {
   //-----------------------------------------
   Future<void> _loadSuraData() async {
     try {
-      final loadedData = await JsonLoader.loadJsonList(
-        'assets/daily_suras.json',
+      final languageProvider = Provider.of<LanguageProvider>(
+        context,
+        listen: false,
       );
+
+      // ভাষা অনুযায়ী JSON ফাইল সিলেক্ট করুন
+      final String jsonFile = languageProvider.isEnglish
+          ? 'assets/en_daily_suras.json'
+          : 'assets/daily_suras.json';
+
+      final loadedData = await JsonLoader.loadJsonList(jsonFile);
 
       final List<Map<String, dynamic>> convertedData = loadedData
           .map<Map<String, dynamic>>((item) => Map<String, dynamic>.from(item))
@@ -88,26 +150,45 @@ class _SuraPageState extends State<SuraPage> {
       });
     } catch (e) {
       debugPrint('Error loading sura data: $e');
+      // Fallback data
       setState(() {
         _isLoading = false;
-        dailySuras = [
-          {
-            'title': 'সূরা আল ফাতিহা - الفاتحة',
-            'serial': 1,
-            'type': 'মাক্কি',
-            'ayat_count': 7,
-            'ayat': [
-              {
-                'arabic': 'بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ',
-                'transliteration': 'বিসমিল্লাহির রাহমানির রাহিম',
-                'meaning': 'পরম করুণাময়, পরম দয়ালু আল্লাহর নামে।',
-              },
-            ],
-            'reference': 'কুরআন, সূরা আল ফাতিহা, আয়াত ১-৭',
-          },
-        ];
+        dailySuras = _getFallbackData();
       });
     }
+  }
+
+  List<Map<String, dynamic>> _getFallbackData() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final isEnglish = languageProvider.isEnglish;
+
+    return [
+      {
+        'title': isEnglish
+            ? 'Surah Al-Fatihah - الفاتحة'
+            : 'সূরা আল ফাতিহা - الفاتحة',
+        'serial': 1,
+        'type': isEnglish ? 'Makki' : 'মাক্কি',
+        'ayat_count': 7,
+        'ayat': [
+          {
+            'arabic': 'بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ',
+            'transliteration': isEnglish
+                ? 'Bismillahir Rahmanir Rahim'
+                : 'বিসমিল্লাহির রাহমানির রাহিম',
+            'meaning': isEnglish
+                ? 'In the name of Allah, the Most Gracious, the Most Merciful.'
+                : 'পরম করুণাময়, পরম দয়ালু আল্লাহর নামে।',
+          },
+        ],
+        'reference': isEnglish
+            ? 'Quran, Surah Al-Fatihah, Verses 1-7'
+            : 'কুরআন, সূরা আল ফাতিহা, আয়াত ১-৭',
+      },
+    ];
   }
 
   void _increaseFontSize() {
@@ -236,7 +317,7 @@ class _SuraPageState extends State<SuraPage> {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'গুরুত্বপূর্ণ সতর্কবার্তা',
+                      _text('importantWarning', context),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -255,19 +336,13 @@ class _SuraPageState extends State<SuraPage> {
                       height: 1.6,
                       color: _getSecondaryTextColor(context),
                     ),
-                    children: const [
+                    children: [
+                      TextSpan(text: _text('warningContent1', context)),
                       TextSpan(
-                        text:
-                            'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে ',
-                      ),
-                      TextSpan(
-                        text: 'অনেক সময় অর্থের বিকৃতি ঘটে',
+                        text: _text('warningContent2', context),
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
-                      TextSpan(
-                        text:
-                            '। তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন।',
-                      ),
+                      TextSpan(text: _text('warningContent3', context)),
                     ],
                   ),
                   textAlign: TextAlign.justify,
@@ -288,7 +363,7 @@ class _SuraPageState extends State<SuraPage> {
                     ),
                     Expanded(
                       child: Text(
-                        'আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি। শুদ্ধ করে কুরআন শিক্ষা করা প্রত্যেক মুসলিমের উপর ফরজ।',
+                        _text('warningContent4', context),
                         style: TextStyle(
                           fontSize: 14.5,
                           height: 1.6,
@@ -339,7 +414,7 @@ class _SuraPageState extends State<SuraPage> {
                         ],
                       ),
                       child: Text(
-                        'বুঝেছি, ধন্যবাদ',
+                        _text('understoodThanks', context),
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -389,7 +464,7 @@ class _SuraPageState extends State<SuraPage> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'বাংলা উচ্চরণ',
+                      _text('warningTitle', context),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -412,6 +487,14 @@ class _SuraPageState extends State<SuraPage> {
         sura['ayat_count'] ?? (sura['ayat'] as List?)?.length ?? 0;
     final title = sura['title'] ?? '';
     final bool isExpanded = expandedIndices.contains(index);
+
+    // Convert type based on language
+    String displayType = type;
+    if (type == 'মাক্কি') {
+      displayType = _text('makki', context);
+    } else if (type == 'মাদিনী') {
+      displayType = _text('madani', context);
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -478,7 +561,7 @@ class _SuraPageState extends State<SuraPage> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: type == 'মাক্কি'
+                        color: type == 'মাক্কি' || type == 'Makki'
                             ? (Theme.of(context).brightness == Brightness.dark
                                   ? Color(0xFFFFB74D)
                                   : Color(0xFFFFA000))
@@ -488,7 +571,7 @@ class _SuraPageState extends State<SuraPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        type,
+                        displayType,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -525,7 +608,7 @@ class _SuraPageState extends State<SuraPage> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '$ayatCount আয়াত',
+                            '$ayatCount ${_text('verses', context)}',
                             style: TextStyle(
                               color: _getHeaderTextColor(context),
                               fontSize: 12,
@@ -642,7 +725,7 @@ class _SuraPageState extends State<SuraPage> {
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        'ফন্ট সাইজ',
+                                        _text('fontSize', context),
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
@@ -718,17 +801,17 @@ class _SuraPageState extends State<SuraPage> {
                                       _buildFontSizeButton(
                                         icon: Icons.zoom_out_rounded,
                                         onPressed: _decreaseFontSize,
-                                        tooltip: 'ফন্ট ছোট করুন',
+                                        tooltip: _text('decreaseFont', context),
                                       ),
                                       _buildFontSizeButton(
                                         icon: Icons.restart_alt_rounded,
                                         onPressed: _resetFontSize,
-                                        tooltip: 'ডিফল্ট ফন্ট সাইজ',
+                                        tooltip: _text('defaultFont', context),
                                       ),
                                       _buildFontSizeButton(
                                         icon: Icons.zoom_in_rounded,
                                         onPressed: _increaseFontSize,
-                                        tooltip: 'ফন্ট বড় করুন',
+                                        tooltip: _text('increaseFont', context),
                                       ),
                                     ],
                                   ),
@@ -757,7 +840,7 @@ class _SuraPageState extends State<SuraPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
                                     children: [
-                                      // আরবি টেক্সট
+                                      // আরবি টেক্সট (সবসময় আরবি থাকে)
                                       Directionality(
                                         textDirection: TextDirection.rtl,
                                         child: SelectableText(
@@ -797,7 +880,7 @@ class _SuraPageState extends State<SuraPage> {
 
                                       const SizedBox(height: 12),
 
-                                      // উচ্চারণ
+                                      // উচ্চারণ (ভাষা অনুযায়ী পরিবর্তন হবে)
                                       SelectableText(
                                         ay['transliteration'] ?? '',
                                         style: TextStyle(
@@ -814,9 +897,9 @@ class _SuraPageState extends State<SuraPage> {
 
                                       const SizedBox(height: 12),
 
-                                      // অর্থ
+                                      // অর্থ (ভাষা অনুযায়ী পরিবর্তন হবে)
                                       SelectableText(
-                                        'অর্থ: ${ay['meaning'] ?? ''}',
+                                        '${_text('meaning', context)}: ${ay['meaning'] ?? ''}',
                                         style: TextStyle(
                                           fontSize: _fontSize,
                                           color: _getSecondaryTextColor(
@@ -864,7 +947,7 @@ class _SuraPageState extends State<SuraPage> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: SelectableText(
-                                        'সূত্র: ${sura['reference']}',
+                                        '${_text('source', context)}: ${sura['reference']}',
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontStyle: FontStyle.italic,
@@ -911,13 +994,13 @@ class _SuraPageState extends State<SuraPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final languageProvider = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: _getPrimaryColor(context),
-        title: const Text(
-          'পবিত্র সুরাসমূহ',
+        title: Text(
+          _text('pageTitle', context),
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
@@ -946,8 +1029,8 @@ class _SuraPageState extends State<SuraPage> {
                 size: 18,
                 color: Colors.white,
               ),
-              label: const Text(
-                "শব্দে শব্দে কুরআন",
+              label: Text(
+                _text('wordByWordQuran', context),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -992,7 +1075,7 @@ class _SuraPageState extends State<SuraPage> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'সুরা লোড হচ্ছে...',
+                              _text('loading', context),
                               style: TextStyle(
                                 color: _getSecondaryTextColor(context),
                                 fontSize: 16,
@@ -1013,7 +1096,7 @@ class _SuraPageState extends State<SuraPage> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'কোন সুরা পাওয়া যায়নি',
+                              _text('noSuraFound', context),
                               style: TextStyle(
                                 color: _getSecondaryTextColor(context),
                                 fontSize: 16,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 import 'tasbeeh_stats_page.dart';
 import 'ad_helper.dart';
+import '../providers/language_provider.dart';
 
 class TasbeehPage extends StatefulWidget {
   const TasbeehPage({Key? key}) : super(key: key);
@@ -12,6 +14,51 @@ class TasbeehPage extends StatefulWidget {
 }
 
 class _TasbeehPageState extends State<TasbeehPage> {
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'pageTitle': {'en': 'Digital Tasbeeh', 'bn': 'ডিজিটাল তসবীহ'},
+    'subhanallah': {'en': 'Subhanallah', 'bn': 'সুবহানাল্লাহ'},
+    'alhamdulillah': {'en': 'Alhamdulillah', 'bn': 'আলহামদুলিল্লাহা'},
+    'allahuAkbar': {'en': 'Allahu Akbar', 'bn': 'আল্লাহু আকবার'},
+    'currentSession': {'en': 'Current Session', 'bn': 'বর্তমান সেশন'},
+    'totalZikr': {'en': 'Total Zikr', 'bn': 'মোট জিকির'},
+    'resetSession': {'en': 'Reset Session', 'bn': 'সেশন রিসেট'},
+    'lifetimeStats': {'en': 'Lifetime Stats', 'bn': 'লাইফটাইম স্ট্যাটস'},
+    'resetAll': {'en': 'Reset All', 'bn': 'সম্পূর্ণ রিসেট'},
+    'lightMode': {'en': 'Light Mode', 'bn': 'লাইট মোড'},
+    'darkMode': {'en': 'Dark Mode', 'bn': 'ডার্ক মোড'},
+    'zikrBenefits': {'en': 'Benefits of Zikr', 'bn': 'জিকিরের ফজিলত'},
+    'benefitContent': {
+      'en':
+          "The Prophet Muhammad ﷺ said: 'Indeed, the remembrance of Allah brings peace to the heart.'",
+      'bn':
+          "রাসূলুল্লাহ ﷺ বলেছেন: 'নিশ্চয়ই আল্লাহর স্মরণ (জিকির) হৃদয়কে শান্ত করে।'",
+    },
+    'peaceAndHappiness': {
+      'en': 'Peace and happiness of mind',
+      'bn': 'সুখ ও মনের প্রশান্তি লাভ',
+    },
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
+  // তসবীহ বাক্য গুলো ভাষা অনুযায়ী
+  List<String> getTasbeehPhrases(BuildContext context) {
+    return [
+      _text('subhanallah', context),
+      _text('alhamdulillah', context),
+      _text('allahuAkbar', context),
+    ];
+  }
+
   String selectedPhrase = "সুবহানাল্লাহ";
   int subhanallahCount = 0;
   int alhamdulillahCount = 0;
@@ -25,8 +72,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
   bool _isDarkMode = false;
 
   final Map<String, String> benefits = {
-    "সুখ ও মনের প্রশান্তি লাভ":
-        "রাসূলুল্লাহ ﷺ বলেছেন: 'নিশ্চয়ই আল্লাহর স্মরণ (জিকির) হৃদয়কে শান্ত করে।'",
+    "peaceAndHappiness": _texts['benefitContent']!['en']!,
   };
 
   BannerAd? _bannerAd;
@@ -37,7 +83,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
     super.initState();
     _loadSavedData();
     _loadBannerAd();
-    _updateBackgroundColor("সুবহানাল্লাহ");
+    _updateBackgroundColor(selectedPhrase);
     _loadThemePreference();
   }
 
@@ -116,23 +162,26 @@ class _TasbeehPageState extends State<TasbeehPage> {
   }
 
   int _getCurrentCount() {
-    if (selectedPhrase == "সুবহানাল্লাহ") return uiSubhanallahCount;
-    if (selectedPhrase == "আলহামদুলিল্লাহা") return uiAlhamdulillahCount;
-    if (selectedPhrase == "আল্লাহু আকবার") return uiAllahuakbarCount;
+    if (selectedPhrase == _text('subhanallah', context))
+      return uiSubhanallahCount;
+    if (selectedPhrase == _text('alhamdulillah', context))
+      return uiAlhamdulillahCount;
+    if (selectedPhrase == _text('allahuAkbar', context))
+      return uiAllahuakbarCount;
     return 0;
   }
 
   void _updateBackgroundColor(String phrase) {
     setState(() {
-      if (phrase == "সুবহানাল্লাহ") {
+      if (phrase == _text('subhanallah', context)) {
         _backgroundColor = _isDarkMode
             ? Colors.green.shade900.withOpacity(0.3)
             : Colors.green.shade100;
-      } else if (phrase == "আলহামদুলিল্লাহা") {
+      } else if (phrase == _text('alhamdulillah', context)) {
         _backgroundColor = _isDarkMode
             ? Colors.blue.shade900.withOpacity(0.3)
             : Colors.blue.shade100;
-      } else if (phrase == "আল্লাহু আকবার") {
+      } else if (phrase == _text('allahuAkbar', context)) {
         _backgroundColor = _isDarkMode
             ? Colors.orange.shade900.withOpacity(0.3)
             : Colors.orange.shade100;
@@ -146,17 +195,17 @@ class _TasbeehPageState extends State<TasbeehPage> {
       selectedPhrase = phrase;
       _updateBackgroundColor(phrase);
 
-      if (phrase == "সুবহানাল্লাহ") {
+      if (phrase == _text('subhanallah', context)) {
         uiSubhanallahCount++;
         subhanallahCount++;
         prefs.setInt("subhanallahCount", subhanallahCount);
       }
-      if (phrase == "আলহামদুলিল্লাহা") {
+      if (phrase == _text('alhamdulillah', context)) {
         uiAlhamdulillahCount++;
         alhamdulillahCount++;
         prefs.setInt("alhamdulillahCount", alhamdulillahCount);
       }
-      if (phrase == "আল্লাহু আকবার") {
+      if (phrase == _text('allahuAkbar', context)) {
         uiAllahuakbarCount++;
         allahuakbarCount++;
         prefs.setInt("allahuakbarCount", allahuakbarCount);
@@ -179,8 +228,8 @@ class _TasbeehPageState extends State<TasbeehPage> {
       prefs.setInt("alhamdulillahCount", 0);
       prefs.setInt("allahuakbarCount", 0);
 
-      selectedPhrase = "সুবহানাল্লাহ";
-      _updateBackgroundColor("সুবহানাল্লাহ");
+      selectedPhrase = _text('subhanallah', context);
+      _updateBackgroundColor(_text('subhanallah', context));
     });
   }
 
@@ -189,15 +238,15 @@ class _TasbeehPageState extends State<TasbeehPage> {
       uiSubhanallahCount = 0;
       uiAlhamdulillahCount = 0;
       uiAllahuakbarCount = 0;
-      selectedPhrase = "সুবহানাল্লাহ";
-      _updateBackgroundColor("সুবহানাল্লাহ");
+      selectedPhrase = _text('subhanallah', context);
+      _updateBackgroundColor(_text('subhanallah', context));
     });
   }
 
   int _getCountForPhrase(String phrase) {
-    if (phrase == "সুবহানাল্লাহ") return uiSubhanallahCount;
-    if (phrase == "আলহামদুলিল্লাহা") return uiAlhamdulillahCount;
-    if (phrase == "আল্লাহু আকবার") return uiAllahuakbarCount;
+    if (phrase == _text('subhanallah', context)) return uiSubhanallahCount;
+    if (phrase == _text('alhamdulillah', context)) return uiAlhamdulillahCount;
+    if (phrase == _text('allahuAkbar', context)) return uiAllahuakbarCount;
     return 0;
   }
 
@@ -215,11 +264,8 @@ class _TasbeehPageState extends State<TasbeehPage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> tasbeehPhrases = [
-      "সুবহানাল্লাহ",
-      "আলহামদুলিল্লাহা",
-      "আল্লাহু আকবার",
-    ];
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final tasbeehPhrases = getTasbeehPhrases(context);
     final List<Color> colors = [
       Colors.green.shade700,
       Colors.blue.shade700,
@@ -261,8 +307,8 @@ class _TasbeehPageState extends State<TasbeehPage> {
             ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            "ডিজিটাল তসবীহ",
+          title: Text(
+            _text('pageTitle', context),
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 18,
@@ -270,7 +316,6 @@ class _TasbeehPageState extends State<TasbeehPage> {
             ),
           ),
           backgroundColor: Colors.green[800],
-          //centerTitle: true,
           elevation: 2,
           leading: Container(
             margin: EdgeInsets.all(8),
@@ -280,16 +325,16 @@ class _TasbeehPageState extends State<TasbeehPage> {
             ),
             child: IconButton(
               icon: Icon(
-                Icons.arrow_back_rounded, // একই আইকন
+                Icons.arrow_back_rounded,
                 color: Colors.white,
-                size: 20, // একই সাইজ
+                size: 20,
               ),
               onPressed: () {
                 if (Navigator.canPop(context)) {
                   Navigator.pop(context);
                 }
               },
-              splashRadius: 20, // একই স্প্ল্যাশ রেডিয়াস
+              splashRadius: 20,
             ),
           ),
           actions: [
@@ -300,7 +345,9 @@ class _TasbeehPageState extends State<TasbeehPage> {
                 size: 22,
               ),
               onPressed: _toggleDarkMode,
-              tooltip: _isDarkMode ? "লাইট মোড" : "ডার্ক মোড",
+              tooltip: _isDarkMode
+                  ? _text('lightMode', context)
+                  : _text('darkMode', context),
             ),
             PopupMenuButton<String>(
               icon: Icon(Icons.more_vert, color: Colors.white, size: 22),
@@ -311,7 +358,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                     children: [
                       Icon(Icons.refresh, size: 20, color: Colors.green),
                       SizedBox(width: 8),
-                      Text("বর্তমান সেশন রিসেট"),
+                      Text(_text('resetSession', context)),
                     ],
                   ),
                 ),
@@ -321,7 +368,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                     children: [
                       Icon(Icons.delete_forever, size: 20, color: Colors.red),
                       SizedBox(width: 8),
-                      Text("সম্পূর্ণ রিসেট"),
+                      Text(_text('resetAll', context)),
                     ],
                   ),
                 ),
@@ -408,7 +455,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                         ),
                                         SizedBox(width: 6),
                                         Text(
-                                          "বর্তমান সেশন",
+                                          _text('currentSession', context),
                                           style: TextStyle(
                                             fontSize: 14,
                                             color: _isDarkMode
@@ -421,7 +468,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
-                                      "মোট জিকির: ${_getTotalCount()}",
+                                      "${_text('totalZikr', context)}: ${_getTotalCount()}",
                                       style: TextStyle(
                                         fontSize: 15,
                                         color: _isDarkMode
@@ -461,6 +508,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                     darkColor: darkColor,
                                     count: _getCountForPhrase(phrase),
                                     isSelected: selectedPhrase == phrase,
+                                    context: context,
                                   ),
                                 );
                               }).toList(),
@@ -471,8 +519,8 @@ class _TasbeehPageState extends State<TasbeehPage> {
                           Container(
                             width: contentWidth,
                             child: _buildBenefitCard(
-                              "জিকিরের ফজিলত",
-                              benefits["সুখ ও মনের প্রশান্তি লাভ"] ?? "",
+                              _text('zikrBenefits', context),
+                              _text('benefitContent', context),
                               context,
                             ),
                           ),
@@ -517,17 +565,18 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                     Expanded(
                                       child: _buildActionButton(
                                         icon: Icons.refresh,
-                                        text: "সেশন রিসেট",
+                                        text: _text('resetSession', context),
                                         color: Colors.orange,
                                         onPressed: _resetUICounts,
                                         isSmall: true,
+                                        context: context,
                                       ),
                                     ),
                                     SizedBox(width: 8),
                                     Expanded(
                                       child: _buildActionButton(
                                         icon: Icons.bar_chart,
-                                        text: "লাইফটাইম স্ট্যাটস",
+                                        text: _text('lifetimeStats', context),
                                         color: Colors.blue,
                                         onPressed: () {
                                           Navigator.push(
@@ -539,6 +588,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                           );
                                         },
                                         isSmall: true,
+                                        context: context,
                                       ),
                                     ),
                                   ],
@@ -550,17 +600,18 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                 Expanded(
                                   child: _buildActionButton(
                                     icon: Icons.refresh,
-                                    text: "সেশন রিসেট",
+                                    text: _text('resetSession', context),
                                     color: Colors.orange,
                                     onPressed: _resetUICounts,
                                     isSmall: false,
+                                    context: context,
                                   ),
                                 ),
                                 SizedBox(width: 12),
                                 Expanded(
                                   child: _buildActionButton(
                                     icon: Icons.bar_chart,
-                                    text: "লাইফটাইম স্ট্যাটস",
+                                    text: _text('lifetimeStats', context),
                                     color: Colors.blue,
                                     onPressed: () {
                                       Navigator.push(
@@ -572,6 +623,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
                                       );
                                     },
                                     isSmall: false,
+                                    context: context,
                                   ),
                                 ),
                               ],
@@ -603,6 +655,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
     required Color darkColor,
     required int count,
     required bool isSelected,
+    required BuildContext context,
   }) {
     return Material(
       borderRadius: BorderRadius.circular(16),
@@ -681,6 +734,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
     required Color color,
     required VoidCallback onPressed,
     required bool isSmall,
+    required BuildContext context,
   }) {
     return ElevatedButton.icon(
       onPressed: onPressed,

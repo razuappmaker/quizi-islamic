@@ -1,14 +1,15 @@
-// Nadiyatul Quaran
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart' show rootBundle;
-
+import 'package:provider/provider.dart';
 import 'ad_helper.dart';
+import '../providers/language_provider.dart';
 
 class NadiyatulQuran extends StatefulWidget {
   const NadiyatulQuran({Key? key}) : super(key: key);
@@ -21,25 +22,92 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
   BannerAd? _bannerAd;
   Map<String, int> _pdfPageCounts = {};
   bool _isBannerAdLoaded = false;
+  bool _showEnglishWarning = true; // ✅ ইংরেজি ইউজারদের জন্য সতর্কবার্তা
 
-  final List<Map<String, String>> guides = [
-    {
-      "title": "নাদিয়াতুল কোরআন",
-      "path": "assets/pdf/nadiyatul_quran.pdf",
-      "description": "সহজ কুরআন শিক্ষা",
-    },
-    {
-      "title": "ওমরাহ গাইড",
-      "path": "assets/pdf/umrah_guide.pdf",
-      "description": "ওমরাহ পালনের সম্পূর্ণ ধাপে ধাপে গাইড",
-    },
-  ];
+  List<Map<String, String>> guides = [];
 
   @override
   void initState() {
     super.initState();
     _initializeAds();
-    _loadPdfInfo();
+    _loadPdfGuides();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    languageProvider.addListener(_onLanguageChanged);
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      _loadPdfGuides();
+    }
+  }
+
+  Future<void> _loadPdfGuides() async {
+    try {
+      final languageProvider = Provider.of<LanguageProvider>(
+        context,
+        listen: false,
+      );
+      final isEnglish = languageProvider.isEnglish;
+
+      final jsonFile = isEnglish
+          ? 'assets/en_pdf_guides.json'
+          : 'assets/pdf_guides.json';
+
+      final String response = await DefaultAssetBundle.of(
+        context,
+      ).loadString(jsonFile);
+      final List<dynamic> data = json.decode(response);
+
+      if (mounted) {
+        setState(() {
+          guides = data
+              .map<Map<String, String>>(
+                (item) => {
+                  "title": item['title'] ?? '',
+                  "path": item['path'] ?? '',
+                  "description": item['description'] ?? '',
+                  "pages": item['pages'] ?? '0',
+                  "duration": item['duration'] ?? '10-15 min',
+                },
+              )
+              .toList();
+        });
+      }
+
+      _loadPdfInfo();
+    } catch (e) {
+      print('Error loading PDF guides: $e');
+      _setDefaultData();
+    }
+  }
+
+  void _setDefaultData() {
+    setState(() {
+      guides = [
+        {
+          "title": "নাদিয়াতুল কোরআন",
+          "path": "assets/pdf/nadiyatul_quran.pdf",
+          "description": "সহজ কুরআন শিক্ষা",
+          "pages": "32",
+          "duration": "১০-১৫ মিনিট",
+        },
+        {
+          "title": "ওমরাহ গাইড",
+          "path": "assets/pdf/umrah_guide.pdf",
+          "description": "ওমরাহ পালনের সম্পূর্ণ ধাপে ধাপে গাইড",
+          "pages": "28",
+          "duration": "১৫-২০ মিনিট",
+        },
+      ];
+    });
   }
 
   Future<void> _initializeAds() async {
@@ -74,7 +142,6 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
             });
           },
           onAdClicked: (ad) {
-            // Record ad click
             AdHelper.recordAdClick();
           },
         ),
@@ -89,9 +156,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
   Future<void> _loadPdfInfo() async {
     for (var guide in guides) {
       try {
-        // PDF পৃষ্ঠা সংখ্যা লোড করার সিমুলেশন
-        _pdfPageCounts[guide["path"]!] =
-            32; // ধরে নিচ্ছি প্রতিটি PDF-এ ১২ পৃষ্ঠা আছে
+        _pdfPageCounts[guide["path"]!] = int.parse(guide["pages"] ?? "0");
       } catch (e) {
         print("Error loading PDF info for ${guide['path']}: $e");
         _pdfPageCounts[guide["path"]!] = 0;
@@ -100,8 +165,49 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
     setState(() {});
   }
 
+  // ✅ ইংরেজি ইউজারদের জন্য সতর্কবার্তা ডায়ালগ
+  void _showEnglishWarningDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.orange[800]),
+              const SizedBox(width: 8),
+              const Text(
+                "Important Information",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: const Text(
+            "These PDFs are available only in Bengali language. They have not been translated to English. The same PDF will be used for all language users.",
+            style: TextStyle(fontSize: 15, height: 1.4),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  _showEnglishWarning = false;
+                });
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    languageProvider.removeListener(_onLanguageChanged);
     _bannerAd?.dispose();
     super.dispose();
   }
@@ -115,7 +221,6 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
     );
   }
 
-  // Adaptive banner widget with proper sizing
   Widget _buildAdaptiveBannerWidget(BannerAd banner) {
     return Container(
       width: banner.size.width.toDouble(),
@@ -127,17 +232,19 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final isEnglish = languageProvider.isEnglish;
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[700],
-        title: const Text(
-          'কোরআন শিক্ষা',
+        title: Text(
+          isEnglish ? 'Quran Learning' : 'কোরআন শিক্ষা',
           style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
         ),
-        //centerTitle: true,
         leading: Container(
           margin: EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -150,53 +257,101 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
             splashRadius: 20,
           ),
         ),
+        actions: [
+          // ✅ শুধুমাত্র ইংরেজি ইউজারদের জন্য এবং একবারের বেশি না দেখালে আইকন দেখান
+          if (isEnglish && _showEnglishWarning)
+            IconButton(
+              icon: Icon(Icons.info_outline, color: Colors.yellow[700]),
+              tooltip: "Important Information",
+              onPressed: _showEnglishWarningDialog,
+            ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
-        bottom: false, // We'll handle bottom padding manually for the ad
+        bottom: false,
         child: Column(
           children: [
-            // Main content area with safe area padding
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: mediaQuery.padding.bottom,
-                  // Add bottom padding for system UI
-                  left: 16.0,
-                  right: 16.0,
-                  top: 16.0,
+            // ✅ ইংরেজি ইউজারদের জন্য ব্যানার (শুধুমাত্র একবার দেখাবে)
+            if (isEnglish && _showEnglishWarning)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange[300]!),
                 ),
-                child: ListView(
+                child: Row(
                   children: [
-                    _buildPdfCard(
-                      title: "নাদিয়াতুল কোরআন",
-                      path: "assets/pdf/nadiyatul_quran.pdf",
-                      description: "সহজ কুরআন শিক্ষা",
-                      pageCount:
-                          _pdfPageCounts["assets/pdf/nadiyatul_quran.pdf"] ?? 0,
-                      isDark: isDark,
+                    Icon(
+                      Icons.info_outline,
+                      color: Colors.orange[800],
+                      size: 20,
                     ),
-                    const SizedBox(height: 16),
-                    _buildPdfCard(
-                      title: "ওমরাহ গাইড",
-                      path: "assets/pdf/umrah_guide.pdf",
-                      description: "ওমরাহ পালনের সম্পূর্ণ ধাপে ধাপে গাইড",
-                      pageCount:
-                          _pdfPageCounts["assets/pdf/umrah_guide.pdf"] ?? 0,
-                      isDark: isDark,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "PDFs are in Bengali only. Tap for details.",
+                        style: TextStyle(
+                          color: Colors.orange[900],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        size: 18,
+                        color: Colors.orange[700],
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _showEnglishWarning = false;
+                        });
+                      },
                     ),
                   ],
                 ),
               ),
+
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: mediaQuery.padding.bottom,
+                  left: 16.0,
+                  right: 16.0,
+                  top: 16.0,
+                ),
+                child: guides.isEmpty
+                    ? Center(child: CircularProgressIndicator())
+                    : ListView(
+                        children: [
+                          ...List<Widget>.generate(guides.length, (index) {
+                            final guide = guides[index];
+                            return _buildPdfCard(
+                              title: guide["title"]!,
+                              path: guide["path"]!,
+                              description: guide["description"]!,
+                              pageCount: _pdfPageCounts[guide["path"]!] ?? 0,
+                              duration: guide["duration"]!,
+                              isDark: isDark,
+                              isEnglish: isEnglish,
+                            );
+                          }),
+                        ],
+                      ),
+              ),
             ),
 
-            // নিচের adaptive ব্যানার অ্যাড - safe area consideration
             if (_isBannerAdLoaded && _bannerAd != null)
               Container(
                 width: mediaQuery.size.width,
                 height: _bannerAd!.size.height.toDouble(),
                 alignment: Alignment.center,
                 color: Colors.transparent,
-                // Add bottom padding to account for system navigation bar
                 margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
                 child: _buildAdaptiveBannerWidget(_bannerAd!),
               ),
@@ -211,9 +366,10 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
     required String path,
     required String description,
     required int pageCount,
+    required String duration,
     required bool isDark,
+    required bool isEnglish,
   }) {
-    // ছবির পাথ ম্যাপিং
     String imagePath = "";
     if (path == "assets/pdf/nadiyatul_quran.pdf") {
       imagePath = "assets/images/nadiyatul_quran_preview.png";
@@ -249,7 +405,6 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ছবি প্রিভিউ সেকশন
                       Container(
                         width: 100,
                         height: 140,
@@ -278,7 +433,6 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                             height: 140,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              // যদি ছবি লোড না হয় তাহলে ডিফল্ট ভিউ দেখাবে
                               return Container(
                                 color: isDark
                                     ? Colors.green[800]
@@ -295,7 +449,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      "প্রিভিউ",
+                                      isEnglish ? "Preview" : "প্রিভিউ",
                                       style: TextStyle(
                                         fontSize: 10,
                                         color: isDark
@@ -314,7 +468,6 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
 
                       const SizedBox(width: 20),
 
-                      // কন্টেন্ট সেকশন
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,25 +496,25 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                             ),
                             const SizedBox(height: 12),
 
-                            // PDF তথ্য
                             Row(
                               children: [
                                 _buildInfoChip(
                                   icon: Icons.pages,
-                                  text: "$pageCount পৃষ্ঠা",
+                                  text: isEnglish
+                                      ? "$pageCount Pages"
+                                      : "$pageCount পৃষ্ঠা",
                                   isDark: isDark,
                                 ),
                                 const SizedBox(width: 8),
                                 _buildInfoChip(
                                   icon: Icons.timer,
-                                  text: "১০-১৫ মিনিট",
+                                  text: duration,
                                   isDark: isDark,
                                 ),
                               ],
                             ),
                             const SizedBox(height: 16),
 
-                            // অ্যাকশন বাটন
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
@@ -394,7 +547,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    "পিডিএফ পড়ুন",
+                                    isEnglish ? "Read PDF" : "পিডিএফ পড়ুন",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -454,7 +607,6 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
   }
 }
 
-// উন্নত PDF ভিউয়ার পেজ
 class AdvancedPdfViewerPage extends StatefulWidget {
   final String title;
   final String assetPath;
@@ -475,7 +627,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
   bool _isLoading = true;
   bool _isBannerAdLoaded = false;
   int _currentPage = 1;
-  int _totalPages = 32; // ডিফল্ট হিসেবে 12 ধরে নিচ্ছি
+  int _totalPages = 32;
   double _zoomLevel = 1.0;
 
   @override
@@ -483,6 +635,22 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
     super.initState();
     _initializeAds();
     _initializePdf();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    languageProvider.addListener(_onLanguageChanged);
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _initializeAds() async {
@@ -517,7 +685,6 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
             });
           },
           onAdClicked: (ad) {
-            // Record ad click
             AdHelper.recordAdClick();
           },
         ),
@@ -530,7 +697,6 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
   }
 
   void _initializePdf() {
-    // PDF লোড হওয়ার পর কলব্যাক
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
         setState(() {
@@ -542,35 +708,43 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
 
   Future<void> _downloadPDF() async {
     try {
-      // ✅ rootBundle ব্যবহার করে assets থেকে PDF লোড করুন
+      final languageProvider = Provider.of<LanguageProvider>(
+        context,
+        listen: false,
+      );
+      final isEnglish = languageProvider.isEnglish;
+
       final ByteData data = await rootBundle.load(widget.assetPath);
       final List<int> bytes = data.buffer.asUint8List();
 
-      // ✅ ডিভাইসের ডাউনলোড ডিরেক্টরি পান
       final Directory? downloadsDir = await getExternalStorageDirectory();
 
       if (downloadsDir == null) {
-        throw Exception('ডাউনলোড ডিরেক্টরি পাওয়া যায়নি');
+        throw Exception(
+          isEnglish
+              ? 'Download directory not found'
+              : 'ডাউনলোড ডিরেক্টরি পাওয়া যায়নি',
+        );
       }
 
-      // ✅ PDF ফাইল তৈরি করুন
       final String filePath = '${downloadsDir.path}/${widget.title}.pdf';
       final File file = File(filePath);
 
-      // ✅ ফাইলে ডেটা লিখুন
       await file.writeAsBytes(bytes, flush: true);
 
-      // ✅ সাফল্য মেসেজ দেখান
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("ডাউনলোড সম্পন্ন: ${widget.title}.pdf"),
+            content: Text(
+              isEnglish
+                  ? "Download completed: ${widget.title}.pdf"
+                  : "ডাউনলোড সম্পন্ন: ${widget.title}.pdf",
+            ),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 3),
             action: SnackBarAction(
-              label: "ফোল্ডার দেখুন",
+              label: isEnglish ? "Open Folder" : "ফোল্ডার দেখুন",
               onPressed: () {
-                // ইউজারকে ফোল্ডারে নিয়ে যাওয়ার অপশন
                 _openDownloadsFolder(downloadsDir.path);
               },
             ),
@@ -578,13 +752,23 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
         );
       }
 
-      print('PDF ডাউনলোড সম্পন্ন: $filePath');
+      print('PDF downloaded: $filePath');
     } catch (e) {
-      print('PDF ডাউনলোড ব্যর্থ: $e');
+      final languageProvider = Provider.of<LanguageProvider>(
+        context,
+        listen: false,
+      );
+      final isEnglish = languageProvider.isEnglish;
+
+      print('PDF download failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("ডাউনলোড ব্যর্থ: ${e.toString()}"),
+            content: Text(
+              isEnglish
+                  ? "Download failed: ${e.toString()}"
+                  : "ডাউনলোড ব্যর্থ: ${e.toString()}",
+            ),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -593,46 +777,57 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
     }
   }
 
-  // ✅ ফোল্ডার ওপেন করার মেথড (ঐচ্ছিক)
   void _openDownloadsFolder(String path) async {
     try {
-      // Android-এ ডাউনলোড ফোল্ডার ওপেন করার চেষ্টা করুন
       final Directory downloadsDir = Directory(path);
       if (await downloadsDir.exists()) {
-        // আপনি এখানে file_picker বা অন্য কোনো প্যাকেজ ব্যবহার করে ফোল্ডার ওপেন করতে পারেন
-        print('ডাউনলোড ফোল্ডার: $path');
+        print('Download folder: $path');
       }
     } catch (e) {
-      print('ফোল্ডার ওপেন করতে সমস্যা: $e');
+      print('Error opening folder: $e');
     }
   }
 
   Future<void> _sharePDF() async {
     try {
-      // ✅ rootBundle ব্যবহার করে PDF লোড করুন
       final ByteData data = await rootBundle.load(widget.assetPath);
       final List<int> bytes = data.buffer.asUint8List();
 
-      // ✅ টেম্পোরারি ফাইল তৈরি করুন
       final Directory tempDir = await getTemporaryDirectory();
       final String tempPath = '${tempDir.path}/${widget.title}.pdf';
       final File tempFile = File(tempPath);
 
-      // ✅ টেম্প ফাইলে ডেটা লিখুন
       await tempFile.writeAsBytes(bytes, flush: true);
 
-      // ✅ শেয়ার করুন
+      final languageProvider = Provider.of<LanguageProvider>(
+        context,
+        listen: false,
+      );
+      final isEnglish = languageProvider.isEnglish;
+
       await Share.shareXFiles(
         [XFile(tempPath)],
-        text: '${widget.title} - ইসলামিক গাইড',
+        text: isEnglish
+            ? '${widget.title} - Islamic Guide'
+            : '${widget.title} - ইসলামিক গাইড',
         subject: widget.title,
       );
     } catch (e) {
-      print('PDF শেয়ার করতে ব্যর্থ: $e');
+      final languageProvider = Provider.of<LanguageProvider>(
+        context,
+        listen: false,
+      );
+      final isEnglish = languageProvider.isEnglish;
+
+      print('PDF share failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("শেয়ার করতে ব্যর্থ: ${e.toString()}"),
+            content: Text(
+              isEnglish
+                  ? "Share failed: ${e.toString()}"
+                  : "শেয়ার করতে ব্যর্থ: ${e.toString()}",
+            ),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -651,6 +846,12 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
   }
 
   void _showReadingGuide() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final isEnglish = languageProvider.isEnglish;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -679,7 +880,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
             ),
             const SizedBox(height: 20),
             Text(
-              "পড়ার গাইড",
+              isEnglish ? "Reading Guide" : "পড়ার গাইড",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -687,14 +888,32 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
               ),
             ),
             const SizedBox(height: 16),
-            _buildGuideItem("📖", "প্রথমে সম্পূর্ণ PDF টি একবার দেখে নিন"),
-            _buildGuideItem("🔍", "জরুরি অংশগুলো জুম করে দেখুন"),
+            _buildGuideItem(
+              "📖",
+              isEnglish
+                  ? "First, browse through the entire PDF once"
+                  : "প্রথমে সম্পূর্ণ PDF টি একবার দেখে নিন",
+            ),
+            _buildGuideItem(
+              "🔍",
+              isEnglish
+                  ? "Zoom in to see important parts"
+                  : "জরুরি অংশগুলো জুম করে দেখুন",
+            ),
             _buildGuideItem(
               "📑",
-              "পৃষ্ঠা নেভিগেশন ব্যবহার করে সহজে চলাফেরা করুন",
+              isEnglish
+                  ? "Use page navigation to move around easily"
+                  : "পৃষ্ঠা নেভিগেশন ব্যবহার করে সহজে চলাফেরা করুন",
             ),
-            _buildGuideItem("💾", "প্রয়োজনে ডাউনলোড করে নিন"),
-            _buildGuideItem("📤", "অন্যদের সাথে শেয়ার করুন"),
+            _buildGuideItem(
+              "💾",
+              isEnglish ? "Download if needed" : "প্রয়োজনে ডাউনলোড করে নিন",
+            ),
+            _buildGuideItem(
+              "📤",
+              isEnglish ? "Share with others" : "অন্যদের সাথে শেয়ার করুন",
+            ),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
@@ -704,8 +923,8 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                   backgroundColor: Colors.green[700],
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text(
-                  "বুঝেছি",
+                child: Text(
+                  isEnglish ? "Got it" : "বুঝেছি",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -735,16 +954,23 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
     );
   }
 
-  // পৃষ্ঠা সংখ্যা ইনপুট ডায়ালগ
   void _showPageInputDialog() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final isEnglish = languageProvider.isEnglish;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("পৃষ্ঠা নং লিখুন"),
+        title: Text(isEnglish ? "Enter Page Number" : "পৃষ্ঠা নং লিখুন"),
         content: TextField(
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            hintText: "১ থেকে $_totalPages এর মধ্যে লিখুন",
+            hintText: isEnglish
+                ? "Enter between 1 and $_totalPages"
+                : "১ থেকে $_totalPages এর মধ্যে লিখুন",
             border: const OutlineInputBorder(),
           ),
           onChanged: (value) {
@@ -758,14 +984,13 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("বাতিল"),
+            child: Text(isEnglish ? "Cancel" : "বাতিল"),
           ),
         ],
       ),
     );
   }
 
-  // Adaptive banner widget with proper sizing
   Widget _buildAdaptiveBannerWidget(BannerAd banner) {
     return Container(
       width: banner.size.width.toDouble(),
@@ -777,12 +1002,20 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
 
   @override
   void dispose() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    languageProvider.removeListener(_onLanguageChanged);
     _bannerAd?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final isEnglish = languageProvider.isEnglish;
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mediaQuery = MediaQuery.of(context);
 
@@ -793,11 +1026,12 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outlined),
-            tooltip: "পড়ার গাইড",
+            tooltip: isEnglish ? "Reading Guide" : "পড়ার গাইড",
             onPressed: _showReadingGuide,
           ),
           IconButton(
             icon: const Icon(Icons.zoom_in),
+            tooltip: isEnglish ? "Zoom In" : "জুম ইন",
             onPressed: () {
               setState(() {
                 _zoomLevel += 0.2;
@@ -807,6 +1041,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
           ),
           IconButton(
             icon: const Icon(Icons.zoom_out),
+            tooltip: isEnglish ? "Zoom Out" : "জুম আউট",
             onPressed: () {
               setState(() {
                 _zoomLevel = (_zoomLevel - 0.2).clamp(0.5, 3.0);
@@ -817,20 +1052,19 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: _downloadPDF,
-            tooltip: "PDF ডাউনলোড করুন",
+            tooltip: isEnglish ? "Download PDF" : "PDF ডাউনলোড করুন",
           ),
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: _sharePDF,
-            tooltip: "PDF শেয়ার করুন",
+            tooltip: isEnglish ? "Share PDF" : "PDF শেয়ার করুন",
           ),
         ],
       ),
       body: SafeArea(
-        bottom: false, // We'll handle bottom padding manually for the ad
+        bottom: false,
         child: Column(
           children: [
-            // PDF নেভিগেশন কন্ট্রোল
             Container(
               color: isDark ? Colors.grey[900] : Colors.grey[100],
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -838,14 +1072,15 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.first_page),
+                    tooltip: isEnglish ? "First Page" : "প্রথম পৃষ্ঠা",
                     onPressed: () => _goToPage(1),
                   ),
                   IconButton(
                     icon: const Icon(Icons.navigate_before),
+                    tooltip: isEnglish ? "Previous Page" : "আগের পৃষ্ঠা",
                     onPressed: () => _goToPage(_currentPage - 1),
                   ),
 
-                  // পৃষ্ঠা ইনডিকেটর - ট্যাপ করলে ডায়ালগ খুলবে
                   Expanded(
                     child: GestureDetector(
                       onTap: _showPageInputDialog,
@@ -862,7 +1097,9 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                         ),
                         child: Center(
                           child: Text(
-                            "পৃষ্ঠা: $_currentPage/$_totalPages",
+                            isEnglish
+                                ? "Page: $_currentPage/$_totalPages"
+                                : "পৃষ্ঠা: $_currentPage/$_totalPages",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white : Colors.black,
@@ -875,24 +1112,21 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
 
                   IconButton(
                     icon: const Icon(Icons.navigate_next),
+                    tooltip: isEnglish ? "Next Page" : "পরবর্তী পৃষ্ঠা",
                     onPressed: () => _goToPage(_currentPage + 1),
                   ),
                   IconButton(
                     icon: const Icon(Icons.last_page),
+                    tooltip: isEnglish ? "Last Page" : "শেষ পৃষ্ঠা",
                     onPressed: () => _goToPage(_totalPages),
                   ),
                 ],
               ),
             ),
 
-            // PDF ভিউয়ার
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: mediaQuery
-                      .padding
-                      .bottom, // Add bottom padding for system UI
-                ),
+                padding: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
                 child: Stack(
                   children: [
                     SfPdfViewer.asset(
@@ -918,8 +1152,10 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              const Text(
-                                "PDF লোড হচ্ছে...",
+                              Text(
+                                isEnglish
+                                    ? "Loading PDF..."
+                                    : "PDF লোড হচ্ছে...",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -934,14 +1170,12 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
               ),
             ),
 
-            // নিচের adaptive ব্যানার অ্যাড - safe area consideration
             if (_isBannerAdLoaded && _bannerAd != null)
               Container(
                 width: mediaQuery.size.width,
                 height: _bannerAd!.size.height.toDouble(),
                 alignment: Alignment.center,
                 color: Colors.transparent,
-                // Add bottom padding to account for system navigation bar
                 margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
                 child: _buildAdaptiveBannerWidget(_bannerAd!),
               ),
@@ -949,7 +1183,6 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
         ),
       ),
 
-      // ফ্লোটিং অ্যাকশন বাটন
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -957,12 +1190,14 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
             onPressed: _showPageInputDialog,
             backgroundColor: Colors.blue[700],
             mini: true,
+            tooltip: isEnglish ? "Search Page" : "পৃষ্ঠা খুঁজুন",
             child: const Icon(Icons.search, color: Colors.white, size: 20),
           ),
           const SizedBox(height: 8),
           FloatingActionButton(
             onPressed: _showReadingGuide,
             backgroundColor: Colors.green[700],
+            tooltip: isEnglish ? "Reading Guide" : "পড়ার গাইড",
             child: const Icon(Icons.help_outline, color: Colors.white),
           ),
         ],

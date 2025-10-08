@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'ad_helper.dart'; // ✅ AdHelper import
+import '../providers/language_provider.dart';
 
 class TasbeehStatsPage extends StatefulWidget {
   const TasbeehStatsPage({Key? key}) : super(key: key);
@@ -11,6 +13,48 @@ class TasbeehStatsPage extends StatefulWidget {
 }
 
 class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'pageTitle': {'en': 'Total Tasbeeh Count', 'bn': 'সর্বমোট তাসবিহ গণনা'},
+    'subhanallah': {'en': 'Subhanallah', 'bn': 'সুবহানাল্লাহ'},
+    'alhamdulillah': {'en': 'Alhamdulillah', 'bn': 'আলহামদুলিল্লাহা'},
+    'allahuAkbar': {'en': 'Allahu Akbar', 'bn': 'আল্লাহু আকবার'},
+    'resetAll': {'en': 'Reset All', 'bn': 'সম্পূর্ণ রিসেট'},
+    'benefits': {'en': 'Benefits', 'bn': 'উপকারিতা'},
+    'resetSuccess': {
+      'en': 'All counts have been reset',
+      'bn': 'সব গণনা রিসেট করা হয়েছে',
+    },
+    'subhanallahBenefit': {
+      'en':
+          "The Prophet Muhammad ﷺ said: 'Whoever says 'Subhanallah' one hundred times a day, will have one hundred sins forgiven.' (Sahih Bukhari, Hadith: 6406)",
+      'bn':
+          "রাসূলুল্লাহ ﷺ বলেছেন যে ব্যক্তি প্রতিদিন একশবার 'সুবহানাল্লাহ' বলে, তার জন্য একশটি পাপ মাফ করা হবে। (সহীহ বুখারি, হাদিস: 6406)",
+    },
+    'alhamdulillahBenefit': {
+      'en':
+          "The Prophet Muhammad ﷺ said: 'Whoever says 'Alhamdulillah' one hundred times, will have one hundred thanks accepted by Allah.' (Sahih Muslim, Hadith: 2713)",
+      'bn':
+          "রাসূলুল্লাহ ﷺ বলেছেন: যে ব্যক্তি একশবার 'আলহামদুলিল্লাহা' বলে, তার জন্য একশটি ধন্যবাদ আল্লাহর কাছে গ্রহণযোগ্য হবে। (সহীহ মুসলিম, হাদিস: 2713)",
+    },
+    'allahuAkbarBenefit': {
+      'en':
+          "The Prophet Muhammad ﷺ said: 'Saying 'Allahu Akbar' in the morning and evening keeps the heart connected with Allah and erases daily sins.' (Sahih Muslim, Hadith: 2721)",
+      'bn':
+          "রাসূলুল্লাহ ﷺ বলেছেন: 'সকালে ও বিকেলে 'আল্লাহু আকবার' বলা হৃদয়কে আল্লাহর সাথে সংযুক্ত রাখে এবং দৈনন্দিন পাপগুলো মুছে দেয়।' (সহীহ মুসলিম, হাদিস: 2721)",
+    },
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
   int subhanallahCount = 0;
   int alhamdulillahCount = 0;
   int allahuakbarCount = 0;
@@ -19,15 +63,14 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
   BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
 
-  // উপকারিতা map
-  final Map<String, String> benefits = {
-    "সুবহানাল্লাহ":
-        "রাসূলুল্লাহ ﷺ বলেছেন যে ব্যক্তি প্রতিদিন একশবার 'সুবহানাল্লাহ' বলে, তার জন্য একশটি পাপ মাফ করা হবে। (সহীহ বুখারি, হাদিস: 6406)",
-    "আলহামদুলিল্লাহা":
-        "রাসূলুল্লাহ ﷺ বলেছেন: যে ব্যক্তি একশবার 'আলহামদুলিল্লাহা' বলে, তার জন্য একশটি ধন্যবাদ আল্লাহর কাছে গ্রহণযোগ্য হবে। (সহীহ মুসলিম, হাদিস: 2713)",
-    "আল্লাহু আকবার":
-        "রাসূলুল্লাহ ﷺ বলেছেন: 'সকালে ও বিকেলে 'আল্লাহু আকবার' বলা হৃদয়কে আল্লাহর সাথে সংযুক্ত রাখে এবং দৈনন্দিন পাপগুলো মুছে দেয়।' (সহীহ মুসলিম, হাদিস: 2721)",
-  };
+  // উপকারিতা map - ভাষা অনুযায়ী
+  Map<String, String> getBenefits(BuildContext context) {
+    return {
+      _text('subhanallah', context): _text('subhanallahBenefit', context),
+      _text('alhamdulillah', context): _text('alhamdulillahBenefit', context),
+      _text('allahuAkbar', context): _text('allahuAkbarBenefit', context),
+    };
+  }
 
   @override
   void initState() {
@@ -114,9 +157,9 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("সব গণনা রিসেট করা হয়েছে"),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(_text('resetSuccess', context)),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -232,6 +275,9 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final benefits = getBenefits(context);
+
     final MaterialColor subColor = Colors.green;
     final MaterialColor alhamColor = Colors.blue;
     final MaterialColor akbarColor = Colors.orange;
@@ -241,13 +287,11 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: const Text(
-          "সর্বমোট তাসবিহ গণনা",
+        title: Text(
+          _text('pageTitle', context),
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         backgroundColor: Colors.green[800],
-
-        //centerTitle: true,
         leading: Container(
           margin: EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -285,19 +329,19 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
                     children: [
                       const SizedBox(height: 20),
                       _buildStatCard(
-                        "সুবহানাল্লাহ",
+                        _text('subhanallah', context),
                         subhanallahCount,
                         subColor,
                         context,
                       ),
                       _buildStatCard(
-                        "আলহামদুলিল্লাহা",
+                        _text('alhamdulillah', context),
                         alhamdulillahCount,
                         alhamColor,
                         context,
                       ),
                       _buildStatCard(
-                        "আল্লাহু আকবার",
+                        _text('allahuAkbar', context),
                         allahuakbarCount,
                         akbarColor,
                         context,
@@ -312,7 +356,7 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
                           onPressed: _resetAllCounts,
                           icon: const Icon(Icons.refresh),
                           label: Text(
-                            "সম্পূর্ণ রিসেট",
+                            _text('resetAll', context),
                             style: TextStyle(
                               fontSize: screenWidth > 600 ? 18 : 16,
                             ),
@@ -346,7 +390,7 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "উপকারিতা",
+                            _text('benefits', context),
                             style: TextStyle(
                               fontSize: screenWidth > 600 ? 26 : 22,
                               fontWeight: FontWeight.bold,
@@ -361,18 +405,18 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
                       ),
                       const SizedBox(height: 10),
                       _buildBenefitCard(
-                        "সুবহানাল্লাহ",
-                        benefits["সুবহানাল্লাহ"] ?? "",
+                        _text('subhanallah', context),
+                        benefits[_text('subhanallah', context)] ?? "",
                         context,
                       ),
                       _buildBenefitCard(
-                        "আলহামদুলিল্লাহা",
-                        benefits["আলহামদুলিল্লাহা"] ?? "",
+                        _text('alhamdulillah', context),
+                        benefits[_text('alhamdulillah', context)] ?? "",
                         context,
                       ),
                       _buildBenefitCard(
-                        "আল্লাহু আকবার",
-                        benefits["আল্লাহু আকবার"] ?? "",
+                        _text('allahuAkbar', context),
+                        benefits[_text('allahuAkbar', context)] ?? "",
                         context,
                       ),
                       const SizedBox(height: 20),

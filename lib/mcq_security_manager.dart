@@ -1,10 +1,12 @@
-// mcq_security_manager.dart - FINAL CLEAN VERSION
+// mcq_security_manager.dart - FINAL CLEAN VERSION with Language Support
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
 import 'network_json_loader.dart';
+import '../providers/language_provider.dart';
 import '../utils/point_manager.dart';
 
 class AnswerResult {
@@ -31,45 +33,84 @@ class MCQSecurityManager {
   int _totalPointsEarned = 0;
 
   // ==================== LANGUAGE ====================
-  bool _isEnglish = false;
+  bool get _isEnglish => _languageProvider?.isEnglish ?? false;
+  LanguageProvider? _languageProvider;
 
   // ==================== CURRENT QUIZ ID ====================
   String _currentQuizId = '';
 
   // ==================== CATEGORY MAPPING ====================
-  final Map<String, String> _categoryMappings = {
+  final Map<String, Map<String, String>> _categoryMappings = {
     // English categories
-    'Basic Islamic Knowledge': 'Basic Islamic Knowledge',
-    'Quran': 'Quran',
-    'Prophet Biography': 'Prophet Biography',
-    'Worship': 'Worship',
-    'Hereafter': 'Hereafter',
-    'Judgment Day': 'Judgment Day',
-    'Women in Islam': 'Women in Islam',
-    'Islamic Ethics & Manners': 'Islamic Ethics & Manners',
-    'Religious Law (Marriage-Divorce)': 'Religious Law (Marriage-Divorce)',
-    'Etiquette': 'Etiquette',
-    'Marital & Family Relations': 'Marital & Family Relations',
-    'Hadith': 'Hadith',
-    'Prophets': 'Prophets',
-    'Islamic History': 'Islamic History',
-
-    // Bengali categories
-    'ইসলামী প্রাথমিক জ্ঞান': 'ইসলামী প্রাথমিক জ্ঞান',
-    'কোরআন': 'কোরআন',
-    'মহানবী সঃ এর জীবনী': 'মহানবী সঃ এর জীবনী',
-    'ইবাদত': 'ইবাদত',
-    'আখিরাত': 'আখিরাত',
-    'বিচার দিবস': 'বিচার দিবস',
-    'নারী ও ইসলাম': 'নারী ও ইসলাম',
-    'ইসলামী নৈতিকতা ও আচার': 'ইসলামী নৈতিকতা ও আচার',
-    'ধর্মীয় আইন(বিবাহ-বিচ্ছেদ)': 'ধর্মীয় আইন(বিবাহ-বিচ্ছেদ)',
-    'শিষ্টাচার': 'শিষ্টাচার',
-    'দাম্পত্য ও পারিবারিক সম্পর্ক': 'দাম্পত্য ও পারিবারিক সম্পর্ক',
-    'হাদিস': 'হাদিস',
-    'নবী-রাসূল': 'নবী-রাসূল',
-    'ইসলামের ইতিহাস': 'ইসলামের ইতিহাস',
+    'Basic Islamic Knowledge': {
+      'en': 'Basic Islamic Knowledge',
+      'bn': 'ইসলামী প্রাথমিক জ্ঞান',
+    },
+    'Quran': {'en': 'Quran', 'bn': 'কোরআন'},
+    'Prophet Biography': {
+      'en': 'Prophet Biography',
+      'bn': 'মহানবী সঃ এর জীবনী',
+    },
+    'Worship': {'en': 'Worship', 'bn': 'ইবাদত'},
+    'Hereafter': {'en': 'Hereafter', 'bn': 'আখিরাত'},
+    'Judgment Day': {'en': 'Judgment Day', 'bn': 'বিচার দিবস'},
+    'Women in Islam': {'en': 'Women in Islam', 'bn': 'নারী ও ইসলাম'},
+    'Islamic Ethics & Manners': {
+      'en': 'Islamic Ethics & Manners',
+      'bn': 'ইসলামী নৈতিকতা ও আচার',
+    },
+    'Religious Law (Marriage-Divorce)': {
+      'en': 'Religious Law (Marriage-Divorce)',
+      'bn': 'ধর্মীয় আইন(বিবাহ-বিচ্ছেদ)',
+    },
+    'Etiquette': {'en': 'Etiquette', 'bn': 'শিষ্টাচার'},
+    'Marital & Family Relations': {
+      'en': 'Marital & Family Relations',
+      'bn': 'দাম্পত্য ও পারিবারিক সম্পর্ক',
+    },
+    'Hadith': {'en': 'Hadith', 'bn': 'হাদিস'},
+    'Prophets': {'en': 'Prophets', 'bn': 'নবী-রাসূল'},
+    'Islamic History': {'en': 'Islamic History', 'bn': 'ইসলামের ইতিহাস'},
   };
+
+  // ==================== TEXT DICTIONARY ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'searchGoogle': {'en': 'Search on Google', 'bn': 'গুগলে সার্চ করুন'},
+    'searchConfirmation': {
+      'en': 'Do you want to search Google for the question:',
+      'bn': 'আপনি কি "প্রশ্ন" প্রশ্নটি গুগলে সার্চ করতে চান?',
+    },
+    'cancel': {'en': 'Cancel', 'bn': 'বাতিল'},
+    'search': {'en': 'Search', 'bn': 'সার্চ করুন'},
+    'googleSearchError': {
+      'en': 'Cannot open Google search',
+      'bn': 'গুগল সার্চ খোলা যাচ্ছে না',
+    },
+    'searchError': {
+      'en': 'Error opening Google search',
+      'bn': 'গুগল সার্চ খুলতে ত্রুটি',
+    },
+    'noQuestionsLoaded': {
+      'en': 'No questions loaded',
+      'bn': 'কোন প্রশ্ন লোড করা যায়নি',
+    },
+    'noQuestionsForCategory': {
+      'en': 'No questions found for this category',
+      'bn': 'এই ক্যাটাগরির জন্য কোন প্রশ্ন পাওয়া যায়নি',
+    },
+    'questionLoadError': {
+      'en': 'Questions could not be loaded',
+      'bn': 'প্রশ্ন লোড করা যায়নি',
+    },
+    'quizNotAvailable': {'en': 'Quiz not available', 'bn': 'কুইজ খেলা যাবে না'},
+    'unknownReason': {'en': 'Unknown reason', 'bn': 'অজানা কারণ'},
+  };
+
+  // ==================== HELPER METHOD ====================
+  String _text(String key, BuildContext context) {
+    final langKey = _isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
 
   // ==================== INITIALIZATION ====================
 
@@ -77,14 +118,19 @@ class MCQSecurityManager {
   Future<void> initialize({
     required String category,
     required String quizId,
+    required BuildContext context,
   }) async {
     try {
       print('🔄 QUIZ INITIALIZATION STARTED...');
 
-      final String mappedQuizId = getMappedQuizId(category);
+      // Set language provider from context
+      _languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+
+      final String mappedQuizId = getMappedQuizId(category, context);
       _currentQuizId = mappedQuizId;
 
       print('📝 Category: $category → Mapped: $mappedQuizId');
+      print('🌐 Language: ${_isEnglish ? 'English' : 'Bengali'}');
 
       // Security check
       final canPlayResult = await PointManager.canPlayQuiz(mappedQuizId);
@@ -96,16 +142,17 @@ class MCQSecurityManager {
 
       if (!canPlayResult['canPlay']) {
         final String errorMessage =
-            canPlayResult['message'] ?? 'কুইজ খেলা যাবে না';
-        final String reason = canPlayResult['reason'] ?? 'অজানা কারণ';
+            canPlayResult['message'] ?? _text('quizNotAvailable', context);
+        final String reason =
+            canPlayResult['reason'] ?? _text('unknownReason', context);
         throw Exception('$reason: $errorMessage');
       }
 
-      // Load questions
-      await loadQuestions(mappedQuizId);
+      // Load questions with language support
+      await loadQuestions(mappedQuizId, context);
 
       if (questions.isEmpty) {
-        throw Exception('কোন প্রশ্ন লোড করা যায়নি');
+        throw Exception(_text('noQuestionsLoaded', context));
       }
 
       // Initialize stats
@@ -167,8 +214,7 @@ class MCQSecurityManager {
       _updateQuizRecord();
     }
 
-    // Add points and update stats
-    //_addPointsToUser(pointsForThisQuestion);
+    // Update stats
     _updateUserStats();
 
     // Finalize if last question
@@ -200,43 +246,6 @@ class MCQSecurityManager {
     else
       return 3;
   }
-
-  /// ইউজার অ্যাকাউন্টে পয়েন্ট যোগ করার মেথড
-  /*Future<void> _addPointsToUser(int earnedPoints) async {
-    try {
-      // Security checks
-      if (earnedPoints <= 0 || earnedPoints > 100) {
-        print('⚠️ Invalid points amount: $earnedPoints');
-        return;
-      }
-
-      // 🔥 Check daily limit BEFORE adding points
-      final totalPointsToday = await PointManager.getTotalPointsToday();
-      if (totalPointsToday >= PointManager.MAX_POINTS_PER_DAY) {
-        print('🚫 Daily points limit reached, skipping points addition');
-        return;
-      }
-
-      // 🔥 Ensure we don't exceed daily limit
-      int pointsToAdd = earnedPoints;
-      if (totalPointsToday + earnedPoints > PointManager.MAX_POINTS_PER_DAY) {
-        pointsToAdd = PointManager.MAX_POINTS_PER_DAY - totalPointsToday;
-        print(
-          '🎯 Capping points: $earnedPoints → $pointsToAdd (to stay within daily limit)',
-        );
-      }
-
-      // Add points
-      if (pointsToAdd > 0) {
-        await PointManager.addPoints(pointsToAdd);
-        print("✅ $pointsToAdd points added to user account");
-      } else {
-        print('⏭️ No points added (Daily limit reached)');
-      }
-    } catch (e) {
-      print("❌ Error adding points: $e");
-    }
-  }*/
 
   // ==================== QUIZ RECORDING ====================
 
@@ -328,12 +337,15 @@ class MCQSecurityManager {
 
   // ==================== QUESTION LOADING ====================
 
-  /// প্রশ্ন লোড করার মেথড
-  Future<void> loadQuestions(String quizId) async {
+  /// প্রশ্ন লোড করার মেথড - ভাষা অনুযায়ী
+  Future<void> loadQuestions(String quizId, BuildContext context) async {
     try {
+      // ভাষা অনুযায়ী JSON ফাইল সিলেক্ট করুন
       final String fileName = _isEnglish
-          ? 'assets/enquestions.json'
+          ? 'assets/en_questions.json'
           : 'assets/questions.json';
+
+      print('📁 Loading questions from: $fileName');
 
       // Try network first
       try {
@@ -344,7 +356,7 @@ class MCQSecurityManager {
           for (var item in allQuestionsData) {
             if (item is Map) questionsMap.addAll(item as Map<dynamic, dynamic>);
           }
-          _setQuestionsFromMap(questionsMap, quizId);
+          _setQuestionsFromMap(questionsMap, quizId, context);
           return;
         }
       } catch (e) {
@@ -355,13 +367,13 @@ class MCQSecurityManager {
       try {
         final String localResponse = await rootBundle.loadString(fileName);
         final Map<dynamic, dynamic> localData = json.decode(localResponse);
-        _setQuestionsFromMap(localData, quizId);
+        _setQuestionsFromMap(localData, quizId, context);
         return;
       } catch (e) {
         print('❌ Local load failed: $e');
       }
 
-      throw Exception('প্রশ্ন লোড করা যায়নি');
+      throw Exception(_text('questionLoadError', context));
     } catch (e) {
       print('❌ All question loading methods failed: $e');
       rethrow;
@@ -369,15 +381,23 @@ class MCQSecurityManager {
   }
 
   /// ম্যাপ থেকে প্রশ্ন সেট করার মেথড
-  void _setQuestionsFromMap(Map<dynamic, dynamic> questionsMap, String quizId) {
+  void _setQuestionsFromMap(
+    Map<dynamic, dynamic> questionsMap,
+    String quizId,
+    BuildContext context,
+  ) {
     final quizIdString = quizId.toString();
     final availableKeys = questionsMap.keys.map((k) => k.toString()).toList();
+
+    print('🔍 Looking for quiz ID: $quizIdString');
+    print('📋 Available keys: $availableKeys');
 
     // Exact match
     if (questionsMap.containsKey(quizIdString)) {
       final questionsData = questionsMap[quizIdString];
       if (questionsData is List) {
         questions = List<dynamic>.from(questionsData);
+        print('✅ Exact match found - Questions: ${questions.length}');
         return;
       }
     }
@@ -390,12 +410,13 @@ class MCQSecurityManager {
         final questionsData = questionsMap[key];
         if (questionsData is List) {
           questions = List<dynamic>.from(questionsData);
+          print('✅ Partial match found - Questions: ${questions.length}');
           return;
         }
       }
     }
 
-    throw Exception('এই ক্যাটাগরির জন্য কোন প্রশ্ন পাওয়া যায়নি');
+    throw Exception(_text('noQuestionsForCategory', context));
   }
 
   // ==================== VALIDATION METHODS ====================
@@ -418,7 +439,7 @@ class MCQSecurityManager {
 
   // ==================== EXTERNAL SERVICES ====================
 
-  /// গুগলে সার্চ করার মেথড
+  /// গুগলে সার্চ করার মেথড - ভাষা অনুযায়ী
   Future<void> searchOnGoogle({
     required BuildContext context,
     required String question,
@@ -427,16 +448,16 @@ class MCQSecurityManager {
       final bool? shouldSearch = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('গুগলে সার্চ করুন'),
-          content: Text('আপনি কি "$question" প্রশ্নটি গুগলে সার্চ করতে চান?'),
+          title: Text(_text('searchGoogle', context)),
+          content: Text('${_text('searchConfirmation', context)} "$question"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('বাতিল'),
+              child: Text(_text('cancel', context)),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('সার্চ করুন'),
+              child: Text(_text('search', context)),
             ),
           ],
         ),
@@ -449,12 +470,12 @@ class MCQSecurityManager {
         if (await canLaunchUrl(Uri.parse(url))) {
           await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
         } else {
-          _showErrorSnackBar(context, 'গুগল সার্চ খোলা যাচ্ছে না');
+          _showErrorSnackBar(context, _text('googleSearchError', context));
         }
       }
     } catch (e) {
       print('❌ Google search error: $e');
-      _showErrorSnackBar(context, 'গুগল সার্চ খুলতে ত্রুটি');
+      _showErrorSnackBar(context, _text('searchError', context));
     }
   }
 
@@ -471,9 +492,24 @@ class MCQSecurityManager {
 
   // ==================== CATEGORY UTILITIES ====================
 
-  /// ক্যাটাগরি ম্যাপিং মেথড
-  String getMappedQuizId(String category) {
-    return _categoryMappings[category] ?? category;
+  /// ক্যাটাগরি ম্যাপিং মেথড - ভাষা অনুযায়ী
+  String getMappedQuizId(String category, BuildContext context) {
+    final langKey = _isEnglish ? 'en' : 'bn';
+
+    // First try exact match
+    if (_categoryMappings.containsKey(category)) {
+      return _categoryMappings[category]![langKey] ?? category;
+    }
+
+    // Then try case-insensitive match
+    for (final key in _categoryMappings.keys) {
+      if (key.toLowerCase() == category.toLowerCase()) {
+        return _categoryMappings[key]![langKey] ?? category;
+      }
+    }
+
+    // Return original if no match found
+    return category;
   }
 
   /// ভ্যালিড ক্যাটাগরি চেক মেথড
@@ -481,9 +517,13 @@ class MCQSecurityManager {
     return _categoryMappings.containsKey(category);
   }
 
-  /// অ্যাভেইলেবল ক্যাটাগরি লিস্ট মেথড
-  List<String> getAvailableCategories() {
-    return _categoryMappings.keys.toList();
+  /// অ্যাভেইলেবল ক্যাটাগরি লিস্ট মেথড - ভাষা অনুযায়ী
+  List<String> getAvailableCategories(BuildContext context) {
+    final langKey = _isEnglish ? 'en' : 'bn';
+    return _categoryMappings.values
+        .map((map) => map[langKey] ?? '')
+        .where((category) => category.isNotEmpty)
+        .toList();
   }
 
   // ==================== GETTERS ====================
@@ -504,37 +544,10 @@ class MCQSecurityManager {
       ? (_totalCorrectAnswers / _totalQuestionsAnswered) * 100
       : 0.0;
 
-  // ==================== DEBUGGING UTILITIES ====================
-
-  // TODO: Remove debug methods after testing
-  /*
-  Future<void> _debugPointsStatus() async {
-    try {
-      final totalPointsToday = await PointManager.getTotalPointsToday();
-      print('🔍 DEBUG POINTS STATUS:');
-      print('   - MAX_POINTS_PER_DAY: ${PointManager.MAX_POINTS_PER_DAY}');
-      print('   - Total Points Today: $totalPointsToday');
-      print('   - Remaining Points: ${PointManager.MAX_POINTS_PER_DAY - totalPointsToday}');
-    } catch (e) {
-      print('❌ Error checking points status: $e');
-    }
+  /// ভাষা সেট করার মেথড (যদি প্রয়োজন হয়)
+  void setLanguageProvider(LanguageProvider provider) {
+    _languageProvider = provider;
   }
-
-  void printDebugInfo(String category, String quizId) {
-    print('=== MCQ SECURITY MANAGER DEBUG INFO ===');
-    print('📝 Category: $category');
-    print('🔑 Quiz ID: $quizId');
-    print('🗺️ Mapped Quiz ID: ${getMappedQuizId(category)}');
-    print('📊 Questions Loaded: ${questions.length}');
-    print('✅ Valid Category: ${isValidCategory(category)}');
-    print('🎯 Quiz Started: $quizStarted');
-    print('📝 Quiz Recorded: $_quizRecorded');
-    print('💰 Total Earned Points: $_totalEarnedPoints');
-    print('=== END DEBUG INFO ===');
-  }
-  */
-
-  // ==================== CLEANUP ====================
 
   /// ডিসপোজ মেথড
   void dispose() {
@@ -544,5 +557,6 @@ class MCQSecurityManager {
     pointsAdded = false;
     quizStarted = false;
     _quizRecorded = false;
+    _languageProvider = null;
   }
 }

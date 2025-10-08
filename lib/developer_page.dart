@@ -1,3 +1,4 @@
+//developer page
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -166,6 +167,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
     final languageProvider = Provider.of<LanguageProvider>(context);
     final isEnglish = languageProvider.isEnglish;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
@@ -174,366 +176,428 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
           // Header Section
           SliverAppBar(
             expandedHeight: 280,
-            floating: false,
             pinned: true,
+            snap: false,
+            stretch: true,
             backgroundColor: isDark ? Colors.black : Colors.green[800],
             foregroundColor: Colors.white,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                isEnglish ? 'Developer' : 'ডেভেলপার',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Background Gradient
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.green[900]!,
-                          Colors.green[700]!,
-                          Colors.green[500]!,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+            toolbarHeight: 60,
+            collapsedHeight: 60,
+            floating: false,
+            automaticallyImplyLeading: false,
+            flexibleSpace: LayoutBuilder(
+              builder: (context, constraints) {
+                final double expandRatio = constraints.biggest.height / 280;
+                final bool isExpanded = expandRatio > 0.8;
+
+                return FlexibleSpaceBar(
+                  title: AnimatedOpacity(
+                    opacity: isExpanded ? 0.0 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        isEnglish ? 'Developer' : 'ডেভেলপার',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.8),
+                              blurRadius: 8,
+                              offset: const Offset(1, 1),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  // Developer Photo and Info
-                  Container(
-                    color: Colors.black.withOpacity(0.3),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Colors.white.withOpacity(0.2),
-                          child: CircleAvatar(
-                            radius: 56,
-                            backgroundImage: const AssetImage(
-                              'assets/images/razu.jpg',
+                  centerTitle: true,
+                  titlePadding: const EdgeInsets.only(bottom: 16),
+                  stretchModes: const [
+                    StretchMode.zoomBackground,
+                    StretchMode.blurBackground,
+                  ],
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Background Gradient
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.green[900]!,
+                              Colors.green[700]!,
+                              Colors.green[500]!,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                      ),
+                      // Developer Photo and Info
+                      Container(
+                        color: Colors.black.withOpacity(0.3),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            AnimatedOpacity(
+                              opacity: isExpanded ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 300),
+                              child: CircleAvatar(
+                                radius: 60,
+                                backgroundColor: Colors.white.withOpacity(0.2),
+                                child: CircleAvatar(
+                                  radius: 56,
+                                  backgroundImage: const AssetImage(
+                                    'assets/images/razu.jpg',
+                                  ),
+                                  backgroundColor: Colors.grey[300],
+                                ),
+                              ),
                             ),
-                            backgroundColor: Colors.grey[300],
-                          ),
+                            const SizedBox(height: 16),
+                            AnimatedOpacity(
+                              opacity: isExpanded ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 400),
+                              child: Text(
+                                isEnglish
+                                    ? developerInfo['name_en']!
+                                    : developerInfo['name']!,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black,
+                                      blurRadius: 4,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            AnimatedOpacity(
+                              opacity: isExpanded ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 500),
+                              child: Text(
+                                isEnglish
+                                    ? developerInfo['title_en']!
+                                    : developerInfo['title']!,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontWeight: FontWeight.w500,
+                                  shadows: [
+                                    const Shadow(
+                                      color: Colors.black,
+                                      blurRadius: 4,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            AnimatedOpacity(
+                              opacity: isExpanded ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 600),
+                              child: Text(
+                                isEnglish
+                                    ? developerInfo['experience_en']!
+                                    : developerInfo['experience']!,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white.withOpacity(0.8),
+                                  shadows: [
+                                    const Shadow(
+                                      color: Colors.black,
+                                      blurRadius: 4,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          isEnglish
-                              ? developerInfo['name_en']!
-                              : developerInfo['name']!,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isEnglish
-                              ? developerInfo['title_en']!
-                              : developerInfo['title']!,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white.withOpacity(0.9),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          isEnglish
-                              ? developerInfo['experience_en']!
-                              : developerInfo['experience']!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.8),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
 
-          // Content Section
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Specialization Card
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    color: isDark ? Colors.grey[800] : Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.star_rounded,
-                            color: Colors.amber,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              isEnglish
-                                  ? developerInfo['specialization_en']!
-                                  : developerInfo['specialization']!,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: isDark ? Colors.white : Colors.grey[800],
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                        ],
+          // Content Section - FIXED VERSION
+          SliverPadding(
+            padding: EdgeInsets.only(
+              bottom: bottomPadding + 20, // সিস্টেম ন্যাভিগেশন বারের জন্য স্পেস
+            ),
+            sliver: SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Specialization Card
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // About Section
-                  Text(
-                    isEnglish ? 'About Me' : 'আমার সম্পর্কে',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.green[800],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    color: isDark ? Colors.grey[800] : Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Text(
-                        isEnglish
-                            ? aboutText['about_en']!
-                            : aboutText['about']!,
-                        style: TextStyle(
-                          fontSize: 15,
-                          height: 1.6,
-                          color: isDark ? Colors.white70 : Colors.grey[700],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Portfolio Apps Section
-                  Text(
-                    isEnglish ? 'Portfolio Apps' : 'আমার তৈরি অ্যাপস',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.green[800],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 1.2,
-                        ),
-                    itemCount: isEnglish
-                        ? apps['apps_en']!.length
-                        : apps['apps_bn']!.length,
-                    itemBuilder: (context, index) {
-                      final appName = isEnglish
-                          ? apps['apps_en']![index]
-                          : apps['apps_bn']![index];
-                      return Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        color: isDark ? Colors.grey[800] : Colors.white,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.green.withOpacity(0.1),
-                                Colors.blue.withOpacity(0.1),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+                      color: isDark ? Colors.grey[800] : Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.star_rounded,
+                              color: Colors.amber,
+                              size: 28,
                             ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.apps_rounded,
-                                color: Colors.green[600],
-                                size: 32,
-                              ),
-                              const SizedBox(height: 8),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                isEnglish
+                                    ? developerInfo['specialization_en']!
+                                    : developerInfo['specialization']!,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark
+                                      ? Colors.white
+                                      : Colors.grey[800],
+                                  height: 1.4,
                                 ),
-                                child: Text(
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // About Section
+                    Text(
+                      isEnglish ? 'About Me' : 'আমার সম্পর্কে',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.green[800],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      color: isDark ? Colors.grey[800] : Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Text(
+                          isEnglish
+                              ? aboutText['about_en']!
+                              : aboutText['about']!,
+                          style: TextStyle(
+                            fontSize: 15,
+                            height: 1.6,
+                            color: isDark ? Colors.white70 : Colors.grey[700],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Portfolio Apps Section
+                    Text(
+                      isEnglish ? 'Portfolio Apps' : 'আমার তৈরি অ্যাপস',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.green[800],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            childAspectRatio: 1.0,
+                          ),
+                      itemCount: isEnglish
+                          ? apps['apps_en']!.length
+                          : apps['apps_bn']!.length,
+                      itemBuilder: (context, index) {
+                        final appName = isEnglish
+                            ? apps['apps_en']![index]
+                            : apps['apps_bn']![index];
+
+                        return Card(
+                          elevation: 1,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          color: isDark ? Colors.grey[800] : Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.rocket_launch_rounded,
+                                  color: Colors.green[600],
+                                  size: 24,
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
                                   appName,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
                                     color: isDark
                                         ? Colors.white
-                                        : Colors.grey[800],
+                                        : Colors.grey[700],
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Contact Section
+                    Text(
+                      isEnglish ? 'Get In Touch' : 'যোগাযোগ করুন',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.green[800],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      color: isDark ? Colors.grey[800] : Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          children:
+                              (isEnglish
+                                      ? contactInfo['contacts_en']!
+                                      : contactInfo['contacts']!)
+                                  .map((contact) {
+                                    return ListTile(
+                                      leading: Text(
+                                        contact['icon']!,
+                                        style: const TextStyle(fontSize: 20),
+                                      ),
+                                      title: Text(
+                                        contact['title']!,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.grey[800],
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        contact['value']!,
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.white70
+                                              : Colors.grey[600],
+                                        ),
+                                      ),
+                                      trailing: Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        size: 16,
+                                        color: Colors.green[600],
+                                      ),
+                                      onTap: () => _launchContact(
+                                        contact['type']!,
+                                        contact['value']!,
+                                        context,
+                                      ),
+                                    );
+                                  })
+                                  .toList(),
                         ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Contact Section
-                  Text(
-                    isEnglish ? 'Get In Touch' : 'যোগাযোগ করুন',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.green[800],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    color: isDark ? Colors.grey[800] : Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
+
+                    const SizedBox(height: 32),
+
+                    // Call to Action
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.green[700]!, Colors.green[500]!],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       child: Column(
-                        children:
-                            (isEnglish
-                                    ? contactInfo['contacts_en']!
-                                    : contactInfo['contacts']!)
-                                .map((contact) {
-                                  return ListTile(
-                                    leading: Text(
-                                      contact['icon']!,
-                                      style: const TextStyle(fontSize: 20),
-                                    ),
-                                    title: Text(
-                                      contact['title']!,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.grey[800],
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      contact['value']!,
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? Colors.white70
-                                            : Colors.grey[600],
-                                      ),
-                                    ),
-                                    trailing: Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      size: 16,
-                                      color: Colors.green[600],
-                                    ),
-                                    onTap: () => _launchContact(
-                                      contact['type']!,
-                                      contact['value']!,
-                                      context,
-                                    ),
-                                  );
-                                })
-                                .toList(),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Call to Action
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.green[700]!, Colors.green[500]!],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.handshake_rounded,
-                          color: Colors.white,
-                          size: 40,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          isEnglish
-                              ? 'Let\'s Build Something Amazing Together!'
-                              : 'চলুন একসাথে কিছু অসাধারণ তৈরি করি!',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        children: [
+                          Icon(
+                            Icons.handshake_rounded,
                             color: Colors.white,
+                            size: 40,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isEnglish
-                              ? 'Ready to start your next project?'
-                              : 'আপনার পরবর্তী প্রজেক্ট শুরু করতে প্রস্তুত?',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.9),
+                          const SizedBox(height: 12),
+                          Text(
+                            isEnglish
+                                ? 'Let\'s Build Something Amazing Together!'
+                                : 'চলুন একসাথে কিছু অসাধারণ তৈরি করি!',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          Text(
+                            isEnglish
+                                ? 'Ready to start your next project?'
+                                : 'আপনার পরবর্তী প্রজেক্ট শুরু করতে প্রস্তুত?',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 40),
-                ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ),

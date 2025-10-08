@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Kalima Tayyiba",
+    "text": "لَا إِلَٰهَ إِلَّا ٱللَّٰهُ مُحَمَّدٌ رَسُولُ ٱللَّٰهِ",
+    "transliteration": "La ilaha illallahu Muhammadur Rasulullah.",
+    "meaning": "There is no god but Allah, Muhammad is the Messenger of Allah."
+  },
+  {
+    "title": "Kalima Shahadat",
+    "text": "أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    "transliteration": "Ashhadu alla ilaha illallahu wa ashhadu anna Muhammadan abduhu wa rasuluhu.",
+    "meaning": "I bear witness that there is no god but Allah, and I bear witness that Muhammad is His servant and Messenger."
+  }
+]

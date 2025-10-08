@@ -1,5 +1,3 @@
-// Organaize Ifter Time page
-
 // lib/pages/ifter_time_page.dart
 import 'dart:async';
 import 'dart:convert';
@@ -8,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/language_provider.dart';
 import 'ad_helper.dart';
 
 class IfterTimePage extends StatefulWidget {
@@ -19,6 +18,146 @@ class IfterTimePage extends StatefulWidget {
 
 class _IfterTimePageState extends State<IfterTimePage>
     with SingleTickerProviderStateMixin {
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'pageTitle': {'en': 'Iftar & Sehri', 'bn': 'ইফতার ও সেহরি'},
+    'locationLoading': {'en': 'Loading...', 'bn': 'লোড হচ্ছে...'},
+    'unknown': {'en': 'Unknown', 'bn': 'অজানা'},
+    'timeSetting': {'en': 'Time Setting', 'bn': 'সময় সেটিং'},
+    'adjustTime': {
+      'en': 'Adjust Iftar Time',
+      'bn': 'ইফতার সময় সামঞ্জস্য করুন',
+    },
+    'adjustDescription': {
+      'en':
+          'Adjust according to local mosque time\nUse (+) (-) buttons to adjust by 1 minute',
+      'bn':
+          'স্থানীয় মসজিদের সময়ের সাথে মিলিয়ে নিন\n(+) (-) বাটন দিয়ে ১ মিনিট করে প্রয়োজনমতো সামঞ্জস্য করুন',
+    },
+    'currentAdjustment': {
+      'en': 'Current Adjustment',
+      'bn': 'বর্তমান অ্যাডজাস্টমেন্ট',
+    },
+    'minutes': {'en': 'minutes', 'bn': 'মিনিট'},
+    'cancel': {'en': 'Cancel', 'bn': 'বাতিল'},
+    'save': {'en': 'Save', 'bn': 'সংরক্ষণ করুন'},
+    'timeReset': {
+      'en': 'Iftar time reset',
+      'bn': 'ইফতার সময় রিসেট করা হয়েছে',
+    },
+    'timeAdjusted': {
+      'en': 'Iftar time adjusted by',
+      'bn': 'ইফতার সময় অ্যাডজাস্ট করা হয়েছে',
+    },
+    'refreshData': {'en': 'Refresh data', 'bn': 'ডেটা রিফ্রেশ করুন'},
+    'remainingTime': {'en': 'Time until Iftar', 'bn': 'ইফতারের সময় বাকি'},
+    'adjusted': {'en': 'minutes adjusted', 'bn': 'মিনিট অ্যাডজাস্টেড'},
+    'comingSoon': {'en': 'Iftar time coming soon', 'bn': 'ইফতারের সময় আসছে'},
+    'getReady': {'en': 'Get ready', 'bn': 'প্রস্তুত হোন'},
+    'littleTimeLeft': {'en': 'Little time left', 'bn': 'অল্প সময় বাকি'},
+    'soonIftar': {'en': 'Iftar soon', 'bn': 'শীঘ্রই ইফতার'},
+    'nearIftar': {'en': 'Iftar time nearby', 'bn': 'ইফতারের সময় কাছাকাছি'},
+    'ramadanHadith': {'en': 'Ramadan Hadith', 'bn': 'রমজানের হাদিস'},
+    'nextHadith': {'en': 'Next Hadith', 'bn': 'পরবর্তী হাদিস'},
+    'todaysSchedule': {'en': "Today's Schedule", 'bn': 'আজকের সময়সূচী'},
+    'sehriEnd': {'en': 'Sehri End', 'bn': 'সাহরি শেষ'},
+    'iftar': {'en': 'Iftar', 'bn': 'ইফতার'},
+    'importantInfo': {
+      'en': 'Important Ramadan Info',
+      'bn': 'রমজানের গুরুত্বপূর্ণ তথ্য',
+    },
+    'iftarDua': {'en': 'Iftar Dua', 'bn': 'ইফতারের দোয়া'},
+    'prophetSaid': {'en': 'Prophet ﷺ said', 'bn': 'রাসূল ﷺ বলেছেন'},
+    'fastingEtiquette': {'en': 'Fasting Etiquette', 'bn': 'রোজার আদব'},
+    'rewardInfo': {'en': 'About Rewards', 'bn': 'সওয়াবের কথা'},
+    'fastingRemaining': {'en': 'Fasting remaining', 'bn': 'রোজার বাকি'},
+    'refresh': {'en': 'Refresh', 'bn': 'রিফ্রেশ'},
+    'hours': {'en': 'Hours', 'bn': 'ঘণ্টা'},
+    'minutesShort': {'en': 'Min', 'bn': 'মিনিট'},
+    'seconds': {'en': 'Sec', 'bn': 'সেকেন্ড'},
+    'iftarTime': {'en': 'Iftar Time', 'bn': 'ইফতারের সময়'},
+
+    // হাদিস টেক্সট
+    'hadith1': {
+      'en':
+          "The month of Ramadan in which was revealed the Quran, a guidance for mankind and clear proofs for the guidance and the criterion (between right and wrong). Surah Al-Baqarah 2:185",
+      'bn':
+          "রমযান মাস, এতে নাযিল করা হয়েছে কুরআন, যা মানুষের জন্য হিদায়াত এবং সৎপথের দিক-নির্দেশনা ও সত্যাসত্যের পার্থক্যকারী। সূরা আল-বাকারাহ ২:১৮৫",
+    },
+    'hadith2': {
+      'en':
+          "O you who have believed, decreed upon you is fasting as it was decreed upon those before you that you may become righteous. Surah Al-Baqarah 2:183",
+      'bn':
+          "হে ঈমানদারগণ! তোমাদের উপর রোযা ফরয করা হয়েছে, যেমন ফরয করা হয়েছিল তোমাদের পূর্ববর্তীদের উপর, যাতে তোমরা মুত্তাকী হতে পার। সূরা আল-বাকারাহ ২:১৮৩",
+    },
+    'hadith3': {
+      'en':
+          "And whoever is ill or on a journey - then an equal number of other days. Allah intends for you ease and does not intend for you hardship. Surah Al-Baqarah 2:185",
+      'bn':
+          "আর যে কেউ অসুস্থ অথবা সফরে থাকবে, সে যেন অন্য দিনে সংখ্যাটি পূর্ণ করে। আল্লাহ তোমাদের জন্য সহজ চান এবং তোমাদের জন্য কঠোরতা চান না। সূরা আল-বাকারাহ ২:১৮৫",
+    },
+    'hadith4': {
+      'en':
+          "When the month of Ramadan enters, the gates of Paradise are opened, the gates of Hellfire are closed and the devils are chained. Sahih al-Bukhari 1899, Sahih Muslim 1079",
+      'bn':
+          "যখন রমজান মাস প্রবেশ করে, জান্নাতের দরজাগুলো খুলে দেওয়া হয়, জাহান্নামের দরজাগুলো বন্ধ করে দেওয়া হয় এবং শয়তানদের শিকলবদ্ধ করা হয়। সহিহ বুখারি ১৮৯৯, সহিহ মুসলিম ১০৭৯",
+    },
+    'hadith5': {
+      'en':
+          "Ramadan is the month of patience, and the reward of patience is Paradise. Sunan Ibn Khuzaymah 1887",
+      'bn':
+          "রমজান হলো ধৈর্যের মাস, আর ধৈর্যের প্রতিদান হলো জান্নাত। সুনান ইবনে খুযাইমাহ ১৮৮৭",
+    },
+    'hadith6': {
+      'en':
+          "Whoever witnesses the month of Ramadan should fast through it. Surah Al-Baqarah 2:185",
+      'bn':
+          "তোমাদের মধ্যে যে ব্যক্তি এ মাস (রমজান) পাবে, সে যেন এ মাসে রোযা রাখে। সূরা আল-বাকারাহ ২:১৮৫",
+    },
+    'hadith7': {
+      'en':
+          "Whoever fasts during Ramadan out of sincere faith and hoping for a reward from Allah, then all his previous sins will be forgiven. Sahih al-Bukhari 38, Sahih Muslim 760",
+      'bn':
+          "যে ব্যক্তি ঈমান ও সওয়াবের আশায় রমজানের রোযা রাখবে, তার পূর্বেকার গুনাহ মাফ করে দেওয়া হবে। সহিহ বুখারি ৩৮, সহিহ মুসলিম ৭৬০",
+    },
+
+    // তথ্য আইটেম কন্টেন্ট
+    'iftarDuaContent': {
+      'en':
+          "O Allah! I fasted for You and I believe in You and I put my trust in You and I break my fast with Your sustenance.",
+      'bn':
+          "আল্লাহুম্মা ইন্নি লাকা সুমতু, ওয়া বিকা আমানতু, ওয়া 'আলাইكا তাওয়াক্কালতু, ওয়া 'আলা রিজকিকা আফতারতু।",
+    },
+    'prophetSaidContent': {
+      'en':
+          "Take Suhur (pre-dawn meal). Surely, there is a blessing in Suhur. (Sahih al-Bukhari 1923, Sahih Muslim 1095)",
+      'bn':
+          "রোজা রাখার জন্য সাহ্‌রি খাও; নিশ্চয়ই সাহরিতে বরকত আছে। (সহিহ বুখারি ১৯২৩, সহিহ মুসলিম ১০৯৫)",
+    },
+    'fastingEtiquetteContent': {
+      'en':
+          "Fasting is not just abstaining from food and drink, but also restraining the eyes, ears, tongue and all limbs from sins.",
+      'bn':
+          "শুধু খাবার-পানাহার থেকে বিরত থাকা নয়, বরং চোখ, কান, জিহ্বা ও সব অঙ্গ-প্রত্যঙ্গকে পাপ থেকে সংযত রাখা।",
+    },
+    'rewardInfoContent': {
+      'en':
+          "Every good deed in Ramadan is rewarded 70 times more. So perform as many good deeds as possible.",
+      'bn':
+          "রমজানের প্রতিটি নেকির সওয়াব ৭০ গুণ বেশি। তাই বেশি বেশি নেক আমল করুন।",
+    },
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
   // ==================== ভেরিয়েবল ডিক্লেয়ারেশন ====================
 
   // ---------- নামাজের সময় সম্পর্কিত ভেরিয়েবল ----------
@@ -44,16 +183,6 @@ class _IfterTimePageState extends State<IfterTimePage>
   bool _showInterstitialAds = true;
 
   // ---------- হাদিস ভেরিয়েবল ----------
-  final List<String> _ramadanHadiths = [
-    "রমযান মাস, এতে নাযিল করা হয়েছে কুরআন, যা মানুষের জন্য হিদায়াত এবং সৎপথের দিক-নির্দেশনা ও সত্যাসত্যের পার্থক্যকারী। সূরা আল-বাকারাহ ২:১৮৫",
-    "হে ঈমানদারগণ! তোমাদের উপর রোযা ফরয করা হয়েছে, যেমন ফরয করা হয়েছিল তোমাদের পূর্ববর্তীদের উপর, যাতে তোমরা মুত্তাকী হতে পার। সূরা আল-বাকারাহ ২:১৮৩",
-    "আর যে কেউ অসুস্থ অথবা সফরে থাকবে, সে যেন অন্য দিনে সংখ্যাটি পূর্ণ করে। আল্লাহ তোমাদের জন্য সহজ চান এবং তোমাদের জন্য কঠোরতা চান না। সূরা আল-বাকারাহ ২:১৮৫",
-    "যখন রমজান মাস প্রবেশ করে, জান্নাতের দরজাগুলো খুলে দেওয়া হয়, জাহান্নামের দরজাগুলো বন্ধ করে দেওয়া হয় এবং শয়তানদের শিকলবদ্ধ করা হয়। সহিহ বুখারি, হাদিস: ১৮৯৯; সহিহ মুসলিম, হাদিস: ১০৭৯",
-    "রমজান হলো ধৈর্যের মাস, আর ধৈর্যের প্রতিদান হলো জান্নাত। সুনান ইবনে খুযাইমাহ, হাদিস: ১৮৮৭",
-    "তোমাদের মধ্যে যে ব্যক্তি এ মাস (রমজান) পাবে, সে যেন এ মাসে রোযা রাখে।সূরা আল-বাকারাহ ২:১৮৫",
-    "যে ব্যক্তি ঈমান ও সওয়াবের আশায় রমজানের রোযা রাখবে, তার পূর্বেকার গুনাহ মাফ করে দেওয়া হবে। সহিহ বুখারি, হাদিস: ৩৮; সহিহ মুসলিম, হাদিস: ৭৬০",
-  ];
-
   String _currentHadith = "";
 
   @override
@@ -77,7 +206,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     _selectRandomHadith();
     _initializeAds();
     _loadAdjustmentSettings();
-    _loadAd(); // ব্যানার অ্যাড লোড
+    _loadAd();
   }
 
   // ---------- অ্যানিমেশন ইনিশিয়ালাইজেশন ----------
@@ -252,7 +381,7 @@ class _IfterTimePageState extends State<IfterTimePage>
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return _buildAdjustmentDialog(setState);
+            return _buildAdjustmentDialog(setState, context);
           },
         );
       },
@@ -264,26 +393,28 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- অ্যাডজাস্টমেন্ট ডায়ালগ বিল্ড ----------
-  Widget _buildAdjustmentDialog(void Function(void Function()) setState) {
+  Widget _buildAdjustmentDialog(
+    void Function(void Function()) setState,
+    BuildContext context,
+  ) {
     return AlertDialog(
       title: Row(
         children: [
           Icon(Icons.schedule, color: Colors.green),
           SizedBox(width: 8),
-          Text("ইফতার সময় সামঞ্জস্য করুন"),
+          Text(_text('adjustTime', context)),
         ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "স্থানীয় মসজিদের সময়ের সাথে মিলিয়ে নিন\n"
-            "(+/-) বাটন দিয়ে ১ মিনিট করে প্রয়োজনমতো সামঞ্জস্য করুন",
+            _text('adjustDescription', context),
             style: TextStyle(fontSize: 14),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
-          _buildCurrentAdjustmentDisplay(),
+          _buildCurrentAdjustmentDisplay(context),
           SizedBox(height: 20),
           _buildAdjustmentButtons(setState),
         ],
@@ -296,7 +427,7 @@ class _IfterTimePageState extends State<IfterTimePage>
               _showAdjustmentDialog = false;
             });
           },
-          child: Text("বাতিল"),
+          child: Text(_text('cancel', context)),
         ),
         ElevatedButton(
           onPressed: () {
@@ -305,17 +436,17 @@ class _IfterTimePageState extends State<IfterTimePage>
             setState(() {
               _showAdjustmentDialog = false;
             });
-            _showAdjustmentSuccessSnackbar();
+            _showAdjustmentSuccessSnackbar(context);
           },
           style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-          child: Text("সংরক্ষণ করুন"),
+          child: Text(_text('save', context)),
         ),
       ],
     );
   }
 
   // ---------- বর্তমান অ্যাডজাস্টমেন্ট ডিসপ্লে ----------
-  Widget _buildCurrentAdjustmentDisplay() {
+  Widget _buildCurrentAdjustmentDisplay(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -325,12 +456,12 @@ class _IfterTimePageState extends State<IfterTimePage>
       child: Column(
         children: [
           Text(
-            "বর্তমান অ্যাডজাস্টমেন্ট",
+            _text('currentAdjustment', context),
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
           SizedBox(height: 5),
           Text(
-            "${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment মিনিট",
+            "${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment ${_text('minutes', context)}",
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -382,13 +513,13 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- অ্যাডজাস্টমেন্ট স্ন্যাকবার ----------
-  void _showAdjustmentSuccessSnackbar() {
+  void _showAdjustmentSuccessSnackbar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           iftarTimeAdjustment == 0
-              ? "ইফতার সময় রিসেট করা হয়েছে"
-              : "ইফতার সময় ${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment মিনিট অ্যাডজাস্ট করা হয়েছে",
+              ? _text('timeReset', context)
+              : "${_text('timeAdjusted', context)} ${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment ${_text('minutes', context)}",
         ),
         duration: Duration(seconds: 2),
         backgroundColor: iftarTimeAdjustment == 0
@@ -434,8 +565,8 @@ class _IfterTimePageState extends State<IfterTimePage>
     final prefs = await SharedPreferences.getInstance();
 
     setState(() {
-      cityName = prefs.getString("cityName") ?? "অজানা";
-      countryName = prefs.getString("countryName") ?? "অজানা";
+      cityName = prefs.getString("cityName") ?? _text('unknown', context);
+      countryName = prefs.getString("countryName") ?? _text('unknown', context);
       _loadPrayerTimes(prefs);
     });
   }
@@ -473,10 +604,17 @@ class _IfterTimePageState extends State<IfterTimePage>
 
   // ---------- র্যান্ডম হাদিস নির্বাচন ----------
   void _selectRandomHadith() {
-    final random =
-        DateTime.now().millisecondsSinceEpoch % _ramadanHadiths.length;
+    final random = DateTime.now().millisecondsSinceEpoch % 7; // 7টি হাদিস
+    final hadithKey = 'hadith${random + 1}';
+
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+
     setState(() {
-      _currentHadith = _ramadanHadiths[random];
+      _currentHadith = _texts[hadithKey]?[langKey] ?? "হাদিস লোড হচ্ছে...";
     });
   }
 
@@ -591,97 +729,41 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- প্রোগ্রেস টেক্সট ----------
-  String _getProgressText(Duration remainingTime) {
+  String _getProgressText(Duration remainingTime, BuildContext context) {
     final hours = remainingTime.inHours;
     final minutes = remainingTime.inMinutes % 60;
 
-    if (hours > 1) return "ইফতারের সময় আসছে";
-    if (hours == 1) return "প্রস্তুত হোন";
-    if (minutes > 30) return "অল্প সময় বাকি";
-    if (minutes > 10) return "শীঘ্রই ইফতার";
-    return "ইফতারের সময় কাছাকাছি";
+    if (hours > 1) return _text('comingSoon', context);
+    if (hours == 1) return _text('getReady', context);
+    if (minutes > 30) return _text('littleTimeLeft', context);
+    if (minutes > 10) return _text('soonIftar', context);
+    return _text('nearIftar', context);
   }
 
   // ==================== UI কম্পোনেন্ট বিল্ডার মেথড ====================
 
-  // ---------- সময় ইউনিট বিল্ড ----------
-  Widget _buildTimeUnit(String label, int value, Color color) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.5), width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.3),
-                blurRadius: 8,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Text(
-            value.toString().padLeft(2, '0'),
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: color,
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Colors.white.withOpacity(0.9),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ---------- কোলন সেপারেটর ----------
-  Widget _buildColon(Color color) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Text(
-        ":",
-        style: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.w800,
-          color: color,
-        ),
-      ),
-    );
-  }
-
-  // ==================== মূল UI বিল্ড মেথড ====================
-
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     final primaryColor = Colors.green;
     final backgroundColor = isDarkMode ? Colors.grey[900] : Colors.grey[50];
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: _buildAppBar(primaryColor),
-      body: _buildBody(isDarkMode, primaryColor),
+      appBar: _buildAppBar(primaryColor, context),
+      body: _buildBody(isDarkMode, primaryColor, context),
       bottomNavigationBar: _buildBannerAd(),
     );
   }
 
   // ---------- অ্যাপবার বিল্ড ----------
-  AppBar _buildAppBar(Color primaryColor) {
+  AppBar _buildAppBar(Color primaryColor, BuildContext context) {
     return AppBar(
       backgroundColor: primaryColor,
-      title: const Text(
-        "ইফতার ও সেহরি",
+      title: Text(
+        _text('pageTitle', context),
         style: TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 18,
@@ -742,7 +824,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      "সময় সেটিং",
+                      _text('timeSetting', context),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -760,7 +842,7 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- বডি বিল্ড ----------
-  Widget _buildBody(bool isDarkMode, Color primaryColor) {
+  Widget _buildBody(bool isDarkMode, Color primaryColor, BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > 600;
@@ -770,24 +852,15 @@ class _IfterTimePageState extends State<IfterTimePage>
           padding: EdgeInsets.all(padding),
           child: Column(
             children: [
-              // লোকেশন UI সেকশন
-              _buildLocationSection(isDarkMode, isTablet),
+              _buildLocationSection(isDarkMode, isTablet, context),
               SizedBox(height: isTablet ? 32 : 24),
-
-              // কাউন্টডাউন UI সেকশন
-              _buildCountdownSection(isDarkMode, isTablet),
+              _buildCountdownSection(isDarkMode, isTablet, context),
               SizedBox(height: isTablet ? 32 : 24),
-
-              // হাদিস UI সেকশন
-              _buildHadithSection(isDarkMode, isTablet),
+              _buildHadithSection(isDarkMode, isTablet, context),
               SizedBox(height: isTablet ? 32 : 24),
-
-              // সময় UI সেকশন
-              _buildTimeSection(isDarkMode, isTablet),
+              _buildTimeSection(isDarkMode, isTablet, context),
               SizedBox(height: isTablet ? 32 : 24),
-
-              // তথ্য UI সেকশন
-              _buildInfoSection(isDarkMode, isTablet),
+              _buildInfoSection(isDarkMode, isTablet, context),
             ],
           ),
         );
@@ -796,28 +869,30 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- লোকেশন UI সেকশন ----------
-  // ---------- লোকেশন UI সেকশন (কম উচ্চতা) ----------
-  Widget _buildLocationSection(bool isDarkMode, bool isTablet) {
+  Widget _buildLocationSection(
+    bool isDarkMode,
+    bool isTablet,
+    BuildContext context,
+  ) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: isTablet ? 16 : 12,
-        vertical: isTablet ? 12 : 8, // কম ভার্টিক্যাল প্যাডিং
+        vertical: isTablet ? 12 : 8,
       ),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.green[900] : Colors.green[100],
-        borderRadius: BorderRadius.circular(12), // ছোট বর্ডার রেডিয়াস
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 6, // কম ব্লার
-            offset: Offset(0, 2), // ছোট শ্যাডো
+            blurRadius: 6,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         children: [
-          // লোকেশন আইকন - ছোট সাইজ
           Container(
             padding: EdgeInsets.all(isTablet ? 6 : 4),
             decoration: BoxDecoration(
@@ -826,40 +901,33 @@ class _IfterTimePageState extends State<IfterTimePage>
             ),
             child: Icon(
               Icons.location_on,
-              size: isTablet ? 20 : 18, // ছোট আইকন
+              size: isTablet ? 20 : 18,
               color: isDarkMode ? Colors.green[300] : Colors.green[700],
             ),
           ),
-
           SizedBox(width: isTablet ? 10 : 8),
-
-          // লোকেশন টেক্সট - কম্প্যাক্ট
           Expanded(
             child: Column(
-              mainAxisSize: MainAxisSize.min, // মিনিমাম স্পেস নেয়
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "$cityName, $countryName",
+                  "${cityName ?? _text('unknown', context)}, ${countryName ?? _text('unknown', context)}",
                   style: TextStyle(
-                    fontSize: isTablet ? 16 : 14, // ছোট ফন্ট
+                    fontSize: isTablet ? 16 : 14,
                     fontWeight: FontWeight.w600,
                     color: isDarkMode ? Colors.white : Colors.black87,
                   ),
-                  maxLines: 1, // এক লাইনে সীমিত
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-
-                // অ্যাডজাস্টমেন্ট ইন্ডিকেটর - ছোট সাইজ
                 if (iftarTimeAdjustment != 0) ...[
-                  SizedBox(height: 4), // কম গ্যাপ
-                  _buildCompactAdjustmentIndicator(isDarkMode),
+                  SizedBox(height: 4),
+                  _buildCompactAdjustmentIndicator(isDarkMode, context),
                 ],
               ],
             ),
           ),
-
-          // রিফ্রেশ বাটন - ছোট সাইজ
           Container(
             decoration: BoxDecoration(
               color: isDarkMode ? Colors.green[800] : Colors.green[200],
@@ -868,15 +936,14 @@ class _IfterTimePageState extends State<IfterTimePage>
             child: IconButton(
               icon: Icon(
                 Icons.refresh,
-                size: isTablet ? 20 : 18, // ছোট আইকন
+                size: isTablet ? 20 : 18,
                 color: isDarkMode ? Colors.green[300] : Colors.green[700],
               ),
               onPressed: _loadSavedData,
-              tooltip: "ডেটা রিফ্রেশ করুন",
+              tooltip: _text('refreshData', context),
               padding: EdgeInsets.all(isTablet ? 6 : 4),
-              // কম প্যাডিং
               constraints: BoxConstraints(
-                minWidth: isTablet ? 36 : 32, // ছোট বাটন
+                minWidth: isTablet ? 36 : 32,
                 minHeight: isTablet ? 36 : 32,
               ),
             ),
@@ -887,9 +954,12 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- কম্প্যাক্ট অ্যাডজাস্টমেন্ট ইন্ডিকেটর ----------
-  Widget _buildCompactAdjustmentIndicator(bool isDarkMode) {
+  Widget _buildCompactAdjustmentIndicator(
+    bool isDarkMode,
+    BuildContext context,
+  ) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2), // কম প্যাডিং
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: iftarTimeAdjustment > 0
             ? Colors.green.withOpacity(0.15)
@@ -897,7 +967,7 @@ class _IfterTimePageState extends State<IfterTimePage>
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: iftarTimeAdjustment > 0 ? Colors.green : Colors.red,
-          width: 0.5, // পাতলা বর্ডার
+          width: 0.5,
         ),
       ),
       child: Row(
@@ -905,14 +975,14 @@ class _IfterTimePageState extends State<IfterTimePage>
         children: [
           Icon(
             iftarTimeAdjustment > 0 ? Icons.arrow_upward : Icons.arrow_downward,
-            size: 10, // খুব ছোট আইকন
+            size: 10,
             color: iftarTimeAdjustment > 0 ? Colors.green : Colors.red,
           ),
-          SizedBox(width: 2), // কম গ্যাপ
+          SizedBox(width: 2),
           Text(
-            "${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment মিনিট",
+            "${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment ${_text('minutes', context)}",
             style: TextStyle(
-              fontSize: 10, // ছোট ফন্ট
+              fontSize: 10,
               fontWeight: FontWeight.w600,
               color: iftarTimeAdjustment > 0 ? Colors.green : Colors.red,
             ),
@@ -923,8 +993,11 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- কাউন্টডাউন UI সেকশন ----------
-  // ---------- কাউন্টডাউন UI সেকশন (প্রফেশনাল ভার্সন) ----------
-  Widget _buildCountdownSection(bool isDarkMode, bool isTablet) {
+  Widget _buildCountdownSection(
+    bool isDarkMode,
+    bool isTablet,
+    BuildContext context,
+  ) {
     final countdownSize = isTablet ? 260.0 : 180.0;
     final countdownColor = _getCountdownColor(iftarCountdown);
     final progressValue = _calculateProgress(iftarCountdown);
@@ -958,36 +1031,30 @@ class _IfterTimePageState extends State<IfterTimePage>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // হেডার সেকশন
-          _buildEnhancedCountdownHeader(isTablet, countdownColor),
+          _buildEnhancedCountdownHeader(isTablet, countdownColor, context),
           SizedBox(height: isTablet ? 20 : 16),
-
-          // মেইন কাউন্টডাউন কন্টেন্ট
           Stack(
             alignment: Alignment.center,
             children: [
-              // ব্যাকগ্রাউন্ড ইফেক্ট
               _buildBackgroundEffects(
                 countdownSize,
                 countdownColor,
                 progressValue,
               ),
-
-              // কাউন্টডাউন টাইমার
               _buildEnhancedCountdownTimer(
                 countdownSize,
                 countdownColor,
                 isTablet,
+                context,
               ),
             ],
           ),
           SizedBox(height: isTablet ? 20 : 16),
-
-          // ইফতার সময় ও প্রোগ্রেস বার
           _buildEnhancedIftarTimeDisplay(
             isTablet,
             countdownColor,
             progressValue,
+            context,
           ),
         ],
       ),
@@ -995,10 +1062,13 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- এনহ্যান্সড কাউন্টডাউন হেডার ----------
-  Widget _buildEnhancedCountdownHeader(bool isTablet, Color accentColor) {
+  Widget _buildEnhancedCountdownHeader(
+    bool isTablet,
+    Color accentColor,
+    BuildContext context,
+  ) {
     return Column(
       children: [
-        // মেইন টাইটেল
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
@@ -1016,7 +1086,7 @@ class _IfterTimePageState extends State<IfterTimePage>
               ),
               SizedBox(width: 8),
               Text(
-                "ইফতারের সময় বাকি",
+                _text('remainingTime', context),
                 style: TextStyle(
                   fontSize: isTablet ? 18 : 16,
                   fontWeight: FontWeight.w700,
@@ -1028,8 +1098,6 @@ class _IfterTimePageState extends State<IfterTimePage>
           ),
         ),
         SizedBox(height: 8),
-
-        // অ্যাডজাস্টমেন্ট ইন্ডিকেটর
         if (iftarTimeAdjustment != 0)
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -1038,7 +1106,7 @@ class _IfterTimePageState extends State<IfterTimePage>
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              "${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment মিনিট অ্যাডজাস্টেড",
+              "${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment ${_text('adjusted', context)}",
               style: TextStyle(
                 fontSize: isTablet ? 12 : 10,
                 color: Colors.white.withOpacity(0.9),
@@ -1062,7 +1130,6 @@ class _IfterTimePageState extends State<IfterTimePage>
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // আউটার গ্লো ইফেক্ট
           Container(
             width: size * 1.1,
             height: size * 1.1,
@@ -1078,8 +1145,6 @@ class _IfterTimePageState extends State<IfterTimePage>
               ),
             ),
           ),
-
-          // প্রোগ্রেস ব্যাকগ্রাউন্ড
           Container(
             width: size,
             height: size,
@@ -1102,6 +1167,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     double size,
     Color accentColor,
     bool isTablet,
+    BuildContext context,
   ) {
     return SizedBox(
       width: size,
@@ -1109,19 +1175,13 @@ class _IfterTimePageState extends State<IfterTimePage>
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // ডুয়েল প্রোগ্রেস ইন্ডিকেটর
           _buildDualProgressIndicator(size, accentColor),
-
-          // কাউন্টডাউন কন্টেন্ট
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // সময় ইউনিট
-              _buildCompactTimeUnits(accentColor, isTablet),
+              _buildCompactTimeUnits(accentColor, isTablet, context),
               SizedBox(height: 8),
-
-              // প্রোগ্রেস টেক্সট
-              _buildProgressStatus(accentColor, isTablet),
+              _buildProgressStatus(accentColor, isTablet, context),
             ],
           ),
         ],
@@ -1139,7 +1199,6 @@ class _IfterTimePageState extends State<IfterTimePage>
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // আউটার প্রোগ্রেস বার
           SizedBox(
             width: size,
             height: size,
@@ -1152,8 +1211,6 @@ class _IfterTimePageState extends State<IfterTimePage>
               ),
             ),
           ),
-
-          // সেন্টার গ্লো
           Container(
             width: size * 0.6,
             height: size * 0.6,
@@ -1174,26 +1231,30 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- কম্প্যাক্ট টাইম ইউনিটস ----------
-  Widget _buildCompactTimeUnits(Color accentColor, bool isTablet) {
+  Widget _buildCompactTimeUnits(
+    Color accentColor,
+    bool isTablet,
+    BuildContext context,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildEnhancedTimeUnit(
-          "ঘণ্টা",
+          _text('hours', context),
           iftarCountdown.inHours,
           accentColor,
           isTablet,
         ),
         _buildTimeSeparator(accentColor, isTablet),
         _buildEnhancedTimeUnit(
-          "মিনিট",
+          _text('minutesShort', context),
           iftarCountdown.inMinutes % 60,
           accentColor,
           isTablet,
         ),
         _buildTimeSeparator(accentColor, isTablet),
         _buildEnhancedTimeUnit(
-          "সেকেন্ড",
+          _text('seconds', context),
           iftarCountdown.inSeconds % 60,
           accentColor,
           isTablet,
@@ -1274,7 +1335,11 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- প্রোগ্রেস স্ট্যাটাস ----------
-  Widget _buildProgressStatus(Color accentColor, bool isTablet) {
+  Widget _buildProgressStatus(
+    Color accentColor,
+    bool isTablet,
+    BuildContext context,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1286,7 +1351,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             border: Border.all(color: accentColor.withOpacity(0.3), width: 1),
           ),
           child: Text(
-            _getProgressText(iftarCountdown),
+            _getProgressText(iftarCountdown, context),
             style: TextStyle(
               fontSize: isTablet ? 13 : 12,
               fontWeight: FontWeight.w600,
@@ -1304,6 +1369,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     bool isTablet,
     Color accentColor,
     double progress,
+    BuildContext context,
   ) {
     return Container(
       padding: EdgeInsets.all(isTablet ? 16 : 12),
@@ -1315,7 +1381,6 @@ class _IfterTimePageState extends State<IfterTimePage>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // ইফতার টাইম ইনফো
           Expanded(
             child: Row(
               children: [
@@ -1337,7 +1402,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "ইফতারের সময়",
+                        _text('iftarTime', context),
                         style: TextStyle(
                           fontSize: isTablet ? 14 : 12,
                           color: Colors.white.withOpacity(0.8),
@@ -1358,8 +1423,6 @@ class _IfterTimePageState extends State<IfterTimePage>
               ],
             ),
           ),
-
-          // প্রোগ্রেস পার্সেন্টেজ
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
@@ -1388,13 +1451,13 @@ class _IfterTimePageState extends State<IfterTimePage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.dining, // রমজান স্পেসিফিক আইকন
+                  Icons.dining,
                   size: isTablet ? 16 : 14,
                   color: Colors.white,
                 ),
                 SizedBox(width: 6),
                 Text(
-                  "রোজার বাকি ${(progress * 100).toStringAsFixed(0)}%",
+                  "${_text('fastingRemaining', context)} ${(progress * 100).toStringAsFixed(0)}%",
                   style: TextStyle(
                     fontSize: isTablet ? 13 : 11,
                     fontWeight: FontWeight.w700,
@@ -1410,7 +1473,11 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- হাদিস UI সেকশন ----------
-  Widget _buildHadithSection(bool isDarkMode, bool isTablet) {
+  Widget _buildHadithSection(
+    bool isDarkMode,
+    bool isTablet,
+    BuildContext context,
+  ) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(isTablet ? 24 : 16),
@@ -1432,7 +1499,6 @@ class _IfterTimePageState extends State<IfterTimePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // হেডার
           Row(
             children: [
               Icon(
@@ -1442,7 +1508,7 @@ class _IfterTimePageState extends State<IfterTimePage>
               ),
               SizedBox(width: 12),
               Text(
-                "রমজানের হাদিস",
+                _text('ramadanHadith', context),
                 style: TextStyle(
                   fontSize: isTablet ? 20 : 16,
                   fontWeight: FontWeight.bold,
@@ -1452,8 +1518,6 @@ class _IfterTimePageState extends State<IfterTimePage>
             ],
           ),
           SizedBox(height: 16),
-
-          // হাদিস টেক্সট
           Container(
             padding: EdgeInsets.all(isTablet ? 20 : 16),
             decoration: BoxDecoration(
@@ -1472,8 +1536,6 @@ class _IfterTimePageState extends State<IfterTimePage>
             ),
           ),
           SizedBox(height: 16),
-
-          // নেক্সট বাটন
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
@@ -1500,7 +1562,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                   ),
                   SizedBox(width: 8),
                   Text(
-                    "পরবর্তী হাদিস",
+                    _text('nextHadith', context),
                     style: TextStyle(
                       fontSize: isTablet ? 16 : 14,
                       color: Colors.white,
@@ -1517,7 +1579,11 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- সময় UI সেকশন (সেহরি ও ইফতার) ----------
-  Widget _buildTimeSection(bool isDarkMode, bool isTablet) {
+  Widget _buildTimeSection(
+    bool isDarkMode,
+    bool isTablet,
+    BuildContext context,
+  ) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(isTablet ? 24 : 16),
@@ -1535,7 +1601,7 @@ class _IfterTimePageState extends State<IfterTimePage>
       child: Column(
         children: [
           Text(
-            "⏰ আজকের সময়সূচী",
+            "⏰ ${_text('todaysSchedule', context)}",
             style: TextStyle(
               fontSize: isTablet ? 22 : 18,
               fontWeight: FontWeight.bold,
@@ -1543,28 +1609,23 @@ class _IfterTimePageState extends State<IfterTimePage>
             ),
           ),
           SizedBox(height: isTablet ? 24 : 16),
-
           Row(
             children: [
-              // সেহরির সময়
               Expanded(
                 child: _buildTimeCard(
                   icon: Icons.nights_stay,
-                  title: "সাহরি শেষ",
+                  title: _text('sehriEnd', context),
                   time: _calculateSehriTime(),
                   color: Colors.orange,
                   isDarkMode: isDarkMode,
                   isTablet: isTablet,
                 ),
               ),
-
               SizedBox(width: isTablet ? 20 : 16),
-
-              // ইফতারের সময়
               Expanded(
                 child: _buildTimeCard(
                   icon: Icons.wb_sunny,
-                  title: "ইফতার",
+                  title: _text('iftar', context),
                   time: _getIftarTime(),
                   color: Colors.green,
                   isDarkMode: isDarkMode,
@@ -1630,7 +1691,11 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- তথ্য UI সেকশন ----------
-  Widget _buildInfoSection(bool isDarkMode, bool isTablet) {
+  Widget _buildInfoSection(
+    bool isDarkMode,
+    bool isTablet,
+    BuildContext context,
+  ) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(isTablet ? 24 : 16),
@@ -1657,7 +1722,7 @@ class _IfterTimePageState extends State<IfterTimePage>
               ),
               SizedBox(width: 12),
               Text(
-                "রমজানের গুরুত্বপূর্ণ তথ্য",
+                _text('importantInfo', context),
                 style: TextStyle(
                   fontSize: isTablet ? 20 : 16,
                   fontWeight: FontWeight.bold,
@@ -1667,34 +1732,30 @@ class _IfterTimePageState extends State<IfterTimePage>
             ],
           ),
           SizedBox(height: 16),
-
           _buildInfoItem(
-            "🍽️ ইফতারের দোয়া",
-            "আল্লাহুম্মা ইন্নি লাকা সুমতু, ওয়া বিকা আমানতু, ওয়া 'আলাইকা তাওয়াক্কালতু, ওয়া 'আলা রিজকিকা আফতারতু।",
+            _text('iftarDua', context),
+            _text('iftarDuaContent', context),
             isDarkMode,
             isTablet,
           ),
           SizedBox(height: 12),
-
           _buildInfoItem(
-            "👉 রাসূল ﷺ বলেছেন",
-            "রোজা রাখার জন্য সাহ্‌রি খাও; নিশ্চয়ই সাহরিতে বরকত আছে। (সহিহ বুখারি 1923, সহিহ মুসলিম 1095)",
+            _text('prophetSaid', context),
+            _text('prophetSaidContent', context),
             isDarkMode,
             isTablet,
           ),
           SizedBox(height: 12),
-
           _buildInfoItem(
-            "👆 রোজার আদব",
-            "শুধু খাবার-পানাহার থেকে বিরত থাকা নয়, বরং চোখ, কান, জিহ্বা ও সব অঙ্গ-প্রত্যঙ্গকে পাপ থেকে সংযত রাখা।",
+            _text('fastingEtiquette', context),
+            _text('fastingEtiquetteContent', context),
             isDarkMode,
             isTablet,
           ),
           SizedBox(height: 12),
-
           _buildInfoItem(
-            "💫 সওয়াবের কথা",
-            "রমজানের প্রতিটি নেকির সওয়াব ৭০ গুণ বেশি। তাই বেশি বেশি নেক আমল করুন।",
+            _text('rewardInfo', context),
+            _text('rewardInfoContent', context),
             isDarkMode,
             isTablet,
           ),
@@ -1759,7 +1820,6 @@ class _IfterTimePageState extends State<IfterTimePage>
         ),
       );
     } else {
-      // ব্যানার অ্যাড না থাকলে শুধু সিস্টেম ন্যাভিগেশন বার এর জন্য স্পেস রাখুন
       return SafeArea(child: Container(height: 0));
     }
   }

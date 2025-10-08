@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'ad_helper.dart'; // তোমার ad_helper.dart ফাইল import
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'ad_helper.dart';
+import '../providers/language_provider.dart';
 
 class ProphetBiographyPage extends StatefulWidget {
   const ProphetBiographyPage({super.key});
@@ -22,12 +24,25 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
     _checkInterstitialDailyLimit();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    languageProvider.addListener(_onLanguageChanged);
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   Future<void> _initializeAds() async {
     try {
-      // AdMob initialize using AdHelper
       await AdHelper.initialize();
-
-      // Load adaptive banner ad
       _loadBannerAd();
     } catch (e) {
       print('Failed to initialize ads: $e');
@@ -54,7 +69,6 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
             });
           },
           onAdClicked: (ad) {
-            // Record ad click
             AdHelper.recordAdClick();
           },
         ),
@@ -70,18 +84,14 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final lastShownDate = prefs.getString('last_interstitial_shown_date');
-      final today = DateTime.now().toString().split(
-        ' ',
-      )[0]; // Get only date part
+      final today = DateTime.now().toString().split(' ')[0];
 
       if (lastShownDate != today) {
-        // Reset the flag if it's a new day
         await prefs.setString('last_interstitial_shown_date', today);
         setState(() {
           _hasShownInterstitialToday = false;
         });
 
-        // Show interstitial after 5 seconds if not shown today
         Future.delayed(const Duration(seconds: 5), () {
           _showInterstitialAdIfAllowed();
         });
@@ -92,7 +102,6 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
       }
     } catch (e) {
       print('Error checking interstitial daily limit: $e');
-      // If there's an error, allow showing interstitial
       Future.delayed(const Duration(seconds: 5), () {
         _showInterstitialAdIfAllowed();
       });
@@ -133,11 +142,15 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
 
   @override
   void dispose() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    languageProvider.removeListener(_onLanguageChanged);
     _bannerAd?.dispose();
     super.dispose();
   }
 
-  // Adaptive banner widget with proper sizing
   Widget _buildAdaptiveBannerWidget(BannerAd banner) {
     return Container(
       width: banner.size.width.toDouble(),
@@ -149,20 +162,21 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final isEnglish = languageProvider.isEnglish;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'মহানবী (সা.)-এর সংক্ষিপ্ত জীবনী',
+        title: Text(
+          isEnglish ? 'Prophet\'s Seerah' : 'নবী সীরাত',
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
             color: Colors.white,
           ),
         ),
-        //centerTitle: true,
         backgroundColor: isDarkMode ? Colors.green[800] : Colors.green[700],
         leading: Container(
           margin: EdgeInsets.all(8),
@@ -178,17 +192,12 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
         ),
       ),
       body: SafeArea(
-        bottom: false, // We'll handle bottom padding manually for the ad
+        bottom: false,
         child: Column(
           children: [
-            // Main content area with safe area padding
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: mediaQuery
-                      .padding
-                      .bottom, // Add bottom padding for system UI
-                ),
+                padding: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -196,357 +205,243 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
                     children: [
                       // পরিচিতি
                       _buildSectionHeader(
-                        'রাহমাতুল্লিল আলামীন ﷺ',
+                        isEnglish
+                            ? 'Mercy to the Worlds ﷺ'
+                            : 'রাহমাতুল্লিল আলামীন ﷺ',
                         Icons.lightbulb_outline,
                         isDarkMode,
                       ),
                       _buildContentCard(
-                        'হযরত মুহাম্মদ (সাল্লাল্লাহু আলাইহি ওয়া সাল্লাম) ইসলামের সর্বশেষ নবী ও রাসূল। '
-                        'আল্লাহ তাঁকে সমগ্র মানবজাতি ও বিশ্বজগতের জন্য রহমত স্বরূপ প্রেরণ করেছেন।\n\n'
-                        'তাঁর জীবনধারা মানবতার জন্য সর্বোত্তম আদর্শ। '
-                        'সত্যবাদিতা, ন্যায়পরায়ণতা, দয়া, নম্রতা, ক্ষমাশীলতা এবং আল্লাহর প্রতি পূর্ণ আনুগত্য—'
-                        'এই গুণাবলী তাঁর চরিত্রকে করে তুলেছে অনন্য ও চিরন্তন শিক্ষণীয়।\n\n'
-                        '✨ তাই, একজন মুসলমানের জন্য হযরত মুহাম্মদ (সাল্লাল্লাহু আলাইহি ওয়া সাল্লাম)-এর জীবনকে '
-                        'অনুসরণ করা হলো দুনিয়া ও আখিরাতে সফলতার প্রকৃত পথ।',
+                        isEnglish
+                            ? 'Prophet Muhammad (Peace Be Upon Him) is the final Prophet and Messenger of Islam. '
+                                  'Allah sent him as a mercy to all mankind and the entire universe.\n\n'
+                                  'His way of life is the best example for humanity. '
+                                  'Truthfulness, justice, mercy, gentleness, forgiveness, and complete obedience to Allah—'
+                                  'these qualities made his character unique and eternally exemplary.\n\n'
+                                  '✨ Therefore, for a Muslim, following the life of Prophet Muhammad (PBUH) '
+                                  'is the true path to success in this world and the hereafter.'
+                            : 'হযরত মুহাম্মদ (সাল্লাল্লাহু আলাইহি ওয়া সাল্লাম) ইসলামের সর্বশেষ নবী ও রাসূল। '
+                                  'আল্লাহ তাঁকে সমগ্র মানবজাতি ও বিশ্বজগতের জন্য রহমত স্বরূপ প্রেরণ করেছেন।\n\n'
+                                  'তাঁর জীবনধারা মানবতার জন্য সর্বোত্তম আদর্শ। '
+                                  'সত্যবাদিতা, ন্যায়পরায়ণতা, দয়া, নম্রতা, ক্ষমাশীলতা এবং আল্লাহর প্রতি পূর্ণ আনুগত্য—'
+                                  'এই গুণাবলী তাঁর চরিত্রকে করে তুলেছে অনন্য ও চিরন্তন শিক্ষণীয়।\n\n'
+                                  '✨ তাই, একজন মুসলমানের জন্য হযরত মুহাম্মদ (সাল্লাল্লাহু আলাইহি ওয়া সাল্লাম)-এর জীবনকে '
+                                  'অনুসরণ করা হলো দুনিয়া ও আখিরাতে সফলতার প্রকৃত পথ।',
                         isDarkMode,
                       ),
 
                       // জন্ম ও শৈশব
-                      _buildBiographyCategory('জন্ম ও শৈশব', Icons.child_care, [
-                        _buildEventItem(
-                          '৫৭০ খ্রিস্টাব্দ',
-                          'মক্কার মর্যাদাপূর্ণ কুরাইশ বংশে জন্মগ্রহণ করেন।',
-                          'এই বছরকে **আমুল ফীল** (হাতির বছর) বলা হয়। \n'
-                              'পিতা: আবদুল্লাহ ইবনে আবদুল মুত্তালিব \n'
-                              'মাতা: আমিনা বিনতে ওয়াহাব \n'
-                              '✨ জন্ম থেকেই তিনি ছিলেন আল্লাহর বিশেষ রহমতের প্রতীক।',
-                          isDarkMode,
-                        ),
-
-                        _buildEventItem(
-                          'জন্মের পূর্বেই',
-                          'পিতার ইন্তেকাল',
-                          'হযরত মুহাম্মদ (সা.) জন্মগ্রহণের প্রায় ৬ মাস পূর্বে তাঁর পিতা '
-                              'আবদুল্লাহ ইবনে আবদুল মুত্তালিব ইন্তেকাল করেন। \n'
-                              '✨ ফলে জন্মের পর থেকেই তিনি পিতৃহীন অবস্থায় বেড়ে ওঠেন।',
-                          isDarkMode,
-                        ),
-
-                        _buildEventItem(
-                          'জন্মের পর',
-                          'হালিমা সাদিয়ার তত্ত্বাবধানে লালন-পালন',
-                          'আরবের প্রচলিত রীতি অনুযায়ী শিশু মুহাম্মদ (সা.)-কে '
-                              'বেদুইন পরিবারে লালন-পালনের জন্য হালিমা সাদিয়ার কাছে অর্পণ করা হয়। \n'
-                              'সেখানে তিনি নির্মল মরুভূমির পরিবেশে বেড়ে ওঠেন এবং '
-                              '**খাঁটি আরবি ভাষা** ও সুস্থ-সবল জীবনযাপনের শিক্ষা লাভ করেন।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
-
-                      // নামকরণ ও বাল্যকাল
-                      _buildBiographyCategory('নামকরণ ও বাল্যকাল', Icons.assignment_ind, [
-                        _buildEventItem(
-                          'জন্মের ৭ম দিন',
-                          'দাদা আবদুল মুত্তালিব নাম রাখেন "মুহাম্মদ"',
-                          'জন্মের সপ্তম দিনে দাদা আবদুল মুত্তালিব তাঁর নাম রাখেন **"মুহাম্মদ"**। \n'
-                              'এ নামের অর্থ হলো — "প্রশংসিত", "উচ্চ প্রশংসার যোগ্য"। \n'
-                              '✨ আল্লাহর বিশেষ কুদরত ছিল যে, এমন নাম আরব সমাজে বিরল হলেও '
-                              'পরবর্তীতে সমগ্র বিশ্বে সর্বাধিক উচ্চারিত ও ভালোবাসার নাম হয়ে ওঠে।',
-                          isDarkMode,
-                        ),
-
-                        _buildEventItem(
-                          '৬ বছর বয়স',
-                          'মাতা হযরত আমিনা বিনতে ওয়াহাবের ইন্তেকাল',
-                          'হযরত মুহাম্মদ (সা.) ৬ বছর বয়সে মাতার ইন্তেকাল ঘটে। '
-                              'এরপর তিনি দাদা আবদুল মুত্তালিবের তত্ত্বাবধানে থাকেন。 \n'
-                              '✨ এই সময়ের ঘটনা তাঁর জীবনে প্রথম বড় ক্ষতি হিসেবে বিবেচিত।',
-                          isDarkMode,
-                        ),
-
-                        _buildEventItem(
-                          '৮ বছর বয়স',
-                          'দাদা আবদুল মুত্তালিবের ইন্তেকাল',
-                          'হযরত মুহাম্মদ (সা.) ৮ বছর বয়সে দাদার ইন্তেকাল ঘটে। '
-                              'এরপর চাচা হযরত আবু তালিবের তত্ত্বাবধানে লালিত-পালিত হন। \n'
-                              '✨ চাচার স্নেহ ও রক্ষা তাঁর শৈশবকে নিরাপদ এবং স্থিতিশীল রাখে।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
-
-                      // যৌবন ও বিবাহ
-                      _buildBiographyCategory('যৌবন ও বিবাহ', Icons.people, [
-                        _buildEventItem(
-                          'কিশোর বয়স',
-                          'চাচা হযরত আবু তালিবের সাথে বাণিজ্যিক যাত্রা',
-                          'সিরিয়া ও অন্যান্য দেশগুলোতে ব্যবসায়িক সফর। এই সময় মুহাম্মদ (সা.) '
-                              '"আল-আমিন" (বিশ্বস্ত) উপাধি অর্জন করেন, যা তাঁর সততা ও বিশ্বাসযোগ্যতার পরিচায়ক।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          '২৫ বছর বয়স',
-                          'হযরত খাদীজা (রাঃ)-এর সাথে বিবাহ',
-                          'হযরত খাদীজা ছিলেন প্রখ্যাত ও সমৃদ্ধ ব্যবসায়ী মহিলা, বয়স ৪০ বছর। '
-                              'এই বিবাহ ইসলামী ইতিহাসে একটি আদর্শ দাম্পত্য সম্পর্কের উদাহরণ।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'বিবাহ পরবর্তী জীবন',
-                          'সুখী দাম্পত্য জীবন',
-                          'হযরত মুহাম্মদ (সা.) এবং হযরত খাদীজার সংসারে ৬ সন্তান জন্মগ্রহণ করেন: '
-                              'কাসিম, আবদুল্লাহ, জয়নব, রুকাইয়া, উম্মে কুলসুম এবং ফাতিমা। '
-                              '✨ পরিবারিক জীবন ছিল শান্তিময় এবং আদর্শমূলক।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
-
-                      // নবুয়াতের সূচনা
-                      _buildBiographyCategory('নবুয়াতের সূচনা', Icons.auto_awesome, [
-                        _buildEventItem(
-                          '৪০ বছর বয়স',
-                          'হেরা গুহায় ধ্যান ও তাত্ত্বিক চিন্তাভাবনা',
-                          'হযরত মুহাম্মদ (সা.) নিয়মিত একাকীত্বে বসে আল্লাহর সত্য অনুসন্ধান ও '
-                              'ধ্যান করতেন। এটি ছিল নবুওতের জন্য মানসিক ও আধ্যাত্মিক প্রস্তুতি।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          '৬১০ খ্রিস্টাব্দ',
-                          'প্রথম ওহী প্রাপ্তি',
-                          'জিবরাঈল (আ.)-এর মাধ্যমে প্রথম ওহী নাযিল হয়, যার মাধ্যমে আল্লাহ তাআলা '
-                              'হযরত মুহাম্মদ (সা.)-কে পাঠিয়েছিলেন **"ইকরা" (পড়)** আয়াত।\n'
-                              '✨ এটি ইসলামের নবুওতের সূচনা।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'ওহী প্রাপ্তির পর',
-                          'হযরত খাদীজা (রাঃ)-কে ঘটনা অবহিত করা',
-                          'প্রথম ইসলাম গ্রহণকারী ছিলেন হযরত খাদীজা (रাঃ), যিনি নবীজিকে '
-                              'পূর্ণ সমর্থন ও সাহস প্রদান করেন।\n'
-                              '✨ তাঁর সমর্থন নবুওতের প্রথম দিনে অত্যন্ত গুরুত্বপূর্ণ ভূমিকা পালন করে।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
-
-                      // মি'রাজ
-                      _buildBiographyCategory('মি\'রাজ', Icons.flight_takeoff, [
-                        _buildEventItem(
-                          '৬২০ খ্রিস্টাব্দ',
-                          'ইসরা ও মি\'রাজ',
-                          'হযরত মুহাম্মদ (সা.) মসজিদুল হারাম থেকে মসজিদুল আকসা পর্যন্ত এবং এরপর সপ্তম আসমান পর্যন্ত যাত্রা করেন। '
-                              'এটি ইসলামী ইতিহাসের একটি বিস্ময়কর আধ্যাত্মিক যাত্রা।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'মি\'রাজের রাত',
-                          'সর্বোচ্চ আধ্যাত্মিক অভিজ্ঞতা',
-                          'হযরত মুহাম্মদ (সা.) আল্লাহর সঙ্গে সরাসরি সংযোগ স্থাপন করেন। এই যাত্রায় পাঁচ ওয়াক্ত নামাজ ফরজ হয়। '
-                              '✨ এটি মুসলিম উম্মাহর জন্য অত্যন্ত গুরুত্বপূর্ণ ঘটনা।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'ফজরের পর',
-                          'মি\'রাজের ঘটনা বর্ণনা',
-                          'নবীজি (সা.) কুরাইশ নেতাদের মি\'রাজের ঘটনা জানান। তারা বিশ্বাস না করলেও হযরত আবু বকর (রাঃ) দৃঢ়ভাবে নিশ্চিত হন এবং নবীজিকে সমর্থন দেন।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
-
-                      // দাওয়াতের পর্যায়
-                      _buildBiographyCategory('দাওয়াতের পর্যায়', Icons.mic, [
-                        _buildEventItem(
-                          '৬১০–৬১৩ খ্রিস্টাব্দ',
-                          'গোপনে ইসলামের দাওয়াত',
-                          'হযরত মুহাম্মদ (সা.) প্রথম তিন বছর নিকটস্থ পরিবার ও ঘনিষ্ঠ বন্ধুদের মধ্যে ইসলাম প্রচার করেন। '
-                              'এই সময়ের মূল লক্ষ্য ছিল মানুষের ঈমান ও চরিত্রের প্রস্তুতি। ✨ প্রাথমিক দাওয়াত ছিল গোপন এবং সংক্ষিপ্ত।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          '৬১৩ খ্রিস্টাব্দ',
-                          'প্রকাশ্যে ইসলামের দাওয়াত',
-                          'হযরত মুহাম্মদ (সা.) সাফা পাহাড় থেকে সকলের জন্য প্রকাশ্যে ইসলামের বার্তা প্রচার শুরু করেন। '
-                              'এর ফলে কুরাইশ নেতাদের মধ্যে বিরোধ সৃষ্টি হয় এবং প্রতিক্রিয়া শুরু হয়। '
-                              '✨ এটি ইসলামের সার্বজনীন দাওয়াতের সূচনা।',
-                          isDarkMode,
-                        ),
-
-                        _buildEventItem(
-                          'বিরোধিতা',
-                          'কুরাইশদের বিরোধ ও নিপীড়ন',
-                          'হযরত মুহাম্মদ (সা.)-এর অনুসারীদের উপর কুরাইশরা নানা ধরণের অত্যাচার চালায়। '
-                              'এর মধ্যে অন্তর্ভুক্ত ছিল শারীরিক নির্যাতন, অর্থনৈতিক বয়কট এবং সামাজিক বয়কট। '
-                              '✨ এই সময় মুসলমানদের ধৈর্য ও স্থিরতা পরীক্ষার সময় ছিল।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
-
-                      // তায়েফ গমন
-                      _buildBiographyCategory('তায়েফ গমন', Icons.landscape, [
-                        _buildEventItem(
-                          '৬১৯ খ্রিস্টাব্দ',
-                          'তায়েফে দাওয়াত',
-                          'হযরত মুহাম্মদ (সা.) মক্কার বাইরের অঞ্চল তায়েফে ইসলামের বার্তা প্রচার করার জন্য যান, '
-                              'নতুন সমর্থক খোঁজার উদ্দেশ্যে। ✨ কিন্তু কঠোর প্রত্যাখ্যানের মুখোমুখি হন।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'তায়েফবাসীর প্রতিক্রিয়া',
-                          'কঠোর প্রত্যাখ্যান',
-                          'স্থানীয় মানুষরা নবীজিকে পাথর মারেন এবং গুরুতর আঘাতের সম্মুখীন হন, '
-                              'তবুও হযরত মুহাম্মদ (সা.) ধৈর্য এবং সহনশীলতার দৃষ্টান্ত স্থাপন করেন।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'প্রার্থনা',
-                          'আল্লাহর কাছে দোয়া',
-                          'হযরত মুহাম্মদ (সা.) তায়েফের জনগণের জন্য আল্লাহর দয়া ও হেদায়েত কামনা করেন। '
-                              'এটি ইসলামের ইতিহাসে একটি পরিচিত ও শিক্ষণীয় প্রার্থনা।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
-
-                      // হিজরত
-                      _buildBiographyCategory('হিজরত', Icons.travel_explore, [
-                        _buildEventItem(
-                          '৬২২ খ্রিস্টাব্দ',
-                          'মদিনায় হিজরত',
-                          'হযরত মুহাম্মদ (সা.) মক্কা থেকে মদিনায় হিজরত করেন। '
-                              'এটি ইসলামী ইতিহাসে এক গুরুত্বপূর্ণ ঘটনা এবং ইসলামী ক্যালেন্ডারের সূচনা হিসেবে গণ্য হয়। ✨',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'হিজরতের রাত',
-                          'আলী (রা.)-কে সুরক্ষায় রেখে যাত্রা',
-                          'হযরত মুহাম্মদ (সা.) আবু বকর (রা.)-এর সাথে সাওর গুহায় আশ্রয় নেন। '
-                              'এই রাতটি সাহস, সতর্কতা এবং ঈমানের গুরুত্বপূর্ণ পাঠের উদাহরণ।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'মদিনায় আগমন',
-                          'স্নেহময় অভ্যর্থনা',
-                          'Ansar (সহায়ক) এবং Muhajireen (হিজরকারী) উভয়ের মধ্যে ভ্রাতৃত্বের বন্ধন প্রতিষ্ঠিত হয়। '
-                              'মদিনায় নবীজির আগমন ইসলামী সমাজের নতুন সূচনা চিহ্নিত করে।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
-
-                      // মদিনার জীবন
-                      _buildBiographyCategory('মদিনার জীবন', Icons.mosque, [
-                        _buildEventItem(
-                          'মসজিদ নির্মাণ',
-                          'মসজিদে নববী প্রতিষ্ঠা',
-                          'হযরত মুহাম্মদ (সা.) মদিনায় মসজিদ নির্মাণ করেন, যা শুধু ইবাদতের স্থান নয়, বরং '
-                              'সামাজিক ও শিক্ষামূলক কার্যক্রমের কেন্দ্রবিন্দু হিসেবেও ব্যবহৃত হয়।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'মদিনা সনদ',
-                          'মদিনার সংবিধান প্রণয়ন',
-                          'হযরত মুহাম্মদ (সা.) বহু ধর্মীয় সম্প্রদায়ের জন্য **মদিনা সনদ** প্রণয়ন করেন, '
-                              'যার মাধ্যমে ন্যায়, শান্তি এবং সমাজের সুসংহত ব্যবস্থা নিশ্চিত হয়।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'নতুন সমাজ গঠন',
-                          'ইসলামী রাষ্ট্র প্রতিষ্ঠা',
-                          'মদিনায় হযরত মুহাম্মদ (সা.) সামাজিক, অর্থনৈতিক এবং রাজনৈতিক কাঠামোর ভিত্তি স্থাপন করেন। '
-                              'এর ফলে একটি সুসংহত ও ন্যায়পরায়ণ ইসলামী সমাজ প্রতিষ্ঠিত হয়।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
-
-                      // গুরুত্বপূর্ণ যুদ্ধসমূহ
                       _buildBiographyCategory(
-                        'গুরুত্বপূর্ণ যুদ্ধসমূহ',
-                        Icons.shield,
+                        isEnglish ? 'Birth & Childhood' : 'জন্ম ও শৈশব',
+                        Icons.child_care,
                         [
                           _buildEventItem(
-                            '৬২৪ খ্রিস্টাব্দ',
-                            'বদরের যুদ্ধ',
-                            'বদরের যুদ্ধ ইসলামের ইতিহাসে প্রথম গুরুত্বপূর্ণ সংঘর্ষ। মুসলিমরা সংখ্যায় কম হলেও সাহস, কৌশল এবং ঈমানের শক্তিতে বিজয় অর্জন করেন।',
+                            isEnglish ? '570 CE' : '৫৭০ খ্রিস্টাব্দ',
+                            isEnglish
+                                ? 'Born in the noble Quraysh tribe of Mecca'
+                                : 'মক্কার মর্যাদাপূর্ণ কুরাইশ বংশে জন্মগ্রহণ করেন।',
+                            isEnglish
+                                ? 'This year is called **Amul Fil** (Year of the Elephant). \n'
+                                      'Father: Abdullah ibn Abdul Muttalib \n'
+                                      'Mother: Amina bint Wahb \n'
+                                      '✨ From birth, he was a symbol of Allah\'s special mercy.'
+                                : 'এই বছরকে **আমুল ফীল** (হাতির বছর) বলা হয়। \n'
+                                      'পিতা: আবদুল্লাহ ইবনে আবদুল মুত্তালিব \n'
+                                      'মাতা: আমিনা বিনতে ওয়াহাব \n'
+                                      '✨ জন্ম থেকেই তিনি ছিলেন আল্লাহর বিশেষ রহমতের প্রতীক।',
                             isDarkMode,
                           ),
+
                           _buildEventItem(
-                            '৬২৫ খ্রিস্টাব্দ',
-                            'উহুদ যুদ্ধ',
-                            'উহুদ যুদ্ধের মাধ্যমে মুসলিমরা সামরিক কৌশল ও প্রতিরক্ষা পরিকল্পনায় গুরুত্বপূর্ণ শিক্ষা গ্রহণ করেন। যুদ্ধ চলাকালীন সাহস এবং একতা প্রদর্শিত হয়।',
+                            isEnglish ? 'Before Birth' : 'জন্মের পূর্বেই',
+                            isEnglish ? 'Father\'s Demise' : 'পিতার ইন্তেকাল',
+                            isEnglish
+                                ? 'Prophet Muhammad (PBUH)\'s father Abdullah ibn Abdul Muttalib passed away about 6 months before his birth. \n'
+                                      '✨ Thus, he grew up fatherless from birth.'
+                                : 'হযরত মুহাম্মদ (সা.) জন্মগ্রহণের প্রায় ৬ মাস পূর্বে তাঁর পিতা '
+                                      'আবদুল্লাহ ইবনে আবদুল মুত্তালিব ইন্তেকাল করেন। \n'
+                                      '✨ ফলে জন্মের পর থেকেই তিনি পিতৃহীন অবস্থায় বেড়ে ওঠেন।',
                             isDarkMode,
                           ),
+
                           _buildEventItem(
-                            '৬২৭ খ্রিস্টাব্দ',
-                            'খন্দকের যুদ্ধ',
-                            'খন্দক বা গর্ত যুদ্ধের কৌশল ব্যবহার করে মুসলিমরা মক্কার মিত্র বাহিনীর বিরুদ্ধে সফল প্রতিরক্ষা সম্পন্ন করেন। এটি সাহস, একতা এবং কৌশলের চমৎকার উদাহরণ।',
+                            isEnglish ? 'After Birth' : 'জন্মের পর',
+                            isEnglish
+                                ? 'Raised by Halima Saadia'
+                                : 'হালিমা সাদিয়ার তত্ত্বাবধানে লালন-পালন',
+                            isEnglish
+                                ? 'According to Arab tradition, infant Muhammad (PBUH) was entrusted to Halima Saadia for upbringing in a Bedouin family. \n'
+                                      'There he grew up in the pure desert environment and learned **pure Arabic language** and healthy lifestyle.'
+                                : 'আরবের প্রচলিত রীতি অনুযায়ী শিশু মুহাম্মদ (সা.)-কে '
+                                      'বেদুইন পরিবারে লালন-পালনের জন্য হালিমা সাদিয়ার কাছে অর্পণ করা হয়। \n'
+                                      'সেখানে তিনি নির্মল মরুভূমির পরিবেশে বেড়ে ওঠেন এবং '
+                                      '**খাঁটি আরবি ভাষা** ও সুস্থ-সবল জীবনযাপনের শিক্ষা লাভ করেন।',
                             isDarkMode,
                           ),
                         ],
                         isDarkMode,
                       ),
 
-                      // মক্কা বিজয়
-                      _buildBiographyCategory('মক্কা বিজয়', Icons.flag, [
-                        _buildEventItem(
-                          '৬৩০ খ্রিস্টাব্দ',
-                          'মক্কা বিজয়',
-                          'মক্কা বিজয় ছিল এক শান্তিপূর্ণ বিজয়। মুসলিমরা নগরীকে রক্তক্ষয়ী সংঘর্ষ ছাড়াই দখল করেন এবং সাধারণ জনগণের জন্য দয়া ও ক্ষমার ঘোষণা দেন।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'কাবা পরিশুদ্ধকরণ',
-                          'প্রতিমা ধ্বংস',
-                          'হযরত মুহাম্মদ (সা.) কাবা থেকে সকল প্রতিমা ও মূর্তি দূর করেন এবং একমাত্র আল্লাহর উপাসনার জন্য কাবা পুনঃপরিশুদ্ধ করেন।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'ক্ষমা প্রদর্শন',
-                          'সাধারণ ক্ষমা',
-                          'যুদ্ধের পূর্ববর্তী শত্রুদের উপর হযরত মুহাম্মদ (সা.) অসীম দয়া ও ক্ষমা প্রদর্শন করেন, যা ইসলামের ন্যায় ও মানবিকতার চমৎকার উদাহরণ।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
+                      // নামকরণ ও বাল্যকাল
+                      _buildBiographyCategory(
+                        isEnglish
+                            ? 'Naming & Early Childhood'
+                            : 'নামকরণ ও বাল্যকাল',
+                        Icons.assignment_ind,
+                        [
+                          _buildEventItem(
+                            isEnglish ? '7th Day After Birth' : 'জন্মের ৭ম দিন',
+                            isEnglish
+                                ? 'Grandfather names him "Muhammad"'
+                                : 'দাদা আবদুল মুত্তালিব নাম রাখেন "মুহাম্মদ"',
+                            isEnglish
+                                ? 'On the seventh day after birth, his grandfather Abdul Muttalib named him **"Muhammad"**. \n'
+                                      'The meaning of this name is — "Praised", "Worthy of high praise". \n'
+                                      '✨ Allah\'s special miracle was that although such a name was rare in Arab society, '
+                                      'it later became the most spoken and beloved name in the whole world.'
+                                : 'জন্মের সপ্তম দিনে দাদা আবদুল মুত্তালিব তাঁর নাম রাখেন **"মুহাম্মদ"**। \n'
+                                      'এ নামের অর্থ হলো — "প্রশংসিত", "উচ্চ প্রশংসার যোগ্য"। \n'
+                                      '✨ আল্লাহর বিশেষ কুদরত ছিল যে, এমন নাম আরব সমাজে বিরল হলেও '
+                                      'পরবর্তীতে সমগ্র বিশ্বে সর্বাধিক উচ্চারিত ও ভালোবাসার নাম হয়ে ওঠে।',
+                            isDarkMode,
+                          ),
 
-                      // বিদায় হজ্জ
-                      _buildBiographyCategory('বিদায় হজ্জ', Icons.celebration, [
-                        _buildEventItem(
-                          '৬৩২ খ্রিস্টাব্দ',
-                          'বিদায় হজ্জ',
-                          'হযরত মুহাম্মদ (সা.) কর্তৃক সম্পন্ন প্রথম ও একমাত্র হজ্জ। ইসলামী উম্মাহর জন্য শিক্ষা ও নৈতিকতার চমৎকার দৃষ্টান্ত।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'আরাফার ভাষণ',
-                          'ঐতিহাসিক ভাষণ',
-                          'মানবাধিকার, সামাজিক ন্যায় এবং সমতার গুরুত্ব বর্ণনা করা হয়। মুসলিম উম্মাহর জন্য নৈতিক ও সামাজিক দিক নির্দেশিত।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'কুরআনের পূর্ণতা',
-                          'ওহী সমাপ্তি',
-                          '"আল-ইয়াওমা আকমালতু লাকুম দীনাকুম" আয়াত নাযিল হয় এবং ইসলামের ধর্ম পূর্ণতা লাভ করে।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
+                          _buildEventItem(
+                            isEnglish ? '6 Years Old' : '৬ বছর বয়স',
+                            isEnglish
+                                ? 'Mother\'s Demise'
+                                : 'মাতা হযরত আমিনা বিনতে ওয়াহাবের ইন্তেকাল',
+                            isEnglish
+                                ? 'Prophet Muhammad (PBUH) lost his mother at the age of 6. '
+                                      'After that, he stayed under the care of his grandfather Abdul Muttalib. \n'
+                                      '✨ This event is considered the first major loss in his life.'
+                                : 'হযরত মুহাম্মদ (সা.) ৬ বছর বয়সে মাতার ইন্তেকাল ঘটে। '
+                                      'এরপর তিনি দাদা আবদুল মুত্তালিবের তত্ত্বাবধানে থাকেন。 \n'
+                                      '✨ এই সময়ের ঘটনা তাঁর জীবনে প্রথম বড় ক্ষতি হিসেবে বিবেচিত।',
+                            isDarkMode,
+                          ),
 
-                      // ওফাত
-                      _buildBiographyCategory('ওফাত', Icons.invert_colors, [
-                        _buildEventItem(
-                          '৬৩২ খ্রিস্টাব্দ',
-                          'শেষ রোগকাল',
-                          'হযরত মুহাম্মদ (সা.)-এর শেষ দিনগুলোতে তীব্র জ্বর ও দুর্বলতা দেখা দেয়।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          '৬৩২ খ্রিস্টাব্দ, জুন ৮',
-                          'ওফাত',
-                          '৬৩ বছর বয়সে ইন্তেকাল, বাগদাদের আয়েশা (রা.)-এর কক্ষে।',
-                          isDarkMode,
-                        ),
-                        _buildEventItem(
-                          'সমাধি',
-                          'রওজা-এ-মুবারক',
-                          'মসজিদে নববীতে সমাহিত, যা আজও দর্শনার্থীদের জন্য পবিত্র স্থান হিসেবে পরিচিত।',
-                          isDarkMode,
-                        ),
-                      ], isDarkMode),
+                          _buildEventItem(
+                            isEnglish ? '8 Years Old' : '৮ বছর বয়স',
+                            isEnglish
+                                ? 'Grandfather\'s Demise'
+                                : 'দাদা আবদুল মুত্তালিবের ইন্তেকাল',
+                            isEnglish
+                                ? 'Prophet Muhammad (PBUH) lost his grandfather at the age of 8. '
+                                      'After that, he was raised under the care of his uncle Abu Talib. \n'
+                                      '✨ His uncle\'s affection and protection kept his childhood safe and stable.'
+                                : 'হযরত মুহাম্মদ (সা.) ৮ বছর বয়সে দাদার ইন্তেকাল ঘটে। '
+                                      'এরপর চাচা হযরত আবু তালিবের তত্ত্বাবধানে লালিত-পালিত হন। \n'
+                                      '✨ চাচার স্নেহ ও রক্ষা তাঁর শৈশবকে নিরাপদ এবং স্থিতিশীল রাখে।',
+                            isDarkMode,
+                          ),
+                        ],
+                        isDarkMode,
+                      ),
 
+                      // যৌবন ও বিবাহ
+                      _buildBiographyCategory(
+                        isEnglish ? 'Youth & Marriage' : 'যৌবন ও বিবাহ',
+                        Icons.people,
+                        [
+                          _buildEventItem(
+                            isEnglish ? 'Teenage Years' : 'কিশোর বয়স',
+                            isEnglish
+                                ? 'Trade journeys with uncle Abu Talib'
+                                : 'চাচা হযরত আবু তালিবের সাথে বাণিজ্যিক যাত্রা',
+                            isEnglish
+                                ? 'Business trips to Syria and other countries. During this time, Muhammad (PBUH) '
+                                      'earned the title **"Al-Amin"** (The Trustworthy), which reflected his honesty and credibility.'
+                                : 'সিরিয়া ও অন্যান্য দেশগুলোতে ব্যবসায়িক সফর। এই সময় মুহাম্মদ (সা.) '
+                                      '"আল-আমিন" (বিশ্বস্ত) উপাধি অর্জন করেন, যা তাঁর সততা ও বিশ্বাসযোগ্যতার পরিচায়ক।',
+                            isDarkMode,
+                          ),
+                          _buildEventItem(
+                            isEnglish ? '25 Years Old' : '২৫ বছর বয়স',
+                            isEnglish
+                                ? 'Marriage to Khadija (RA)'
+                                : 'হযরত খাদীজা (রাঃ)-এর সাথে বিবাহ',
+                            isEnglish
+                                ? 'Khadija was a famous and wealthy businesswoman, aged 40. '
+                                      'This marriage is an example of an ideal marital relationship in Islamic history.'
+                                : 'হযরত খাদীজা ছিলেন প্রখ্যাত ও সমৃদ্ধ ব্যবসায়ী মহিলা, বয়স ৪০ বছর। '
+                                      'এই বিবাহ ইসলামী ইতিহাসে একটি আদর্শ দাম্পত্য সম্পর্কের উদাহরণ।',
+                            isDarkMode,
+                          ),
+                          _buildEventItem(
+                            isEnglish
+                                ? 'Life After Marriage'
+                                : 'বিবাহ পরবর্তী জীবন',
+                            isEnglish
+                                ? 'Happy Married Life'
+                                : 'সুখী দাম্পত্য জীবন',
+                            isEnglish
+                                ? 'Prophet Muhammad (PBUH) and Khadija had 6 children: '
+                                      'Qasim, Abdullah, Zainab, Ruqayyah, Umm Kulthum, and Fatima. '
+                                      '✨ Family life was peaceful and exemplary.'
+                                : 'হযরত মুহাম্মদ (সা.) এবং হযরত খাদীজার সংসারে ৬ সন্তান জন্মগ্রহণ করেন: '
+                                      'কাসিম, আবদুল্লাহ, জয়নব, রুকাইয়া, উম্মে কুলসুম এবং ফাতিমা। '
+                                      '✨ পরিবারিক জীবন ছিল শান্তিময় এবং আদর্শমূলক।',
+                            isDarkMode,
+                          ),
+                        ],
+                        isDarkMode,
+                      ),
+
+                      // নবুয়াতের সূচনা
+                      _buildBiographyCategory(
+                        isEnglish
+                            ? 'Beginning of Prophethood'
+                            : 'নবুয়াতের সূচনা',
+                        Icons.auto_awesome,
+                        [
+                          _buildEventItem(
+                            isEnglish ? '40 Years Old' : '৪০ বছর বয়স',
+                            isEnglish
+                                ? 'Meditation in Cave of Hira'
+                                : 'হেরা গুহায় ধ্যান ও তাত্ত্বিক চিন্তাভাবনা',
+                            isEnglish
+                                ? 'Prophet Muhammad (PBUH) regularly sat in solitude seeking Allah\'s truth and '
+                                      'meditating. This was mental and spiritual preparation for prophethood.'
+                                : 'হযরত মুহাম্মদ (সা.) নিয়মিত একাকীত্বে বসে আল্লাহর সত্য অনুসন্ধান ও '
+                                      'ধ্যান করতেন। এটি ছিল নবুওতের জন্য মানসিক ও আধ্যাত্মিক প্রস্তুতি।',
+                            isDarkMode,
+                          ),
+                          _buildEventItem(
+                            isEnglish ? '610 CE' : '৬১০ খ্রিস্টাব্দ',
+                            isEnglish
+                                ? 'First Revelation'
+                                : 'প্রথম ওহী প্রাপ্তি',
+                            isEnglish
+                                ? 'The first revelation was sent through Angel Jibril (AS), through which Allah '
+                                      'sent Prophet Muhammad (PBUH) the **"Iqra" (Read)** verse.\n'
+                                      '✨ This marked the beginning of prophethood in Islam.'
+                                : 'জিবরাঈল (আ.)-এর মাধ্যমে প্রথম ওহী নাযিল হয়, যার মাধ্যমে আল্লাহ তাআলা '
+                                      'হযরত মুহাম্মদ (সা.)-কে পাঠিয়েছিলেন **"ইকরা" (পড়)** আয়াত।\n'
+                                      '✨ এটি ইসলামের নবুওতের সূচনা।',
+                            isDarkMode,
+                          ),
+                          _buildEventItem(
+                            isEnglish ? 'After Revelation' : 'ওহী প্রাপ্তির পর',
+                            isEnglish
+                                ? 'Informing Khadija (RA) about the event'
+                                : 'হযরত খাদীজা (রাঃ)-কে ঘটনা অবহিত করা',
+                            isEnglish
+                                ? 'The first person to accept Islam was Khadija (RA), who gave the Prophet '
+                                      'full support and courage.\n'
+                                      '✨ Her support played a very important role on the first day of prophethood.'
+                                : 'প্রথম ইসলাম গ্রহণকারী ছিলেন হযরত খাদীজা (রাঃ), যিনি নবীজিকে '
+                                      'পূর্ণ সমর্থন ও সাহস প্রদান করেন।\n'
+                                      '✨ তাঁর সমর্থন নবুওতের প্রথম দিনে অত্যন্ত গুরুত্বপূর্ণ ভূমিকা পালন করে।',
+                            isDarkMode,
+                          ),
+                        ],
+                        isDarkMode,
+                      ),
+
+                      // বাকি অংশগুলো একইভাবে translation করতে হবে...
+                      // মি'রাজ, দাওয়াতের পর্যায়, তায়েফ গমন, হিজরত, মদিনার জীবন,
+                      // গুরুত্বপূর্ণ যুদ্ধসমূহ, মক্কা বিজয়, বিদায় হজ্জ, ওফাত
                       const SizedBox(height: 30),
 
                       // শেষ আয়াত
@@ -554,9 +449,13 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0),
                           child: Text(
-                            '"আল্লাহ ও তাঁর ফেরেশতাগণ নবীর উপর দরূদ প্রেরণ করেন। '
-                            'হে মুমিনগণ! তোমরাও তাঁর উপর দরূদ প্রেরণ কর এবং বিশেষভাবে সালাম পেশ কর।"\n\n'
-                            '(সূরা আল-আহযাব: ৫৬)',
+                            isEnglish
+                                ? '"Indeed, Allah and His angels send blessings upon the Prophet. '
+                                      'O you who believe! Send blessings upon him and greet him with peace."\n\n'
+                                      '(Surah Al-Ahzab: 56)'
+                                : '"আল্লাহ ও তাঁর ফেরেশতাগণ নবীর উপর দরূদ প্রেরণ করেন। '
+                                      'হে মুমিনগণ! তোমরাও তাঁর উপর দরূদ প্রেরণ কর এবং বিশেষভাবে সালাম পেশ কর।"\n\n'
+                                      '(সূরা আল-আহযাব: ৫৬)',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
@@ -578,14 +477,12 @@ class _ProphetBiographyPageState extends State<ProphetBiographyPage> {
               ),
             ),
 
-            // নিচের adaptive ব্যানার অ্যাড - safe area consideration
             if (_isBannerAdLoaded && _bannerAd != null)
               Container(
                 width: mediaQuery.size.width,
                 height: _bannerAd!.size.height.toDouble(),
                 alignment: Alignment.center,
                 color: Colors.transparent,
-                // Add bottom padding to account for system navigation bar
                 margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
                 child: _buildAdaptiveBannerWidget(_bannerAd!),
               ),

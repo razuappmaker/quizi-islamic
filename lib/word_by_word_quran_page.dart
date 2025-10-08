@@ -1,10 +1,12 @@
-// word_by_word_quran_page.dart (ফিক্সড - Anchor Ads সহ এবং বটম প্যাডিং ইস্যু সমাধান)
+// word_by_word_quran_page.dart (মাল্টি-ল্যাঙ্গুয়েজ সাপোর্ট সহ)
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 import 'json_loader.dart';
 import 'ad_helper.dart';
 import 'utils/responsive_utils.dart';
 import 'network_json_loader.dart';
+import '../providers/language_provider.dart';
 
 class WordByWordQuranPage extends StatefulWidget {
   const WordByWordQuranPage({Key? key}) : super(key: key);
@@ -27,6 +29,40 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
   bool _isAnchorAdReady = false;
   bool _showAnchorAd = true;
 
+  // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
+  static const Map<String, Map<String, String>> _texts = {
+    'pageTitle': {'en': 'Word by Word Quran', 'bn': 'শব্দে শব্দে কুরআন'},
+    'loading': {
+      'en': 'Loading Word by Word Quran...',
+      'bn': 'শব্দে শব্দে কুরআন লোড হচ্ছে...',
+    },
+    'noSuraFound': {'en': 'No Surahs Found', 'bn': 'কোন সুরা পাওয়া যায়নি'},
+    'fontSize': {'en': 'Font Size', 'bn': 'ফন্ট সাইজ'},
+    'decreaseFont': {'en': 'Decrease font', 'bn': 'ফন্ট ছোট করুন'},
+    'defaultFont': {'en': 'Default font size', 'bn': 'ডিফল্ট ফন্ট সাইজ'},
+    'increaseFont': {'en': 'Increase font', 'bn': 'ফন্ট বড় করুন'},
+    'wordByWordMeaning': {
+      'en': 'Word by Word Meaning',
+      'bn': 'শব্দে শব্দে অর্থ',
+    },
+    'completeMeaning': {'en': 'Complete Meaning', 'bn': 'সম্পূর্ণ অর্থ'},
+    'source': {'en': 'Source', 'bn': 'সূত্র'},
+    'makki': {'en': 'Makki', 'bn': 'মাক্কি'},
+    'madani': {'en': 'Madani', 'bn': 'মাদিনী'},
+    'verses': {'en': 'verses', 'bn': 'আয়াত'},
+    'close': {'en': 'Close', 'bn': 'বন্ধ'},
+  };
+
+  // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
+  String _text(String key, BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final langKey = languageProvider.isEnglish ? 'en' : 'bn';
+    return _texts[key]?[langKey] ?? key;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -36,9 +72,17 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
 
   Future<void> _loadWordQuranData() async {
     try {
-      final loadedData = await NetworkJsonLoader.loadJsonList(
-        'assets/wordquran.json',
+      final languageProvider = Provider.of<LanguageProvider>(
+        context,
+        listen: false,
       );
+
+      // ভাষা অনুযায়ী JSON ফাইল সিলেক্ট করুন
+      final String jsonFile = languageProvider.isEnglish
+          ? 'assets/en_wordquran.json'
+          : 'assets/wordquran.json';
+
+      final loadedData = await NetworkJsonLoader.loadJsonList(jsonFile);
 
       final List<Map<String, dynamic>> convertedData = loadedData
           .map<Map<String, dynamic>>((item) => Map<String, dynamic>.from(item))
@@ -49,34 +93,64 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
         _isLoading = false;
       });
 
-      print('✅ Word Quran data loaded successfully from network/assets');
+      print('✅ Word Quran data loaded successfully from: $jsonFile');
     } catch (e) {
       debugPrint('Error loading word by word Quran data: $e');
 
       setState(() {
         _isLoading = false;
-        wordSuras = [
-          {
-            'title': 'সূরা আল ফাতিহা - الفاتحة',
-            'ayat': [
-              {
-                'arabic_words': [
-                  {'word': 'بِسْمِ', 'meaning': 'নামে'},
-                  {'word': 'ٱللَّٰهِ', 'meaning': 'আল্লাহর'},
-                  {'word': 'ٱلرَّحْمَٰنِ', 'meaning': 'পরম করুণাময়'},
-                  {'word': 'ٱلرَّحِيمِ', 'meaning': 'অতি দয়ালু'},
-                ],
-                'transliteration': 'বিসমিল্লাহির রাহমানির রাহিম',
-                'meaning': 'পরম করুণাময়, পরম দয়ালু আল্লাহর নামে।',
-              },
-            ],
-            'reference': 'কুরআন, সূরা আল ফাতিহা, আয়াত ১-৭',
-          },
-        ];
+        wordSuras = _getFallbackData();
       });
 
       print('⚠️ Using fallback default data for word Quran');
     }
+  }
+
+  List<Map<String, dynamic>> _getFallbackData() {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final isEnglish = languageProvider.isEnglish;
+
+    return [
+      {
+        'title': isEnglish
+            ? 'Surah Al-Fatihah - الفاتحة'
+            : 'সূরা আল ফাতিহা - الفاتحة',
+        'serial': 1,
+        'type': isEnglish ? 'Makki' : 'মাক্কি',
+        'ayat_count': 7,
+        'ayat': [
+          {
+            'arabic_words': [
+              {
+                'word': 'بِسْمِ',
+                'meaning': isEnglish ? 'In the name of' : 'নামে',
+              },
+              {'word': 'ٱللَّٰهِ', 'meaning': isEnglish ? 'Allah' : 'আল্লাহর'},
+              {
+                'word': 'ٱلرَّحْمَٰنِ',
+                'meaning': isEnglish ? 'the Most Gracious' : 'পরম করুণাময়',
+              },
+              {
+                'word': 'ٱلرَّحِيمِ',
+                'meaning': isEnglish ? 'the Most Merciful' : 'অতি দয়ালু',
+              },
+            ],
+            'transliteration': isEnglish
+                ? 'Bismillahir Rahmanir Rahim'
+                : 'বিসমিল্লাহির রাহমানির রাহিম',
+            'meaning': isEnglish
+                ? 'In the name of Allah, the Most Gracious, the Most Merciful.'
+                : 'পরম করুণাময়, পরম দয়ালু আল্লাহর নামে।',
+          },
+        ],
+        'reference': isEnglish
+            ? 'Quran, Surah Al-Fatihah, Verses 1-7'
+            : 'কুরআন, সূরা আল ফাতিহা, আয়াত ১-৭',
+      },
+    ];
   }
 
   Future<void> _loadAnchorAd() async {
@@ -200,6 +274,14 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
     final title = sura['title'] ?? '';
     final bool isExpanded = expandedIndices.contains(index);
 
+    // Convert type based on language
+    String displayType = type;
+    if (type == 'মাক্কি') {
+      displayType = _text('makki', context);
+    } else if (type == 'মাদিনী') {
+      displayType = _text('madani', context);
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
@@ -265,7 +347,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: type == 'মাক্কি'
+                        color: type == 'মাক্কি' || type == 'Makki'
                             ? (Theme.of(context).brightness == Brightness.dark
                                   ? Color(0xFFFFB74D)
                                   : Color(0xFFFFA000))
@@ -275,7 +357,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        type,
+                        displayType,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -312,7 +394,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '$ayatCount আয়াত',
+                            '$ayatCount ${_text('verses', context)}',
                             style: TextStyle(
                               color: _getHeaderTextColor(context),
                               fontSize: 12,
@@ -367,7 +449,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'শব্দে শব্দে অর্থ:',
+            '${_text('wordByWordMeaning', context)}:',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
@@ -529,7 +611,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        'ফন্ট সাইজ',
+                                        _text('fontSize', context),
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
@@ -605,17 +687,17 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                       _buildFontSizeButton(
                                         icon: Icons.zoom_out_rounded,
                                         onPressed: _decreaseFontSize,
-                                        tooltip: 'ফন্ট ছোট করুন',
+                                        tooltip: _text('decreaseFont', context),
                                       ),
                                       _buildFontSizeButton(
                                         icon: Icons.restart_alt_rounded,
                                         onPressed: _resetFontSize,
-                                        tooltip: 'ডিফল্ট ফন্ট সাইজ',
+                                        tooltip: _text('defaultFont', context),
                                       ),
                                       _buildFontSizeButton(
                                         icon: Icons.zoom_in_rounded,
                                         onPressed: _increaseFontSize,
-                                        tooltip: 'ফন্ট বড় করুন',
+                                        tooltip: _text('increaseFont', context),
                                       ),
                                     ],
                                   ),
@@ -630,7 +712,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   children: [
-                                    // সম্পূর্ণ আয়াত
+                                    // সম্পূর্ণ আয়াত (আরবি সবসময় একই থাকে)
                                     Directionality(
                                       textDirection: TextDirection.rtl,
                                       child: SelectableText(
@@ -679,7 +761,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
 
                                     const SizedBox(height: 12),
 
-                                    // বাংলা উচ্চারণ
+                                    // উচ্চারণ (ভাষা অনুযায়ী পরিবর্তন হবে)
                                     SelectableText(
                                       ay['transliteration'] ?? '',
                                       style: TextStyle(
@@ -696,9 +778,9 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
 
                                     const SizedBox(height: 12),
 
-                                    // সম্পূর্ণ অর্থ
+                                    // সম্পূর্ণ অর্থ (ভাষা অনুযায়ী পরিবর্তন হবে)
                                     SelectableText(
-                                      'সম্পূর্ণ অর্থ: ${ay['meaning'] ?? ''}',
+                                      '${_text('completeMeaning', context)}: ${ay['meaning'] ?? ''}',
                                       style: TextStyle(
                                         fontSize: _fontSize,
                                         color: _getSecondaryTextColor(context),
@@ -744,7 +826,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: SelectableText(
-                                        'সূত্র: ${sura['reference']}',
+                                        '${_text('source', context)}: ${sura['reference']}',
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontStyle: FontStyle.italic,
@@ -780,11 +862,13 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: _getPrimaryColor(context),
-        title: const Text(
-          'শব্দে শব্দে কুরআন',
+        title: Text(
+          _text('pageTitle', context),
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
@@ -822,7 +906,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'শব্দে শব্দে কুরআন লোড হচ্ছে...',
+                              _text('loading', context),
                               style: TextStyle(
                                 color: _getSecondaryTextColor(context),
                                 fontSize: 16,
@@ -843,7 +927,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'কোন সুরা পাওয়া যায়নি',
+                              _text('noSuraFound', context),
                               style: TextStyle(
                                 color: _getSecondaryTextColor(context),
                                 fontSize: 16,

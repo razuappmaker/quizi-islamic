@@ -1,0 +1,54 @@
+{
+  "Basic Islamic Knowledge": [
+    {
+      "question": "How many pillars are there in Islam?",
+      "options": [
+        "Three",
+        "Four",
+        "Five",
+        "Six"
+      ],
+      "answer": "Five"
+    },
+    {
+      "question": "What was the first Qibla in Islam?",
+      "options": [
+        "Madinah",
+        "Baytullah (Kaaba)",
+        "Bayt al-Maqdis (Jerusalem)",
+        "Kaaba"
+      ],
+      "answer": "Bayt al-Maqdis (Jerusalem)"
+    },
+    {
+      "question": "What is the name of the last Prophet in Islam?",
+      "options": [
+        "Prophet Isa (A.S)",
+        "Prophet Musa (A.S)",
+        "Prophet Muhammad (S.A.W)",
+        "Prophet Ibrahim (A.S)"
+      ],
+      "answer": "Prophet Muhammad (S.A.W)"
+    },
+    {
+      "question": "What is the holy book of Islam?",
+      "options": [
+        "Torah",
+        "Bible",
+        "Qur'an",
+        "Zabur"
+      ],
+      "answer": "Qur'an"
+    },
+    {
+      "question": "What is the Muslim place of worship called?",
+      "options": [
+        "Temple",
+        "Church",
+        "Mosque",
+        "Monastery"
+      ],
+      "answer": "Mosque"
+    }
+  ]
+}
