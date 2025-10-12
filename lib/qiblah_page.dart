@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 import 'ad_helper.dart';
 
 class QiblaPage extends StatefulWidget {
@@ -209,7 +211,7 @@ class _QiblaPageState extends State<QiblaPage>
       Position position;
       try {
         position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high, // উচ্চ নির্ভুলতা
+          desiredAccuracy: LocationAccuracy.high,
         ).timeout(const Duration(seconds: 15));
 
         _cachedPosition = position;
@@ -334,23 +336,59 @@ class _QiblaPageState extends State<QiblaPage>
     });
   }
 
+  // ✅ শহরের নাম ট্রান্সলেট করার মেথড
+  String _getTranslatedCityName(String cityName, bool isEnglish) {
+    if (!isEnglish) return cityName;
+
+    Map<String, String> translations = {
+      "লোড হচ্ছে...": "Loading...",
+      "অজানা শহর": "Unknown City",
+      "অজানা অবস্থান": "Unknown Location",
+      "সেভ করা অবস্থান": "Saved Location",
+    };
+
+    return translations[cityName] ?? cityName;
+  }
+
+  // ✅ প্রোগ্রেস টেক্সট ট্রান্সলেট করার মেথড
+  String _getAlignmentText(double difference, bool isEnglish) {
+    if (isEnglish) {
+      if (difference < 1) return "🎯 Perfectly aligned! Start praying";
+      if (difference < 3) return "👍 Very accurate, ready for prayer";
+      if (difference < 8) return "👌 Almost correct, adjust slightly";
+      if (difference < 20) return "↔️ Adjust direction, then pray";
+      if (difference < 45) return "🔄 Rotate phone towards Qibla";
+      return "❌ Completely wrong direction, rotate your phone";
+    } else {
+      if (difference < 1) return "🎯 সম্পূর্ণ সঠিক! নামাজ শুরু করুন";
+      if (difference < 3) return "👍 অত্যন্ত সঠিক, নামাজের জন্য প্রস্তুত";
+      if (difference < 8) return "👌 প্রায় সঠিক, সামান্য adjustment করুন";
+      if (difference < 20) return "↔️ দিক ঠিক করুন, তারপর নামাজ পড়ুন";
+      if (difference < 45) return "🔄 ফোনটি ঘুরিয়ে কিবলার দিক করুন";
+      return "❌ সম্পূর্ণ ভুল দিক, ফোনটি ঘুরিয়ে নিন";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // ✅ LanguageProvider access করুন
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final isEnglish = languageProvider.isEnglish;
+
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
       appBar: AppBar(
-        title: const Text(
-          "কিবলা কম্পাস",
+        title: Text(
+          isEnglish ? "Qibla Compass" : "কিবলা কম্পাস",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
             color: Colors.white,
           ),
         ),
-        //centerTitle: true,
         backgroundColor: Colors.green[700],
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -377,12 +415,12 @@ class _QiblaPageState extends State<QiblaPage>
               _checkInternetConnection();
               _getLocationAndCalculateQibla();
             },
-            tooltip: "রিফ্রেশ করুন",
+            tooltip: isEnglish ? "Refresh" : "রিফ্রেশ করুন",
           ),
           IconButton(
             icon: const Icon(Icons.info_outline, color: Colors.white),
             onPressed: _toggleCompassInstructions,
-            tooltip: "কম্পাস নির্দেশনা",
+            tooltip: isEnglish ? "Compass Instructions" : "কম্পাস নির্দেশনা",
           ),
         ],
       ),
@@ -392,13 +430,7 @@ class _QiblaPageState extends State<QiblaPage>
           children: [
             Expanded(
               child: SingleChildScrollView(
-                // ✅ REMOVE bottom padding from here - only keep top, left, right
-                padding: const EdgeInsets.only(
-                  left: 16,
-                  right: 16,
-                  top: 16,
-                  // ❌ REMOVE: bottom: mediaQuery.padding.bottom,
-                ),
+                padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
                 child: Column(
                   children: [
                     // Internet status indicator
@@ -426,7 +458,9 @@ class _QiblaPageState extends State<QiblaPage>
                             const SizedBox(width: 8),
                             Flexible(
                               child: Text(
-                                "ইন্টারনেট সংযোগ নেই, সেভ করা লোকেশন ব্যবহার করা হচ্ছে",
+                                isEnglish
+                                    ? "No internet connection, using saved location"
+                                    : "ইন্টারনেট সংযোগ নেই, সেভ করা লোকেশন ব্যবহার করা হচ্ছে",
                                 style: TextStyle(
                                   color: Colors.orange[800],
                                   fontSize: 14,
@@ -440,24 +474,24 @@ class _QiblaPageState extends State<QiblaPage>
                       ),
 
                     // Your existing content...
-                    _buildCompactLocationSection(isDarkMode),
+                    _buildCompactLocationSection(isDarkMode, isEnglish),
                     const SizedBox(height: 24),
 
                     if (_isLoading)
-                      _buildLoadingIndicator()
+                      _buildLoadingIndicator(isEnglish)
                     else
-                      _buildProfessionalCompassSection(isDarkMode),
+                      _buildProfessionalCompassSection(isDarkMode, isEnglish),
 
                     const SizedBox(height: 24),
 
                     if (_showCompassInstructions)
-                      _buildInstructionsCard(isDarkMode),
+                      _buildInstructionsCard(isDarkMode, isEnglish),
 
                     const SizedBox(height: 16),
 
-                    if (_isPermissionDenied) _buildPermissionCard(isDarkMode),
+                    if (_isPermissionDenied)
+                      _buildPermissionCard(isDarkMode, isEnglish),
 
-                    // ✅ ADD extra space at the bottom of content instead of padding
                     SizedBox(
                       height: _isBottomBannerAdReady
                           ? 20
@@ -468,7 +502,7 @@ class _QiblaPageState extends State<QiblaPage>
               ),
             ),
 
-            // ✅ Adaptive Bottom Banner Ad - KEEP the margin here only
+            // ✅ Adaptive Bottom Banner Ad
             if (_isBottomBannerAdReady && _bottomBannerAd != null)
               Container(
                 width: double.infinity,
@@ -476,7 +510,6 @@ class _QiblaPageState extends State<QiblaPage>
                 alignment: Alignment.center,
                 color: isDarkMode ? Colors.grey[800] : Colors.white,
                 margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
-                // ✅ Only here
                 child: AdWidget(ad: _bottomBannerAd!),
               ),
           ],
@@ -486,7 +519,7 @@ class _QiblaPageState extends State<QiblaPage>
   }
 
   // ✅ কম্প্যাক্ট লোকেশন সেকশন
-  Widget _buildCompactLocationSection(bool isDarkMode) {
+  Widget _buildCompactLocationSection(bool isDarkMode, bool isEnglish) {
     return FadeTransition(
       opacity: _animation,
       child: Container(
@@ -513,7 +546,7 @@ class _QiblaPageState extends State<QiblaPage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    cityName,
+                    _getTranslatedCityName(cityName, isEnglish),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -531,10 +564,11 @@ class _QiblaPageState extends State<QiblaPage>
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                  if (cityName == "সেভ করা অবস্থান") ...[
+                  if (cityName == "সেভ করা অবস্থান" ||
+                      cityName == "Saved Location") ...[
                     const SizedBox(height: 2),
                     Text(
-                      "সেভ করা লোকেশন",
+                      isEnglish ? "Saved Location" : "সেভ করা লোকেশন",
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.orange[700],
@@ -556,7 +590,7 @@ class _QiblaPageState extends State<QiblaPage>
     );
   }
 
-  Widget _buildLoadingIndicator() {
+  Widget _buildLoadingIndicator(bool isEnglish) {
     return Container(
       padding: const EdgeInsets.all(40),
       child: Column(
@@ -567,7 +601,9 @@ class _QiblaPageState extends State<QiblaPage>
           ),
           const SizedBox(height: 20),
           Text(
-            "কিবলা দিকনির্দেশ লোড হচ্ছে...",
+            isEnglish
+                ? "Loading Qibla direction..."
+                : "কিবলা দিকনির্দেশ লোড হচ্ছে...",
             style: TextStyle(
               fontSize: 16,
               color: Colors.green[600],
@@ -580,12 +616,12 @@ class _QiblaPageState extends State<QiblaPage>
   }
 
   // ✅ প্রফেশনাল কম্পাস সেকশন
-  Widget _buildProfessionalCompassSection(bool isDarkMode) {
+  Widget _buildProfessionalCompassSection(bool isDarkMode, bool isEnglish) {
     return StreamBuilder<CompassEvent>(
       stream: FlutterCompass.events,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return _buildCompassError();
+          return _buildCompassError(isEnglish);
         }
 
         double? heading = snapshot.data?.heading;
@@ -593,28 +629,34 @@ class _QiblaPageState extends State<QiblaPage>
 
         double rotation = 0;
         if (heading != null && qiblaAngle != null) {
-          // সঠিক রোটেশন ক্যালকুলেশন
           rotation = ((qiblaAngle! - heading) * (pi / 180));
         }
 
         return Column(
           children: [
-            _buildProfessionalCompassUI(rotation, heading ?? 0, isDarkMode),
+            _buildProfessionalCompassUI(
+              rotation,
+              heading ?? 0,
+              isDarkMode,
+              isEnglish,
+            ),
             const SizedBox(height: 20),
-            _buildDirectionInfo(heading ?? 0, isDarkMode),
+            _buildDirectionInfo(heading ?? 0, isDarkMode, isEnglish),
           ],
         );
       },
     );
   }
 
-  Widget _buildCompassError() {
+  Widget _buildCompassError(bool isEnglish) {
     return Column(
       children: [
         Icon(Icons.error_outline, color: Colors.red, size: 60),
         const SizedBox(height: 16),
         Text(
-          "কম্পাস লোড করতে সমস্যা হচ্ছে\nমোবাইলটি সামান্য নাড়ান বা রিফ্রেশ করুন",
+          isEnglish
+              ? "Having trouble loading compass\nMove phone slightly or refresh"
+              : "কম্পাস লোড করতে সমস্যা হচ্ছে\nমোবাইলটি সামান্য নাড়ান বা রিফ্রেশ করুন",
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.red,
@@ -631,6 +673,7 @@ class _QiblaPageState extends State<QiblaPage>
     double rotation,
     double heading,
     bool isDarkMode,
+    bool isEnglish,
   ) {
     return Container(
       width: 300,
@@ -718,8 +761,8 @@ class _QiblaPageState extends State<QiblaPage>
                       ),
                     ],
                   ),
-                  child: const Text(
-                    "🕋 কিবলা",
+                  child: Text(
+                    isEnglish ? "🕋 Qibla" : "🕋 কিবলা",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -773,7 +816,7 @@ class _QiblaPageState extends State<QiblaPage>
     );
   }
 
-  Widget _buildDirectionInfo(double heading, bool isDarkMode) {
+  Widget _buildDirectionInfo(double heading, bool isDarkMode, bool isEnglish) {
     double difference = qiblaAngle != null ? (qiblaAngle! - heading).abs() : 0;
     difference = difference > 180 ? 360 - difference : difference;
 
@@ -796,13 +839,13 @@ class _QiblaPageState extends State<QiblaPage>
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildInfoItem(
-                "কিবলা দিক",
+                isEnglish ? "Qibla Direction" : "কিবলা দিক",
                 "${qiblaAngle?.toStringAsFixed(1) ?? '0'}°",
                 Icons.explore,
                 isDarkMode,
               ),
               _buildInfoItem(
-                "বর্তমান দিক",
+                isEnglish ? "Current Direction" : "বর্তমান দিক",
                 "${heading.toStringAsFixed(1)}°",
                 Icons.navigation,
                 isDarkMode,
@@ -819,7 +862,7 @@ class _QiblaPageState extends State<QiblaPage>
           ),
           const SizedBox(height: 12),
           Text(
-            _getAlignmentText(difference),
+            _getAlignmentText(difference, isEnglish),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -829,7 +872,7 @@ class _QiblaPageState extends State<QiblaPage>
           ),
           const SizedBox(height: 8),
           Text(
-            "ভারত: ${_lastLatitude.toStringAsFixed(4)}°, ${_lastLongitude.toStringAsFixed(4)}°",
+            "${isEnglish ? "Location" : "অবস্থান"}: ${_lastLatitude.toStringAsFixed(4)}°, ${_lastLongitude.toStringAsFixed(4)}°",
             style: TextStyle(
               fontSize: 12,
               color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
@@ -884,16 +927,7 @@ class _QiblaPageState extends State<QiblaPage>
     return Colors.red;
   }
 
-  String _getAlignmentText(double difference) {
-    if (difference < 1) return "🎯 সম্পূর্ণ সঠিক! নামাজ শুরু করুন";
-    if (difference < 3) return "👍 অত্যন্ত সঠিক, নামাজের জন্য প্রস্তুত";
-    if (difference < 8) return "👌 প্রায় সঠিক, সামান্য adjustment করুন";
-    if (difference < 20) return "↔️ দিক ঠিক করুন, তারপর নামাজ পড়ুন";
-    if (difference < 45) return "🔄 ফোনটি ঘুরিয়ে কিবলার দিক করুন";
-    return "❌ সম্পূর্ণ ভুল দিক, ফোনটি ঘুরিয়ে নিন";
-  }
-
-  Widget _buildInstructionsCard(bool isDarkMode) {
+  Widget _buildInstructionsCard(bool isDarkMode, bool isEnglish) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -912,7 +946,9 @@ class _QiblaPageState extends State<QiblaPage>
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "কম্পাস ব্যবহার নির্দেশিকা",
+                  isEnglish
+                      ? "Compass Instructions"
+                      : "কম্পাস ব্যবহার নির্দেশিকা",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -923,19 +959,30 @@ class _QiblaPageState extends State<QiblaPage>
             ),
             const SizedBox(height: 16),
             _buildInstructionRow(
-              "📱 ফোনটি সমতল রাখুন এবং ঘুরান",
+              isEnglish
+                  ? "📱 Keep phone flat and rotate"
+                  : "📱 ফোনটি সমতল রাখুন এবং ঘুরান",
               Icons.phone_android,
             ),
             const SizedBox(height: 8),
             _buildInstructionRow(
-              "🎯 লাল তীর কিবলার দিক দেখাবে",
+              isEnglish
+                  ? "🎯 Red arrow shows Qibla direction"
+                  : "🎯 লাল তীর কিবলার দিক দেখাবে",
               Icons.architecture,
             ),
             const SizedBox(height: 8),
-            _buildInstructionRow("🧭 N দিয়ে উত্তর দিক চিন্হিত", Icons.explore),
+            _buildInstructionRow(
+              isEnglish
+                  ? "🧭 N indicates North direction"
+                  : "🧭 N দিয়ে উত্তর দিক চিন্হিত",
+              Icons.explore,
+            ),
             const SizedBox(height: 8),
             _buildInstructionRow(
-              "✅ সবুজ বার দেখাবে কতটা সঠিক",
+              isEnglish
+                  ? "✅ Green bar shows accuracy level"
+                  : "✅ সবুজ বার দেখাবে কতটা সঠিক",
               Icons.check_circle,
             ),
           ],
@@ -957,28 +1004,7 @@ class _QiblaPageState extends State<QiblaPage>
     );
   }
 
-  Widget _buildQuranInstructionRow(String text, String reference) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          text,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          reference,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPermissionCard(bool isDarkMode) {
+  Widget _buildPermissionCard(bool isDarkMode, bool isEnglish) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -990,7 +1016,7 @@ class _QiblaPageState extends State<QiblaPage>
             Icon(Icons.location_off, color: Colors.orange[800], size: 40),
             const SizedBox(height: 12),
             Text(
-              "লোকেশন এক্সেস প্রয়োজন",
+              isEnglish ? "Location Access Required" : "লোকেশন এক্সেস প্রয়োজন",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -999,7 +1025,9 @@ class _QiblaPageState extends State<QiblaPage>
             ),
             const SizedBox(height: 8),
             Text(
-              "সঠিক কিবলা দিকনির্দেশের জন্য লোকেশন এক্সেস দিন",
+              isEnglish
+                  ? "Please allow location access for accurate Qibla direction"
+                  : "সঠিক কিবলা দিকনির্দেশের জন্য লোকেশন এক্সেস দিন",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.orange[700]),
             ),
@@ -1007,7 +1035,7 @@ class _QiblaPageState extends State<QiblaPage>
             ElevatedButton.icon(
               onPressed: _openAppSettings,
               icon: const Icon(Icons.settings),
-              label: const Text("সেটিংস খুলুন"),
+              label: Text(isEnglish ? "Open Settings" : "সেটিংস খুলুন"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,

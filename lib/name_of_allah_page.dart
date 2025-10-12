@@ -193,6 +193,61 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
     }
   }
 
+  // Info Dialog Show Function
+  void _showInfoDialog(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final isEnglish = languageProvider.isEnglish;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.green[800]),
+              SizedBox(width: 8),
+              Text(
+                isEnglish ? "Important Note" : "গুরুত্বপূর্ণ নোট",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[800],
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Text(
+              isEnglish
+                  ? "References from Quranic verses or authentic Hadiths have been mentioned for the virtues (Fazilat) of each name.\n\nSome virtues are related to specific numbers of Dhikr, which are mentioned in various Hadith books and Islamic literature. These are essentially devotional practices.\n\nBefore performing any devotional act, intention (Niyyah) should be pure and it should be done solely for the pleasure of Allah."
+                  : "প্রতিটি নামের ফাজিলাতের জন্য কুরআনের আয়াত বা সহীহ হাদিসের রেফারেন্স উল্লেখ করা হয়েছে।\n\nকিছু ফাজিলাত নির্দিষ্ট সংখ্যক জিকিরের সাথে সম্পর্কিত, যা বিভিন্ন হাদিসের বই ও ইসলামিক গ্রন্থে বর্ণিত আছে। এগুলো মূলত প্রার্থনামূলক আমল।\n\nযে কোনো আমল করার আগে নিয়্যাত খালেস করতে হবে এবং শুধুমাত্র আল্লাহর সন্তুষ্টির জন্য করতে হবে।",
+              style: TextStyle(fontSize: 16, height: 1.5),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                isEnglish ? "OK" : "ঠিক আছে",
+                style: TextStyle(
+                  color: Colors.green[800],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     final languageProvider = Provider.of<LanguageProvider>(
@@ -252,8 +307,9 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
     final primaryColor = Colors.green[800];
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    int totalItems = filteredNames.length + (filteredNames.length / 6).floor();
-
+    //int totalItems = filteredNames.length + (filteredNames.length / 6).floor();
+    // totalItems ক্যালকুলেশন ঠিক করুন
+    int totalItems = filteredNames.length + ((filteredNames.length - 1) ~/ 6);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -279,6 +335,11 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
           ),
         ),
         actions: [
+          // Info Icon Button
+          IconButton(
+            icon: Icon(Icons.info_outline, color: Colors.white),
+            onPressed: () => _showInfoDialog(context),
+          ),
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
@@ -332,9 +393,14 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                 padding: const EdgeInsets.all(16),
                 itemCount: totalItems,
                 itemBuilder: (context, index) {
-                  if ((index + 1) % 6 == 0) {
-                    int adIndex = ((index + 1) / 6).floor() - 1;
-                    if (adIndex < _bannerAds.length &&
+                  // এড পজিশন ক্যালকুলেশন
+                  int totalAdsBefore = (index + 1) ~/ 7;
+                  bool isAdPosition = (index + 1) % 7 == 0;
+
+                  if (isAdPosition && totalAdsBefore <= _bannerAds.length) {
+                    int adIndex = totalAdsBefore - 1;
+                    if (adIndex >= 0 &&
+                        adIndex < _bannerAds.length &&
                         _bannerAds[adIndex] != null) {
                       final banner = _bannerAds[adIndex]!;
                       return Container(
@@ -346,7 +412,9 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                     return const SizedBox.shrink();
                   }
 
-                  int nameIndex = index - (index / 6).floor();
+                  // ✅ সঠিক নাম ইন্ডেক্স ক্যালকুলেশন
+                  // নাম ইন্ডেক্স ক্যালকুলেশন
+                  int nameIndex = index - totalAdsBefore;
                   if (nameIndex >= filteredNames.length) {
                     return const SizedBox.shrink();
                   }

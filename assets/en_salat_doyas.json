@@ -8,11 +8,99 @@
     "reference": "Bukhari: 614, Muslim: 384"
   },
   {
-    "title": "Dua Before Wudu",
+    "title": "Dua Before Starting Wudu",
     "bangla": "Bismillah.",
     "arabic": "بِسْمِ اللهِ",
     "transliteration": "Bismillah.",
     "meaning": "In the name of Allah (I begin the ablution).",
     "reference": "Abu Dawood: 101"
+  },
+  {
+    "title": "Dua After Completing Wudu",
+    "bangla": "Ashhadu an la ilaha illallahu wahdahu la sharika lahu, wa ashhadu anna Muhammadan 'abduhu wa rasuluhu. Allahummaj'alni minat-tawwabeena waj'alni minal-mutatahhireen.",
+    "arabic": "أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ. اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ",
+    "transliteration": "Ashhadu an la ilaha illallahu wahdahu la sharika lahu, wa ashhadu anna Muhammadan 'abduhu wa rasuluhu. Allahummaj'alni minat-tawwabeena waj'alni minal-mutatahhireen.",
+    "meaning": "I bear witness that there is no god but Allah alone, with no partner, and I bear witness that Muhammad is His slave and Messenger. O Allah, make me among those who repent and make me among those who purify themselves.",
+    "reference": "Tirmidhi: 55"
+  },
+  {
+    "title": "Dua Between Two Prostrations (Sajdah)",
+    "bangla": "Rabbi-ghfir li, Rabbi-ghfir li.",
+    "arabic": "رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي",
+    "transliteration": "Rabbi-ghfir li, Rabbi-ghfir li.",
+    "meaning": "My Lord, forgive me. My Lord, forgive me.",
+    "reference": "Abu Dawood: 874"
+  },
+  {
+    "title": "Another Dua Between Two Sajdahs",
+    "bangla": "Rabbi-ghfir li warhamni wajburni warfa'ni warzuqni wahdini wa'afini.",
+    "arabic": "رَبِّ اغْفِرْ لِي وَارْحَمْنِي وَاجْبُرْنِي وَارْفَعْنِي وَارْزُقْنِي وَاهْدِنِي وَعَافِنِي",
+    "transliteration": "Rabbi-ghfir li warhamni wajburni warfa'ni warzuqni wahdini wa'afini.",
+    "meaning": "My Lord, forgive me, have mercy on me, suffice me, elevate me, provide for me, guide me, and protect me.",
+    "reference": "Tirmidhi: 284"
+  },
+  {
+    "title": "Dua When Entering Masjid",
+    "bangla": "Bismillahi wassalatu wassalamu 'ala rasulillahi. Allahummaftah li abwaba rahmatik.",
+    "arabic": "بِسْمِ اللهِ، وَالصَّلَاةُ وَالسَّلَامُ عَلَىٰ رَسُولِ اللهِ. اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+    "transliteration": "Bismillahi wassalatu wassalamu 'ala rasulillahi. Allahummaftah li abwaba rahmatik.",
+    "meaning": "In the name of Allah, and prayers and peace be upon the Messenger of Allah. O Allah, open for me the doors of Your mercy.",
+    "reference": "Muslim: 713"
+  },
+  {
+    "title": "Dua When Leaving Masjid",
+    "bangla": "Bismillahi wassalatu wassalamu 'ala rasulillahi. Allahumma inni as'aluka min fadlik.",
+    "arabic": "بِسْمِ اللهِ، وَالصَّلَاةُ وَالسَّلَامُ عَلَىٰ رَسُولِ اللهِ. اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
+    "transliteration": "Bismillahi wassalatu wassalamu 'ala rasulillahi. Allahumma inni as'aluka min fadlik.",
+    "meaning": "In the name of Allah, and prayers and peace be upon the Messenger of Allah. O Allah, I ask You from Your bounty.",
+    "reference": "Muslim: 713"
+  },
+  {
+    "title": "Dua After Adhan",
+    "bangla": "Allahumma rabba hazihid-da'watit-tammati wassalatil-qa'imati, ati Muhammadanil-waseelata wal-fadeelata wab'athhu maqamam mahmoodanillazi wa'adtahu.",
+    "arabic": "اللَّهُمَّ رَبَّ هَٰذِهِ الدَّعْوَةِ التَّامَّةِ، وَالصَّلَاةِ الْقَائِمَةِ، آتِ مُحَمَّدًا الْوَسِيلَةَ وَالْفَضِيلَةَ، وَابْعَثْهُ مَقَامًا مَحْمُودًا الَّذِي وَعَدْتَهُ",
+    "transliteration": "Allahumma rabba hazihid-da'watit-tammati wassalatil-qa'imati, ati Muhammadanil-waseelata wal-fadeelata wab'athhu maqamam mahmoodanillazi wa'adtahu.",
+    "meaning": "O Allah, Lord of this perfect call and established prayer, grant Muhammad the intercession and favor, and raise him to the honored station You have promised him.",
+    "reference": "Bukhari: 614"
+  },
+  {
+    "title": "Dua Between Adhan and Iqamah",
+    "bangla": "Allahumma rabba hazihid-da'watit-tammati wassalatil-qa'imati, salli 'ala sayyidina Muhammadin wa atihi su'alahu yawmal qiyamati.",
+    "arabic": "اللَّهُمَّ رَبَّ هَٰذِهِ الدَّعْوَةِ التَّامَّةِ، وَالصَّلَاةِ الْقَائِمَةِ، صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ وَآتِهِ سُؤْلَهُ يَوْمَ الْقِيَامَةِ",
+    "transliteration": "Allahumma rabba hazihid-da'watit-tammati wassalatil-qa'imati, salli 'ala sayyidina Muhammadin wa atihi su'alahu yawmal qiyamati.",
+    "meaning": "O Allah, Lord of this perfect call and established prayer, send blessings upon our master Muhammad and grant him his requests on the Day of Judgment.",
+    "reference": "Bukhari: 614"
+  },
+  {
+    "title": "Dua When Starting Prayer (Takbir)",
+    "bangla": "Allahu Akbar.",
+    "arabic": "اللهُ أَكْبَرُ",
+    "transliteration": "Allahu Akbar.",
+    "meaning": "Allah is the Greatest.",
+    "reference": "Abu Dawood: 775"
+  },
+  {
+    "title": "Dua in Qunut (Witr Prayer)",
+    "bangla": "Allahummahdini feeman hadayta, wa 'afini feeman 'afayta, wa tawallani feeman tawallayta, wa barik li feema a'tayta, wa qini sharra ma qadayta, fa innaka taqdi wa la yuqda 'alayk, wa innahu la yazillu man walayta, wa la ya'izzu man 'adayta, tabarakta rabbana wa ta'alayta.",
+    "arabic": "اللَّهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ، وَعَافِنِي فِيمَنْ عَافَيْتَ، وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ، وَبَارِكْ لِي فِيمَا أَعْطَيْتَ، وَقِنِي شَرَّ مَا قَضَيْتَ، فَإِنَّكَ تَقْضِي وَلَا يُقْضَىٰ عَلَيْكَ، وَإِنَّهُ لَا يَذِلُّ مَنْ وَالَيْتَ، وَلَا يَعِزُّ مَنْ عَادَيْتَ، تَبَارَكْتَ رَبَّنَا وَتَعَالَيْتَ",
+    "transliteration": "Allahummahdini feeman hadayta, wa 'afini feeman 'afayta, wa tawallani feeman tawallayta, wa barik li feema a'tayta, wa qini sharra ma qadayta, fa innaka taqdi wa la yuqda 'alayk, wa innahu la yazillu man walayta, wa la ya'izzu man 'adayta, tabarakta rabbana wa ta'alayta.",
+    "meaning": "O Allah, guide me among those You have guided, pardon me among those You have pardoned, turn to me in friendship among those You have turned in friendship, and bless me in what You have bestowed, and save me from the evil of what You have decreed. For indeed You decree and none can decree against You. And he is not humiliated whom You have befriended, nor is he honored who is Your enemy. Blessed are You, O Lord, and Exalted.",
+    "reference": "Abu Dawood: 1425"
+  },
+  {
+    "title": "Dua in Prostration (Sajdah)",
+    "bangla": "Subhana Rabbiyal A'la.",
+    "arabic": "سُبْحَانَ رَبِّيَ الْأَعْلَىٰ",
+    "transliteration": "Subhana Rabbiyal A'la.",
+    "meaning": "Glory to my Lord, the Most High.",
+    "reference": "Muslim: 772"
+  },
+  {
+    "title": "Dua After Tashahhud (Before Salam)",
+    "bangla": "Allahumma inni a'udhu bika min 'adhabi jahannam, wa min 'adhabil qabr, wa min fitnatil mahya wal mamati, wa min sharri fitnatil masihid-dajjal.",
+    "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ جَهَنَّمَ، وَمِنْ عَذَابِ الْقَبْرِ، وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ، وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ",
+    "transliteration": "Allahumma inni a'udhu bika min 'adhabi jahannam, wa min 'adhabil qabr, wa min fitnatil mahya wal mamati, wa min sharri fitnatil masihid-dajjal.",
+    "meaning": "O Allah, I seek refuge with You from the punishment of Hell, from the punishment of the grave, from the trials of life and death, and from the evil of the trial of the False Messiah.",
+    "reference": "Muslim: 588"
   }
 ]

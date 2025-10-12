@@ -400,7 +400,9 @@ class ProhibitedTimeSection extends StatelessWidget {
       builder: (BuildContext context) {
         return Container(
           margin: EdgeInsets.only(
-            bottom: screenHeight - prohibitedSectionPosition + 20,
+            // এখানে bottom value 20% কমিয়ে দিন
+            bottom:
+                (screenHeight - prohibitedSectionPosition + 20) * 0.8, // 20% কম
           ),
           child: Container(
             decoration: BoxDecoration(
@@ -424,10 +426,13 @@ class ProhibitedTimeSection extends StatelessWidget {
                 ),
               ],
             ),
-            constraints: BoxConstraints(maxHeight: availableSpace * 0.8),
+            // উচ্চতা 20% বেশি করুন
+            constraints: BoxConstraints(maxHeight: availableSpace * 1.0),
+            // 0.8 থেকে 1.0
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // ... বাকি কোড অপরিবর্তিত
                 // Header with drag handle
                 Container(
                   padding: EdgeInsets.only(

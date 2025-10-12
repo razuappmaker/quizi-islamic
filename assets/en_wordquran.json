@@ -1,166 +1,4468 @@
 [
-{
-  "title": "Surah Al-Fatiha - The Opening (الفاتحة)",
-  "ayat": [
-    {
-      "arabic_words": [
-        {
-          "word": "بِسْمِ",
-          "meaning": "In the name"
-        },
-        {
-          "word": "ٱللّٰهِ",
-          "meaning": "of Allah"
-        },
-        {
-          "word": "ٱلرَّحْمَٰنِ",
-          "meaning": "the Most Gracious"
-        },
-        {
-          "word": "ٱلرَّحِيمِ",
-          "meaning": "the Most Merciful"
-        }
-      ],
-      "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
-      "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
-    },
-    {
-      "arabic_words": [
-        {
-          "word": "ٱلْحَمْدُ",
-          "meaning": "All praise"
-        },
-        {
-          "word": "لِلّٰهِ",
-          "meaning": "is for Allah"
-        },
-        {
-          "word": "رَبِّ",
-          "meaning": "Lord"
-        },
-        {
-          "word": "ٱلْعَٰلَمِينَ",
-          "meaning": "of the worlds"
-        }
-      ],
-      "transliteration": "Al-ḥamdu lillāhi rabbil-‘ālamīn",
-      "meaning": "All praise is due to Allah, Lord of the worlds."
-    },
-    {
-      "arabic_words": [
-        {
-          "word": "ٱلرَّحْمَٰنِ",
-          "meaning": "the Most Gracious"
-        },
-        {
-          "word": "ٱلرَّحِيمِ",
-          "meaning": "the Most Merciful"
-        }
-      ],
-      "transliteration": "Ar-Raḥmānir-Raḥīm",
-      "meaning": "The Most Gracious, the Most Merciful."
-    },
-    {
-      "arabic_words": [
-        {
-          "word": "مَٰلِكِ",
-          "meaning": "Master"
-        },
-        {
-          "word": "يَوْمِ",
-          "meaning": "of the Day"
-        },
-        {
-          "word": "ٱلدِّينِ",
-          "meaning": "of Judgment"
-        }
-      ],
-      "transliteration": "Māliki yawmi-d-dīn",
-      "meaning": "Master of the Day of Judgment."
-    },
-    {
-      "arabic_words": [
-        {
-          "word": "إِيَّاكَ",
-          "meaning": "You alone"
-        },
-        {
-          "word": "نَعْبُدُ",
-          "meaning": "we worship"
-        },
-        {
-          "word": "وَإِيَّاكَ",
-          "meaning": "and You alone"
-        },
-        {
-          "word": "نَسْتَعِينُ",
-          "meaning": "we ask for help"
-        }
-      ],
-      "transliteration": "Iyyāka na‘budu wa iyyāka nasta‘īn",
-      "meaning": "You alone we worship, and You alone we ask for help."
-    },
-    {
-      "arabic_words": [
-        {
-          "word": "ٱهْدِنَا",
-          "meaning": "Guide us"
-        },
-        {
-          "word": "ٱلصِّرَٰطَ",
-          "meaning": "to the path"
-        },
-        {
-          "word": "ٱلْمُسْتَقِيمَ",
-          "meaning": "that is straight"
-        }
-      ],
-      "transliteration": "Ihdinaṣ-ṣirāṭal-mustaqīm",
-      "meaning": "Guide us on the straight path."
-    },
-    {
-      "arabic_words": [
-        {
-          "word": "صِرَٰطَ",
-          "meaning": "The path"
-        },
-        {
-          "word": "ٱلَّذِينَ",
-          "meaning": "of those"
-        },
-        {
-          "word": "أَنْعَمْتَ",
-          "meaning": "upon whom You have bestowed favor"
-        },
-        {
-          "word": "عَلَيْهِمْ",
-          "meaning": "upon them"
-        },
-        {
-          "word": "غَيْرِ",
-          "meaning": "not"
-        },
-        {
-          "word": "ٱلْمَغْضُوبِ",
-          "meaning": "those who earned Your anger"
-        },
-        {
-          "word": "عَلَيْهِمْ",
-          "meaning": "upon them"
-        },
-        {
-          "word": "وَلَا",
-          "meaning": "nor"
-        },
-        {
-          "word": "ٱلضَّآلِّينَ",
-          "meaning": "those who went astray"
-        }
-      ],
-      "transliteration": "Ṣirāṭ al-ladhīna an‘amta ‘alayhim ghayril-maghdūbi ‘alayhim walāḍ-ḍāllīn",
-      "meaning": "The path of those upon whom You have bestowed Your favor, not of those who earned Your anger, nor of those who went astray."
-    }
-  ],
-  "reference": "Qur'an, Surah Al-Fatiha, Verses 1–7"
-}
+  {
+    "title": "Surah Al-Fatiha - The Opening (الفاتحة)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلْحَمْدُ",
+            "meaning": "All praise"
+          },
+          {
+            "word": "لِلّٰهِ",
+            "meaning": "is for Allah"
+          },
+          {
+            "word": "رَبِّ",
+            "meaning": "Lord"
+          },
+          {
+            "word": "ٱلْعَٰلَمِينَ",
+            "meaning": "of the worlds"
+          }
+        ],
+        "transliteration": "Al-ḥamdu lillāhi rabbil-‘ālamīn",
+        "meaning": "All praise is due to Allah, Lord of the worlds."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Ar-Raḥmānir-Raḥīm",
+        "meaning": "The Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "مَٰلِكِ",
+            "meaning": "Master"
+          },
+          {
+            "word": "يَوْمِ",
+            "meaning": "of the Day"
+          },
+          {
+            "word": "ٱلدِّينِ",
+            "meaning": "of Judgment"
+          }
+        ],
+        "transliteration": "Māliki yawmi-d-dīn",
+        "meaning": "Master of the Day of Judgment."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِيَّاكَ",
+            "meaning": "You alone"
+          },
+          {
+            "word": "نَعْبُدُ",
+            "meaning": "we worship"
+          },
+          {
+            "word": "وَإِيَّاكَ",
+            "meaning": "and You alone"
+          },
+          {
+            "word": "نَسْتَعِينُ",
+            "meaning": "we ask for help"
+          }
+        ],
+        "transliteration": "Iyyāka na‘budu wa iyyāka nasta‘īn",
+        "meaning": "You alone we worship, and You alone we ask for help."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱهْدِنَا",
+            "meaning": "Guide us"
+          },
+          {
+            "word": "ٱلصِّرَٰطَ",
+            "meaning": "to the path"
+          },
+          {
+            "word": "ٱلْمُسْتَقِيمَ",
+            "meaning": "that is straight"
+          }
+        ],
+        "transliteration": "Ihdinaṣ-ṣirāṭal-mustaqīm",
+        "meaning": "Guide us on the straight path."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "صِرَٰطَ",
+            "meaning": "The path"
+          },
+          {
+            "word": "ٱلَّذِينَ",
+            "meaning": "of those"
+          },
+          {
+            "word": "أَنْعَمْتَ",
+            "meaning": "upon whom You have bestowed favor"
+          },
+          {
+            "word": "عَلَيْهِمْ",
+            "meaning": "upon them"
+          },
+          {
+            "word": "غَيْرِ",
+            "meaning": "not"
+          },
+          {
+            "word": "ٱلْمَغْضُوبِ",
+            "meaning": "those who earned Your anger"
+          },
+          {
+            "word": "عَلَيْهِمْ",
+            "meaning": "upon them"
+          },
+          {
+            "word": "وَلَا",
+            "meaning": "nor"
+          },
+          {
+            "word": "ٱلضَّآلِّينَ",
+            "meaning": "those who went astray"
+          }
+        ],
+        "transliteration": "Ṣirāṭ al-ladhīna an‘amta ‘alayhim ghayril-maghdūbi ‘alayhim walāḍ-ḍāllīn",
+        "meaning": "The path of those upon whom You have bestowed Your favor, not of those who earned Your anger, nor of those who went astray."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Fatiha, Verses 1–7"
+  },
+  {
+    "title": "Surah An-Nas - The Mankind (النَّاس)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "قُلْ",
+            "meaning": "Say"
+          },
+          {
+            "word": "أَعُوذُ",
+            "meaning": "I seek refuge"
+          },
+          {
+            "word": "بِرَبِّ",
+            "meaning": "in the Lord"
+          },
+          {
+            "word": "ٱلنَّاسِ",
+            "meaning": "of mankind"
+          }
+        ],
+        "transliteration": "Qul a'ūdhu birabbin-nās",
+        "meaning": "Say, 'I seek refuge in the Lord of mankind.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "مَلِكِ",
+            "meaning": "The King"
+          },
+          {
+            "word": "ٱلنَّاسِ",
+            "meaning": "of mankind"
+          }
+        ],
+        "transliteration": "Malikin-nās",
+        "meaning": "The King of mankind.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِلَٰهِ",
+            "meaning": "The God"
+          },
+          {
+            "word": "ٱلنَّاسِ",
+            "meaning": "of mankind"
+          }
+        ],
+        "transliteration": "Ilāhin-nās",
+        "meaning": "The God of mankind.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "مِن",
+            "meaning": "From"
+          },
+          {
+            "word": "شَرِّ",
+            "meaning": "the evil"
+          },
+          {
+            "word": "ٱلْوَسْوَاسِ",
+            "meaning": "of the whisperer"
+          },
+          {
+            "word": "ٱلْخَنَّاسِ",
+            "meaning": "who withdraws"
+          }
+        ],
+        "transliteration": "Min sharril-waswāsil-khannās",
+        "meaning": "From the evil of the retreating whisperer—'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلَّذِي",
+            "meaning": "Who"
+          },
+          {
+            "word": "يُوَسْوِسُ",
+            "meaning": "whispers"
+          },
+          {
+            "word": "فِي",
+            "meaning": "in"
+          },
+          {
+            "word": "صُدُورِ",
+            "meaning": "the breasts"
+          },
+          {
+            "word": "ٱلنَّاسِ",
+            "meaning": "of mankind"
+          }
+        ],
+        "transliteration": "Alladhī yuwaswisu fī ṣudūrin-nās",
+        "meaning": "Who whispers into the hearts of mankind—'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "مِن",
+            "meaning": "From"
+          },
+          {
+            "word": "ٱلْجِنَّةِ",
+            "meaning": "the jinn"
+          },
+          {
+            "word": "و",
+            "meaning": "and"
+          },
+          {
+            "word": "ٱلنَّاسِ",
+            "meaning": "mankind"
+          }
+        ],
+        "transliteration": "Minal-jinnati wan-nās",
+        "meaning": "From among the jinn and mankind.'"
+      }
+    ],
+    "reference": "Qur'an, Surah An-Nas, Verses 1-6"
+  },
+  {
+    "title": "Surah Al-Falaq - The Daybreak (الْفَلَق)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "قُلْ",
+            "meaning": "Say"
+          },
+          {
+            "word": "أَعُوذُ",
+            "meaning": "I seek refuge"
+          },
+          {
+            "word": "بِرَبِّ",
+            "meaning": "in the Lord"
+          },
+          {
+            "word": "ٱلْفَلَقِ",
+            "meaning": "of the daybreak"
+          }
+        ],
+        "transliteration": "Qul a'ūdhu birabbil-falaq",
+        "meaning": "Say, 'I seek refuge in the Lord of the daybreak.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "مِن",
+            "meaning": "From"
+          },
+          {
+            "word": "شَرِّ",
+            "meaning": "the evil"
+          },
+          {
+            "word": "مَا",
+            "meaning": "of what"
+          },
+          {
+            "word": "خَلَقَ",
+            "meaning": "He has created"
+          }
+        ],
+        "transliteration": "Min sharri mā khalaq",
+        "meaning": "From the evil of what He has created.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمِن",
+            "meaning": "And from"
+          },
+          {
+            "word": "شَرِّ",
+            "meaning": "the evil"
+          },
+          {
+            "word": "غَاسِقٍ",
+            "meaning": "of the darkness"
+          },
+          {
+            "word": "إِذَا",
+            "meaning": "when"
+          },
+          {
+            "word": "وَقَبَ",
+            "meaning": "it settles"
+          }
+        ],
+        "transliteration": "Wa min sharri ghāsiqin idhā waqab",
+        "meaning": "And from the evil of the darkness when it settles.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمِن",
+            "meaning": "And from"
+          },
+          {
+            "word": "شَرِّ",
+            "meaning": "the evil"
+          },
+          {
+            "word": "ٱلنَّفَّٰثَٰتِ",
+            "meaning": "of the blowers"
+          },
+          {
+            "word": "فِي",
+            "meaning": "in"
+          },
+          {
+            "word": "ٱلْعُقَدِ",
+            "meaning": "the knots"
+          }
+        ],
+        "transliteration": "Wa min sharrin-naffāthāti fil-'uqad",
+        "meaning": "And from the evil of the blowers in knots.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمِن",
+            "meaning": "And from"
+          },
+          {
+            "word": "شَرِّ",
+            "meaning": "the evil"
+          },
+          {
+            "word": "حَاسِدٍ",
+            "meaning": "of an envier"
+          },
+          {
+            "word": "إِذَا",
+            "meaning": "when"
+          },
+          {
+            "word": "حَسَدَ",
+            "meaning": "he envies"
+          }
+        ],
+        "transliteration": "Wa min sharri ḥāsidin idhā ḥasad",
+        "meaning": "And from the evil of an envier when he envies.'"
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Falaq, Verses 1-5"
+  },
+  {
+    "title": "Surah Al-Ikhlas - The Sincerity (الْإِخْلَاص)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "قُلْ",
+            "meaning": "Say"
+          },
+          {
+            "word": "هُوَ",
+            "meaning": "He is"
+          },
+          {
+            "word": "ٱللّٰهُ",
+            "meaning": "Allah"
+          },
+          {
+            "word": "أَحَدٌ",
+            "meaning": "the One"
+          }
+        ],
+        "transliteration": "Qul huwallāhu aḥad",
+        "meaning": "Say, 'He is Allah—the One.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱللّٰهُ",
+            "meaning": "Allah"
+          },
+          {
+            "word": "ٱلصَّمَدُ",
+            "meaning": "the Eternal Refuge"
+          }
+        ],
+        "transliteration": "Allāhuṣ-ṣamad",
+        "meaning": "Allah—the Sustainer and Protector, the Eternal Refuge.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "لَمْ",
+            "meaning": "Not"
+          },
+          {
+            "word": "يَلِدْ",
+            "meaning": "has He begotten"
+          },
+          {
+            "word": "وَلَمْ",
+            "meaning": "nor"
+          },
+          {
+            "word": "يُولَدْ",
+            "meaning": "was He begotten"
+          }
+        ],
+        "transliteration": "Lam yalid wa lam yūlad",
+        "meaning": "He has never had offspring, nor was He born.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَلَمْ",
+            "meaning": "And not"
+          },
+          {
+            "word": "يَكُن",
+            "meaning": "has there been"
+          },
+          {
+            "word": "لَّهُ",
+            "meaning": "for Him"
+          },
+          {
+            "word": "كُفُوًا",
+            "meaning": "any equivalent"
+          },
+          {
+            "word": "أَحَدٌ",
+            "meaning": "anyone"
+          }
+        ],
+        "transliteration": "Wa lam yakul-lahū kufuwan aḥad",
+        "meaning": "And there is none comparable to Him.'"
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Ikhlas, Verses 1-4"
+  },
+  {
+    "title": "Surah Al-Masadd - The Palm Fiber (الْمَسَد)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "تَبَّتْ",
+            "meaning": "May perish"
+          },
+          {
+            "word": "يَدَا",
+            "meaning": "the hands"
+          },
+          {
+            "word": "أَبِي",
+            "meaning": "of Abu"
+          },
+          {
+            "word": "لَهَبٍ",
+            "meaning": "Lahab"
+          },
+          {
+            "word": "وَتَبَّ",
+            "meaning": "and may he perish"
+          }
+        ],
+        "transliteration": "Tabbat yadā abī lahabin wa tabb",
+        "meaning": "May the hands of Abu Lahab be ruined, and ruined is he."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "مَا",
+            "meaning": "Not"
+          },
+          {
+            "word": "أَغْنَىٰ",
+            "meaning": "will avail him"
+          },
+          {
+            "word": "عَنْهُ",
+            "meaning": "to him"
+          },
+          {
+            "word": "مَالُهُ",
+            "meaning": "his wealth"
+          },
+          {
+            "word": "وَمَا",
+            "meaning": "and what"
+          },
+          {
+            "word": "كَسَبَ",
+            "meaning": "he earned"
+          }
+        ],
+        "transliteration": "Mā aghnā 'anhu māluhū wa mā kasab",
+        "meaning": "His wealth will not avail him or that which he gained."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "سَيَصْلَىٰ",
+            "meaning": "He will burn"
+          },
+          {
+            "word": "نَارًا",
+            "meaning": "in a Fire"
+          },
+          {
+            "word": "ذَاتَ",
+            "meaning": "of"
+          },
+          {
+            "word": "لَهَبٍ",
+            "meaning": "blazing flames"
+          }
+        ],
+        "transliteration": "Sayaṣlā nāran dhāta lahab",
+        "meaning": "He will burn in a Fire of blazing flames."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَٱمْرَأَتُهُ",
+            "meaning": "And his wife"
+          },
+          {
+            "word": "حَمَّالَةَ",
+            "meaning": "the carrier"
+          },
+          {
+            "word": "ٱلْحَطَبِ",
+            "meaning": "of firewood"
+          }
+        ],
+        "transliteration": "Wamra'atuhū ḥammālatal-ḥaṭab",
+        "meaning": "And his wife as well—the carrier of firewood."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فِي",
+            "meaning": "In"
+          },
+          {
+            "word": "جِيدِهَا",
+            "meaning": "her neck"
+          },
+          {
+            "word": "حَبْلٌ",
+            "meaning": "a rope"
+          },
+          {
+            "word": "مِّن",
+            "meaning": "of"
+          },
+          {
+            "word": "مَّسَدٍ",
+            "meaning": "palm fiber"
+          }
+        ],
+        "transliteration": "Fī jīdihā ḥablum mim masad",
+        "meaning": "Around her neck will be a rope of palm fiber."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Masadd, Verses 1-5"
+  },
+  {
+    "title": "Surah An-Nasr - The Divine Support (النَّصْر)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِذَا",
+            "meaning": "When"
+          },
+          {
+            "word": "جَاءَ",
+            "meaning": "comes"
+          },
+          {
+            "word": "نَصْرُ",
+            "meaning": "the victory"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "وَٱلْفَتْحُ",
+            "meaning": "and the conquest"
+          }
+        ],
+        "transliteration": "Idhā jā'a nasrullāhi wal-fath",
+        "meaning": "When the victory of Allah has come and the conquest."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَرَأَيْتَ",
+            "meaning": "And you see"
+          },
+          {
+            "word": "ٱلنَّاسَ",
+            "meaning": "the people"
+          },
+          {
+            "word": "يَدْخُلُونَ",
+            "meaning": "entering"
+          },
+          {
+            "word": "فِي",
+            "meaning": "into"
+          },
+          {
+            "word": "دِينِ",
+            "meaning": "the religion"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "أَفْوَاجًا",
+            "meaning": "in multitudes"
+          }
+        ],
+        "transliteration": "Wa ra'aitan-nāsa yadkhulūna fī dīnillāhi afwājā",
+        "meaning": "And you see the people entering into the religion of Allah in multitudes."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَسَبِّحْ",
+            "meaning": "Then exalt"
+          },
+          {
+            "word": "بِحَمْدِ",
+            "meaning": "with praise"
+          },
+          {
+            "word": "رَبِّكَ",
+            "meaning": "of your Lord"
+          },
+          {
+            "word": "وَٱسْتَغْفِرْهُ",
+            "meaning": "and ask His forgiveness"
+          },
+          {
+            "word": "إِنَّهُ",
+            "meaning": "Indeed, He"
+          },
+          {
+            "word": "كَانَ",
+            "meaning": "is"
+          },
+          {
+            "word": "تَوَّابًا",
+            "meaning": "ever Accepting of repentance"
+          }
+        ],
+        "transliteration": "Fasabbih bihamdi rabbika wastaghfir'h, innahū kāna tawwābā",
+        "meaning": "Then exalt [Him] with praise of your Lord and ask forgiveness of Him. Indeed, He is ever Accepting of repentance."
+      }
+    ],
+    "reference": "Qur'an, Surah An-Nasr, Verses 1-3"
+  },
+  {
+    "title": "Surah Al-Kafirun - The Disbelievers (الْكَافِرُونَ)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "قُلْ",
+            "meaning": "Say"
+          },
+          {
+            "word": "يَٰٓأَيُّهَا",
+            "meaning": "O"
+          },
+          {
+            "word": "ٱلْكَٰفِرُونَ",
+            "meaning": "disbelievers"
+          }
+        ],
+        "transliteration": "Qul yā ayyuhal-kāfirūn",
+        "meaning": "Say, 'O you disbelievers.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "لَآ",
+            "meaning": "I do not"
+          },
+          {
+            "word": "أَعْبُدُ",
+            "meaning": "worship"
+          },
+          {
+            "word": "مَا",
+            "meaning": "what"
+          },
+          {
+            "word": "تَعْبُدُونَ",
+            "meaning": "you worship"
+          }
+        ],
+        "transliteration": "Lā a'budu mā ta'budūn",
+        "meaning": "I do not worship what you worship.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَلَآ",
+            "meaning": "Nor do"
+          },
+          {
+            "word": "أَنتُمْ",
+            "meaning": "you"
+          },
+          {
+            "word": "عَٰبِدُونَ",
+            "meaning": "worshippers"
+          },
+          {
+            "word": "مَآ",
+            "meaning": "what"
+          },
+          {
+            "word": "أَعْبُدُ",
+            "meaning": "I worship"
+          }
+        ],
+        "transliteration": "Wa lā antum 'ābidūna mā a'bud",
+        "meaning": "Nor do you worship what I worship.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَلَآ",
+            "meaning": "Nor will"
+          },
+          {
+            "word": "أَنَا۠",
+            "meaning": "I"
+          },
+          {
+            "word": "عَابِدٌ",
+            "meaning": "a worshipper"
+          },
+          {
+            "word": "مَّا",
+            "meaning": "what"
+          },
+          {
+            "word": "عَبَدتُّمْ",
+            "meaning": "you have worshipped"
+          }
+        ],
+        "transliteration": "Wa lā ana 'ābidum mā 'abattum",
+        "meaning": "Nor will I worship what you have worshipped.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَلَآ",
+            "meaning": "Nor will"
+          },
+          {
+            "word": "أَنتُمْ",
+            "meaning": "you"
+          },
+          {
+            "word": "عَٰبِدُونَ",
+            "meaning": "worshippers"
+          },
+          {
+            "word": "مَآ",
+            "meaning": "what"
+          },
+          {
+            "word": "أَعْبُدُ",
+            "meaning": "I worship"
+          }
+        ],
+        "transliteration": "Wa lā antum 'ābidūna mā a'bud",
+        "meaning": "Nor will you worship what I worship.'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "لَكُمْ",
+            "meaning": "For you"
+          },
+          {
+            "word": "دِينُكُمْ",
+            "meaning": "is your religion"
+          },
+          {
+            "word": "وَلِىَ",
+            "meaning": "and for me"
+          },
+          {
+            "word": "دِينِ",
+            "meaning": "is my religion"
+          }
+        ],
+        "transliteration": "Lakum dīnukum wa liya dīn",
+        "meaning": "For you is your religion, and for me is my religion.'"
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Kafirun, Verses 1-6"
+  },
+  {
+    "title": "Surah Al-Kawthar - The Abundance (الْكَوْثَر)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّآ",
+            "meaning": "Indeed, We"
+          },
+          {
+            "word": "أَعْطَيْنَٰكَ",
+            "meaning": "have granted you"
+          },
+          {
+            "word": "ٱلْكَوْثَرَ",
+            "meaning": "Al-Kawthar"
+          }
+        ],
+        "transliteration": "Innā a'ṭaynākal-kawthar",
+        "meaning": "Indeed, We have granted you, [O Muhammad], al-Kawthar."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَصَلِّ",
+            "meaning": "So pray"
+          },
+          {
+            "word": "لِرَبِّكَ",
+            "meaning": "to your Lord"
+          },
+          {
+            "word": "وَٱنْحَرْ",
+            "meaning": "and sacrifice"
+          }
+        ],
+        "transliteration": "Faṣalli lirabbika wanḥar",
+        "meaning": "So pray to your Lord and sacrifice [to Him alone]."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّ",
+            "meaning": "Indeed"
+          },
+          {
+            "word": "شَانِئَكَ",
+            "meaning": "your enemy"
+          },
+          {
+            "word": "هُوَ",
+            "meaning": "he is"
+          },
+          {
+            "word": "ٱلْأَبْتَرُ",
+            "meaning": "cut off"
+          }
+        ],
+        "transliteration": "Inna shāni'aka huwal-abtar",
+        "meaning": "Indeed, your enemy is the one cut off [from all goodness]."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Kawthar, Verses 1-3"
+  },
+  {
+    "title": "Surah Al-Ma'un - The Small Kindnesses (الْمَاعُونَ)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَرَءَيْتَ",
+            "meaning": "Have you seen"
+          },
+          {
+            "word": "ٱلَّذِى",
+            "meaning": "the one who"
+          },
+          {
+            "word": "يُكَذِّبُ",
+            "meaning": "denies"
+          },
+          {
+            "word": "بِٱلدِّينِ",
+            "meaning": "the Recompense"
+          }
+        ],
+        "transliteration": "Ara'aytal-ladhī yukadhdhibu bid-dīn",
+        "meaning": "Have you seen the one who denies the Recompense?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَذَٰلِكَ",
+            "meaning": "For that is"
+          },
+          {
+            "word": "ٱلَّذِى",
+            "meaning": "the one who"
+          },
+          {
+            "word": "يَدُعُّ",
+            "meaning": "repels"
+          },
+          {
+            "word": "ٱلْيَتِيمَ",
+            "meaning": "the orphan"
+          }
+        ],
+        "transliteration": "Fadhālikal-ladhī yadu''ul-yatīm",
+        "meaning": "For that is the one who drives away the orphan."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَلَا",
+            "meaning": "And does not"
+          },
+          {
+            "word": "يَحُضُّ",
+            "meaning": "encourage"
+          },
+          {
+            "word": "عَلَىٰ",
+            "meaning": "on"
+          },
+          {
+            "word": "طَعَامِ",
+            "meaning": "the feeding"
+          },
+          {
+            "word": "ٱلْمِسْكِينِ",
+            "meaning": "of the poor"
+          }
+        ],
+        "transliteration": "Wa lā yaḥudḍu 'alā ṭa'āmil-miskīn",
+        "meaning": "And does not encourage the feeding of the poor."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَوَيْلٌ",
+            "meaning": "So woe"
+          },
+          {
+            "word": "لِّلْمُصَلِّينَ",
+            "meaning": "to those who pray"
+          }
+        ],
+        "transliteration": "Fawaylul lil-muṣallīn",
+        "meaning": "So woe to those who pray."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلَّذِينَ",
+            "meaning": "Those who"
+          },
+          {
+            "word": "هُمْ",
+            "meaning": "they"
+          },
+          {
+            "word": "عَن",
+            "meaning": "from"
+          },
+          {
+            "word": "صَلَاتِهِمْ",
+            "meaning": "their prayer"
+          },
+          {
+            "word": "سَاهُونَ",
+            "meaning": "are heedless"
+          }
+        ],
+        "transliteration": "Al-ladhīna hum 'an ṣalātihim sāhūn",
+        "meaning": "[But] who are heedless of their prayer."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلَّذِينَ",
+            "meaning": "Those who"
+          },
+          {
+            "word": "هُمْ",
+            "meaning": "they"
+          },
+          {
+            "word": "يُرَآءُونَ",
+            "meaning": "make show"
+          }
+        ],
+        "transliteration": "Al-ladhīna hum yurā'ūn",
+        "meaning": "Those who make show [of their deeds]."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَيَمْنَعُونَ",
+            "meaning": "And withhold"
+          },
+          {
+            "word": "ٱلْمَاعُونَ",
+            "meaning": "small kindnesses"
+          }
+        ],
+        "transliteration": "Wa yamna'ūnal-mā'ūn",
+        "meaning": "And withhold [simple] assistance."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Ma'un, Verses 1-7"
+  },
+  {
+    "title": "Surah Quraysh - The Quraysh (قُرَيْش)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "لِإِيلَٰفِ",
+            "meaning": "For the security"
+          },
+          {
+            "word": "قُرَيْشٍ",
+            "meaning": "of Quraysh"
+          }
+        ],
+        "transliteration": "Li'īlāfi Quraysh",
+        "meaning": "For the accustomed security of the Quraysh—"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِيلَٰفِهِمْ",
+            "meaning": "Their security"
+          },
+          {
+            "word": "رِحْلَةَ",
+            "meaning": "the journey"
+          },
+          {
+            "word": "ٱلشِّتَآءِ",
+            "meaning": "of winter"
+          },
+          {
+            "word": "وَٱلصَّيْفِ",
+            "meaning": "and summer"
+          }
+        ],
+        "transliteration": "Īlāfihim riḥlata sh-shitā'i waṣ-ṣayf",
+        "meaning": "Their security in the winter and summer journeys—"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَلْيَعْبُدُوا۟",
+            "meaning": "So let them worship"
+          },
+          {
+            "word": "رَبَّ",
+            "meaning": "the Lord"
+          },
+          {
+            "word": "هَٰذَا",
+            "meaning": "of this"
+          },
+          {
+            "word": "ٱلْبَيْتِ",
+            "meaning": "House"
+          }
+        ],
+        "transliteration": "Falya'budū rabba hādhal-bayt",
+        "meaning": "Let them worship the Lord of this House,"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلَّذِىٓ",
+            "meaning": "Who"
+          },
+          {
+            "word": "أَطْعَمَهُم",
+            "meaning": "has fed them"
+          },
+          {
+            "word": "مِّن",
+            "meaning": "from"
+          },
+          {
+            "word": "جُوعٍ",
+            "meaning": "hunger"
+          },
+          {
+            "word": "وَءَامَنَهُم",
+            "meaning": "and secured them"
+          },
+          {
+            "word": "مِّنْ",
+            "meaning": "from"
+          },
+          {
+            "word": "خَوْفٍۭ",
+            "meaning": "fear"
+          }
+        ],
+        "transliteration": "Al-ladhī aṭ'amahum min jū'in wa āmanahum min khawf",
+        "meaning": "Who has fed them, [saving them] from hunger, and made them safe, [saving them] from fear."
+      }
+    ],
+    "reference": "Qur'an, Surah Quraysh, Verses 1-4"
+  },
+  {
+    "title": "Surah Al-Fil - The Elephant (ٱلْفِيل)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَلَمْ",
+            "meaning": "Have not"
+          },
+          {
+            "word": "تَرَ",
+            "meaning": "you seen"
+          },
+          {
+            "word": "كَيْفَ",
+            "meaning": "how"
+          },
+          {
+            "word": "فَعَلَ",
+            "meaning": "dealt"
+          },
+          {
+            "word": "رَبُّكَ",
+            "meaning": "your Lord"
+          },
+          {
+            "word": "بِأَصْحَٰبِ",
+            "meaning": "with the companions"
+          },
+          {
+            "word": "ٱلْفِيلِ",
+            "meaning": "of the elephant"
+          }
+        ],
+        "transliteration": "Alam tara kayfa fa'ala rabbuka bi-aṣḥābil-fīl",
+        "meaning": "Have you not considered, [O Muhammad], how your Lord dealt with the companions of the elephant?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَلَمْ",
+            "meaning": "Did He not"
+          },
+          {
+            "word": "يَجْعَلْ",
+            "meaning": "make"
+          },
+          {
+            "word": "كَيْدَهُمْ",
+            "meaning": "their plan"
+          },
+          {
+            "word": "فِى",
+            "meaning": "into"
+          },
+          {
+            "word": "تَضْلِيلٍ",
+            "meaning": "misguidance"
+          }
+        ],
+        "transliteration": "Alam yaj'al kaydahum fī taḍlīl",
+        "meaning": "Did He not make their plan into misguidance?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَأَرْسَلَ",
+            "meaning": "And sent"
+          },
+          {
+            "word": "عَلَيْهِمْ",
+            "meaning": "upon them"
+          },
+          {
+            "word": "طَيْرًا",
+            "meaning": "birds"
+          },
+          {
+            "word": "أَبَابِيلَ",
+            "meaning": "in flocks"
+          }
+        ],
+        "transliteration": "Wa arsala 'alayhim ṭayran abābīl",
+        "meaning": "And He sent against them birds in flocks,"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "تَرْمِيهِم",
+            "meaning": "Striking them"
+          },
+          {
+            "word": "بِحِجَارَةٍ",
+            "meaning": "with stones"
+          },
+          {
+            "word": "مِّن",
+            "meaning": "of"
+          },
+          {
+            "word": "سِجِّيلٍ",
+            "meaning": "hard clay"
+          }
+        ],
+        "transliteration": "Tarmīhim bi-ḥijāratim min sijjīl",
+        "meaning": "Striking them with stones of hard clay,"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَجَعَلَهُمْ",
+            "meaning": "And made them"
+          },
+          {
+            "word": "كَعَصْفٍ",
+            "meaning": "like straw"
+          },
+          {
+            "word": "مَّأْكُولٍ",
+            "meaning": "eaten up"
+          }
+        ],
+        "transliteration": "Faja'alahum ka'aṣfim ma'kūl",
+        "meaning": "And He made them like eaten straw."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Fil, Verses 1-5"
+  },
+  {
+    "title": "Surah Al-Humazah - The Slanderer (ٱلْهُمَزَة)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَيْلٌ",
+            "meaning": "Woe"
+          },
+          {
+            "word": "لِّكُلِّ",
+            "meaning": "to every"
+          },
+          {
+            "word": "هُمَزَةٍ",
+            "meaning": "slanderer"
+          },
+          {
+            "word": "لُّمَزَةٍ",
+            "meaning": "backbiter"
+          }
+        ],
+        "transliteration": "Waylul likulli humazatil-lumazah",
+        "meaning": "Woe to every scorner and backbiter."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلَّذِى",
+            "meaning": "Who"
+          },
+          {
+            "word": "جَمَعَ",
+            "meaning": "collects"
+          },
+          {
+            "word": "مَالًا",
+            "meaning": "wealth"
+          },
+          {
+            "word": "وَعَدَّدَهُۥ",
+            "meaning": "and counts it"
+          }
+        ],
+        "transliteration": "Al-ladhī jama'a mālaw wa 'addadah",
+        "meaning": "Who collects wealth and [continuously] counts it."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "يَحْسَبُ",
+            "meaning": "He thinks"
+          },
+          {
+            "word": "أَنَّ",
+            "meaning": "that"
+          },
+          {
+            "word": "مَالَهُۥ",
+            "meaning": "his wealth"
+          },
+          {
+            "word": "أَخْلَدَهُۥ",
+            "meaning": "will make him immortal"
+          }
+        ],
+        "transliteration": "Yaḥsabu anna mālahū akhladah",
+        "meaning": "Thinking that his wealth has made him immortal."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "كَلَّا",
+            "meaning": "No"
+          },
+          {
+            "word": "لَيُنبَذَنَّ",
+            "meaning": "He will surely be thrown"
+          },
+          {
+            "word": "فِى",
+            "meaning": "into"
+          },
+          {
+            "word": "ٱلْحُطَمَةِ",
+            "meaning": "the Crusher"
+          }
+        ],
+        "transliteration": "Kallā, layunbadhanna fil-ḥuṭamah",
+        "meaning": "No! He will surely be thrown into the Crusher."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمَآ",
+            "meaning": "And what"
+          },
+          {
+            "word": "أَدْرَىٰكَ",
+            "meaning": "can make you know"
+          },
+          {
+            "word": "مَا",
+            "meaning": "what"
+          },
+          {
+            "word": "ٱلْحُطَمَةُ",
+            "meaning": "the Crusher"
+          }
+        ],
+        "transliteration": "Wa mā adrāka mal-ḥuṭamah",
+        "meaning": "And what can make you know what is the Crusher?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "نَارُ",
+            "meaning": "The Fire"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلْمُوقَدَةُ",
+            "meaning": "kindled"
+          }
+        ],
+        "transliteration": "Nārullāhil-mūqadah",
+        "meaning": "It is the fire of Allah, [eternally] fueled."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلَّتِى",
+            "meaning": "Which"
+          },
+          {
+            "word": "تَطَّلِعُ",
+            "meaning": "mounts"
+          },
+          {
+            "word": "عَلَى",
+            "meaning": "upon"
+          },
+          {
+            "word": "ٱلْأَفْـِٔدَةِ",
+            "meaning": "the hearts"
+          }
+        ],
+        "transliteration": "Al-latī taṭṭali'u 'alal-af'idah",
+        "meaning": "Which mounts directed at the hearts."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّهَا",
+            "meaning": "Indeed, it"
+          },
+          {
+            "word": "عَلَيْهِم",
+            "meaning": "upon them"
+          },
+          {
+            "word": "مُّؤْصَدَةٌ",
+            "meaning": "will be closed down"
+          }
+        ],
+        "transliteration": "Innahā 'alayhim mu'ṣadah",
+        "meaning": "Indeed, it [the fire] will be closed down upon them."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فِى",
+            "meaning": "In"
+          },
+          {
+            "word": "عَمَدٍ",
+            "meaning": "columns"
+          },
+          {
+            "word": "مُّمَدَّدَةٍۭ",
+            "meaning": "extended"
+          }
+        ],
+        "transliteration": "Fī 'amadim-mumaddadah",
+        "meaning": "In extended columns."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Humazah, Verses 1-9"
+  },
+  {
+    "title": "Surah Al-Asr - The Time (ٱلْعَصْر)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَٱلْعَصْرِ",
+            "meaning": "By the time"
+          }
+        ],
+        "transliteration": "Wal-'aṣr",
+        "meaning": "By time."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّ",
+            "meaning": "Indeed"
+          },
+          {
+            "word": "ٱلْإِنسَٰنَ",
+            "meaning": "mankind"
+          },
+          {
+            "word": "لَفِى",
+            "meaning": "is in"
+          },
+          {
+            "word": "خُسْرٍ",
+            "meaning": "loss"
+          }
+        ],
+        "transliteration": "Innal-insāna lafī khusr",
+        "meaning": "Indeed, mankind is in loss."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِلَّا",
+            "meaning": "Except"
+          },
+          {
+            "word": "ٱلَّذِينَ",
+            "meaning": "those who"
+          },
+          {
+            "word": "ءَامَنُوا۟",
+            "meaning": "believe"
+          },
+          {
+            "word": "وَعَمِلُوا۟",
+            "meaning": "and do"
+          },
+          {
+            "word": "ٱلصَّٰلِحَٰتِ",
+            "meaning": "righteous deeds"
+          },
+          {
+            "word": "وَتَوَاصَوْا۟",
+            "meaning": "and advise each other"
+          },
+          {
+            "word": "بِٱلْحَقِّ",
+            "meaning": "to truth"
+          },
+          {
+            "word": "وَتَوَاصَوْا۟",
+            "meaning": "and advise each other"
+          },
+          {
+            "word": "بِٱلصَّبْرِ",
+            "meaning": "to patience"
+          }
+        ],
+        "transliteration": "Illal-ladhīna āmanū wa 'amiluṣ-ṣāliḥāti wa tawāṣaw bil-ḥaqqi wa tawāṣaw biṣ-ṣabr",
+        "meaning": "Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Asr, Verses 1-3"
+  },
+  {
+    "title": "Surah At-Takathur - The Rivalry (التَّكَاثُر)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَلْهَىٰكُمُ",
+            "meaning": "Has distracted you"
+          },
+          {
+            "word": "ٱلتَّكَاثُرُ",
+            "meaning": "the competition for increase"
+          }
+        ],
+        "transliteration": "Alhākumut-takāthur",
+        "meaning": "The competition for [worldly] increase has distracted you."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "حَتَّىٰ",
+            "meaning": "Until"
+          },
+          {
+            "word": "زُرْتُمُ",
+            "meaning": "you visit"
+          },
+          {
+            "word": "ٱلْمَقَابِرَ",
+            "meaning": "the graves"
+          }
+        ],
+        "transliteration": "Ḥattā zurtumul-maqābir",
+        "meaning": "Until you visit the graves."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "كَلَّا",
+            "meaning": "No"
+          },
+          {
+            "word": "سَوْفَ",
+            "meaning": "Soon"
+          },
+          {
+            "word": "تَعْلَمُونَ",
+            "meaning": "you will know"
+          }
+        ],
+        "transliteration": "Kallā sawfa ta'lamūn",
+        "meaning": "No! You are going to know."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ثُمَّ",
+            "meaning": "Then"
+          },
+          {
+            "word": "كَلَّا",
+            "meaning": "no"
+          },
+          {
+            "word": "سَوْفَ",
+            "meaning": "soon"
+          },
+          {
+            "word": "تَعْلَمُونَ",
+            "meaning": "you will know"
+          }
+        ],
+        "transliteration": "Thumma kallā sawfa ta'lamūn",
+        "meaning": "Then no! You are going to know."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "كَلَّا",
+            "meaning": "No"
+          },
+          {
+            "word": "لَوْ",
+            "meaning": "if"
+          },
+          {
+            "word": "تَعْلَمُونَ",
+            "meaning": "you know"
+          },
+          {
+            "word": "عِلْمَ",
+            "meaning": "knowledge"
+          },
+          {
+            "word": "ٱلْيَقِينِ",
+            "meaning": "of certainty"
+          }
+        ],
+        "transliteration": "Kallā law ta'lamūna 'ilmal-yaqīn",
+        "meaning": "No! If you only knew with knowledge of certainty."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "لَتَرَوُنَّ",
+            "meaning": "You will surely see"
+          },
+          {
+            "word": "ٱلْجَحِيمَ",
+            "meaning": "the Hellfire"
+          }
+        ],
+        "transliteration": "Latarawunnal-jaḥīm",
+        "meaning": "You will surely see the Hellfire."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ثُمَّ",
+            "meaning": "Then"
+          },
+          {
+            "word": "لَتَرَوُنَّهَا",
+            "meaning": "you will surely see it"
+          },
+          {
+            "word": "عَيْنَ",
+            "meaning": "eye"
+          },
+          {
+            "word": "ٱلْيَقِينِ",
+            "meaning": "of certainty"
+          }
+        ],
+        "transliteration": "Thumma latarawunnahā 'aynal-yaqīn",
+        "meaning": "Then you will surely see it with the eye of certainty."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ثُمَّ",
+            "meaning": "Then"
+          },
+          {
+            "word": "لَتُسْـَٔلُنَّ",
+            "meaning": "you will surely be asked"
+          },
+          {
+            "word": "يَوْمَئِذٍ",
+            "meaning": "that Day"
+          },
+          {
+            "word": "عَنِ",
+            "meaning": "about"
+          },
+          {
+            "word": "ٱلنَّعِيمِ",
+            "meaning": "the pleasures"
+          }
+        ],
+        "transliteration": "Thumma latus'alunna yauma'dhin 'anin-na'īm",
+        "meaning": "Then you will surely be asked that Day about the pleasures."
+      }
+    ],
+    "reference": "Qur'an, Surah At-Takathur, Verses 1-8"
+  },
+  {
+    "title": "Surah Al-Qari'ah - The Striking Calamity (الْقَارِعَة)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلْقَارِعَةُ",
+            "meaning": "The Striking Calamity"
+          }
+        ],
+        "transliteration": "Al-qāri'ah",
+        "meaning": "The Striking Calamity -"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "مَا",
+            "meaning": "What"
+          },
+          {
+            "word": "ٱلْقَارِعَةُ",
+            "meaning": "is the Striking Calamity"
+          }
+        ],
+        "transliteration": "Mal-qāri'ah",
+        "meaning": "What is the Striking Calamity?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمَا",
+            "meaning": "And what"
+          },
+          {
+            "word": "أَدْرَىٰكَ",
+            "meaning": "can make you know"
+          },
+          {
+            "word": "مَا",
+            "meaning": "what"
+          },
+          {
+            "word": "ٱلْقَارِعَةُ",
+            "meaning": "the Striking Calamity"
+          }
+        ],
+        "transliteration": "Wa mā adrāka mal-qāri'ah",
+        "meaning": "And what can make you know what is the Striking Calamity?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "يَوْمَ",
+            "meaning": "The Day"
+          },
+          {
+            "word": "يَكُونُ",
+            "meaning": "when will be"
+          },
+          {
+            "word": "ٱلنَّاسُ",
+            "meaning": "the people"
+          },
+          {
+            "word": "كَٱلْفَرَاشِ",
+            "meaning": "like moths"
+          },
+          {
+            "word": "ٱلْمَبْثُوثِ",
+            "meaning": "scattered"
+          }
+        ],
+        "transliteration": "Yauma yakūnun-nāsu kal-farāshil-mabthūth",
+        "meaning": "It is the Day when people will be like moths, dispersed."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَتَكُونُ",
+            "meaning": "And will be"
+          },
+          {
+            "word": "ٱلْجِبَالُ",
+            "meaning": "the mountains"
+          },
+          {
+            "word": "كَٱلْعِهْنِ",
+            "meaning": "like wool"
+          },
+          {
+            "word": "ٱلْمَنفُوشِ",
+            "meaning": "fluffed up"
+          }
+        ],
+        "transliteration": "Wa takūnul-jibālu kal-'ihnil-manfūsh",
+        "meaning": "And the mountains will be like wool, fluffed up."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَأَمَّا",
+            "meaning": "Then as for"
+          },
+          {
+            "word": "مَن",
+            "meaning": "whoever"
+          },
+          {
+            "word": "ثَقُلَتْ",
+            "meaning": "are heavy"
+          },
+          {
+            "word": "مَوَٰزِينُهُۥ",
+            "meaning": "his scales"
+          }
+        ],
+        "transliteration": "Fa-ammā man thaqulat mawāzīnuh",
+        "meaning": "Then as for one whose scales are heavy [with good deeds]."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَهُوَ",
+            "meaning": "Then he"
+          },
+          {
+            "word": "فِى",
+            "meaning": "in"
+          },
+          {
+            "word": "عِيشَةٍ",
+            "meaning": "a life"
+          },
+          {
+            "word": "رَّاضِيَةٍ",
+            "meaning": "pleasant"
+          }
+        ],
+        "transliteration": "Fahuwa fī 'īshatir-rāḍiyah",
+        "meaning": "He will be in a pleasant life."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَأَمَّا",
+            "meaning": "But as for"
+          },
+          {
+            "word": "مَنْ",
+            "meaning": "whoever"
+          },
+          {
+            "word": "خَفَّتْ",
+            "meaning": "are light"
+          },
+          {
+            "word": "مَوَٰزِينُهُۥ",
+            "meaning": "his scales"
+          }
+        ],
+        "transliteration": "Wa ammā man khaffat mawāzīnuh",
+        "meaning": "But as for one whose scales are light."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَأُمُّهُۥ",
+            "meaning": "His home"
+          },
+          {
+            "word": "هَاوِيَةٌ",
+            "meaning": "will be the Abyss"
+          }
+        ],
+        "transliteration": "Fa-ummuhū hāwiyah",
+        "meaning": "His home will be the Abyss."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمَا",
+            "meaning": "And what"
+          },
+          {
+            "word": "أَدْرَىٰكَ",
+            "meaning": "can make you know"
+          },
+          {
+            "word": "مَا",
+            "meaning": "what"
+          },
+          {
+            "word": "هِيَهْ",
+            "meaning": "that"
+          }
+        ],
+        "transliteration": "Wa mā adrāka mā hiyah",
+        "meaning": "And what can make you know what that is?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "نَارٌ",
+            "meaning": "A Fire"
+          },
+          {
+            "word": "حَامِيَةٌۢ",
+            "meaning": "intensely hot"
+          }
+        ],
+        "transliteration": "Nārun ḥāmiyah",
+        "meaning": "It is a Fire, intensely hot."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Qari'ah, Verses 1-11"
+  },
+  {
+    "title": "Surah Al-'Adiyat - The Chargers (الْعَادِيَات)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللّٰهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَٱلْعَٰدِيَٰتِ",
+            "meaning": "By the chargers"
+          },
+          {
+            "word": "ضَبْحًا",
+            "meaning": "panting"
+          }
+        ],
+        "transliteration": "Wal-'ādi-yāti ḍabḥā",
+        "meaning": "By the racers, panting."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَٱلْمُورِيَٰتِ",
+            "meaning": "Then the producers of sparks"
+          },
+          {
+            "word": "قَدْحًا",
+            "meaning": "striking"
+          }
+        ],
+        "transliteration": "Fal-mūriyāti qadḥā",
+        "meaning": "And the producers of sparks [when] striking."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَٱلْمُغِيرَٰتِ",
+            "meaning": "Then the invaders"
+          },
+          {
+            "word": "صُبْحًا",
+            "meaning": "at dawn"
+          }
+        ],
+        "transliteration": "Fal-mughīrāti ṣubḥā",
+        "meaning": "And the invaders at dawn."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَأَثَرْنَ",
+            "meaning": "Then they raise"
+          },
+          {
+            "word": "بِهِۦ",
+            "meaning": "therewith"
+          },
+          {
+            "word": "نَقْعًا",
+            "meaning": "dust"
+          }
+        ],
+        "transliteration": "Fa-atharna bihī naq'ā",
+        "meaning": "Then thereby raising dust."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَوَسَطْنَ",
+            "meaning": "Then they penetrate"
+          },
+          {
+            "word": "بِهِۦ",
+            "meaning": "therewith"
+          },
+          {
+            "word": "جَمْعًا",
+            "meaning": "the center collectively"
+          }
+        ],
+        "transliteration": "Fawasaṭna bihī jam'ā",
+        "meaning": "And thereby penetrating into the center collectively."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّ",
+            "meaning": "Indeed"
+          },
+          {
+            "word": "ٱلْإِنسَٰنَ",
+            "meaning": "mankind"
+          },
+          {
+            "word": "لِرَبِّهِۦ",
+            "meaning": "to his Lord"
+          },
+          {
+            "word": "لَكَنُودٌ",
+            "meaning": "is ungrateful"
+          }
+        ],
+        "transliteration": "Innal-insāna lirabbihī lakanūd",
+        "meaning": "Indeed mankind, to his Lord, is ungrateful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَإِنَّهُۥ",
+            "meaning": "And indeed he"
+          },
+          {
+            "word": "عَلَىٰ",
+            "meaning": "to"
+          },
+          {
+            "word": "ذَٰلِكَ",
+            "meaning": "that"
+          },
+          {
+            "word": "لَشَهِيدٌ",
+            "meaning": "is a witness"
+          }
+        ],
+        "transliteration": "Wa innahū 'alā dhālikā lashahīd",
+        "meaning": "And indeed, he is to that a witness."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَإِنَّهُۥ",
+            "meaning": "And indeed he"
+          },
+          {
+            "word": "لِحُبِّ",
+            "meaning": "for love"
+          },
+          {
+            "word": "ٱلْخَيْرِ",
+            "meaning": "of wealth"
+          },
+          {
+            "word": "لَشَدِيدٌ",
+            "meaning": "is intense"
+          }
+        ],
+        "transliteration": "Wa innahū liḥubbil-khayri lashadīd",
+        "meaning": "And indeed he is, in love of wealth, intense."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَفَلَا",
+            "meaning": "Does not"
+          },
+          {
+            "word": "يَعْلَمُ",
+            "meaning": "he know"
+          },
+          {
+            "word": "إِذَا",
+            "meaning": "when"
+          },
+          {
+            "word": "بُعْثِرَ",
+            "meaning": "is scattered"
+          },
+          {
+            "word": "مَا",
+            "meaning": "what"
+          },
+          {
+            "word": "فِى",
+            "meaning": "in"
+          },
+          {
+            "word": "ٱلْقُبُورِ",
+            "meaning": "the graves"
+          }
+        ],
+        "transliteration": "A-falā ya'lamu idhā bu'thira mā fil-qubūr",
+        "meaning": "But does he not know that when what is in the graves is scattered."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَحُصِّلَ",
+            "meaning": "And is obtained"
+          },
+          {
+            "word": "مَا",
+            "meaning": "what"
+          },
+          {
+            "word": "فِى",
+            "meaning": "in"
+          },
+          {
+            "word": "ٱلصُّدُورِ",
+            "meaning": "the breasts"
+          }
+        ],
+        "transliteration": "Wa ḥuṣṣila mā fiṣ-ṣudūr",
+        "meaning": "And that within the breasts is obtained."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّ",
+            "meaning": "Indeed"
+          },
+          {
+            "word": "رَبَّهُم",
+            "meaning": "their Lord"
+          },
+          {
+            "word": "بِهِمْ",
+            "meaning": "with them"
+          },
+          {
+            "word": "يَوْمَئِذٍ",
+            "meaning": "that Day"
+          },
+          {
+            "word": "لَّخَبِيرٌ",
+            "meaning": "is All-Aware"
+          }
+        ],
+        "transliteration": "Inna rabbahum bihim yauma'dhil-lakhabīr",
+        "meaning": "Indeed, their Lord with them, that Day, is [fully] Aware."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-'Adiyat, Verses 1-11"
+  },
+  {
+    "title": "Surah Az-Zalzalah - The Earthquake (الزَّلْزَلَة)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللَّهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِذَا",
+            "meaning": "When"
+          },
+          {
+            "word": "زُلْزِلَتِ",
+            "meaning": "is shaken"
+          },
+          {
+            "word": "ٱلْأَرْضُ",
+            "meaning": "the earth"
+          },
+          {
+            "word": "زِلْزَالَهَا",
+            "meaning": "with its earthquake"
+          }
+        ],
+        "transliteration": "Iẓā zulzilatil-arḍu zilzālahā",
+        "meaning": "When the earth is shaken with its [final] earthquake."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَأَخْرَجَتِ",
+            "meaning": "And discharges"
+          },
+          {
+            "word": "ٱلْأَرْضُ",
+            "meaning": "the earth"
+          },
+          {
+            "word": "أَثْقَالَهَا",
+            "meaning": "its burdens"
+          }
+        ],
+        "transliteration": "Wa akhrajatil-arḍu athqālahā",
+        "meaning": "And the earth discharges its burdens."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَقَالَ",
+            "meaning": "And says"
+          },
+          {
+            "word": "ٱلْإِنْسَانُ",
+            "meaning": "the human"
+          },
+          {
+            "word": "مَا",
+            "meaning": "what"
+          },
+          {
+            "word": "لَهَا",
+            "meaning": "is with it"
+          }
+        ],
+        "transliteration": "Wa qālal-insānu mā lahā",
+        "meaning": "And man says, 'What is [wrong] with it?'"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "يَوْمَئِذٍ",
+            "meaning": "That Day"
+          },
+          {
+            "word": "تُحَدِّثُ",
+            "meaning": "will report"
+          },
+          {
+            "word": "أَخْبَارَهَا",
+            "meaning": "its news"
+          }
+        ],
+        "transliteration": "Yawma'iẓin tuḥaddithu akhbārahā",
+        "meaning": "That Day, it will report its news."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "بِأَنَّ",
+            "meaning": "Because"
+          },
+          {
+            "word": "رَبَّكَ",
+            "meaning": "your Lord"
+          },
+          {
+            "word": "أَوْحَىٰ",
+            "meaning": "has inspired"
+          },
+          {
+            "word": "لَهَا",
+            "meaning": "to it"
+          }
+        ],
+        "transliteration": "Bi-anna rabbaka awḥā lahā",
+        "meaning": "Because your Lord has commanded it."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "يَوْمَئِذٍ",
+            "meaning": "That Day"
+          },
+          {
+            "word": "يَصْدُرُ",
+            "meaning": "will depart"
+          },
+          {
+            "word": "ٱلنَّاسُ",
+            "meaning": "the people"
+          },
+          {
+            "word": "أَشْتَاتًا",
+            "meaning": "separated"
+          },
+          {
+            "word": "لِّيُرَوْا۟",
+            "meaning": "to be shown"
+          },
+          {
+            "word": "أَعْمَالَهُمْ",
+            "meaning": "their deeds"
+          }
+        ],
+        "transliteration": "Yawma'iẓin yaṣdurun-nāsu ashtātal-liyurau a'mālahum",
+        "meaning": "That Day, the people will depart separated [into categories] to be shown [the result of] their deeds."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَمَن",
+            "meaning": "So whoever"
+          },
+          {
+            "word": "يَعْمَلْ",
+            "meaning": "does"
+          },
+          {
+            "word": "مِثْقَالَ",
+            "meaning": "an atom's weight"
+          },
+          {
+            "word": "ذَرَّةٍ",
+            "meaning": "of a particle"
+          },
+          {
+            "word": "خَيْرًا",
+            "meaning": "of good"
+          },
+          {
+            "word": "يَرَهُۥ",
+            "meaning": "will see it"
+          }
+        ],
+        "transliteration": "Faman ya'mal mithqāla ẓarratin khairay yarah",
+        "meaning": "So whoever does an atom's weight of good will see it."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمَن",
+            "meaning": "And whoever"
+          },
+          {
+            "word": "يَعْمَلْ",
+            "meaning": "does"
+          },
+          {
+            "word": "مِثْقَالَ",
+            "meaning": "an atom's weight"
+          },
+          {
+            "word": "ذَرَّةٍ",
+            "meaning": "of a particle"
+          },
+          {
+            "word": "شَرًّا",
+            "meaning": "of evil"
+          },
+          {
+            "word": "يَرَهُۥ",
+            "meaning": "will see it"
+          }
+        ],
+        "transliteration": "Wa man ya'mal mithqāla ẓarratin sharray yarah",
+        "meaning": "And whoever does an atom's weight of evil will see it."
+      }
+    ],
+    "reference": "Qur'an, Surah Az-Zalzalah, Verses 1-8"
+  },
+  {
+    "title": "Surah Al-Bayyinah - The Clear Proof (ٱلْبَيِّنَة)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللَّهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "لَمْ",
+            "meaning": "Not"
+          },
+          {
+            "word": "يَكُنِ",
+            "meaning": "were"
+          },
+          {
+            "word": "ٱلَّذِينَ",
+            "meaning": "those who"
+          },
+          {
+            "word": "كَفَرُوا۟",
+            "meaning": "disbelieved"
+          },
+          {
+            "word": "مِنْ",
+            "meaning": "from"
+          },
+          {
+            "word": "أَهْلِ",
+            "meaning": "people"
+          },
+          {
+            "word": "ٱلْكِتَٰبِ",
+            "meaning": "the Scripture"
+          },
+          {
+            "word": "وَٱلْمُشْرِكِينَ",
+            "meaning": "and the polytheists"
+          },
+          {
+            "word": "مُنفَكِّينَ",
+            "meaning": "to be parted"
+          },
+          {
+            "word": "حَتَّىٰ",
+            "meaning": "until"
+          },
+          {
+            "word": "تَأْتِيَهُمُ",
+            "meaning": "comes to them"
+          },
+          {
+            "word": "ٱلْبَيِّنَةُ",
+            "meaning": "the clear evidence"
+          }
+        ],
+        "transliteration": "Lam yakunil-laẓīna kafarū min ahlil-kitābi wal-mushrikīna munfakkīna ḥattā ta'tiyahumul-bayyinah",
+        "meaning": "Those who disbelieved among the People of the Scripture and the polytheists were not to be parted [from misbelief] until there came to them clear evidence."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "رَسُولٌ",
+            "meaning": "A Messenger"
+          },
+          {
+            "word": "مِّنَ",
+            "meaning": "from"
+          },
+          {
+            "word": "ٱللَّهِ",
+            "meaning": "Allah"
+          },
+          {
+            "word": "يَتْلُوا۟",
+            "meaning": "recites"
+          },
+          {
+            "word": "صُحُفًا",
+            "meaning": "pages"
+          },
+          {
+            "word": "مُّطَهَّرَةً",
+            "meaning": "purified"
+          }
+        ],
+        "transliteration": "Rasūlum minallāhi yatlū ṣuḥufam muṭahharah",
+        "meaning": "A Messenger from Allah, reciting purified scriptures."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فِيهَا",
+            "meaning": "In which"
+          },
+          {
+            "word": "كُتُبٌ",
+            "meaning": "writings"
+          },
+          {
+            "word": "قَيِّمَةٌ",
+            "meaning": "correct"
+          }
+        ],
+        "transliteration": "Fīhā kutubun qayyimah",
+        "meaning": "Within which are correct writings."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمَا",
+            "meaning": "And not"
+          },
+          {
+            "word": "تَفَرَّقَ",
+            "meaning": "became divided"
+          },
+          {
+            "word": "ٱلَّذِينَ",
+            "meaning": "those who"
+          },
+          {
+            "word": "أُوتُوا۟",
+            "meaning": "were given"
+          },
+          {
+            "word": "ٱلْكِتَٰبَ",
+            "meaning": "the Scripture"
+          },
+          {
+            "word": "إِلَّا",
+            "meaning": "except"
+          },
+          {
+            "word": "مِنۢ",
+            "meaning": "after"
+          },
+          {
+            "word": "بَعْدِ",
+            "meaning": "after"
+          },
+          {
+            "word": "مَا",
+            "meaning": "when"
+          },
+          {
+            "word": "جَآءَتْهُمُ",
+            "meaning": "came to them"
+          },
+          {
+            "word": "ٱلْبَيِّنَةُ",
+            "meaning": "the clear evidence"
+          }
+        ],
+        "transliteration": "Wa mā tafarraqal-laẓīna ūtul-kitāba illā mim ba'di mā jā'athumul-bayyinah",
+        "meaning": "Nor did those who were given the Scripture become divided until after there had come to them clear evidence."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمَآ",
+            "meaning": "And they were not"
+          },
+          {
+            "word": "أُمِرُوٓا۟",
+            "meaning": "commanded"
+          },
+          {
+            "word": "إِلَّا",
+            "meaning": "except"
+          },
+          {
+            "word": "لِيَعْبُدُوا۟",
+            "meaning": "to worship"
+          },
+          {
+            "word": "ٱللَّهَ",
+            "meaning": "Allah"
+          },
+          {
+            "word": "مُخْلِصِينَ",
+            "meaning": "sincerely"
+          },
+          {
+            "word": "لَهُ",
+            "meaning": "to Him"
+          },
+          {
+            "word": "ٱلدِّينَ",
+            "meaning": "the religion"
+          },
+          {
+            "word": "حُنَفَآءَ",
+            "meaning": "being upright"
+          },
+          {
+            "word": "وَيُقِيمُوا۟",
+            "meaning": "and to establish"
+          },
+          {
+            "word": "ٱلصَّلَوٰةَ",
+            "meaning": "the prayer"
+          },
+          {
+            "word": "وَيُؤْتُوا۟",
+            "meaning": "and to give"
+          },
+          {
+            "word": "ٱلزَّكَوٰةَ",
+            "meaning": "the zakah"
+          },
+          {
+            "word": "وَذَٰلِكَ",
+            "meaning": "and that"
+          },
+          {
+            "word": "دِينُ",
+            "meaning": "religion"
+          },
+          {
+            "word": "ٱلْقَيِّمَةِ",
+            "meaning": "the correct"
+          }
+        ],
+        "transliteration": "Wa mā umirū illā liya'budullāha mukhliṣīna lahud-dīna ḥunafā'a wayuqīmuṣ-ṣalāta wayu'tuz-zakāh, wa ẓālikā dīnul-qayyimah",
+        "meaning": "And they were not commanded except to worship Allah, [being] sincere to Him in religion, inclining to truth, and to establish prayer and to give zakah. And that is the correct religion."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّ",
+            "meaning": "Indeed"
+          },
+          {
+            "word": "ٱلَّذِينَ",
+            "meaning": "those who"
+          },
+          {
+            "word": "كَفَرُوا۟",
+            "meaning": "disbelieved"
+          },
+          {
+            "word": "مِنْ",
+            "meaning": "from"
+          },
+          {
+            "word": "أَهْلِ",
+            "meaning": "people"
+          },
+          {
+            "word": "ٱلْكِتَٰبِ",
+            "meaning": "the Scripture"
+          },
+          {
+            "word": "وَٱلْمُشْرِكِينَ",
+            "meaning": "and the polytheists"
+          },
+          {
+            "word": "فِى",
+            "meaning": "in"
+          },
+          {
+            "word": "نَارِ",
+            "meaning": "the Fire"
+          },
+          {
+            "word": "جَهَنَّمَ",
+            "meaning": "of Hell"
+          },
+          {
+            "word": "خَٰلِدِينَ",
+            "meaning": "abiding eternally"
+          },
+          {
+            "word": "فِيهَا",
+            "meaning": "therein"
+          },
+          {
+            "word": "أُو۟لَٰٓئِكَ",
+            "meaning": "those"
+          },
+          {
+            "word": "هُمْ",
+            "meaning": "they"
+          },
+          {
+            "word": "شَرُّ",
+            "meaning": "the worst"
+          },
+          {
+            "word": "ٱلْبَرِيَّةِ",
+            "meaning": "of creatures"
+          }
+        ],
+        "transliteration": "Innal-laẓīna kafarū min ahlil-kitābi wal-mushrikīna fī nāri jahannama khālidīna fīhā, ulā'ika hum sharrul-bariyyah",
+        "meaning": "Indeed, they who disbelieved among the People of the Scripture and the polytheists will be in the fire of Hell, abiding eternally therein. Those are the worst of creatures."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّ",
+            "meaning": "Indeed"
+          },
+          {
+            "word": "ٱلَّذِينَ",
+            "meaning": "those who"
+          },
+          {
+            "word": "ءَامَنُوا۟",
+            "meaning": "believed"
+          },
+          {
+            "word": "وَعَمِلُوا۟",
+            "meaning": "and did"
+          },
+          {
+            "word": "ٱلصَّٰلِحَٰتِ",
+            "meaning": "righteous deeds"
+          },
+          {
+            "word": "أُو۟لَٰٓئِكَ",
+            "meaning": "those"
+          },
+          {
+            "word": "هُمْ",
+            "meaning": "they"
+          },
+          {
+            "word": "خَيْرُ",
+            "meaning": "the best"
+          },
+          {
+            "word": "ٱلْبَرِيَّةِ",
+            "meaning": "of creatures"
+          }
+        ],
+        "transliteration": "Innal-laẓīna āmanū wa 'amiluṣ-ṣāliḥāti ulā'ika hum khairul-bariyyah",
+        "meaning": "Indeed, they who have believed and done righteous deeds - those are the best of creatures."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "جَزَآؤُهُمْ",
+            "meaning": "Their reward"
+          },
+          {
+            "word": "عِندَ",
+            "meaning": "with"
+          },
+          {
+            "word": "رَبِّهِمْ",
+            "meaning": "their Lord"
+          },
+          {
+            "word": "جَنَّٰتُ",
+            "meaning": "Gardens"
+          },
+          {
+            "word": "عَدْنٍ",
+            "meaning": "of Eternity"
+          },
+          {
+            "word": "تَجْرِى",
+            "meaning": "flow"
+          },
+          {
+            "word": "مِن",
+            "meaning": "from"
+          },
+          {
+            "word": "تَحْتِهَا",
+            "meaning": "beneath them"
+          },
+          {
+            "word": "ٱلْأَنْهَٰرُ",
+            "meaning": "the rivers"
+          },
+          {
+            "word": "خَٰلِدِينَ",
+            "meaning": "abiding"
+          },
+          {
+            "word": "فِيهَآ",
+            "meaning": "therein"
+          },
+          {
+            "word": "أَبَدًا",
+            "meaning": "forever"
+          },
+          {
+            "word": "رَّضِىَ",
+            "meaning": "is pleased"
+          },
+          {
+            "word": "ٱللَّهُ",
+            "meaning": "Allah"
+          },
+          {
+            "word": "عَنْهُمْ",
+            "meaning": "with them"
+          },
+          {
+            "word": "وَرَضُوا۟",
+            "meaning": "and they are pleased"
+          },
+          {
+            "word": "عَنْهُ",
+            "meaning": "with Him"
+          },
+          {
+            "word": "ذَٰلِكَ",
+            "meaning": "that"
+          },
+          {
+            "word": "لِمَنْ",
+            "meaning": "for whoever"
+          },
+          {
+            "word": "خَشِىَ",
+            "meaning": "feared"
+          },
+          {
+            "word": "رَبَّهُۥ",
+            "meaning": "his Lord"
+          }
+        ],
+        "transliteration": "Jazā'uhum 'inda rabbihim jannātu 'adnin tajrī min taḥtihal-anhāru khālidīna fīhā abadā, raḍiyallāhu 'anhum wa raḍū 'anhu, ẓālikā liman khashiya rabbah",
+        "meaning": "Their reward with their Lord will be gardens of perpetual residence beneath which rivers flow, abiding therein forever. Allah is pleased with them and they are pleased with Him. That is for whoever has feared his Lord."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Bayyinah, Verses 1-8"
+  },
+  {
+    "title": "Surah Al-Qadr - The Decree (الْقَدْر)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللَّهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّا",
+            "meaning": "Indeed, We"
+          },
+          {
+            "word": "أَنزَلْنَٰهُ",
+            "meaning": "have sent it down"
+          },
+          {
+            "word": "فِى",
+            "meaning": "in"
+          },
+          {
+            "word": "لَيْلَةِ",
+            "meaning": "the Night"
+          },
+          {
+            "word": "ٱلْقَدْرِ",
+            "meaning": "of Decree"
+          }
+        ],
+        "transliteration": "Innā anzalnāhu fī laylatil-qadr",
+        "meaning": "Indeed, We sent it [the Quran] down during the Night of Decree."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَمَآ",
+            "meaning": "And what"
+          },
+          {
+            "word": "أَدْرَىٰكَ",
+            "meaning": "can make you know"
+          },
+          {
+            "word": "مَا",
+            "meaning": "what"
+          },
+          {
+            "word": "لَيْلَةُ",
+            "meaning": "the Night"
+          },
+          {
+            "word": "ٱلْقَدْرِ",
+            "meaning": "of Decree"
+          }
+        ],
+        "transliteration": "Wa mā adrāka mā laylatul-qadr",
+        "meaning": "And what can make you know what is the Night of Decree?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "لَيْلَةُ",
+            "meaning": "The Night"
+          },
+          {
+            "word": "ٱلْقَدْرِ",
+            "meaning": "of Decree"
+          },
+          {
+            "word": "خَيْرٌ",
+            "meaning": "is better"
+          },
+          {
+            "word": "مِّنْ",
+            "meaning": "than"
+          },
+          {
+            "word": "أَلْفِ",
+            "meaning": "a thousand"
+          },
+          {
+            "word": "شَهْرٍ",
+            "meaning": "months"
+          }
+        ],
+        "transliteration": "Laylatul-qadri khairum min alfi shahr",
+        "meaning": "The Night of Decree is better than a thousand months."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "تَنَزَّلُ",
+            "meaning": "Descend"
+          },
+          {
+            "word": "ٱلْمَلَٰٓئِكَةُ",
+            "meaning": "the angels"
+          },
+          {
+            "word": "وَٱلرُّوحُ",
+            "meaning": "and the Spirit"
+          },
+          {
+            "word": "فِيهَا",
+            "meaning": "therein"
+          },
+          {
+            "word": "بِإِذْنِ",
+            "meaning": "by permission"
+          },
+          {
+            "word": "رَبِّهِم",
+            "meaning": "of their Lord"
+          },
+          {
+            "word": "مِّن",
+            "meaning": "for"
+          },
+          {
+            "word": "كُلِّ",
+            "meaning": "every"
+          },
+          {
+            "word": "أَمْرٍ",
+            "meaning": "matter"
+          }
+        ],
+        "transliteration": "Tanazzalul-malā'ikatu war-rūḥu fīhā bi'idhni rabbihim min kulli amr",
+        "meaning": "The angels and the Spirit [Jibril] descend therein by permission of their Lord for every matter."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "سَلَٰمٌ",
+            "meaning": "Peace"
+          },
+          {
+            "word": "هِيَ",
+            "meaning": "it is"
+          },
+          {
+            "word": "حَتَّىٰ",
+            "meaning": "until"
+          },
+          {
+            "word": "مَطْلَعِ",
+            "meaning": "the emergence"
+          },
+          {
+            "word": "ٱلْفَجْرِ",
+            "meaning": "of dawn"
+          }
+        ],
+        "transliteration": "Salāmun hiya ḥattā maṭla'il-fajr",
+        "meaning": "Peace it is until the emergence of dawn."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Qadr, Verses 1-5"
+  },
+  {
+    "title": "Surah Al-Alaq - The Clot (الْعَلَق)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللَّهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱقْرَأْ",
+            "meaning": "Read"
+          },
+          {
+            "word": "بِٱسْمِ",
+            "meaning": "in the name"
+          },
+          {
+            "word": "رَبِّكَ",
+            "meaning": "of your Lord"
+          },
+          {
+            "word": "ٱلَّذِى",
+            "meaning": "Who"
+          },
+          {
+            "word": "خَلَقَ",
+            "meaning": "created"
+          }
+        ],
+        "transliteration": "Iqra' bismi rabbikal-ladhī khalaq",
+        "meaning": "Read in the name of your Lord who created."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "خَلَقَ",
+            "meaning": "Created"
+          },
+          {
+            "word": "ٱلْإِنسَٰنَ",
+            "meaning": "the human"
+          },
+          {
+            "word": "مِنْ",
+            "meaning": "from"
+          },
+          {
+            "word": "عَلَقٍ",
+            "meaning": "a clinging clot"
+          }
+        ],
+        "transliteration": "Khalaqal-insāna min 'alaq",
+        "meaning": "Created man from a clinging clot."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱقْرَأْ",
+            "meaning": "Read"
+          },
+          {
+            "word": "وَرَبُّكَ",
+            "meaning": "and your Lord"
+          },
+          {
+            "word": "ٱلْأَكْرَمُ",
+            "meaning": "the Most Generous"
+          }
+        ],
+        "transliteration": "Iqra' wa rabbukal-akram",
+        "meaning": "Read, and your Lord is the Most Generous."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلَّذِى",
+            "meaning": "Who"
+          },
+          {
+            "word": "عَلَّمَ",
+            "meaning": "taught"
+          },
+          {
+            "word": "بِٱلْقَلَمِ",
+            "meaning": "by the pen"
+          }
+        ],
+        "transliteration": "Al-ladhī 'allama bil-qalam",
+        "meaning": "Who taught by the pen."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "عَلَّمَ",
+            "meaning": "Taught"
+          },
+          {
+            "word": "ٱلْإِنسَٰنَ",
+            "meaning": "the human"
+          },
+          {
+            "word": "مَا",
+            "meaning": "what"
+          },
+          {
+            "word": "لَمْ",
+            "meaning": "not"
+          },
+          {
+            "word": "يَعْلَمْ",
+            "meaning": "he knew"
+          }
+        ],
+        "transliteration": "'Allamal-insāna mā lam ya'lam",
+        "meaning": "Taught man that which he knew not."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "كَلَّا",
+            "meaning": "No"
+          },
+          {
+            "word": "إِنَّ",
+            "meaning": "indeed"
+          },
+          {
+            "word": "ٱلْإِنسَٰنَ",
+            "meaning": "the human"
+          },
+          {
+            "word": "لَيَطْغَىٰ",
+            "meaning": "transgresses"
+          }
+        ],
+        "transliteration": "Kallā innal-insāna layaṭghā",
+        "meaning": "No! [But] indeed, man transgresses."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَن",
+            "meaning": "because"
+          },
+          {
+            "word": "رَءَاهُ",
+            "meaning": "he sees himself"
+          },
+          {
+            "word": "ٱسْتَغْنَىٰ",
+            "meaning": "self-sufficient"
+          }
+        ],
+        "transliteration": "Ar ra'āhus-taghna",
+        "meaning": "Because he sees himself self-sufficient."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّ",
+            "meaning": "Indeed"
+          },
+          {
+            "word": "إِلَىٰ",
+            "meaning": "to"
+          },
+          {
+            "word": "رَبِّكَ",
+            "meaning": "your Lord"
+          },
+          {
+            "word": "ٱلرُّجْعَىٰ",
+            "meaning": "is the return"
+          }
+        ],
+        "transliteration": "Inna ilā rabbikar-ruj'ā",
+        "meaning": "Indeed, to your Lord is the return."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَرَءَيْتَ",
+            "meaning": "Have you seen"
+          },
+          {
+            "word": "ٱلَّذِى",
+            "meaning": "the one who"
+          },
+          {
+            "word": "يَنْهَىٰ",
+            "meaning": "forbids"
+          }
+        ],
+        "transliteration": "Ara'aytal-ladhī yanhā",
+        "meaning": "Have you seen the one who forbids."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "عَبْدًا",
+            "meaning": "a servant"
+          },
+          {
+            "word": "إِذَا",
+            "meaning": "when"
+          },
+          {
+            "word": "صَلَّىٰ",
+            "meaning": "he prays"
+          }
+        ],
+        "transliteration": "Abdan idhā ṣallā",
+        "meaning": "A servant when he prays?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَرَءَيْتَ",
+            "meaning": "Have you seen"
+          },
+          {
+            "word": "إِن",
+            "meaning": "if"
+          },
+          {
+            "word": "كَانَ",
+            "meaning": "he was"
+          },
+          {
+            "word": "عَلَى",
+            "meaning": "upon"
+          },
+          {
+            "word": "ٱلْهُدَىٰ",
+            "meaning": "guidance"
+          }
+        ],
+        "transliteration": "Ara'ayta in kāna 'alal-hudā",
+        "meaning": "Have you seen if he is upon guidance."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَوْ",
+            "meaning": "or"
+          },
+          {
+            "word": "أَمَرَ",
+            "meaning": "he enjoined"
+          },
+          {
+            "word": "بِٱلتَّقْوَىٰ",
+            "meaning": "righteousness"
+          }
+        ],
+        "transliteration": "Aw amara bit-taqwā",
+        "meaning": "Or enjoins righteousness?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَرَءَيْتَ",
+            "meaning": "Have you seen"
+          },
+          {
+            "word": "إِن",
+            "meaning": "if"
+          },
+          {
+            "word": "كَذَّبَ",
+            "meaning": "he denied"
+          },
+          {
+            "word": "وَتَوَلَّىٰ",
+            "meaning": "and turned away"
+          }
+        ],
+        "transliteration": "Ara'ayta in kadhdhaba wa tawallā",
+        "meaning": "Have you seen if he denies and turns away."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَلَمْ",
+            "meaning": "Does not"
+          },
+          {
+            "word": "يَعْلَم",
+            "meaning": "he know"
+          },
+          {
+            "word": "بِأَنَّ",
+            "meaning": "that"
+          },
+          {
+            "word": "ٱللَّهَ",
+            "meaning": "Allah"
+          },
+          {
+            "word": "يَرَىٰ",
+            "meaning": "sees"
+          }
+        ],
+        "transliteration": "Alam ya'lam bi'annallāha yarā",
+        "meaning": "Does he not know that Allah sees?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "كَلَّا",
+            "meaning": "No"
+          },
+          {
+            "word": "لَئِن",
+            "meaning": "if"
+          },
+          {
+            "word": "لَّمْ",
+            "meaning": "not"
+          },
+          {
+            "word": "يَنتَهِ",
+            "meaning": "he ceases"
+          },
+          {
+            "word": "لَنَسْفَعًا",
+            "meaning": "We will drag"
+          },
+          {
+            "word": "بِٱلنَّاصِيَةِ",
+            "meaning": "by the forelock"
+          }
+        ],
+        "transliteration": "Kallā la'il lam yantahi lanasfa'am bin-nāṣiyah",
+        "meaning": "No! If he does not desist, We will surely drag him by the forelock."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "نَاصِيَةٍ",
+            "meaning": "A forelock"
+          },
+          {
+            "word": "كَٰذِبَةٍ",
+            "meaning": "lying"
+          },
+          {
+            "word": "خَاطِئَةٍ",
+            "meaning": "sinning"
+          }
+        ],
+        "transliteration": "Nāṣiyatin kādhibatin khāṭi'ah",
+        "meaning": "A lying, sinning forelock."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَلْيَدْعُ",
+            "meaning": "Then let him call"
+          },
+          {
+            "word": "نَادِيَهُ",
+            "meaning": "his associates"
+          }
+        ],
+        "transliteration": "Falyad'u nādiyah",
+        "meaning": "Then let him call his associates."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "سَنَدْعُ",
+            "meaning": "We will call"
+          },
+          {
+            "word": "ٱلزَّبَانِيَةَ",
+            "meaning": "the angels of Hell"
+          }
+        ],
+        "transliteration": "Sanad'uz-zabāniyah",
+        "meaning": "We will call the angels of Hell."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "كَلَّا",
+            "meaning": "No"
+          },
+          {
+            "word": "لَا",
+            "meaning": "do not"
+          },
+          {
+            "word": "تُطِعْهُ",
+            "meaning": "obey him"
+          },
+          {
+            "word": "وَٱسْجُدْ",
+            "meaning": "and prostrate"
+          },
+          {
+            "word": "وَٱقْتَرِب",
+            "meaning": "and draw near"
+          }
+        ],
+        "transliteration": "Kallā lā tuṭi'h wasjud waqtarib",
+        "meaning": "No! Do not obey him. But prostrate and draw near [to Allah]."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Alaq, Verses 1-19"
+  },
+  {
+    "title": "Surah At-Tin - The Fig (التِّينِ)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللَّهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَٱلتِّينِ",
+            "meaning": "By the fig"
+          },
+          {
+            "word": "وَٱلزَّيْتُونِ",
+            "meaning": "and the olive"
+          }
+        ],
+        "transliteration": "Wat-tīni waz-zaytūn",
+        "meaning": "By the fig and the olive."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَطُورِ",
+            "meaning": "And by Mount"
+          },
+          {
+            "word": "سِينِينَ",
+            "meaning": "Sinai"
+          }
+        ],
+        "transliteration": "Wa ṭūri sīnīn",
+        "meaning": "And [by] Mount Sinai."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَهَٰذَا",
+            "meaning": "And this"
+          },
+          {
+            "word": "ٱلْبَلَدِ",
+            "meaning": "city"
+          },
+          {
+            "word": "ٱلْأَمِينِ",
+            "meaning": "the secure"
+          }
+        ],
+        "transliteration": "Wa hādhāl-baladil-amīn",
+        "meaning": "And [by] this secure city [Makkah]."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "لَقَدْ",
+            "meaning": "Certainly"
+          },
+          {
+            "word": "خَلَقْنَا",
+            "meaning": "We created"
+          },
+          {
+            "word": "ٱلْإِنسَٰنَ",
+            "meaning": "the human"
+          },
+          {
+            "word": "فِىٓ",
+            "meaning": "in"
+          },
+          {
+            "word": "أَحْسَنِ",
+            "meaning": "the best"
+          },
+          {
+            "word": "تَقْوِيمٍ",
+            "meaning": "of stature"
+          }
+        ],
+        "transliteration": "Laqad khalaqnal-insāna fī aḥsani taqwīm",
+        "meaning": "We have certainly created man in the best of stature."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ثُمَّ",
+            "meaning": "Then"
+          },
+          {
+            "word": "رَدَدْنَٰهُ",
+            "meaning": "We return him"
+          },
+          {
+            "word": "أَسْفَلَ",
+            "meaning": "to the lowest"
+          },
+          {
+            "word": "سَٰفِلِينَ",
+            "meaning": "of the low"
+          }
+        ],
+        "transliteration": "Thumma radadnāhu asfala sāfilīn",
+        "meaning": "Then We return him to the lowest of the low."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِلَّا",
+            "meaning": "Except"
+          },
+          {
+            "word": "ٱلَّذِينَ",
+            "meaning": "those who"
+          },
+          {
+            "word": "ءَامَنُوا۟",
+            "meaning": "believed"
+          },
+          {
+            "word": "وَعَمِلُوا۟",
+            "meaning": "and did"
+          },
+          {
+            "word": "ٱلصَّٰلِحَٰتِ",
+            "meaning": "righteous deeds"
+          },
+          {
+            "word": "فَلَهُمْ",
+            "meaning": "then for them"
+          },
+          {
+            "word": "أَجْرٌ",
+            "meaning": "a reward"
+          },
+          {
+            "word": "غَيْرُ",
+            "meaning": "without"
+          },
+          {
+            "word": "مَمْنُونٍ",
+            "meaning": "interruption"
+          }
+        ],
+        "transliteration": "Illal-ladhīna āmanū wa 'amiluṣ-ṣāliḥāti fa lahum ajrun ghairu mamnūn",
+        "meaning": "Except for those who believe and do righteous deeds, for they will have a reward uninterrupted."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَمَا",
+            "meaning": "Then what"
+          },
+          {
+            "word": "يُكَذِّبُكَ",
+            "meaning": "causes you to deny"
+          },
+          {
+            "word": "بَعْدُ",
+            "meaning": "after"
+          },
+          {
+            "word": "بِٱلدِّينِ",
+            "meaning": "the Recompense"
+          }
+        ],
+        "transliteration": "Fa mā yukadhdhibuka ba'du bid-dīn",
+        "meaning": "So what yet causes you to deny the Recompense?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَلَيْسَ",
+            "meaning": "Is not"
+          },
+          {
+            "word": "ٱللَّهُ",
+            "meaning": "Allah"
+          },
+          {
+            "word": "بِأَحْكَمِ",
+            "meaning": "the most just"
+          },
+          {
+            "word": "ٱلْحَٰكِمِينَ",
+            "meaning": "of judges"
+          }
+        ],
+        "transliteration": "A-laisallāhu bi-aḥkamil-ḥākimīn",
+        "meaning": "Is not Allah the most just of judges?"
+      }
+    ],
+    "reference": "Qur'an, Surah At-Tin, Verses 1-8"
+  },
+  {
+    "title": "Surah Al-Inshirah - The Relief (الانشراح)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللَّهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَلَمْ",
+            "meaning": "Have not"
+          },
+          {
+            "word": "نَشْرَحْ",
+            "meaning": "We expanded"
+          },
+          {
+            "word": "لَكَ",
+            "meaning": "for you"
+          },
+          {
+            "word": "صَدْرَكَ",
+            "meaning": "your breast"
+          }
+        ],
+        "transliteration": "Alam nashraḥ laka ṣadrak",
+        "meaning": "Did We not expand for you, [O Muhammad], your breast?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَوَضَعْنَا",
+            "meaning": "And We removed"
+          },
+          {
+            "word": "عَنكَ",
+            "meaning": "from you"
+          },
+          {
+            "word": "وِزْرَكَ",
+            "meaning": "your burden"
+          }
+        ],
+        "transliteration": "Wa waḍa'nā 'anka wizrak",
+        "meaning": "And We removed from you your burden."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "ٱلَّذِىٓ",
+            "meaning": "Which"
+          },
+          {
+            "word": "أَنقَضَ",
+            "meaning": "weighed down"
+          },
+          {
+            "word": "ظَهْرَكَ",
+            "meaning": "your back"
+          }
+        ],
+        "transliteration": "Al-ladhī anqaḍa ẓahrak",
+        "meaning": "Which had weighed upon your back."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَرَفَعْنَا",
+            "meaning": "And We raised"
+          },
+          {
+            "word": "لَكَ",
+            "meaning": "for you"
+          },
+          {
+            "word": "ذِكْرَكَ",
+            "meaning": "your fame"
+          }
+        ],
+        "transliteration": "Wa rafa'nā laka dhikrak",
+        "meaning": "And raised high for you your repute."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَإِنَّ",
+            "meaning": "So indeed"
+          },
+          {
+            "word": "مَعَ",
+            "meaning": "with"
+          },
+          {
+            "word": "ٱلْعُسْرِ",
+            "meaning": "the hardship"
+          },
+          {
+            "word": "يُسْرًا",
+            "meaning": "ease"
+          }
+        ],
+        "transliteration": "Fa inna ma'al-'usri yusrā",
+        "meaning": "For indeed, with hardship [will be] ease."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "إِنَّ",
+            "meaning": "Indeed"
+          },
+          {
+            "word": "مَعَ",
+            "meaning": "with"
+          },
+          {
+            "word": "ٱلْعُسْرِ",
+            "meaning": "the hardship"
+          },
+          {
+            "word": "يُسْرًا",
+            "meaning": "ease"
+          }
+        ],
+        "transliteration": "Inna ma'al-'usri yusrā",
+        "meaning": "Indeed, with hardship [will be] ease."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَإِذَا",
+            "meaning": "So when"
+          },
+          {
+            "word": "فَرَغْتَ",
+            "meaning": "you have finished"
+          },
+          {
+            "word": "فَٱنصَبْ",
+            "meaning": "then stand up"
+          }
+        ],
+        "transliteration": "Fa idhā faraghta fanṣab",
+        "meaning": "So when you have finished [your duties], then stand up [for worship]."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَإِلَىٰ",
+            "meaning": "And to"
+          },
+          {
+            "word": "رَبِّكَ",
+            "meaning": "your Lord"
+          },
+          {
+            "word": "فَٱرْغَب",
+            "meaning": "direct longing"
+          }
+        ],
+        "transliteration": "Wa ilā rabbika farghab",
+        "meaning": "And to your Lord direct [your] longing."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Inshirah, Verses 1-8"
+  },
+  {
+    "title": "Surah Ad-Duha - The Morning Brightness (الضُّحَىٰ)",
+    "ayat": [
+      {
+        "arabic_words": [
+          {
+            "word": "بِسْمِ",
+            "meaning": "In the name"
+          },
+          {
+            "word": "ٱللَّهِ",
+            "meaning": "of Allah"
+          },
+          {
+            "word": "ٱلرَّحْمَٰنِ",
+            "meaning": "the Most Gracious"
+          },
+          {
+            "word": "ٱلرَّحِيمِ",
+            "meaning": "the Most Merciful"
+          }
+        ],
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَٱلضُّحَىٰ",
+            "meaning": "By the morning brightness"
+          }
+        ],
+        "transliteration": "Wad-duḥā",
+        "meaning": "By the morning brightness."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَٱللَّيْلِ",
+            "meaning": "And by the night"
+          },
+          {
+            "word": "إِذَا",
+            "meaning": "when"
+          },
+          {
+            "word": "سَجَىٰ",
+            "meaning": "it covers with darkness"
+          }
+        ],
+        "transliteration": "Wal-layli iẓā sajā",
+        "meaning": "And by the night when it covers with darkness."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "مَا",
+            "meaning": "Not"
+          },
+          {
+            "word": "وَدَّعَكَ",
+            "meaning": "has taken leave of you"
+          },
+          {
+            "word": "رَبُّكَ",
+            "meaning": "your Lord"
+          },
+          {
+            "word": "وَمَا",
+            "meaning": "nor"
+          },
+          {
+            "word": "قَلَىٰ",
+            "meaning": "has He detested"
+          }
+        ],
+        "transliteration": "Mā wadda'aka rabbuka wa mā qalā",
+        "meaning": "Your Lord has not taken leave of you, [O Muhammad], nor has He detested [you]."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَلَلْءَاخِرَةُ",
+            "meaning": "And the Hereafter"
+          },
+          {
+            "word": "خَيْرٌ",
+            "meaning": "is better"
+          },
+          {
+            "word": "لَّكَ",
+            "meaning": "for you"
+          },
+          {
+            "word": "مِنَ",
+            "meaning": "than"
+          },
+          {
+            "word": "ٱلْأُولَىٰ",
+            "meaning": "the first [life]"
+          }
+        ],
+        "transliteration": "Wa lal-ākhiratu khairul laka minal-ūlā",
+        "meaning": "And the Hereafter is better for you than the first [life]."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَلَسَوْفَ",
+            "meaning": "And soon"
+          },
+          {
+            "word": "يُعْطِيكَ",
+            "meaning": "will give you"
+          },
+          {
+            "word": "رَبُّكَ",
+            "meaning": "your Lord"
+          },
+          {
+            "word": "فَتَرْضَىٰ",
+            "meaning": "so you will be satisfied"
+          }
+        ],
+        "transliteration": "Wa lasawfa yu'ṭīka rabbuka fatarḍā",
+        "meaning": "And your Lord is going to give you, and you will be satisfied."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "أَلَمْ",
+            "meaning": "Did not"
+          },
+          {
+            "word": "يَجِدْكَ",
+            "meaning": "He find you"
+          },
+          {
+            "word": "يَتِيمًا",
+            "meaning": "an orphan"
+          },
+          {
+            "word": "فَـَٔاوَىٰ",
+            "meaning": "and give refuge"
+          }
+        ],
+        "transliteration": "Alam yajidka yatīman fa āwā",
+        "meaning": "Did He not find you an orphan and give [you] refuge?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَوَجَدَكَ",
+            "meaning": "And He found you"
+          },
+          {
+            "word": "ضَآلًّا",
+            "meaning": "lost"
+          },
+          {
+            "word": "فَهَدَىٰ",
+            "meaning": "and guided"
+          }
+        ],
+        "transliteration": "Wa wajadaka ḍāllan fahadā",
+        "meaning": "And He found you lost and guided [you]?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَوَجَدَكَ",
+            "meaning": "And He found you"
+          },
+          {
+            "word": "عَآئِلًا",
+            "meaning": "poor"
+          },
+          {
+            "word": "فَأَغْنَىٰ",
+            "meaning": "and made self-sufficient"
+          }
+        ],
+        "transliteration": "Wa wajadaka 'ā'ilan fa aghnā",
+        "meaning": "And He found you poor and made [you] self-sufficient?"
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "فَأَمَّا",
+            "meaning": "So as for"
+          },
+          {
+            "word": "ٱلْيَتِيمَ",
+            "meaning": "the orphan"
+          },
+          {
+            "word": "فَلَا",
+            "meaning": "then do not"
+          },
+          {
+            "word": "تَقْهَرْ",
+            "meaning": "oppress"
+          }
+        ],
+        "transliteration": "Fa ammal-yatīma falā taqhar",
+        "meaning": "So as for the orphan, do not oppress [him]."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَأَمَّا",
+            "meaning": "And as for"
+          },
+          {
+            "word": "ٱلسَّآئِلَ",
+            "meaning": "the petitioner"
+          },
+          {
+            "word": "فَلَا",
+            "meaning": "then do not"
+          },
+          {
+            "word": "تَنْهَرْ",
+            "meaning": "repel"
+          }
+        ],
+        "transliteration": "Wa ammas-sā'ila falā tanhar",
+        "meaning": "And as for the petitioner, do not repel [him]."
+      },
+      {
+        "arabic_words": [
+          {
+            "word": "وَأَمَّا",
+            "meaning": "And as for"
+          },
+          {
+            "word": "بِنِعْمَةِ",
+            "meaning": "the favor"
+          },
+          {
+            "word": "رَبِّكَ",
+            "meaning": "of your Lord"
+          },
+          {
+            "word": "فَحَدِّثْ",
+            "meaning": "then proclaim"
+          }
+        ],
+        "transliteration": "Wa amma bini'mati rabbika faḥaddith",
+        "meaning": "But as for the favor of your Lord, report [it]."
+      }
+    ],
+    "reference": "Qur'an, Surah Ad-Duha, Verses 1-11"
+  }
 ]

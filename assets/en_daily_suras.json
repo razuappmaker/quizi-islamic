@@ -5,39 +5,1066 @@
       {
         "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
         "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
-        "meaning": "In the name of Allah, the Most Gracious, the Most Merciful."
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
       },
       {
         "arabic": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
-        "transliteration": "Al-ḥamdu lillāhi rabbil-‘ālamīn",
-        "meaning": "All praise is due to Allah, Lord of the worlds."
+        "transliteration": "Al-ḥamdu lillāhi rabbil-'ālamīn",
+        "meaning": "All praise is for Allah—Lord of all worlds,"
       },
       {
         "arabic": "الرَّحْمَٰنِ الرَّحِيمِ",
         "transliteration": "Ar-Raḥmānir-Raḥīm",
-        "meaning": "The Most Gracious, the Most Merciful."
+        "meaning": "The Most Compassionate, Most Merciful,"
       },
       {
         "arabic": "مَالِكِ يَوْمِ الدِّينِ",
-        "transliteration": "Māliki yawmi-d-dīn",
+        "transliteration": "Māliki yawmid-dīn",
         "meaning": "Master of the Day of Judgment."
       },
       {
         "arabic": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
-        "transliteration": "Iyyāka na‘budu wa iyyāka nasta‘īn",
-        "meaning": "You alone we worship, and You alone we ask for help."
+        "transliteration": "Iyyāka na'budu wa iyyāka nasta'īn",
+        "meaning": "You alone we worship and You alone we ask for help."
       },
       {
         "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
-        "transliteration": "Ihdinaṣ-ṣirāṭal-mustaqīm",
-        "meaning": "Guide us on the straight path."
+        "transliteration": "Ihdinas-ṣirāṭal-mustaqīm",
+        "meaning": "Guide us along the Straight Path,"
       },
       {
         "arabic": "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
-        "transliteration": "Ṣirāṭ al-ladhīna an‘amta ‘alayhim ghayril-maghdūbi ‘alayhim walāḍ-ḍāllīn",
-        "meaning": "The path of those upon whom You have bestowed Your grace, not of those who have incurred Your wrath, nor of those who have gone astray."
+        "transliteration": "Ṣirāṭalladhīna an'amta 'alayhim ghayril-maghḍūbi 'alayhim walāḍ-ḍāllīn",
+        "meaning": "The path of those You have blessed—not those You are displeased with, or those who are astray."
       }
     ],
-    "reference": "Qur'an, Surah Al-Fatiha, Verses 1–7"
+    "reference": "Qur'an, Surah Al-Fatiha, Verses 1-7"
+  },
+  {
+    "title": "Surah An-Nas - النَّاس",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "قُلْ أَعُوذُ بِرَبِّ النَّاسِ",
+        "transliteration": "Qul a'ūdhu birabbin-nās",
+        "meaning": "Say, 'I seek refuge in the Lord of humankind,'"
+      },
+      {
+        "arabic": "مَلِكِ النَّاسِ",
+        "transliteration": "Malikin-nās",
+        "meaning": "The Sovereign of humankind,'"
+      },
+      {
+        "arabic": "إِلَٰهِ النَّاسِ",
+        "transliteration": "Ilāhin-nās",
+        "meaning": "The God of humankind,'"
+      },
+      {
+        "arabic": "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
+        "transliteration": "Min sharril-waswāsil-khannās",
+        "meaning": "From the evil of the retreating whisperer—'"
+      },
+      {
+        "arabic": "الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ",
+        "transliteration": "Alladhī yuwaswisu fī ṣudūrin-nās",
+        "meaning": "Who whispers into the hearts of humankind—'"
+      },
+      {
+        "arabic": "مِنَ الْجِنَّةِ وَالنَّاسِ",
+        "transliteration": "Minal-jinnati wan-nās",
+        "meaning": "From among the jinn and humankind.'"
+      }
+    ],
+    "reference": "Qur'an, Surah An-Nas, Verses 1-6"
+  },
+  {
+    "title": "Surah Al-Falaq - الْفَلَق",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ",
+        "transliteration": "Qul a'ūdhu birabbil-falaq",
+        "meaning": "Say, 'I seek refuge in the Lord of the daybreak'"
+      },
+      {
+        "arabic": "مِن شَرِّ مَا خَلَقَ",
+        "transliteration": "Min sharri mā khalaq",
+        "meaning": "From the evil of what He has created,'"
+      },
+      {
+        "arabic": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+        "transliteration": "Wa min sharri ghāsiqin idhā waqab",
+        "meaning": "And from the evil of the darkness when it settles,'"
+      },
+      {
+        "arabic": "وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ",
+        "transliteration": "Wa min sharrin-naffāthāti fil-'uqad",
+        "meaning": "And from the evil of the blowers in knots,'"
+      },
+      {
+        "arabic": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+        "transliteration": "Wa min sharri ḥāsidin idhā ḥasad",
+        "meaning": "And from the evil of an envier when he envies.'"
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Falaq, Verses 1-5"
+  },
+  {
+    "title": "Surah Al-Ikhlas - الْإِخْلَاص",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "قُلْ هُوَ اللَّهُ أَحَدٌ",
+        "transliteration": "Qul huwallāhu aḥad",
+        "meaning": "Say, 'He is Allah—the One.'"
+      },
+      {
+        "arabic": "اللَّهُ الصَّمَدُ",
+        "transliteration": "Allāhuṣ-ṣamad",
+        "meaning": "Allah—the Sustainer and Protector, the Eternal Refuge.'"
+      },
+      {
+        "arabic": "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+        "transliteration": "Lam yalid wa lam yūlad",
+        "meaning": "He has never had offspring, nor was He born.'"
+      },
+      {
+        "arabic": "وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ",
+        "transliteration": "Wa lam yakul-lahū kufuwan aḥad",
+        "meaning": "And there is none comparable to Him.'"
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Ikhlas, Verses 1-4"
+  },
+  {
+    "title": "Surah Al-Masadd - الْمَسَد",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ",
+        "transliteration": "Tabbat yadā abī lahabin wa tabb",
+        "meaning": "May the hands of Abu Lahab be ruined, and ruined is he."
+      },
+      {
+        "arabic": "مَا أَغْنَىٰ عَنْهُ مَالُهُ وَمَا كَسَبَ",
+        "transliteration": "Mā aghnā 'anhu māluhū wa mā kasab",
+        "meaning": "His wealth will not avail him or that which he gained."
+      },
+      {
+        "arabic": "سَيَصْلَىٰ نَارًا ذَاتَ لَهَبٍ",
+        "transliteration": "Sayaṣlā nāran dhāta lahab",
+        "meaning": "He will burn in a Fire of blazing flames,"
+      },
+      {
+        "arabic": "وَامْرَأَتُهُ حَمَّالَةَ الْحَطَبِ",
+        "transliteration": "Wamra'atuhū ḥammālatal-ḥaṭab",
+        "meaning": "And his wife as well—the carrier of firewood,"
+      },
+      {
+        "arabic": "فِي جِيدِهَا حَبْلٌ مِّن مَّسَدٍ",
+        "transliteration": "Fī jīdihā ḥablum mim masad",
+        "meaning": "Around her neck will be a rope of palm fiber."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Masadd, Verses 1-5"
+  },
+  {
+    "title": "Surah An-Nasr - النَّصْر",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ",
+        "transliteration": "Idhā jā'a nasrullāhi wal-fath",
+        "meaning": "When the victory of Allah has come and the conquest,"
+      },
+      {
+        "arabic": "وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا",
+        "transliteration": "Wa ra'aitan-nāsa yadkhulūna fī dīnillāhi afwājā",
+        "meaning": "And you see the people entering into the religion of Allah in multitudes,"
+      },
+      {
+        "arabic": "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ ۚ إِنَّهُ كَانَ تَوَّابًا",
+        "transliteration": "Fasabbih bihamdi rabbika wastaghfir'h, innahū kāna tawwābā",
+        "meaning": "Then exalt [Him] with praise of your Lord and ask forgiveness of Him. Indeed, He is ever Accepting of repentance."
+      }
+    ],
+    "reference": "Qur'an, Surah An-Nasr, Verses 1-3"
+  },
+  {
+    "title": "Surah Al-Kafirun - الْكَافِرُونَ",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "قُلْ يَا أَيُّهَا الْكَافِرُونَ",
+        "transliteration": "Qul yā ayyuhal-kāfirūn",
+        "meaning": "Say, 'O you disbelievers,"
+      },
+      {
+        "arabic": "لَا أَعْبُدُ مَا تَعْبُدُونَ",
+        "transliteration": "Lā a'budu mā ta'budūn",
+        "meaning": "I do not worship what you worship,"
+      },
+      {
+        "arabic": "وَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ",
+        "transliteration": "Wa lā antum 'ābidūna mā a'bud",
+        "meaning": "Nor do you worship what I worship,"
+      },
+      {
+        "arabic": "وَلَا أَنَا عَابِدٌ مَا عَبَدْتُمْ",
+        "transliteration": "Wa lā ana 'ābidum mā 'abattum",
+        "meaning": "Nor will I worship what you have worshipped,"
+      },
+      {
+        "arabic": "وَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ",
+        "transliteration": "Wa lā antum 'ābidūna mā a'bud",
+        "meaning": "Nor will you worship what I worship,"
+      },
+      {
+        "arabic": "لَكُمْ دِينُكُمْ وَلِيَ دِينِ",
+        "transliteration": "Lakum dīnukum wa liya dīn",
+        "meaning": "For you is your religion, and for me is my religion.'"
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Kafirun, Verses 1-6"
+  },
+  {
+    "title": "Surah Al-Kawthar - الْكَوْثَر",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ",
+        "transliteration": "Innā a'ṭaynākal-kawthar",
+        "meaning": "Indeed, We have granted you, [O Muhammad], al-Kawthar."
+      },
+      {
+        "arabic": "فَصَلِّ لِرَبِّكَ وَانْحَرْ",
+        "transliteration": "Faṣalli lirabbika wanḥar",
+        "meaning": "So pray to your Lord and sacrifice [to Him alone]."
+      },
+      {
+        "arabic": "إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ",
+        "transliteration": "Inna shāni'aka huwal-abtar",
+        "meaning": "Indeed, your enemy is the one cut off [from all goodness]."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Kawthar, Verses 1-3"
+  },
+  {
+    "title": "Surah Al-Ma'un - الْمَاعُون",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ",
+        "transliteration": "Ara'aytal-ladhī yukadhdhibu bid-dīn",
+        "meaning": "Have you seen the one who denies the Recompense?"
+      },
+      {
+        "arabic": "فَذَٰلِكَ الَّذِي يَدُعُّ الْيَتِيمَ",
+        "transliteration": "Fadhālikal-ladhī yadu''ul-yatīm",
+        "meaning": "For that is the one who drives away the orphan,"
+      },
+      {
+        "arabic": "وَلَا يَحُضُّ عَلَىٰ طَعَامِ الْمِسْكِينِ",
+        "transliteration": "Wa lā yaḥudḍu 'alā ṭa'āmil-miskīn",
+        "meaning": "And does not encourage the feeding of the poor."
+      },
+      {
+        "arabic": "فَوَيْلٌ لِّلْمُصَلِّينَ",
+        "transliteration": "Fawaylul lil-muṣallīn",
+        "meaning": "So woe to those who pray"
+      },
+      {
+        "arabic": "الَّذِينَ هُمْ عَن صَلَاتِهِمْ سَاهُونَ",
+        "transliteration": "Al-ladhīna hum 'an ṣalātihim sāhūn",
+        "meaning": "[But] who are heedless of their prayer—"
+      },
+      {
+        "arabic": "الَّذِينَ هُمْ يُرَاءُونَ",
+        "transliteration": "Al-ladhīna hum yurā'ūn",
+        "meaning": "Those who make show [of their deeds]"
+      },
+      {
+        "arabic": "وَيَمْنَعُونَ الْمَاعُونَ",
+        "transliteration": "Wa yamna'ūnal-mā'ūn",
+        "meaning": "And withhold [simple] assistance."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Ma'un, Verses 1-7"
+  },
+  {
+    "title": "Surah Quraysh - قُرَيْش",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "لِإِيلَافِ قُرَيْشٍ",
+        "transliteration": "Li'īlāfi Quraysh",
+        "meaning": "For the accustomed security of the Quraysh—"
+      },
+      {
+        "arabic": "إِيلَافِهِمْ رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ",
+        "transliteration": "Īlāfihim riḥlata sh-shitā'i waṣ-ṣayf",
+        "meaning": "Their security in the winter and summer journeys—"
+      },
+      {
+        "arabic": "فَلْيَعْبُدُوا رَبَّ هَٰذَا الْبَيْتِ",
+        "transliteration": "Falya'budū rabba hādhal-bayt",
+        "meaning": "Let them worship the Lord of this House,"
+      },
+      {
+        "arabic": "الَّذِي أَطْعَمَهُم مِّن جُوعٍ وَآمَنَهُم مِّنْ خَوْفٍ",
+        "transliteration": "Al-ladhī aṭ'amahum min jū'in wa āmanahum min khawf",
+        "meaning": "Who has fed them, [saving them] from hunger, and made them safe, [saving them] from fear."
+      }
+    ],
+    "reference": "Qur'an, Surah Quraysh, Verses 1-4"
+  },
+  {
+    "title": "Surah Al-Fil - الْفِيل",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ",
+        "transliteration": "Alam tara kayfa fa'ala rabbuka bi'aṣḥābil-fīl",
+        "meaning": "Have you not considered, [O Muhammad], how your Lord dealt with the companions of the elephant?"
+      },
+      {
+        "arabic": "أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ",
+        "transliteration": "Alam yaj'al kaydahum fī taḍlīl",
+        "meaning": "Did He not make their plan into misguidance?"
+      },
+      {
+        "arabic": "وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ",
+        "transliteration": "Wa arsala 'alayhim ṭayran abābīl",
+        "meaning": "And He sent against them birds in flocks,"
+      },
+      {
+        "arabic": "تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ",
+        "transliteration": "Tarmīhim biḥijāratim min sijjīl",
+        "meaning": "Striking them with stones of hard clay,"
+      },
+      {
+        "arabic": "فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍ",
+        "transliteration": "Faja'alahum ka'aṣfim ma'kūl",
+        "meaning": "And He made them like eaten straw."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Fil, Verses 1-5"
+  },
+  {
+    "title": "Surah Al-Humazah - الْهُمَزَة",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "وَيْلٌ لِّكُلِّ هُمَزَةٍ لُّمَزَةٍ",
+        "transliteration": "Waylul likulli humazatil-lumazah",
+        "meaning": "Woe to every scorner and backbiter"
+      },
+      {
+        "arabic": "الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ",
+        "transliteration": "Al-ladhī jama'a mālaw wa 'addadah",
+        "meaning": "Who collects wealth and [continuously] counts it"
+      },
+      {
+        "arabic": "يَحْسَبُ أَنَّ مَالَهُ أَخْلَدَهُ",
+        "transliteration": "Yaḥsabu anna mālahū akhladah",
+        "meaning": "Thinking that his wealth has made him immortal"
+      },
+      {
+        "arabic": "كَلَّا ۖ لَيُنبَذَنَّ فِي الْحُطَمَةِ",
+        "transliteration": "Kallā, layunbadhanna fil-ḥuṭamah",
+        "meaning": "No! He will surely be thrown into the Crusher"
+      },
+      {
+        "arabic": "وَمَا أَدْرَاكَ مَا الْحُطَمَةُ",
+        "transliteration": "Wa mā adrāka mal-ḥuṭamah",
+        "meaning": "And what can make you know what is the Crusher?"
+      },
+      {
+        "arabic": "نَارُ اللَّهِ الْمُوقَدَةُ",
+        "transliteration": "Nārullāhil-mūqadah",
+        "meaning": "It is the fire of Allah, [eternally] fueled"
+      },
+      {
+        "arabic": "الَّتِي تَطَّلِعُ عَلَى الْأَفْئِدَةِ",
+        "transliteration": "Al-latī taṭṭali'u 'alal-af'idah",
+        "meaning": "Which mounts directed at the hearts"
+      },
+      {
+        "arabic": "إِنَّهَا عَلَيْهِم مُّؤْصَدَةٌ",
+        "transliteration": "Innahā 'alayhim mu'ṣadah",
+        "meaning": "Indeed, it [the fire] will be closed down upon them"
+      },
+      {
+        "arabic": "فِي عَمَدٍ مُّمَدَّدَةٍ",
+        "transliteration": "Fī 'amadim-mumaddadah",
+        "meaning": "In extended columns"
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Humazah, Verses 1-9"
+  },
+  {
+    "title": "Surah Al-Asr - الْعَصْر",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "وَالْعَصْرِ",
+        "transliteration": "Wal-'aṣr",
+        "meaning": "By time,"
+      },
+      {
+        "arabic": "إِنَّ الْإِنْسَانَ لَفِي خُسْرٍ",
+        "transliteration": "Innal-insāna lafī khusr",
+        "meaning": "Indeed, mankind is in loss,"
+      },
+      {
+        "arabic": "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ",
+        "transliteration": "Illal-ladhīna āmanū wa 'amiluṣ-ṣāliḥāti wa tawāṣaw bil-ḥaqqi wa tawāṣaw biṣ-ṣabr",
+        "meaning": "Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Asr, Verses 1-3"
+  },
+  {
+    "title": "Surah At-Takathur - التَّكَاثُر",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "أَلْهَاكُمُ التَّكَاثُرُ",
+        "transliteration": "Alhākumut-takāthur",
+        "meaning": "The competition for [worldly] increase has distracted you"
+      },
+      {
+        "arabic": "حَتَّىٰ زُرْتُمُ الْمَقَابِرَ",
+        "transliteration": "Ḥattā zurtumul-maqābir",
+        "meaning": "Until you visit the graves"
+      },
+      {
+        "arabic": "كَلَّا سَوْفَ تَعْلَمُونَ",
+        "transliteration": "Kallā sawfa ta'lamūn",
+        "meaning": "No! You are going to know"
+      },
+      {
+        "arabic": "ثُمَّ كَلَّا سَوْفَ تَعْلَمُونَ",
+        "transliteration": "Thumma kallā sawfa ta'lamūn",
+        "meaning": "Then no! You are going to know"
+      },
+      {
+        "arabic": "كَلَّا لَوْ تَعْلَمُونَ عِلْمَ الْيَقِينِ",
+        "transliteration": "Kallā law ta'lamūna 'ilmal-yaqīn",
+        "meaning": "No! If you only knew with knowledge of certainty"
+      },
+      {
+        "arabic": "لَتَرَوُنَّ الْجَحِيمَ",
+        "transliteration": "Latarawunnal-jaḥīm",
+        "meaning": "You will surely see the Hellfire"
+      },
+      {
+        "arabic": "ثُمَّ لَتَرَوُنَّهَا عَيْنَ الْيَقِينِ",
+        "transliteration": "Thumma latarawunnahā 'aynal-yaqīn",
+        "meaning": "Then you will surely see it with the eye of certainty"
+      },
+      {
+        "arabic": "ثُمَّ لَتُسْأَلُنَّ يَوْمَئِذٍ عَنِ النَّعِيمِ",
+        "transliteration": "Thumma latus'alunna yauma'dhin 'anin-na'īm",
+        "meaning": "Then you will surely be asked that Day about the pleasures"
+      }
+    ],
+    "reference": "Qur'an, Surah At-Takathur, Verses 1-8"
+  },
+  {
+    "title": "Surah Al-Qari'ah - الْقَارِعَة",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "الْقَارِعَةُ",
+        "transliteration": "Al-qāri'ah",
+        "meaning": "The Striking Calamity -"
+      },
+      {
+        "arabic": "مَا الْقَارِعَةُ",
+        "transliteration": "Mal-qāri'ah",
+        "meaning": "What is the Striking Calamity?"
+      },
+      {
+        "arabic": "وَمَا أَدْرَاكَ مَا الْقَارِعَةُ",
+        "transliteration": "Wa mā adrāka mal-qāri'ah",
+        "meaning": "And what can make you know what is the Striking Calamity?"
+      },
+      {
+        "arabic": "يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ",
+        "transliteration": "Yauma yakūnun-nāsu kal-farāshil-mabthūth",
+        "meaning": "It is the Day when people will be like moths, dispersed,"
+      },
+      {
+        "arabic": "وَتَكُونُ الْجِبَالُ كَالْعِهْنِ الْمَنفُوشِ",
+        "transliteration": "Wa takūnul-jibālu kal-'ihnil-manfūsh",
+        "meaning": "And the mountains will be like wool, fluffed up."
+      },
+      {
+        "arabic": "فَأَمَّا مَن ثَقُلَتْ مَوَازِينُهُ",
+        "transliteration": "Fa-ammā man thaqulat mawāzīnuh",
+        "meaning": "Then as for one whose scales are heavy [with good deeds],"
+      },
+      {
+        "arabic": "فَهُوَ فِي عِيشَةٍ رَّاضِيَةٍ",
+        "transliteration": "Fahuwa fī 'īshatir-rāḍiyah",
+        "meaning": "He will be in a pleasant life."
+      },
+      {
+        "arabic": "وَأَمَّا مَنْ خَفَّتْ مَوَازِينُهُ",
+        "transliteration": "Wa ammā man khaffat mawāzīnuh",
+        "meaning": "But as for one whose scales are light,"
+      },
+      {
+        "arabic": "فَأُمُّهُ هَاوِيَةٌ",
+        "transliteration": "Fa-ummuhū hāwiyah",
+        "meaning": "His home will be the Abyss."
+      },
+      {
+        "arabic": "وَمَا أَدْرَاكَ مَا هِيَهْ",
+        "transliteration": "Wa mā adrāka mā hiyah",
+        "meaning": "And what can make you know what that is?"
+      },
+      {
+        "arabic": "نَارٌ حَامِيَةٌ",
+        "transliteration": "Nārun ḥāmiyah",
+        "meaning": "It is a Fire, intensely hot."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Qari'ah, Verses 1-11"
+  },
+  {
+    "title": "Surah Al-'Adiyat - الْعَادِيَات",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "وَالْعَادِيَاتِ ضَبْحًا",
+        "transliteration": "Wal-'ādi-yāti ḍabḥā",
+        "meaning": "By the racers, panting,"
+      },
+      {
+        "arabic": "فَالْمُورِيَاتِ قَدْحًا",
+        "transliteration": "Fal-mūriyāti qadḥā",
+        "meaning": "And the producers of sparks [when] striking"
+      },
+      {
+        "arabic": "فَالْمُغِيرَاتِ صُبْحًا",
+        "transliteration": "Fal-mughīrāti ṣubḥā",
+        "meaning": "And the invaders at dawn,"
+      },
+      {
+        "arabic": "فَأَثَرْنَ بِهِ نَقْعًا",
+        "transliteration": "Fa-atharna bihī naq'ā",
+        "meaning": "Then thereby raising dust,"
+      },
+      {
+        "arabic": "فَوَسَطْنَ بِهِ جَمْعًا",
+        "transliteration": "Fawasaṭna bihī jam'ā",
+        "meaning": "And thereby penetrating into the center collectively,"
+      },
+      {
+        "arabic": "إِنَّ الْإِنْسَانَ لِرَبِّهِ لَكَنُودٌ",
+        "transliteration": "Innal-insāna lirabbihī lakanūd",
+        "meaning": "Indeed mankind, to his Lord, is ungrateful."
+      },
+      {
+        "arabic": "وَإِنَّهُ عَلَىٰ ذَٰلِكَ لَشَهِيدٌ",
+        "transliteration": "Wa innahū 'alā dhālikā lashahīd",
+        "meaning": "And indeed, he is to that a witness."
+      },
+      {
+        "arabic": "وَإِنَّهُ لِحُبِّ الْخَيْرِ لَشَدِيدٌ",
+        "transliteration": "Wa innahū liḥubbil-khayri lashadīd",
+        "meaning": "And indeed he is, in love of wealth, intense."
+      },
+      {
+        "arabic": "أَفَلَا يَعْلَمُ إِذَا بُعْثِرَ مَا فِي الْقُبُورِ",
+        "transliteration": "A-falā ya'lamu idhā bu'thira mā fil-qubūr",
+        "meaning": "But does he not know that when what is in the graves is scattered"
+      },
+      {
+        "arabic": "وَحُصِّلَ مَا فِي الصُّدُورِ",
+        "transliteration": "Wa ḥuṣṣila mā fiṣ-ṣudūr",
+        "meaning": "And that within the breasts is obtained,"
+      },
+      {
+        "arabic": "إِنَّ رَبَّهُم بِهِمْ يَوْمَئِذٍ لَّخَبِيرٌ",
+        "transliteration": "Inna rabbahum bihim yauma'dhil-lakhabīr",
+        "meaning": "Indeed, their Lord with them, that Day, is [fully] Aware."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-'Adiyat, Verses 1-11"
+  },
+  {
+    "title": "Surah Az-Zalzalah - الزَّلْزَلَة",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "إِذَا زُلْزِلَتِ الْأَرْضُ زِلْزَالَهَا",
+        "transliteration": "Idhā zulzilatil-arḍu zilzālahā",
+        "meaning": "When the earth is shaken with its [final] earthquake"
+      },
+      {
+        "arabic": "وَأَخْرَجَتِ الْأَرْضُ أَثْقَالَهَا",
+        "transliteration": "Wa akhrajatil-arḍu athqālahā",
+        "meaning": "And the earth discharges its burdens"
+      },
+      {
+        "arabic": "وَقَالَ الْإِنْسَانُ مَا لَهَا",
+        "transliteration": "Wa qālal-insānu mā lahā",
+        "meaning": "And man says, 'What is [wrong] with it?'"
+      },
+      {
+        "arabic": "يَوْمَئِذٍ تُحَدِّثُ أَخْبَارَهَا",
+        "transliteration": "Yawma'idhin tuḥaddithu akhbārahā",
+        "meaning": "That Day, it will report its news"
+      },
+      {
+        "arabic": "بِأَنَّ رَبَّكَ أَوْحَىٰ لَهَا",
+        "transliteration": "Bi-anna rabbaka awḥā lahā",
+        "meaning": "Because your Lord has commanded it."
+      },
+      {
+        "arabic": "يَوْمَئِذٍ يَصْدُرُ النَّاسُ أَشْتَاتًا لِّيُرَوْا أَعْمَالَهُمْ",
+        "transliteration": "Yawma'idhin yaṣdurun-nāsu ashtātal-liyuraw a'mālahum",
+        "meaning": "That Day, the people will depart separated [into categories] to be shown [the result of] their deeds."
+      },
+      {
+        "arabic": "فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ",
+        "transliteration": "Famay ya'mal mithqāla dharratin khayray yarah",
+        "meaning": "So whoever does an atom's weight of good will see it,"
+      },
+      {
+        "arabic": "وَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ شَرًّا يَرَهُ",
+        "transliteration": "Wa may ya'mal mithqāla dharratin sharray yarah",
+        "meaning": "And whoever does an atom's weight of evil will see it."
+      }
+    ],
+    "reference": "Qur'an, Surah Az-Zalzalah, Verses 1-8"
+  },
+  {
+    "title": "Surah Al-Bayyinah - الْبَيِّنَة",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "لَمْ يَكُنِ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ وَالْمُشْرِكِينَ مُنفَكِّينَ حَتَّىٰ تَأْتِيَهُمُ الْبَيِّنَةُ",
+        "transliteration": "Lam yakunil-ladhīna kafarū min ahlil-kitābi wal-mushrikīna munfakkīna ḥattā ta'tiyahumul-bayyinah",
+        "meaning": "Those who disbelieved among the People of the Scripture and the polytheists were not to be parted [from misbelief] until there came to them clear evidence -"
+      },
+      {
+        "arabic": "رَسُولٌ مِّنَ اللَّهِ يَتْلُو صُحُفًا مُّطَهَّرَةً",
+        "transliteration": "Rasūlum minallāhi yatlū ṣuḥufam muṭahharah",
+        "meaning": "A Messenger from Allah, reciting purified scriptures"
+      },
+      {
+        "arabic": "فِيهَا كُتُبٌ قَيِّمَةٌ",
+        "transliteration": "Fīhā kutubun qayyimah",
+        "meaning": "Within which are correct writings."
+      },
+      {
+        "arabic": "وَمَا تَفَرَّقَ الَّذِينَ أُوتُوا الْكِتَابَ إِلَّا مِن بَعْدِ مَا جَاءَتْهُمُ الْبَيِّنَةُ",
+        "transliteration": "Wa mā tafarraqal-ladhīna ūtul-kitāba illā mim ba'di mā jā'athumul-bayyinah",
+        "meaning": "Nor did those who were given the Scripture become divided until after there had come to them clear evidence."
+      },
+      {
+        "arabic": "وَمَا أُمِرُوا إِلَّا لِيَعْبُدُوا اللَّهَ مُخْلِصِينَ لَهُ الدِّينَ حُنَفَاءَ وَيُقِيمُوا الصَّلَاةَ وَيُؤْتُوا الزَّكَاةَ ۚ وَذَٰلِكَ دِينُ الْقَيِّمَةِ",
+        "transliteration": "Wa mā umirū illā liya'budullāha mukhliṣīna lahud-dīna ḥunafā'a wayuqīmuṣ-ṣalāta wayu'tuz-zakāh, wa dhālika dīnul-qayyimah",
+        "meaning": "And they were not commanded except to worship Allah, [being] sincere to Him in religion, inclining to truth, and to establish prayer and to give zakah. And that is the correct religion."
+      },
+      {
+        "arabic": "إِنَّ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ وَالْمُشْرِكِينَ فِي نَارِ جَهَنَّمَ خَالِدِينَ فِيهَا ۚ أُولَٰئِكَ هُمْ شَرُّ الْبَرِيَّةِ",
+        "transliteration": "Innal-ladhīna kafarū min ahlil-kitābi wal-mushrikīna fī nāri jahannama khālidīna fīhā, ulā'ika hum sharrul-bariyyah",
+        "meaning": "Indeed, they who disbelieved among the People of the Scripture and the polytheists will be in the fire of Hell, abiding eternally therein. Those are the worst of creatures."
+      },
+      {
+        "arabic": "إِنَّ الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ أُولَٰئِكَ هُمْ خَيْرُ الْبَرِيَّةِ",
+        "transliteration": "Innal-ladhīna āmanū wa 'amiluṣ-ṣāliḥāti ulā'ika hum khayrul-bariyyah",
+        "meaning": "Indeed, they who have believed and done righteous deeds - those are the best of creatures."
+      },
+      {
+        "arabic": "جَزَاؤُهُمْ عِندَ رَبِّهِمْ جَنَّاتُ عَدْنٍ تَجْرِي مِن تَحْتِهَا الْأَنْهَارُ خَالِدِينَ فِيهَا أَبَدًا ۖ رَّضِيَ اللَّهُ عَنْهُمْ وَرَضُوا عَنْهُ ۚ ذَٰلِكَ لِمَنْ خَشِيَ رَبَّهُ",
+        "transliteration": "Jazā'uhum 'inda rabbihim jannātu 'adnin tajrī min taḥtihal-anhāru khālidīna fīhā abadā, raḍiyallāhu 'anhum wa raḍū 'anh, dhālika liman khashiya rabbah",
+        "meaning": "Their reward with their Lord will be gardens of perpetual residence beneath which rivers flow, abiding therein forever. Allah is pleased with them and they are pleased with Him. That is for whoever has feared his Lord."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Bayyinah, Verses 1-8"
+  },
+  {
+    "title": "Surah Al-Qadr - الْقَدْر",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ",
+        "transliteration": "Innā anzalnāhu fī laylatil-qadr",
+        "meaning": "Indeed, We sent it [the Quran] down during the Night of Decree."
+      },
+      {
+        "arabic": "وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ",
+        "transliteration": "Wa mā adrāka mā laylatul-qadr",
+        "meaning": "And what can make you know what is the Night of Decree?"
+      },
+      {
+        "arabic": "لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ",
+        "transliteration": "Laylatul-qadri khairum min alfi shahr",
+        "meaning": "The Night of Decree is better than a thousand months."
+      },
+      {
+        "arabic": "تَنَزَّلُ الْمَلَائِكَةُ وَالرُّوحُ فِيهَا بِإِذْنِ رَبِّهِم مِّن كُلِّ أَمْرٍ",
+        "transliteration": "Tanazzalul-malā'ikatu war-rūhu fīhā bi'idhni rabbihim min kulli amr",
+        "meaning": "The angels and the Spirit [Jibril] descend therein by permission of their Lord for every matter."
+      },
+      {
+        "arabic": "سَلَامٌ هِيَ حَتَّىٰ مَطْلَعِ الْفَجْرِ",
+        "transliteration": "Salāmun hiya ḥattā maṭla'il-fajr",
+        "meaning": "Peace it is until the emergence of dawn."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Qadr, Verses 1-5"
+  },
+  {
+    "title": "Surah Al-Alaq - الْعَلَق",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ",
+        "transliteration": "Iqra' bismi rabbikal-ladhī khalaq",
+        "meaning": "Read in the name of your Lord who created -"
+      },
+      {
+        "arabic": "خَلَقَ الْإِنْسَانَ مِنْ عَلَقٍ",
+        "transliteration": "Khalaqal-insāna min 'alaq",
+        "meaning": "Created man from a clinging clot."
+      },
+      {
+        "arabic": "اقْرَأْ وَرَبُّكَ الْأَكْرَمُ",
+        "transliteration": "Iqra' wa rabbukal-akram",
+        "meaning": "Read, and your Lord is the Most Generous -"
+      },
+      {
+        "arabic": "الَّذِي عَلَّمَ بِالْقَلَمِ",
+        "transliteration": "Al-ladhī 'allama bil-qalam",
+        "meaning": "Who taught by the pen -"
+      },
+      {
+        "arabic": "عَلَّمَ الْإِنْسَانَ مَا لَمْ يَعْلَمْ",
+        "transliteration": "'Allamal-insāna mā lam ya'lam",
+        "meaning": "Taught man that which he knew not."
+      },
+      {
+        "arabic": "كَلَّا إِنَّ الْإِنْسَانَ لَيَطْغَىٰ",
+        "transliteration": "Kallā innal-insāna layaṭghā",
+        "meaning": "No! [But] indeed, man transgresses"
+      },
+      {
+        "arabic": "أَن رَّآهُ اسْتَغْنَىٰ",
+        "transliteration": "Ar ra'āhus-taghna",
+        "meaning": "Because he sees himself self-sufficient."
+      },
+      {
+        "arabic": "إِنَّ إِلَىٰ رَبِّكَ الرُّجْعَىٰ",
+        "transliteration": "Inna ilā rabbikar-ruj'ā",
+        "meaning": "Indeed, to your Lord is the return."
+      },
+      {
+        "arabic": "أَرَأَيْتَ الَّذِي يَنْهَىٰ",
+        "transliteration": "Ara'aytal-ladhī yanhā",
+        "meaning": "Have you seen the one who forbids"
+      },
+      {
+        "arabic": "عَبْدًا إِذَا صَلَّىٰ",
+        "transliteration": "Abdan idhā ṣallā",
+        "meaning": "A servant when he prays?"
+      },
+      {
+        "arabic": "أَرَأَيْتَ إِن كَانَ عَلَى الْهُدَىٰ",
+        "transliteration": "Ara'ayta in kāna 'alal-hudā",
+        "meaning": "Have you seen if he is upon guidance"
+      },
+      {
+        "arabic": "أَوْ أَمَرَ بِالتَّقْوَىٰ",
+        "transliteration": "Aw amara bit-taqwā",
+        "meaning": "Or enjoins righteousness?"
+      },
+      {
+        "arabic": "أَرَأَيْتَ إِن كَذَّبَ وَتَوَلَّىٰ",
+        "transliteration": "Ara'ayta in kadhdhaba wa tawallā",
+        "meaning": "Have you seen if he denies and turns away -"
+      },
+      {
+        "arabic": "أَلَمْ يَعْلَمْ بِأَنَّ اللَّهَ يَرَىٰ",
+        "transliteration": "Alam ya'lam bi'annallāha yarā",
+        "meaning": "Does he not know that Allah sees?"
+      },
+      {
+        "arabic": "كَلَّا لَئِن لَّمْ يَنتَهِ لَنَسْفَعًا بِالنَّاصِيَةِ",
+        "transliteration": "Kallā la'il lam yantahi lanasfa'am bin-nāṣiyah",
+        "meaning": "No! If he does not desist, We will surely drag him by the forelock -"
+      },
+      {
+        "arabic": "نَاصِيَةٍ كَاذِبَةٍ خَاطِئَةٍ",
+        "transliteration": "Nāṣiyatin kādhibatin khāṭi'ah",
+        "meaning": "A lying, sinning forelock."
+      },
+      {
+        "arabic": "فَلْيَدْعُ نَادِيَهُ",
+        "transliteration": "Falyad'u nādiyah",
+        "meaning": "Then let him call his associates;"
+      },
+      {
+        "arabic": "سَنَدْعُ الزَّبَانِيَةَ",
+        "transliteration": "Sanad'uz-zabāniyah",
+        "meaning": "We will call the angels of Hell."
+      },
+      {
+        "arabic": "كَلَّا لَا تُطِعْهُ وَاسْجُدْ وَاقْتَرِب",
+        "transliteration": "Kallā lā tuṭi'h wasjud waqtarib",
+        "meaning": "No! Do not obey him. But prostrate and draw near [to Allah]."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Alaq, Verses 1-19"
+  },
+  {
+    "title": "Surah At-Tin - التِّين",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "وَالتِّينِ وَالزَّيْتُونِ",
+        "transliteration": "Wat-tīni waz-zaytūn",
+        "meaning": "By the fig and the olive"
+      },
+      {
+        "arabic": "وَطُورِ سِينِينَ",
+        "transliteration": "Wa ṭūri sīnīn",
+        "meaning": "And [by] Mount Sinai"
+      },
+      {
+        "arabic": "وَهَٰذَا الْبَلَدِ الْأَمِينِ",
+        "transliteration": "Wa hādhāl-baladil-amīn",
+        "meaning": "And [by] this secure city [Makkah],"
+      },
+      {
+        "arabic": "لَقَدْ خَلَقْنَا الْإِنْسَانَ فِي أَحْسَنِ تَقْوِيمٍ",
+        "transliteration": "Laqad khalaqnal-insāna fī aḥsani taqwīm",
+        "meaning": "We have certainly created man in the best of stature;"
+      },
+      {
+        "arabic": "ثُمَّ رَدَدْنَاهُ أَسْفَلَ سَافِلِينَ",
+        "transliteration": "Thumma radadnāhu asfala sāfilīn",
+        "meaning": "Then We return him to the lowest of the low,"
+      },
+      {
+        "arabic": "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ فَلَهُمْ أَجْرٌ غَيْرُ مَمْنُونٍ",
+        "transliteration": "Illal-ladhīna āmanū wa 'amiluṣ-ṣāliḥāti fa lahum ajrun ghairu mamnūn",
+        "meaning": "Except for those who believe and do righteous deeds, for they will have a reward uninterrupted."
+      },
+      {
+        "arabic": "فَمَا يُكَذِّبُكَ بَعْدُ بِالدِّينِ",
+        "transliteration": "Fa mā yukadhdhibuka ba'du bid-dīn",
+        "meaning": "So what yet causes you to deny the Recompense?"
+      },
+      {
+        "arabic": "أَلَيْسَ اللَّهُ بِأَحْكَمِ الْحَاكِمِينَ",
+        "transliteration": "A-laisallāhu bi-aḥkamil-ḥākimīn",
+        "meaning": "Is not Allah the most just of judges?"
+      }
+    ],
+    "reference": "Qur'an, Surah At-Tin, Verses 1-8"
+  },
+  {
+    "title": "Surah Al-Inshirah - الانْشِرَاح",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ",
+        "transliteration": "Alam nashraḥ laka ṣadrak",
+        "meaning": "Did We not expand for you, [O Muhammad], your breast?"
+      },
+      {
+        "arabic": "وَوَضَعْنَا عَنكَ وِزْرَكَ",
+        "transliteration": "Wa waḍa'nā 'anka wizrak",
+        "meaning": "And We removed from you your burden"
+      },
+      {
+        "arabic": "الَّذِي أَنقَضَ ظَهْرَكَ",
+        "transliteration": "Al-ladhī anqaḍa ẓahrak",
+        "meaning": "Which had weighed upon your back"
+      },
+      {
+        "arabic": "وَرَفَعْنَا لَكَ ذِكْرَكَ",
+        "transliteration": "Wa rafa'nā laka dhikrak",
+        "meaning": "And raised high for you your repute."
+      },
+      {
+        "arabic": "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
+        "transliteration": "Fa inna ma'al-'usri yusrā",
+        "meaning": "For indeed, with hardship [will be] ease."
+      },
+      {
+        "arabic": "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+        "transliteration": "Inna ma'al-'usri yusrā",
+        "meaning": "Indeed, with hardship [will be] ease."
+      },
+      {
+        "arabic": "فَإِذَا فَرَغْتَ فَانصَبْ",
+        "transliteration": "Fa idhā faraghta fanṣab",
+        "meaning": "So when you have finished [your duties], then stand up [for worship]"
+      },
+      {
+        "arabic": "وَإِلَىٰ رَبِّكَ فَارْغَب",
+        "transliteration": "Wa ilā rabbika farghab",
+        "meaning": "And to your Lord direct [your] longing."
+      }
+    ],
+    "reference": "Qur'an, Surah Al-Inshirah, Verses 1-8"
+  },
+  {
+    "title": "Surah Ad-Duha - الضُّحَى",
+    "ayat": [
+      {
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "transliteration": "Bismillāhir-Raḥmānir-Raḥīm",
+        "meaning": "In the Name of Allah—the Most Compassionate, Most Merciful."
+      },
+      {
+        "arabic": "وَالضُّحَىٰ",
+        "transliteration": "Wad-duhā",
+        "meaning": "By the morning brightness"
+      },
+      {
+        "arabic": "وَاللَّيْلِ إِذَا سَجَىٰ",
+        "transliteration": "Wal-layli idhā sajā",
+        "meaning": "And by the night when it covers with darkness,"
+      },
+      {
+        "arabic": "مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَىٰ",
+        "transliteration": "Mā wadda'aka rabbuka wa mā qalā",
+        "meaning": "Your Lord has not taken leave of you, [O Muhammad], nor has He detested [you]."
+      },
+      {
+        "arabic": "وَلَلْآخِرَةُ خَيْرٌ لَّكَ مِنَ الْأُولَىٰ",
+        "transliteration": "Wa lal-ākhiratu khairul laka minal-ūlā",
+        "meaning": "And the Hereafter is better for you than the first [life]."
+      },
+      {
+        "arabic": "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ",
+        "transliteration": "Wa lasawfa yu'ṭīka rabbuka fatarḍā",
+        "meaning": "And your Lord is going to give you, and you will be satisfied."
+      },
+      {
+        "arabic": "أَلَمْ يَجِدْكَ يَتِيمًا فَآوَىٰ",
+        "transliteration": "Alam yajidka yatīman fa āwā",
+        "meaning": "Did He not find you an orphan and give [you] refuge?"
+      },
+      {
+        "arabic": "وَوَجَدَكَ ضَالًّا فَهَدَىٰ",
+        "transliteration": "Wa wajadaka ḍāllan fahadā",
+        "meaning": "And He found you lost and guided [you]?"
+      },
+      {
+        "arabic": "وَوَجَدَكَ عَائِلًا فَأَغْنَىٰ",
+        "transliteration": "Wa wajadaka 'ā'ilan fa aghnā",
+        "meaning": "And He found you poor and made [you] self-sufficient?"
+      },
+      {
+        "arabic": "فَأَمَّا الْيَتِيمَ فَلَا تَقْهَرْ",
+        "transliteration": "Fa ammal-yatīma falā taqhar",
+        "meaning": "So as for the orphan, do not oppress [him]."
+      },
+      {
+        "arabic": "وَأَمَّا السَّائِلَ فَلَا تَنْهَرْ",
+        "transliteration": "Wa ammas-sā'ila falā tanhar",
+        "meaning": "And as for the petitioner, do not repel [him]."
+      },
+      {
+        "arabic": "وَأَمَّا بِنِعْمَةِ رَبِّكَ فَحَدِّثْ",
+        "transliteration": "Wa amma bini'mati rabbika faḥaddith",
+        "meaning": "But as for the favor of your Lord, report [it]."
+      }
+    ],
+    "reference": "Qur'an, Surah Ad-Duha, Verses 1-11"
   }
 ]

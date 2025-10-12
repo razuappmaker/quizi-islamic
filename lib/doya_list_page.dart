@@ -39,15 +39,12 @@ class _DoyaListPageState extends State<DoyaListPage> {
     'warning': {'en': 'Warning', 'bn': 'সতর্কবার্তা'},
     'warningContent': {
       'en':
-          'When reading Quranic verses or Arabic prayers in Bengali pronunciation, meaning distortion often occurs. So take this pronunciation only as a helper. Let us learn to read the Quran correctly.',
+          'When reading Quranic verses or Arabic prayers in Bengali/English pronunciation, meaning distortion often occurs. So take this pronunciation only as a helper. Let us learn to read the Quran correctly.',
       'bn':
           'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে অনেক সময় অর্থের বিকৃতি ঘটে। তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন। আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি।',
     },
     'understood': {'en': 'Understood', 'bn': 'বুঝেছি'},
-    'bengaliPronunciation': {
-      'en': 'Bengali Pronunciation',
-      'bn': 'বাংলা উচ্চরণ',
-    },
+    'bengaliPronunciation': {'en': 'Pronunciation', 'bn': 'উচ্চরণ'},
     'meaning': {'en': 'Meaning', 'bn': 'অর্থ'},
     'reference': {'en': 'Reference', 'bn': 'রেফারেন্স'},
     'copy': {'en': 'Copy', 'bn': 'কপি'},

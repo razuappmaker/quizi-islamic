@@ -1,20 +1,902 @@
 [
   {
     "arabic": "ٱللَّهُ",
-    "bangla": "",
+    "bangla": "আল্লাহ",
     "english": "Allah",
-    "meaningBn": "সর্বশক্তিমান, স্রষ্টা",
-    "meaningEn": "The God",
-    "fazilatBn": "প্রতিদিন ৫ ওয়াক্ত ফরজ নামাজের পর 'আল্লাহ' নামটি ১০০ বার পাঠ করলে, ইনশাআল্লাহ, আল্লাহর নৈকট্য লাভ হবে, মন শান্ত হবে, পাপ মাফ হবে এবং জীবন বরকতময় হবে।",
-    "fazilatEn": "Reciting 'Allah' 100 times after the 5 daily obligatory prayers will bring you closer to Allah, peace of mind, forgiveness of sins, and a blessed life."
+    "meaningBn": "সর্বশক্তিমান স্রষ্টা",
+    "meaningEn": "The Supreme God, The Almighty Creator",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Allah' 100 times daily, Allah will remove his worries and grant him peace of mind. Ref: Sahih Bukhari 748"
   },
   {
-    "arabic": "ٱلرَّحْمَـٰنُ",
-    "bangla": "",
+    "arabic": "ٱلرَّحْمَٰنُ",
+    "bangla": "আর-রহমান",
     "english": "Ar-Rahman",
+    "meaningBn": "পরম করুণাময়",
+    "meaningEn": "The Most Gracious, The Beneficent",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Rahman' 100 times after each prayer, Allah will remove the hardness of his heart. Ref: Tirmidhi 3524"
+  },
+  {
+    "arabic": "ٱلرَّحِيمُ",
+    "bangla": "আর-রহীম",
+    "english": "Ar-Rahim",
+    "meaningBn": "অতি দয়ালু",
+    "meaningEn": "The Most Merciful",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Rahim' 100 times daily, Allah will grant him mercy in this world and the hereafter. Ref: Surah Al-Baqarah 2:163"
+  },
+  {
+    "arabic": "ٱلْمَلِكُ",
+    "bangla": "আল-মালিক",
+    "english": "Al-Malik",
+    "meaningBn": "সর্বময় শাসক",
+    "meaningEn": "The King, The Absolute Ruler, The Sovereign Lord",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Malik' frequently, Allah will grant him honor, self-respect, and protection from oppression. Ref: Tirmidhi 3524"
+  },
+  {
+    "arabic": "ٱلْقُدُّوسُ",
+    "bangla": "আল-কুদ্দুস",
+    "english": "Al-Quddus",
+    "meaningBn": "পবিত্রতম",
+    "meaningEn": "The Most Holy, The Most Pure",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Quddus' regularly, Allah will purify his heart from spiritual diseases. Ref: Sahih Muslim 591"
+  },
+  {
+    "arabic": "ٱلسَّلَامُ",
+    "bangla": "আস-সালাম",
+    "english": "As-Salam",
+    "meaningBn": "শান্তির আধার",
+    "meaningEn": "The Source of Peace, The Flawless",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'As-Salam' 160 times daily, Allah will protect him from all calamities. Ref: Sunan Abu Dawud 5085"
+  },
+  {
+    "arabic": "ٱلْمُؤْمِنُ",
+    "bangla": "আল-মু'মিন",
+    "english": "Al-Mu'min",
+    "meaningBn": "বিশ্বাস স্থাপনকারী",
+    "meaningEn": "The Guardian of Faith, The Giver of Security",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Mu'min', Allah will strengthen his faith and grant him security. Ref: Sahih Bukhari 7405"
+  },
+  {
+    "arabic": "ٱلْمُهَيْمِنُ",
+    "bangla": "আল-মুহাইমিন",
+    "english": "Al-Muhaimin",
+    "meaningBn": "তত্ত্বাবধায়ক",
+    "meaningEn": "The Protector, The Guardian, The Witness",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muhaimin', Allah will oversee all his affairs and protect him. Ref: Surah Al-Hashr 59:23"
+  },
+  {
+    "arabic": "ٱلْعَزِيزُ",
+    "bangla": "আল-আযীয",
+    "english": "Al-Aziz",
+    "meaningBn": "পরাক্রমশালী",
+    "meaningEn": "The Almighty, The Invulnerable",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Aziz' 40 times daily, Allah will grant him honor and strength. Ref: Sunan Ibn Majah 3861"
+  },
+  {
+    "arabic": "ٱلْجَبَّارُ",
+    "bangla": "আল-জাব্বার",
+    "english": "Al-Jabbar",
+    "meaningBn": "মহাশক্তিশালী",
+    "meaningEn": "The Compeller, The Restorer",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Jabbar', Allah will strengthen his heart and solve his problems. Ref: Surah Al-Hashr 59:23"
+  },
+  {
+    "arabic": "ٱلْمُتَكَبِّرُ",
+    "bangla": "আল-মুতাকাব্বির",
+    "english": "Al-Mutakabbir",
+    "meaningBn": "মহামহিমান্বিত",
+    "meaningEn": "The Supreme, The Majestic",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Mutakabbir', Allah will elevate his status and protect from arrogance. Ref: Surah Al-Hashr 59:23"
+  },
+  {
+    "arabic": "ٱلْخَالِقُ",
+    "bangla": "আল-খালিক",
+    "english": "Al-Khaliq",
+    "meaningBn": "সৃষ্টিকর্তা",
+    "meaningEn": "The Creator",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Khaliq' regularly, Allah will grant him creative wisdom. Ref: Surah Al-Hashr 59:24"
+  },
+  {
+    "arabic": "ٱلْبَارِئُ",
+    "bangla": "আল-বারি",
+    "english": "Al-Bari",
+    "meaningBn": "আবিষ্কারক",
+    "meaningEn": "The Evolver, The Maker",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Bari', Allah will make his tasks easy and perfect. Ref: Surah Al-Hashr 59:24"
+  },
+  {
+    "arabic": "ٱلْمُصَوِّرُ",
+    "bangla": "আল-মুসাওবির",
+    "english": "Al-Musawwir",
+    "meaningBn": "আকৃতি দানকারী",
+    "meaningEn": "The Fashioner, The Shaper",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Musawwir', Allah will beautify his character and personality. Ref: Surah Al-Hashr 59:24"
+  },
+  {
+    "arabic": "ٱلْغَفَّارُ",
+    "bangla": "আল-গাফফার",
+    "english": "Al-Ghaffar",
+    "meaningBn": "ক্ষমাশীল",
+    "meaningEn": "The Repeatedly Forgiving",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Ghaffar' frequently, Allah will forgive his sins repeatedly. Ref: Surah Taha 20:82"
+  },
+  {
+    "arabic": "ٱلْقَهَّارُ",
+    "bangla": "আল-কাহহার",
+    "english": "Al-Qahhar",
+    "meaningBn": "পরাক্রমশালী",
+    "meaningEn": "The Subduer, The Ever-Dominating",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Qahhar', Allah will grant him victory over enemies. Ref: Surah Al-Hashr 59:23"
+  },
+  {
+    "arabic": "ٱلْوَهَّابُ",
+    "bangla": "আল-ওয়াহহাব",
+    "english": "Al-Wahhab",
+    "meaningBn": "অনুদানকারী",
+    "meaningEn": "The Bestower",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Wahhab' 100 times after Isha prayer, his prayers will be accepted. Ref: Sahih Bukhari"
+  },
+  {
+    "arabic": "ٱلْرَّزَّاقُ",
+    "bangla": "আর-রাজ্জাক",
+    "english": "Ar-Razzaq",
+    "meaningBn": "রিজিক দাতা",
+    "meaningEn": "The Provider",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Razzaq' 10 times after Fajr, Allah will provide from unexpected sources. Ref: Surah Adh-Dhariyat 51:58"
+  },
+  {
+    "arabic": "ٱلْفَتَّاحُ",
+    "bangla": "আল-ফাত্তাহ",
+    "english": "Al-Fattah",
+    "meaningBn": "বিজয়দাতা",
+    "meaningEn": "The Opener, The Judge",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Fattah' 70 times for any problem, Allah will open solutions. Ref: Surah Saba 34:26"
+  },
+  {
+    "arabic": "ٱلْعَلِيمُ",
+    "bangla": "আল-আলিম",
+    "english": "Al-Alim",
+    "meaningBn": "সর্বজ্ঞ",
+    "meaningEn": "The All-Knowing",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Alim', Allah will grant him knowledge and wisdom. Ref: Surah Al-Baqarah 2:29"
+  },
+  {
+    "arabic": "ٱلْقَابِضُ",
+    "bangla": "আল-কাবিদ",
+    "english": "Al-Qabid",
+    "meaningBn": "সংকোচনকারী",
+    "meaningEn": "The Withholder, The Constrictor",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Qabid' during fear, Allah will reduce his difficulties. Ref: Surah Al-Baqarah 2:245"
+  },
+  {
+    "arabic": "ٱلْبَاسِطُ",
+    "bangla": "আল-বাসিত",
+    "english": "Al-Basit",
+    "meaningBn": "প্রসারক",
+    "meaningEn": "The Expander, The Enlarger",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Basit', Allah will expand his sustenance and knowledge. Ref: Surah Al-Baqarah 2:245"
+  },
+  {
+    "arabic": "ٱلْخَافِضُ",
+    "bangla": "আল-খাফিদ",
+    "english": "Al-Khafid",
+    "meaningBn": "অপমানকারী",
+    "meaningEn": "The Abaser, The Humiliator",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Khafid' against oppressors, Allah will humble them. Ref: Surah Al-Waqiah 56:3"
+  },
+  {
+    "arabic": "ٱلْرَّافِعُ",
+    "bangla": "আর-রাফি",
+    "english": "Ar-Rafi",
+    "meaningBn": "উন্নয়নকারী",
+    "meaningEn": "The Exalter, The Elevator",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ar-Rafi', Allah will elevate his status in both worlds. Ref: Surah Al-Mujadalah 58:11"
+  },
+  {
+    "arabic": "ٱلْمُعِزُّ",
+    "bangla": "আল-মুইজ্জ",
+    "english": "Al-Mu'izz",
+    "meaningBn": "সম্মানদাতা",
+    "meaningEn": "The Honourer, The Bestower of Honour",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Mu'izz', Allah will grant him honor and respect. Ref: Surah Al-Imran 3:26"
+  },
+  {
+    "arabic": "ٱلْمُذِلُّ",
+    "bangla": "আল-মুযিল্ল",
+    "english": "Al-Muzill",
+    "meaningBn": "লাঞ্ছিতকারী",
+    "meaningEn": "The Dishonourer, The Humiliator",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muzill' against enemies, Allah will disgrace them. Ref: Surah Al-Imran 3:26"
+  },
+  {
+    "arabic": "ٱلسَّمِيعُ",
+    "bangla": "আস-সামি",
+    "english": "As-Sami",
+    "meaningBn": "সর্বশ্রোতা",
+    "meaningEn": "The All-Hearing",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'As-Sami' frequently, Allah will accept his prayers quickly. Ref: Surah Al-Baqarah 2:127"
+  },
+  {
+    "arabic": "ٱلْبَصِيرُ",
+    "bangla": "আল-বাসির",
+    "english": "Al-Basir",
+    "meaningBn": "সর্বদর্শী",
+    "meaningEn": "The All-Seeing",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Basir', Allah will grant him insight and clarity. Ref: Surah Al-Hadid 57:4"
+  },
+  {
+    "arabic": "ٱلْحَكَمُ",
+    "bangla": "আল-হাকাম",
+    "english": "Al-Hakam",
+    "meaningBn": "বিচারক",
+    "meaningEn": "The Judge, The Arbitrator",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Hakam' during disputes, Allah will grant justice. Ref: Surah Al-Mumin 40:48"
+  },
+  {
+    "arabic": "ٱلْعَدْلُ",
+    "bangla": "আল-আদল",
+    "english": "Al-Adl",
+    "meaningBn": "ন্যায়বান",
+    "meaningEn": "The Just, The Equitable",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Adl', Allah will instill justice in his heart. Ref: Surah An-Nahl 16:90"
+  },
+  {
+    "arabic": "ٱللَّطِيفُ",
+    "bangla": "আল-লাতিফ",
+    "english": "Al-Latif",
+    "meaningBn": "সূক্ষ্মদর্শী",
+    "meaningEn": "The Subtle, The Gracious",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Latif' 133 times, Allah will solve his problems subtly. Ref: Surah Ash-Shura 42:19"
+  },
+  {
+    "arabic": "ٱلْخَبِيرُ",
+    "bangla": "আল-খাবির",
+    "english": "Al-Khabir",
+    "meaningBn": "সম্যক জ্ঞাতা",
+    "meaningEn": "The All-Aware",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Khabir', Allah will grant him deep understanding. Ref: Surah Al-An'am 6:18"
+  },
+  {
+    "arabic": "ٱلْحَلِيمُ",
+    "bangla": "আল-হালিম",
+    "english": "Al-Halim",
+    "meaningBn": "অতি সহিষ্ণু",
+    "meaningEn": "The Forbearing, The Indulgent",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Halim', Allah will grant him patience and tolerance. Ref: Surah Al-Baqarah 2:225"
+  },
+  {
+    "arabic": "ٱلْعَظِيمُ",
+    "bangla": "আল-আজিম",
+    "english": "Al-Azim",
+    "meaningBn": "মহান",
+    "meaningEn": "The Magnificent, The Supreme",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Azimu', Allah will increase his honor and status. Ref: Surah Al-Baqarah 2:255"
+  },
+  {
+    "arabic": "ٱلْغَفُورُ",
+    "bangla": "আল-গাফুর",
+    "english": "Al-Ghafur",
+    "meaningBn": "ক্ষমাকারী",
+    "meaningEn": "The All-Forgiving",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Ghafur' seeking forgiveness, Allah will forgive his sins. Ref: Surah An-Nisa 4:110"
+  },
+  {
+    "arabic": "ٱلْشَّكُورُ",
+    "bangla": "আশ-শাকুর",
+    "english": "Ash-Shakur",
+    "meaningBn": "কৃতজ্ঞতাস্বীকারকারী",
+    "meaningEn": "The Appreciative",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ash-Shakur', Allah will multiply rewards for his small deeds. Ref: Surah Fatir 35:30"
+  },
+  {
+    "arabic": "ٱلْعَلِيُّ",
+    "bangla": "আল-আলি",
+    "english": "Al-Ali",
+    "meaningBn": "সর্বোচ্চ",
+    "meaningEn": "The Most High, The Exalted",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Ali', Allah will elevate his spiritual status. Ref: Surah Al-Baqarah 2:255"
+  },
+  {
+    "arabic": "ٱلْكَبِيرُ",
+    "bangla": "আল-কাবির",
+    "english": "Al-Kabir",
+    "meaningBn": "মহত্তম",
+    "meaningEn": "The Greatest, The Most Grand",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Kabiru', Allah will make his problems seem small. Ref: Surah Al-Hajj 22:62"
+  },
+  {
+    "arabic": "ٱلْحَفِيظُ",
+    "bangla": "আল-হাফিজ",
+    "english": "Al-Hafiz",
+    "meaningBn": "রক্ষক",
+    "meaningEn": "The Preserver, The Guardian",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Hafiz', Allah will protect him from all harms. Ref: Surah Yusuf 12:64"
+  },
+  {
+    "arabic": "ٱلْمُقِيتُ",
+    "bangla": "আল-মুকিত",
+    "english": "Al-Muqit",
+    "meaningBn": "শক্তিদাতা",
+    "meaningEn": "The Sustainer, The Nourisher",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muqit', Allah will grant him physical and spiritual strength. Ref: Surah An-Nisa 4:85"
+  },
+  {
+    "arabic": "ٱلْحَسِيبُ",
+    "bangla": "আল-হাসিব",
+    "english": "Al-Hasib",
+    "meaningBn": "মনোনয়নকারী",
+    "meaningEn": "The Reckoner, The Sufficient",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Hasbunallah wa ni'mal wakeel', Allah will suffice him. Ref: Surah An-Nisa 4:6"
+  },
+  {
+    "arabic": "ٱلْجَلِيلُ",
+    "bangla": "আল-জালিল",
+    "english": "Al-Jalil",
+    "meaningBn": "মহিমান্বিত",
+    "meaningEn": "The Majestic, The Sublime",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Jalil', Allah will grant him majesty and honor. Ref: Surah Ar-Rahman 55:27"
+  },
+  {
+    "arabic": "ٱلْكَرِيمُ",
+    "bangla": "আল-কারিম",
+    "english": "Al-Karim",
+    "meaningBn": "মহানুভব",
+    "meaningEn": "The Generous, The Bountiful",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Karim' frequently, Allah will bless his sustenance. Ref: Surah An-Naml 27:40"
+  },
+  {
+    "arabic": "ٱلْرَّقِيبُ",
+    "bangla": "আর-রাকিব",
+    "english": "Ar-Raqib",
+    "meaningBn": "প্রহরী",
+    "meaningEn": "The Watchful, The Observer",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ar-Raqib', Allah will watch over his affairs. Ref: Surah An-Nisa 4:1"
+  },
+  {
+    "arabic": "ٱلْمُجِيبُ",
+    "bangla": "আল-মুজিব",
+    "english": "Al-Mujib",
+    "meaningBn": "প্রার্থনা কবুলকারী",
+    "meaningEn": "The Responsive, The Answerer",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Mujib' before dua, Allah will accept his prayers. Ref: Surah Hud 11:61"
+  },
+  {
+    "arabic": "ٱلْوَاسِعُ",
+    "bangla": "আল-ওয়াসি",
+    "english": "Al-Wasi",
+    "meaningBn": "প্রশস্ত",
+    "meaningEn": "The All-Embracing, The Omnipresent",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Wasi', Allah will expand his sustenance and knowledge. Ref: Surah Al-Baqarah 2:115"
+  },
+  {
+    "arabic": "ٱلْحَكِيمُ",
+    "bangla": "আল-হাকিম",
+    "english": "Al-Hakim",
+    "meaningBn": "পরম জ্ঞানী",
+    "meaningEn": "The Wise, The Judicious",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Hakim', Allah will grant him wisdom in decisions. Ref: Surah Al-An'am 6:18"
+  },
+  {
+    "arabic": "ٱلْوَدُودُ",
+    "bangla": "আল-ওয়াদুদ",
+    "english": "Al-Wadud",
+    "meaningBn": "প্রেমময়",
+    "meaningEn": "The Loving, The Kind One",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Wadud', Allah will create love in hearts for him. Ref: Surah Al-Buruj 85:14"
+  },
+  {
+    "arabic": "ٱلْمَجِيدُ",
+    "bangla": "আল-মাজিদ",
+    "english": "Al-Majid",
+    "meaningBn": "মহিমান্বিত",
+    "meaningEn": "The Majestic, The Glorious",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Majid', Allah will honor him in both worlds. Ref: Surah Hud 11:73"
+  },
+  {
+    "arabic": "ٱلْبَاعِثُ",
+    "bangla": "আল-বাইস",
+    "english": "Al-Ba'ith",
+    "meaningBn": "পুনরুত্থানকারী",
+    "meaningEn": "The Resurrector, The Raiser",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Ba'ith', Allah will revive his spiritual energy. Ref: Surah Al-Hajj 22:7"
+  },
+  {
+    "arabic": "ٱلْشَّهِيدُ",
+    "bangla": "আশ-শাহিদ",
+    "english": "Ash-Shahid",
+    "meaningBn": "সাক্ষী",
+    "meaningEn": "The Witness",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ash-Shahid', Allah will be his witness against false accusations. Ref: Surah Al-Mujadalah 58:6"
+  },
+  {
+    "arabic": "ٱلْحَقُّ",
+    "bangla": "আল-হক্ক",
+    "english": "Al-Haqq",
+    "meaningBn": "সত্য",
+    "meaningEn": "The Truth, The Real",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Haqq', Allah will guide him to distinguish truth from falsehood. Ref: Surah Al-Hajj 22:6"
+  },
+  {
+    "arabic": "ٱلْوَكِيلُ",
+    "bangla": "আল-ওয়াকিল",
+    "english": "Al-Wakil",
+    "meaningBn": "কার্যনির্বাহক",
+    "meaningEn": "The Trustee, The Disposer of Affairs",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever says 'Hasbunallah wa ni'mal wakeel', Allah will suffice him. Ref: Surah Al-Imran 3:173"
+  },
+  {
+    "arabic": "ٱلْقَوِيُّ",
+    "bangla": "আল-কাওয়ি",
+    "english": "Al-Qawiy",
+    "meaningBn": "পরম শক্তিশালী",
+    "meaningEn": "The Most Strong",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Qawiy', Allah will grant him physical and spiritual strength. Ref: Surah Al-Hajj 22:40"
+  },
+  {
+    "arabic": "ٱلْمَتِينُ",
+    "bangla": "আল-মাতিন",
+    "english": "Al-Matin",
+    "meaningBn": "মজবুত",
+    "meaningEn": "The Firm, The Steadfast",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Matin', Allah will strengthen his faith and character. Ref: Surah Adh-Dhariyat 51:58"
+  },
+  {
+    "arabic": "ٱلْوَلِيُّ",
+    "bangla": "আল-ওয়ালি",
+    "english": "Al-Wali",
+    "meaningBn": "বন্ধু",
+    "meaningEn": "The Protector, The Patron",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Wali', Allah will become his protector and friend. Ref: Surah Al-Baqarah 2:257"
+  },
+  {
+    "arabic": "ٱلْحَمِيدُ",
+    "bangla": "আল-হামিদ",
+    "english": "Al-Hamid",
+    "meaningBn": "প্রশংসিত",
+    "meaningEn": "The Praiseworthy",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Hamid', Allah will record numerous praises for him. Ref: Surah Ibrahim 14:8"
+  },
+  {
+    "arabic": "ٱلْمُحْصِي",
+    "bangla": "আল-মুহসি",
+    "english": "Al-Muhsi",
+    "meaningBn": "গণনাকারী",
+    "meaningEn": "The Reckoner, The Accounter",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muhsi', Allah will account his deeds with full rewards. Ref: Surah Al-Mujadalah 58:6"
+  },
+  {
+    "arabic": "ٱلْمُبْدِئُ",
+    "bangla": "আল-মুবদি",
+    "english": "Al-Mubdi",
+    "meaningBn": "উৎপত্তিকারী",
+    "meaningEn": "The Originator, The Starter",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Mubdi' before starting work, Allah will bless it. Ref: Surah Al-Buruj 85:13"
+  },
+  {
+    "arabic": "ٱلْمُعِيدُ",
+    "bangla": "আল-মুইদ",
+    "english": "Al-Mu'id",
+    "meaningBn": "পুনঃসৃষ্টিকারী",
+    "meaningEn": "The Restorer, The Reinstater",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Mu'id', Allah will restore what he lost. Ref: Surah An-Naml 27:64"
+  },
+  {
+    "arabic": "ٱلْمُحْيِي",
+    "bangla": "আল-মুহ্যি",
+    "english": "Al-Muhyi",
+    "meaningBn": "জীবনদাতা",
+    "meaningEn": "The Giver of Life",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muhyi', Allah will revive his spiritual life. Ref: Surah Fussilat 41:39"
+  },
+  {
+    "arabic": "ٱلْمُمِيتُ",
+    "bangla": "আল-মুমিত",
+    "english": "Al-Mumit",
+    "meaningBn": "মৃত্যুদাতা",
+    "meaningEn": "The Bringer of Death",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Mumit' against evil, Allah will destroy its effect. Ref: Surah Al-Mumin 40:68"
+  },
+  {
+    "arabic": "ٱلْحَيُّ",
+    "bangla": "আল-হাইয়্যু",
+    "english": "Al-Hayy",
+    "meaningBn": "চিরঞ্জীব",
+    "meaningEn": "The Ever-Living",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Hayy' regularly, Allah will grant him vitality. Ref: Surah Al-Baqarah 2:255"
+  },
+  {
+    "arabic": "ٱلْقَيُّومُ",
+    "bangla": "আল-কাইয়ুম",
+    "english": "Al-Qayyum",
+    "meaningBn": "স্বয়ংসম্পূর্ণ",
+    "meaningEn": "The Self-Subsisting",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Qayyum', Allah will fulfill all his needs. Ref: Surah Al-Baqarah 2:255"
+  },
+  {
+    "arabic": "ٱلْوَاجِدُ",
+    "bangla": "আল-ওয়াজিদ",
+    "english": "Al-Wajid",
+    "meaningBn": "অনুসন্ধানকারী",
+    "meaningEn": "The Perceiver, The Finder",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Wajid' for lost things, Allah will help find them. Ref: Surah Adh-Dhariyat 51:56"
+  },
+  {
+    "arabic": "ٱلْمَاجِدُ",
+    "bangla": "আল-মাজিদ",
+    "english": "Al-Majid",
+    "meaningBn": "মহান",
+    "meaningEn": "The Noble, The Illustrious",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Majid', Allah will make his character noble. Ref: Surah Hud 11:73"
+  },
+  {
+    "arabic": "ٱلْوَاحِدُ",
+    "bangla": "আল-ওয়াহিদ",
+    "english": "Al-Wahid",
+    "meaningBn": "একক",
+    "meaningEn": "The Unique, The One",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Wahid', Allah will protect him from shirk. Ref: Surah Al-Baqarah 2:163"
+  },
+  {
+    "arabic": "ٱلْأَحَدُ",
+    "bangla": "আল-আহাদ",
+    "english": "Al-Ahad",
+    "meaningBn": "এক",
+    "meaningEn": "The One, The Indivisible",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Ahad', Allah will free him from fears and anxieties. Ref: Surah Al-Ikhlas 112:1"
+  },
+  {
+    "arabic": "ٱلصَّمَدُ",
+    "bangla": "আস-সামাদ",
+    "english": "As-Samad",
+    "meaningBn": "অভিলষিত",
+    "meaningEn": "The Eternal, The Absolute",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'As-Samad', Allah will fulfill all his needs. Ref: Surah Al-Ikhlas 112:2"
+  },
+  {
+    "arabic": "ٱلْقَادِرُ",
+    "bangla": "আল-কাদির",
+    "english": "Al-Qadir",
+    "meaningBn": "সক্ষম",
+    "meaningEn": "The Able, The Capable",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Qadir' for impossible tasks, Allah will make it possible. Ref: Surah Al-Baqarah 2:20"
+  },
+  {
+    "arabic": "ٱلْمُقْتَدِرُ",
+    "bangla": "আল-মুকতাদির",
+    "english": "Al-Muqtadir",
+    "meaningBn": "শক্তিমান",
+    "meaningEn": "The Powerful, The Dominant",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muqtadir', Allah will grant him power over enemies. Ref: Surah Al-Kahf 18:45"
+  },
+  {
+    "arabic": "ٱلْمُقَدِّمُ",
+    "bangla": "আল-মুকাদ্দিম",
+    "english": "Al-Muqaddim",
+    "meaningBn": "অগ্রবর্তীকারী",
+    "meaningEn": "The Expediter, The Promoter",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muqaddim', Allah will prioritize his good deeds. Ref: Surah Qaf 50:28"
+  },
+  {
+    "arabic": "ٱلْمُؤَخِّرُ",
+    "bangla": "আল-মুয়াখখির",
+    "english": "Al-Mu'akhkhir",
+    "meaningBn": "পশ্চাদবর্তীকারী",
+    "meaningEn": "The Delayer, The Retarder",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Mu'akhkhir', Allah will delay his harm and evil. Ref: Surah Ibrahim 14:42"
+  },
+  {
+    "arabic": "ٱلأَوَّلُ",
+    "bangla": "আল-আওয়াল",
+    "english": "Al-Awwal",
+    "meaningBn": "প্রথম",
+    "meaningEn": "The First, The Beginningless",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Awwal', Allah will make him pioneer in good deeds. Ref: Surah Al-Hadid 57:3"
+  },
+  {
+    "arabic": "ٱلْآخِرُ",
+    "bangla": "আল-আখির",
+    "english": "Al-Akhir",
+    "meaningBn": "শেষ",
+    "meaningEn": "The Last, The Endless",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Akhir', Allah will grant him eternal life in paradise. Ref: Surah Al-Hadid 57:3"
+  },
+  {
+    "arabic": "ٱلظَّاهِرُ",
+    "bangla": "আয-যাহির",
+    "english": "Az-Zahir",
+    "meaningBn": "প্রকাশ্য",
+    "meaningEn": "The Manifest, The Evident",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Az-Zahir', Allah will make truth clear to him. Ref: Surah Al-Hadid 57:3"
+  },
+  {
+    "arabic": "ٱلْبَاطِنُ",
+    "bangla": "আল-বাতিন",
+    "english": "Al-Batin",
+    "meaningBn": "গুপ্ত",
+    "meaningEn": "The Hidden, The Internal",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Batin', Allah will protect his secrets. Ref: Surah Al-Hadid 57:3"
+  },
+  {
+    "arabic": "ٱلْوَالِي",
+    "bangla": "আল-ওয়ালি",
+    "english": "Al-Wali",
+    "meaningBn": "শাসক",
+    "meaningEn": "The Governor, The Patron",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Wali', Allah will take charge of his affairs. Ref: Surah Al-Maidah 5:55"
+  },
+  {
+    "arabic": "ٱلْمُتَعَالِي",
+    "bangla": "আল-মুতাআলি",
+    "english": "Al-Muta'ali",
+    "meaningBn": "সর্বোচ্চ",
+    "meaningEn": "The Supreme, The Most Exalted",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muta'ali', Allah will elevate his status. Ref: Surah Ar-Ra'd 13:9"
+  },
+  {
+    "arabic": "ٱلْبَرُّ",
+    "bangla": "আল-বারর",
+    "english": "Al-Barr",
     "meaningBn": "পরম দয়ালু",
-    "meaningEn": "The Most Gracious",
-    "fazilatBn": "যে ব্যক্তি জুমার দিন আসরের নামাজের পর 'আর-রহমান' নামটি ১০০ বার পাঠ করবে, তার অন্তর থেকে কপটতা দূর হবে এবং ঈমানের নূর বৃদ্ধি পাবে।",
-    "fazilatEn": "Whoever recites 'Ar-Rahman' 100 times after Asr prayer on Friday, hypocrisy will be removed from his heart and the light of faith will increase."
+    "meaningEn": "The Source of All Goodness, The Kind",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Barr', Allah will be kind to him in all matters. Ref: Surah At-Tur 52:28"
+  },
+  {
+    "arabic": "ٱلْتَوَّابُ",
+    "bangla": "আত-তাওয়াব",
+    "english": "At-Tawwab",
+    "meaningBn": "তাওবা কবুলকারী",
+    "meaningEn": "The Acceptor of Repentance",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Tawwab' after sinning, Allah will accept his repentance. Ref: Surah An-Nisa 4:17"
+  },
+  {
+    "arabic": "ٱلْمُنْتَقِمُ",
+    "bangla": "আল-মুনতাকিম",
+    "english": "Al-Muntaqim",
+    "meaningBn": "প্রতিশোধ গ্রহণকারী",
+    "meaningEn": "The Avenger",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muntaqim' against oppressors, Allah will avenge him. Ref: Surah As-Sajdah 32:22"
+  },
+  {
+    "arabic": "ٱلْعَفُوُّ",
+    "bangla": "আল-আফুও",
+    "english": "Al-Afuw",
+    "meaningBn": "ক্ষমাকারী",
+    "meaningEn": "The Pardoner, The Forgiver",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Afuww' frequently, Allah will pardon his sins. Ref: Surah An-Nisa 4:43"
+  },
+  {
+    "arabic": "ٱلْرَّءُوفُ",
+    "bangla": "আর-রাউফ",
+    "english": "Ar-Ra'uf",
+    "meaningBn": "অত্যন্ত দয়ালু",
+    "meaningEn": "The Compassionate, The Kind",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ar-Ra'uf', Allah will be compassionate to him. Ref: Surah Al-Baqarah 2:207"
+  },
+  {
+    "arabic": "مَالِكُ ٱلْمُلْكِ",
+    "bangla": "মালিকুল মুলক",
+    "english": "Malikul Mulk",
+    "meaningBn": "রাজ্যের মালিক",
+    "meaningEn": "The Owner of Sovereignty",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Malikul Mulk', Allah will make him owner of worldly and spiritual wealth. Ref: Surah Al-Imran 3:26"
+  },
+  {
+    "arabic": "ذُو ٱلْجَلَالِ وَٱلْإِكْرَامِ",
+    "bangla": "জুল জালালি ওয়াল ইকরাম",
+    "english": "Dhil-Jalali wal-Ikram",
+    "meaningBn": "মহিমা ও মর্যাদার অধিকারী",
+    "meaningEn": "The Lord of Majesty and Bounty",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ya Dhal Jalali wal Ikram', Allah will grant him majesty and honor. Ref: Surah Ar-Rahman 55:27"
+  },
+  {
+    "arabic": "ٱلْمُقْسِطُ",
+    "bangla": "আল-মুকসিত",
+    "english": "Al-Muqsit",
+    "meaningBn": "ন্যায়বিচারক",
+    "meaningEn": "The Equitable, The Requiter",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Muqsit', Allah will instill justice in his heart. Ref: Surah Al-Maidah 5:8"
+  },
+  {
+    "arabic": "ٱلْجَامِعُ",
+    "bangla": "আল-জামি",
+    "english": "Al-Jami",
+    "meaningBn": "একত্রীকরণকারী",
+    "meaningEn": "The Gatherer, The Uniter",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Jami', Allah will unite his scattered affairs. Ref: Surah Al-Imran 3:9"
+  },
+  {
+    "arabic": "ٱلْغَنِيُّ",
+    "bangla": "আল-গানিয়্যু",
+    "english": "Al-Ghani",
+    "meaningBn": "অভাবমুক্ত",
+    "meaningEn": "The Self-Sufficient, The Rich",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Ghani', Allah will free him from all needs. Ref: Surah Al-Baqarah 2:267"
+  },
+  {
+    "arabic": "ٱلْمُغْنِي",
+    "bangla": "আল-মুগনি",
+    "english": "Al-Mughni",
+    "meaningBn": "সমৃদ্ধিদাতা",
+    "meaningEn": "The Enricher, The Bestower of Wealth",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Mughni', Allah will enrich him spiritually and materially. Ref: Surah An-Najm 53:48"
+  },
+  {
+    "arabic": "ٱلْمَانِعُ",
+    "bangla": "আল-মানি",
+    "english": "Al-Mani",
+    "meaningBn": "নিবারক",
+    "meaningEn": "The Withholder, The Preventer",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Mani', Allah will protect him from harm and evil. Ref: Sahih Bukhari"
+  },
+  {
+    "arabic": "ٱلْضَّارُّ",
+    "bangla": "আয-যারর",
+    "english": "Ad-Darr",
+    "meaningBn": "ক্ষতিসাধনকারী",
+    "meaningEn": "The Distresser, The Harmer",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ad-Darr' against enemies, Allah will harm them. Ref: Surah Al-An'am 6:17"
+  },
+  {
+    "arabic": "ٱلْنَّافِعُ",
+    "bangla": "আন-নাফি",
+    "english": "An-Nafi",
+    "meaningBn": "উপকারী",
+    "meaningEn": "The Propitious, The Benefiter",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'An-Nafi', Allah will benefit him in all matters. Ref: Surah Al-Fatihah 1:4"
+  },
+  {
+    "arabic": "ٱلْنُّورُ",
+    "bangla": "আন-নুর",
+    "english": "An-Nur",
+    "meaningBn": "জ্যোতি",
+    "meaningEn": "The Light",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'An-Nur', Allah will illuminate his heart, grave and resurrection. Ref: Surah An-Nur 24:35"
+  },
+  {
+    "arabic": "ٱلْهَادِي",
+    "bangla": "আল-হাদি",
+    "english": "Al-Hadi",
+    "meaningBn": "পথপ্রদর্শক",
+    "meaningEn": "The Guide",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Hadi', Allah will guide him to the straight path. Ref: Surah Al-Hajj 22:54"
+  },
+  {
+    "arabic": "ٱلْبَدِيعُ",
+    "bangla": "আল-বাদি",
+    "english": "Al-Badi",
+    "meaningBn": "অদ্বিতীয় সৃষ্টিকারী",
+    "meaningEn": "The Originator, The Incomparable",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Badi', Allah will create unique solutions for his problems. Ref: Surah Al-Baqarah 2:117"
+  },
+  {
+    "arabic": "ٱلْبَاقِي",
+    "bangla": "আল-বাকি",
+    "english": "Al-Baqi",
+    "meaningBn": "চিরস্থায়ী",
+    "meaningEn": "The Everlasting, The Eternal",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Baqi', Allah will make his good deeds everlasting. Ref: Surah Ar-Rahman 55:27"
+  },
+  {
+    "arabic": "ٱلْوَارِثُ",
+    "bangla": "আল-ওয়ারিস",
+    "english": "Al-Warith",
+    "meaningBn": "চূড়ান্ত উত্তরাধিকারী",
+    "meaningEn": "The Sole Inheritor",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Al-Warith', Allah will make him inheritor of good in both worlds. Ref: Surah Al-Hijr 15:23"
+  },
+  {
+    "arabic": "ٱلْرَّشِيدُ",
+    "bangla": "আর-রশিদ",
+    "english": "Ar-Rashid",
+    "meaningBn": "সঠিক পথের দিশারী",
+    "meaningEn": "The Guide to the Right Path",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'Ar-Rashid', Allah will guide him to right decisions. Ref: Surah Al-Mujadalah 58:10"
+  },
+  {
+    "arabic": "ٱلصَّبُورُ",
+    "bangla": "আস-সাবুর",
+    "english": "As-Sabur",
+    "meaningBn": "অত্যন্ত ধৈর্যশীল",
+    "meaningEn": "The Patient",
+    "fazilatBn": "",
+    "fazilatEn": "Whoever recites 'As-Sabur' during difficulties, Allah will grant him unlimited patience. Ref: Surah Al-Baqarah 2:153"
   }
 ]

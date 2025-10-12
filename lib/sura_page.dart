@@ -43,11 +43,11 @@ class _SuraPageState extends State<SuraPage> {
       'en': 'Important Warning',
       'bn': 'গুরুত্বপূর্ণ সতর্কবার্তা',
     },
-    'warningTitle': {'en': 'Bengali Pronunciation', 'bn': 'বাংলা উচ্চরণ'},
+    'warningTitle': {'en': 'Pronunciation', 'bn': 'উচ্চরণ'},
     'warningContent1': {
       'en':
-          'When reading Quranic verses or Arabic prayers in Bengali pronunciation, ',
-      'bn': 'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে ',
+          'When reading Quranic verses or Arabic prayers in Bengali / English pronunciation, ',
+      'bn': 'কুরআনের আয়াত বা আরবি দুআ বাংলায় / ইংরিজি উচ্চারণ করে পড়লে ',
     },
     'warningContent2': {
       'en': 'meaning distortion often occurs',

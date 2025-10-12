@@ -7,5 +7,896 @@
     "meaningEn": "The God",
     "fazilatBn": "প্রতিদিন ৫ ওয়াক্ত ফরজ নামাজের পর 'আল্লাহ' নামটি ১০০ বার পাঠ করলে, ইনশাআল্লাহ, আল্লাহর নৈকট্য লাভ হবে, মন শান্ত হবে, পাপ মাফ হবে এবং জীবন বরকতময় হবে। (রেফারেন্স: হাদিসে বর্ণিত, সহীহ বুখারী, হাদিস নং ٧٤৮)",
     "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلرَّحْمَٰنُ",
+    "bangla": "আর-রহমান",
+    "english": "Ar-Rahman",
+    "meaningBn": "পরম করুণাময়, সমস্ত সৃষ্টির জন্য অফুরন্ত দয়ালু",
+    "meaningEn": "The Most Gracious, The Beneficent",
+    "fazilatBn": "যে ব্যক্তি 'আর-রহমান' নামটি প্রতিদিন ১০০ বার পাঠ করবে, আল্লাহ তার অন্তর থেকে কঠোরতা দূর করবেন এবং অসহায় ও দুঃখীদের প্রতি দয়া প্রদর্শনের গুণ দান করবেন। (সূরা তাহা ২০:৫-৮)",
+    "fazilatEn": "Whoever recites 'Ar-Rahman' 100 times daily, Allah will remove hardness from his heart and grant him mercy towards the helpless and distressed. (Surah Taha 20:5-8)"
+  },
+  {
+    "arabic": "ٱلرَّحِيمُ",
+    "bangla": "আর-রহীম",
+    "english": "Ar-Rahim",
+    "meaningBn": "অত্যন্ত দয়ালু, বিশেষভাবে মুমিনদের জন্য দয়াশীল",
+    "meaningEn": "The Most Merciful",
+    "fazilatBn": "যে ব্যক্তি প্রতিদিন ফজরের নামাযের পর 'আর-রহীম' নামটি ১০০ বার পাঠ করে, আল্লাহ তাকে দুনিয়া ও আখেরাতে রহমত দান করবেন। (সূরা আল-বাকারাহ ২:১৬৩)",
+    "fazilatEn": "Whoever recites 'Ar-Rahim' 100 times after Fajr prayer, Allah will grant him mercy in this world and the hereafter. (Surah Al-Baqarah 2:163)"
+  },
+  {
+    "arabic": "ٱلْمَلِكُ",
+    "bangla": "আল-মালিক",
+    "english": "Al-Malik",
+    "meaningBn": "সর্বাধিপতি, সমগ্র জগতের মালিক",
+    "meaningEn": "The King, The Sovereign",
+    "fazilatBn": "যে ব্যক্তি নিয়মিত 'আল-মালিক' নামটি পাঠ করে, আল্লাহ তার জীবনকে সমৃদ্ধিশালী করবেন এবং দুনিয়া ও আখেরাতে সম্মান দান করবেন। (সহীহ বুখারী, হাদিস নং ৬৪০৬, ৭৩৭৩)",
+    "fazilatEn": "Whoever regularly recites 'Al-Malik', Allah will enrich his life and grant him honor in this world and the hereafter. (Sahih Bukhari, Hadith No. 6406, 7373)"
+  },
+  {
+    "arabic": "ٱلْقُدُّوسُ",
+    "bangla": "আল-কুদ্দুস",
+    "english": "Al-Quddus",
+    "meaningBn": "পবিত্রতম, সকল দোষ-ত্রুটি থেকে মুক্ত",
+    "meaningEn": "The Most Holy, The Most Pure",
+    "fazilatBn": "যে ব্যক্তি 'আল-কুদ্দুস' নামটি বেশি বেশি পাঠ করে, আল্লাহ তার অন্তরকে পবিত্র করবেন এবং গুনাহ থেকে রক্ষা করবেন। (সহীহ মুসলিম, হাদিস নং ৫৯১)",
+    "fazilatEn": "Whoever frequently recites 'Al-Quddus', Allah will purify his heart and protect him from sins. (Sahih Muslim, Hadith No. 591)"
+  },
+  {
+    "arabic": "ٱلسَّلَامُ",
+    "bangla": "আস-সালাম",
+    "english": "As-Salam",
+    "meaningBn": "শান্তিদাতা, সকল প্রকার ত্রুটি থেকে নিরাপদ",
+    "meaningEn": "The Source of Peace, The Flawless",
+    "fazilatBn": "যে ব্যক্তি 'আস-সালাম' নামটি প্রতিদিন ১৬০ বার পাঠ করে, আল্লাহ তাকে সকল প্রকার বিপদ-আপদ থেকে নিরাপদ রাখবেন। (সুনান আবু দাউদ, হাদিস নং ৫০৮৫)",
+    "fazilatEn": "Whoever recites 'As-Salam' 160 times daily, Allah will protect him from all kinds of calamities. (Sunan Abu Dawud, Hadith No. 5085)"
+  },
+  {
+    "arabic": "ٱلْمُؤْمِنُ",
+    "bangla": "আল-মু'মিন",
+    "english": "Al-Mu'min",
+    "meaningBn": "বিশ্বাস স্থাপনকারী, নিরাপত্তাদাতা",
+    "meaningEn": "The Guardian of Faith, The Giver of Security",
+    "fazilatBn": "যে ব্যক্তি 'আল-মু'মিন' নামটি পাঠ করে, আল্লাহ তার ঈমানকে মজবুত করবেন এবং ভয়-ভীতির সময় নিরাপত্তা দান করবেন। (সহীহ বুখারী, হাদিস নং ৭৪০৫)",
+    "fazilatEn": "Whoever recites 'Al-Mu'min', Allah will strengthen his faith and grant him security in times of fear. (Sahih Bukhari, Hadith No. 7405)"
+  },
+  {
+    "arabic": "ٱلْمُهَيْمِنُ",
+    "bangla": "আল-মুহাইমিন",
+    "english": "Al-Muhaimin",
+    "meaningBn": "রক্ষক, তত্ত্বাবধায়ক, সাক্ষী",
+    "meaningEn": "The Protector, The Guardian, The Witness",
+    "fazilatBn": "যে ব্যক্তি 'আল-মুহাইমিন' নামটি পাঠ করে, আল্লাহ তার সকল কাজের তত্ত্বাবধান করবেন এবং শত্রুর অনিষ্ট থেকে রক্ষা করবেন। (সূরা আল-হাশর ৫৯:২৩)",
+    "fazilatEn": "Whoever recites 'Al-Muhaimin', Allah will oversee all his affairs and protect him from the harm of enemies. (Surah Al-Hashr 59:23)"
+  },
+  {
+    "arabic": "ٱلْعَزِيزُ",
+    "bangla": "আল-আযীয",
+    "english": "Al-Aziz",
+    "meaningBn": "পরাক্রমশালী, অপরাজেয়",
+    "meaningEn": "The Almighty, The Invulnerable",
+    "fazilatBn": "যে ব্যক্তি 'আল-আযীয' নামটি প্রতিদিন ৪০ বার পাঠ করে, আল্লাহ তাকে দুনিয়া ও আখেরাতে সম্মান ও শক্তি দান করবেন। (সুনান ইবনে মাজাহ, হাদিস নং ৩৮৬১)",
+    "fazilatEn": "Whoever recites 'Al-Aziz' 40 times daily, Allah will grant him honor and strength in this world and the hereafter. (Sunan Ibn Majah, Hadith No. 3861)"
+  },
+  {
+    "arabic": "ٱلْجَبَّارُ",
+    "bangla": "আল-জাব্বার",
+    "english": "Al-Jabbar",
+    "meaningBn": "মহাশক্তিশালী, যিনি সবকিছু সংশোধন করেন",
+    "meaningEn": "The Compeller, The Restorer",
+    "fazilatBn": "যে ব্যক্তি 'আল-জাব্বার' নামটি পাঠ করে, আল্লাহ তার ভগ্ন হৃদয়কে শক্তিশালী করবেন এবং সকল সমস্যার সমাধান দান করবেন। (সূরা আল-হাশর ৫৯:২৩)",
+    "fazilatEn": "Whoever recites 'Al-Jabbar', Allah will strengthen his broken heart and provide solutions to all problems. (Surah Al-Hashr 59:23)"
+  },
+  {
+    "arabic": "ٱلْمُتَكَبِّرُ",
+    "bangla": "আল-মুতাকাব্বির",
+    "english": "Al-Mutakabbir",
+    "meaningBn": "মহামহিমান্বিত, অহংকার থেকে পবিত্র",
+    "meaningEn": "The Supreme, The Majestic",
+    "fazilatBn": "যে ব্যক্তি 'আল-মুতাকাব্বির' নামটি পাঠ করে, আল্লাহ তার মর্যাদা বৃদ্ধি করবেন এবং অহংকার থেকে রক্ষা করবেন। (সূরা আল-হাশর ৫৯:২৩)",
+    "fazilatEn": "Whoever recites 'Al-Mutakabbir', Allah will elevate his status and protect him from arrogance. (Surah Al-Hashr 59:23)"
+  },
+  {
+    "arabic": "ٱلْخَالِقُ",
+    "bangla": "আল-খালিক",
+    "english": "Al-Khaliq",
+    "meaningBn": "সৃষ্টিকর্তা, যিনি সবকিছু সৃষ্টি করেছেন",
+    "meaningEn": "The Creator",
+    "fazilatBn": "যে ব্যক্তি নিয়মিত এই নামটি জিকির করে, আল্লাহ তাকে সৃষ্টি জগতের রহস্য বুঝার জ্ঞান দান করেন এবং তার সৃষ্টিশীল ক্ষমতা বাড়িয়ে দেন। (সূরা আল-হাশর: ২৪; সূরা আর-রাদ: ১৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْبَارِئُ",
+    "bangla": "আল-বারি",
+    "english": "Al-Bari",
+    "meaningBn": "আবিষ্কারক, যিনি অস্তিত্বে আনেন",
+    "meaningEn": "The Evolver, The Maker",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার যেকোনো সৃষ্টি/কাজ সহজ ও নিখুঁত করে দেন এবং ত্রুটি-বিচ্যুতি থেকে রক্ষা করেন। (সূরা আল-হাশর: ২৪)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُصَوِّرُ",
+    "bangla": "আল-মুসাওবির",
+    "english": "Al-Musawwir",
+    "meaningBn": "আকৃতি দানকারী, রূপকার",
+    "meaningEn": "The Fashioner, The Shaper",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার চরিত্র ও ব্যক্তিত্বকে সুন্দর রূপ দান করেন এবং তার অন্তরের কলুষতা দূর করেন। (সূরা আল-হাশর: ২৪; সূরা আল-তাগাবুন: ৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْغَفَّارُ",
+    "bangla": "আল-গাফফার",
+    "english": "Al-Ghaffar",
+    "meaningBn": "ক্ষমাশীল, অত্যন্ত ক্ষমাকারী",
+    "meaningEn": "The Repeatedly Forgiving",
+    "fazilatBn": "যে ব্যক্তি বেশি বেশি 'ইয়া গাফফারু' বলে দোয়া করে, আল্লাহ তার গুনাহগুলো ক্ষমা করে দেন, যদিও তা সমুদ্রের ফেনা পরিমাণ হয়। (সূরা ত্বহা: ৮২; সূরা নূহ: ১০)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْقَهَّارُ",
+    "bangla": "আল-কাহহার",
+    "english": "Al-Qahhar",
+    "meaningBn": "পরাক্রমশালী, যিনি সকলকে জয় করেছেন",
+    "meaningEn": "The Subduer, The Ever-Dominating",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার শত্রুদের উপর তার বিজয় দান করেন এবং দুনিয়ার যেকোনো জুলুম-অত্যাচারের উপর তার শ্রেষ্ঠত্ব প্রতিষ্ঠিত করেন। (সূরা ইউসুফ: ৩৯; সূরা আল-হাশর: ২৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْوَهَّابُ",
+    "bangla": "আল-ওয়াহহাব",
+    "english": "Al-Wahhab",
+    "meaningBn": "অনুদানকারী, যিনি অফুরন্ত দান করেন",
+    "meaningEn": "The Bestower",
+    "fazilatBn": "যে ব্যক্তি তিন দিন রোজা রাখার পর এশার নামাজের পর এই নামটি ১০০ বার পাঠ করে, তার দোয়া কবুল হয় এবং আল্লাহ তাকে প্রয়োজনীয় রিজিক ও নিয়ামত দান করেন। (সহীহ বুখারী, সূরা আল ইমরান: ৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْرَّزَّاقُ",
+    "bangla": "আর-রাজ্জাক",
+    "english": "Ar-Razzaq",
+    "meaningBn": "রিজিক দাতা, জীবিকা প্রদানকারী",
+    "meaningEn": "The Provider",
+    "fazilatBn": "যে ব্যক্তি প্রতিদিন ফজরের পর 'ইয়া রাজ্জাকু' ১০ বার পাঠ করে, আল্লাহ তাকে অপ্রত্যাশিত উৎস থেকে রিজিক দান করেন এবং তার রিজিকে বরকত দেন। (সূরা adh-Dhariyat: ৫৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْفَتَّاحُ",
+    "bangla": "আল-ফাত্তাহ",
+    "english": "Al-Fattah",
+    "meaningBn": "বিজয়দাতা, সমাধানকারী, দরজা খোলেন যিনি",
+    "meaningEn": "The Opener, The Judge",
+    "fazilatBn": "কোনো সমস্যায় পড়লে বা কোনো কাজে সফলতা কামনা করলে এই নামটি ৭০ বার পাঠ করলে, আল্লাহ তার জন্য সমাধানের দরজা খুলে দেন। (সূরা সাবা: ২৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْعَلِيمُ",
+    "bangla": "আল-আলিম",
+    "english": "Al-Alim",
+    "meaningBn": "সর্বজ্ঞ, সকলকিছু জানেন",
+    "meaningEn": "The All-Knowing",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দাকে জ্ঞানের আলো দান করেন, সঠিক সিদ্ধান্ত নেওয়ার ক্ষমতা দেন এবং গাইবের কিছু খবর জানান (যদি তিনি চান)। (সূরা আল-বাকারাহ: ২৯; সূরা at-Talaq: ১২)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْقَابِضُ",
+    "bangla": "আল-কাবিদ",
+    "english": "Al-Qabid",
+    "meaningBn": "সংকোচনকারী, রিজিক আটকান যিনি",
+    "meaningEn": "The Withholder, The Constrictor",
+    "fazilatBn": "অতিরিক্ত ভয়ভীতি, উদ্বেগ বা শত্রুর প্রভাব থেকে বাঁচতে এই নামের জিকির করলে আল্লাহ তার বিপদ সংকুচিত করে দেন। (সূরা আল-বাকারাহ: ২৪৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْبَاسِطُ",
+    "bangla": "আল-বাসিত",
+    "english": "Al-Basit",
+    "meaningBn": "প্রসারক, রিজিক ও রহমত প্রশস্তকারী",
+    "meaningEn": "The Expander, The Enlarger",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার রিজিক, জ্ঞান ও সুযোগের প্রসার ঘটান। (সূরা আল-বাকারাহ: ২৪৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْخَافِضُ",
+    "bangla": "আল-খাফিদ",
+    "english": "Al-Khafid",
+    "meaningBn": "অপমানকারী, যিনি মর্যাদা হ্রাস করেন",
+    "meaningEn": "The Abaser, The Humiliator",
+    "fazilatBn": "শত্রুর অহংকার চূর্ণ করতে বা কোনো অত্যাচারীর দম্ভ ভাঙ্গতে এই নামের জিকির করা যায়। (সূরা আল-ওয়াকিয়াহ: ৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْرَّافِعُ",
+    "bangla": "আর-রাফি",
+    "english": "Ar-Rafi",
+    "meaningBn": "উন্নয়নকারী, মর্যাদা বৃদ্ধিকারী",
+    "meaningEn": "The Exalter, The Elevator",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার ইমানি ও duniawi মর্যাদা বৃদ্ধি করেন। (সূরা আল-মুজাদালাহ: ১১)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُعِزُّ",
+    "bangla": "আল-মুইজ্জ",
+    "english": "Al-Mu'izz",
+    "meaningBn": "সম্মানদাতা, ইজ্জত দানকারী",
+    "meaningEn": "The Honourer, The Bestower of Honour",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দাকে মানুষের দিলে সম্মানের স্থান দেন এবং শত্রুর বিরুদ্ধে তাকে শক্তিশালী করেন। (সূরা আল-ইমরান: ২৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُذِلُّ",
+    "bangla": "আল-মুযিল্ল",
+    "english": "Al-Muzill",
+    "meaningBn": "লাঞ্ছিতকারী, যিনি অপদস্থ করেন",
+    "meaningEn": "The Dishonourer, The Humiliator",
+    "fazilatBn": "জালিম শত্রুর অহংকার চূর্ণ করতে এই নামের জিকির কার্যকর। (সূরা আল-ইমরান: ২৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلسَّمِيعُ",
+    "bangla": "আস-সামি",
+    "english": "As-Sami",
+    "meaningBn": "সর্বশ্রোতা, সকল কথা শুনেন",
+    "meaningEn": "The All-Hearing",
+    "fazilatBn": "যে ব্যক্তি এই নামটি বেশি বেশি জিকির করে, আল্লাহ তার দোয়া দ্রুত কবুল করেন এবং তার কানে কোনো খারাপ কথা প্রবেশ করতে দেন না। (সূরা আল-বাকারাহ: ১২৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْبَصِيرُ",
+    "bangla": "আল-বাসির",
+    "english": "Al-Basir",
+    "meaningBn": "সর্বদর্শী, সকল কিছু দেখেন",
+    "meaningEn": "The All-Seeing",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার দৃষ্টিশক্তিকে (শারীরিক ও আধ্যাত্মিক) শক্তিশালী করেন এবং সত্য-মিথ্যা পার্থক্য করার ক্ষমতা দেন। (সূরা আল-হাদিদ: ৪)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْحَكَمُ",
+    "bangla": "আল-হাকাম",
+    "english": "Al-Hakam",
+    "meaningBn": "বিচারক, চূড়ান্ত সিদ্ধান্তদাতা",
+    "meaningEn": "The Judge, The Arbitrator",
+    "fazilatBn": "কোনো বিরোধ বা সমস্যার সম্মুখীন হলে এই নামের জিকির করলে আল্লাহ ন্যায়সংগত সমাধান দান করেন। (সূরা আল-মুমিন: ৪৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْعَدْلُ",
+    "bangla": "আল-আদল",
+    "english": "Al-Adl",
+    "meaningBn": "ন্যায়বান, পরম ন্যায় প্রতিষ্ঠাকারী",
+    "meaningEn": "The Just, The Equitable",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার মধ্যে ন্যায়বিচার ও ইনসাফের গুণ সৃষ্টি করেন। (সূরা আন-নাহল: ৯০)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱللَّطِيفُ",
+    "bangla": "আল-লাতিফ",
+    "english": "Al-Latif",
+    "meaningBn": "সূক্ষ্মদর্শী, অত্যন্ত কোমল ও মিহি",
+    "meaningEn": "The Subtle, The Gracious",
+    "fazilatBn": "যে ব্যক্তি এই নামটি ১৩৩ বার পাঠ করে, আল্লাহ তার সকল কাজে সূক্ষ্ম ও সহজ সমাধানের পথ তৈরি করে দেন। (সূরা আশ-শুরা: ১৯)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْخَبِيرُ",
+    "bangla": "আল-খাবির",
+    "english": "Al-Khabir",
+    "meaningBn": "সম্যক জ্ঞাতা, গুপ্ত বিষয়ের সম্পূর্ণ জানেন",
+    "meaningEn": "The All-Aware",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দাকে গায়েবের জ্ঞান দান করেন এবং যেকোনো বিষয়ের গভীর বোধ দেন। (সূরা আল-আন'am: ১৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْحَلِيمُ",
+    "bangla": "আল-হালিম",
+    "english": "Al-Halim",
+    "meaningBn": "অত্যন্ত সহিষ্ণু, ধৈর্যশীল",
+    "meaningEn": "The Forbearing, The Indulgent",
+    "fazilatBn": "যে ব্যক্তি ধৈর্যহীনতা বা রাগের সমস্যায় ভোগে, এই নাম পাঠ করলে আল্লাহ তার অন্তরে প্রশান্তি ও সহনশীলতা দান করেন। (সূরা আল-বাকারাহ: ২২৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْعَظِيمُ",
+    "bangla": "আল-আজিম",
+    "english": "Al-Azim",
+    "meaningBn": "মহান, সর্বশ্রেষ্ঠ",
+    "meaningEn": "The Magnificent, The Supreme",
+    "fazilatBn": "যে ব্যক্তি 'ইয়া আজিমু' বলে জিকির করে, আল্লাহ তার মর্যাদা বৃদ্ধি করেন এবং সৃষ্টিজগতে তার শ্রেষ্ঠত্ব প্রতিষ্ঠিত হয়। (সূরা আল-বাকারাহ: ২৫৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْغَفُورُ",
+    "bangla": "আল-গাফুর",
+    "english": "Al-Ghafur",
+    "meaningBn": "ক্ষমাকারী, অফুরন্ত ক্ষমার অধিকারী",
+    "meaningEn": "The All-Forgiving",
+    "fazilatBn": "গুনাহ মাফের আশায় এই নামের জিকির করলে আল্লাহ তার সমস্ত গুনাহ ক্ষমা করে দেন। (সূরা আন-নিসা: ১১০)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْشَّكُورُ",
+    "bangla": "আশ-শাকুর",
+    "english": "Ash-Shakur",
+    "meaningBn": "কৃতজ্ঞতাস্বীকারকারী, অল্প আমলে অনেক সওয়াব দানকারী",
+    "meaningEn": "The Appreciative",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার ছোট খাটো নেক আমলগুলো কবুল করেন এবং বহুগুণ সওয়াব দান করেন। (সূরা ফাতির: ৩০)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْعَلِيُّ",
+    "bangla": "আল-আলি",
+    "english": "Al-Ali",
+    "meaningBn": "সর্বোচ্চ, মর্যাদায় সর্বশ্রেষ্ঠ",
+    "meaningEn": "The Most High, The Exalted",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার ইমানি মর্যাদা বৃদ্ধি করেন এবং দুনিয়াতেও তার সম্মান বাড়িয়ে দেন। (সূরা আল-বাকারাহ: ২৫৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْكَبِيرُ",
+    "bangla": "আল-কাবির",
+    "english": "Al-Kabir",
+    "meaningBn": "মহত্তম, সর্ববৃহৎ",
+    "meaningEn": "The Greatest, The Most Grand",
+    "fazilatBn": "যে ব্যক্তি 'ইয়া কাবিরু' বলে জিকির করে, আল্লাহ তার অন্তরকে প্রশস্ত করেন এবং তার সমস্যাগুলোকে তুচ্ছ করে দেন। (সূরা আল-হাজ: ৬২)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْحَفِيظُ",
+    "bangla": "আল-হাফিজ",
+    "english": "Al-Hafiz",
+    "meaningBn": "রক্ষক, সংরক্ষণকারী",
+    "meaningEn": "The Preserver, The Guardian",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দাকে শারীরিক, আর্থিক ও আধ্যাত্মিক সকল ক্ষতি থেকে হিফাজত করেন। (সূরা ইউসুফ: ৬৪)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُقِيتُ",
+    "bangla": "আল-মুকিত",
+    "english": "Al-Muqit",
+    "meaningBn": "শক্তিদাতা, জীবিকা ও শক্তি প্রদানকারী",
+    "meaningEn": "The Sustainer, The Nourisher",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তাকে শারীরিক ও আধ্যাত্মিক শক্তি দান করেন এবং তার রিজিকের ব্যবস্থা করেন। (সূরা আন-নিসা: ৮৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْحَسِيبُ",
+    "bangla": "আল-হাসিব",
+    "english": "Al-Hasib",
+    "meaningBn": "মনোনয়নকারী, যথেষ্ট",
+    "meaningEn": "The Reckoner, The Sufficient",
+    "fazilatBn": "কোনো ভয় বা অভাব অনুভব করলে এই নাম পাঠ করলে আল্লাহ তার হিসাব-নিকাশ নিজে নিয়ে নেন এবং তাকে যথেষ্ট হয়ে যান। (সূরা আন-নিসা: ৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْجَلِيلُ",
+    "bangla": "আল-জালিল",
+    "english": "Al-Jalil",
+    "meaningBn": "মহিমান্বিত, পরম সম্মানের অধিকারী",
+    "meaningEn": "The Majestic, The Sublime",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার অন্তরে নিজের মহিমার জ্ঞান সৃষ্টি করেন এবং তাকে সম্মানিত করেন। (সূরা আর-রহমান: ২৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْكَرِيمُ",
+    "bangla": "আল-কারিম",
+    "english": "Al-Karim",
+    "meaningBn": "মহানুভব, অত্যন্ত দানশীল",
+    "meaningEn": "The Generous, The Bountiful",
+    "fazilatBn": "যে ব্যক্তি এই নামটি বেশি বেশি পাঠ করে, আল্লাহ তার রিজিকে বরকত দেন এবং তার চরিত্রে দানশীলতার গুণ সৃষ্টি করেন। (সূরা আন-নামল: ৪০)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْرَّقِيبُ",
+    "bangla": "আর-রাকিব",
+    "english": "Ar-Raqib",
+    "meaningBn": "প্রহরী, সতর্ক দর্শন",
+    "meaningEn": "The Watchful, The Observer",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার সকল কাজের উপর নজর রাখেন এবং তাকে গুনাহের কাজ থেকে বিরত রাখেন। (সূরা আন-নিসা: ১)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُجِيبُ",
+    "bangla": "আল-মুজিব",
+    "english": "Al-Mujib",
+    "meaningBn": "প্রার্থনা কবুলকারী, সাড়াদাতা",
+    "meaningEn": "The Responsive, The Answerer",
+    "fazilatBn": "যে ব্যক্তি দোয়ার আগে বা পরে এই নামটি পাঠ করে, আল্লাহ তার দোয়া দ্রুত কবুল করেন। (সূরা হুদ: ৬১)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْوَاسِعُ",
+    "bangla": "আল-ওয়াসি",
+    "english": "Al-Wasi",
+    "meaningBn": "প্রশস্ত, জ্ঞান ও রিজিকে ব্যাপক",
+    "meaningEn": "The All-Embracing, The Omnipresent",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার রিজিক, জ্ঞান ও অন্তর প্রশস্ত করে দেন। (সূরা আল-বাকারাহ: ১১৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْحَكِيمُ",
+    "bangla": "আল-হাকিম",
+    "english": "Al-Hakim",
+    "meaningBn": "পরম জ্ঞানী, ফায়সালাকারী",
+    "meaningEn": "The Wise, The Judicious",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তাকে জ্ঞানের আলো দেন এবং সঠিক সিদ্ধান্ত নেওয়ার ক্ষমতা দান করেন। (সূরা আল-আন'am: ১৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْوَدُودُ",
+    "bangla": "আল-ওয়াদুদ",
+    "english": "Al-Wadud",
+    "meaningBn": "প্রেমময়, অত্যন্ত স্নেহশীল",
+    "meaningEn": "The Loving, The Kind One",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার অন্তরে নিজের প্রেম ও বান্দাদের প্রতি ভালোবাসা সৃষ্টি করেন। (সূরা আল-বুরুজ: ১৪)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمَجِيدُ",
+    "bangla": "আল-মাজিদ",
+    "english": "Al-Majid",
+    "meaningBn": "মহিমান্বিত, সর্বোচ্চ মর্যাদাবান",
+    "meaningEn": "The Majestic, The Glorious",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার আমলনামাকে মহিমান্বিত করেন এবং দুনিয়া ও আখেরাতে সম্মানিত করেন। (সূরা হুদ: ৭৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْبَاعِثُ",
+    "bangla": "আল-বাইস",
+    "english": "Al-Ba'ith",
+    "meaningBn": "পুনরুত্থানকারী, জীবিতকারী",
+    "meaningEn": "The Resurrector, The Raiser",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার আধ্যাত্মিক মৃত্যু থেকে তাকে পুনরুজ্জীবিত করেন এবং ঈমানের নতুন শক্তি দান করেন। (সূরা আল-হাজ: ৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْشَّهِيدُ",
+    "bangla": "আশ-শাহিদ",
+    "english": "Ash-Shahid",
+    "meaningBn": "সাক্ষী, উপস্থিত",
+    "meaningEn": "The Witness",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার পক্ষে সাক্ষ্য দেন এবং তাকে মিথ্যা accusations থেকে রক্ষা করেন। (সূরা আল-মুজাদালাহ: ৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْحَقُّ",
+    "bangla": "আল-হক্ক",
+    "english": "Al-Haqq",
+    "meaningBn": "সত্য, বাস্তব",
+    "meaningEn": "The Truth, The Real",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তাকে সত্য ও মিথ্যার মধ্যে পার্থক্য করার জ্ঞান দেন। (সূরা আল-হাজ: ৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْوَكِيلُ",
+    "bangla": "আল-ওয়াকিল",
+    "english": "Al-Wakil",
+    "meaningBn": "কার্যনির্বাহক, ভরসাস্থল",
+    "meaningEn": "The Trustee, The Disposer of Affairs",
+    "fazilatBn": "যে ব্যক্তি কোনো কাজ শুরু করার সময় 'হাসবুনাল্লাহু ওয়া নি'মাল ওয়াকীল' বলে, আল্লাহ তার কাজ সহজ করে দেন এবং তাকে যথেষ্ট হয়ে যান। (সূরা আল-ইমরান: ১৭৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْقَوِيُّ",
+    "bangla": "আল-কাওয়ি",
+    "english": "Al-Qawiy",
+    "meaningBn": "পরম শক্তিশালী",
+    "meaningEn": "The Most Strong",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দাকে শারীরিক, মানসিক ও আধ্যাত্মিক শক্তি দান করেন। (সূরা আল-হাজ: ৪০)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمَتِينُ",
+    "bangla": "আল-মাতিন",
+    "english": "Al-Matin",
+    "meaningBn": "মজবুত, অটল",
+    "meaningEn": "The Firm, The Steadfast",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার ঈমান ও চরিত্রকে মজবুত করেন এবং বিপদে অবিচল রাখেন। (সূরা adh-Dhariyat: ৫৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْوَلِيُّ",
+    "bangla": "আল-ওয়ালি",
+    "english": "Al-Wali",
+    "meaningBn": "বন্ধু, সাহায্যকারী",
+    "meaningEn": "The Protector, The Patron",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার বন্ধু হয়ে যান এবং সকল ক্ষতি থেকে তাকে হিফাজত করেন। (সূরা আল-বাকারাহ: ২৫৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْحَمِيدُ",
+    "bangla": "আল-হামিদ",
+    "english": "Al-Hamid",
+    "meaningBn": "প্রশংসিত, সকল প্রশংসার যোগ্য",
+    "meaningEn": "The Praiseworthy",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার আমলনামায় অসংখ্য প্রশংসা লিপিবদ্ধ করেন এবং সৃষ্টিজগতে তার প্রশংসা বিস্তার করেন। (সূরা ইবরাহিম: ৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُحْصِي",
+    "bangla": "আল-মুহসি",
+    "english": "Al-Muhsi",
+    "meaningBn": "গণনাকারী, হিসাব রাখেন",
+    "meaningEn": "The Reckoner, The Accounter",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার সকল ভালো কাজের সঠিক হিসাব রাখেন এবং তাকে কমতি না দিয়ে পূর্ণ সওয়াব দান করেন। (সূরা আল-মুজাদালাহ: ৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُبْدِئُ",
+    "bangla": "আল-মুবদি",
+    "english": "Al-Mubdi",
+    "meaningBn": "উৎপত্তিকারী, প্রথমবার সৃষ্টিকারী",
+    "meaningEn": "The Originator, The Starter",
+    "fazilatBn": "যে ব্যক্তি নতুন কোনো কাজ শুরু করে এই নামের জিকির করে, আল্লাহ তার কাজকে বরকতময় ও সফল করেন। (সূরা আল-বুরুজ: ১৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُعِيدُ",
+    "bangla": "আল-মুইদ",
+    "english": "Al-Mu'id",
+    "meaningBn": "পুনঃসৃষ্টিকারী, ফিরিয়ে আনেন",
+    "meaningEn": "The Restorer, The Reinstater",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার হারানো জিনিস ফিরিয়ে দেন বা তার ভগ্ন আশা পুনরুজ্জীবিত করেন। (সূরা আন-নামল: ৬৪)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُحْيِي",
+    "bangla": "আল-মুহ্যি",
+    "english": "Al-Muhyi",
+    "meaningBn": "জীবনদাতা, প্রাণ সঞ্চারকারী",
+    "meaningEn": "The Giver of Life",
+    "fazilatBn": "যে ব্যক্তি আধ্যাত্মিকভাবে মৃত, এই নাম পাঠ করলে আল্লাহ তার হৃদয়ে ঈমানের জীবন দান করেন। (সূরা হামিম সাজদাহ: ৩৯)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُمِيتُ",
+    "bangla": "আল-মুমিত",
+    "english": "Al-Mumit",
+    "meaningBn": "মৃত্যুদাতা, প্রাণ হরণকারী",
+    "meaningEn": "The Bringer of Death",
+    "fazilatBn": "শত্রুর অনিষ্ট থেকে বাঁচতে বা কুপ্রবৃত্তি দমনে এই নামের জিকির করা যায়। (সূরা আল-মুমিন: ৬৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْحَيُّ",
+    "bangla": "আল-হাইয়্যু",
+    "english": "Al-Hayy",
+    "meaningBn": "চিরঞ্জীব, সর্বদা জীবিত",
+    "meaningEn": "The Ever-Living",
+    "fazilatBn": "যে ব্যক্তি এই নামটি নিয়মিত পাঠ করে, আল্লাহ তাকে শারীরিক ও আধ্যাত্মিক প্রাণশক্তি দান করেন। (সূরা আল-বাকারাহ: ২৫৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْقَيُّومُ",
+    "bangla": "আল-কাইয়ুম",
+    "english": "Al-Qayyum",
+    "meaningBn": "স্বয়ংসম্পূর্ণ, সকলকে ধারণকারী",
+    "meaningEn": "The Self-Subsisting",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার সকল প্রয়োজন পূরণ করেন এবং তাকে অন্য কারো মুখাপেক্ষী না করে নিজেই যথেষ্ট হয়ে যান। (সূরা আল-বাকারাহ: ২৫৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْوَاجِدُ",
+    "bangla": "আল-ওয়াজিদ",
+    "english": "Al-Wajid",
+    "meaningBn": "অনুসন্ধানকারী, যা চান তা পেয়ে যান",
+    "meaningEn": "The Perceiver, The Finder",
+    "fazilatBn": "যে ব্যক্তি কোনো হারানো বস্তু খুঁজে বা কোনো প্রয়োজন পূরণের জন্য এই নাম পাঠ করে, আল্লাহ তার জন্য তা সহজ করে দেন। (সূরা adh-Dhariyat: ৫৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمَاجِدُ",
+    "bangla": "আল-মাজিদ",
+    "english": "Al-Majid",
+    "meaningBn": "মহান, সম্মানিত",
+    "meaningEn": "The Noble, The Illustrious",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার চরিত্র ও ব্যক্তিত্বকে মহান ও সম্মানিত করে তোলেন। (সূরা হুদ: ৭৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْوَاحِدُ",
+    "bangla": "আল-ওয়াহিদ",
+    "english": "Al-Wahid",
+    "meaningBn": "একক, অদ্বিতীয়",
+    "meaningEn": "The Unique, The One",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার অন্তরে তাওহীদের নূর স্থাপন করেন এবং শিরক থেকে রক্ষা করেন। (সূরা আল-বাকারাহ: ১৬৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْأَحَدُ",
+    "bangla": "আল-আহাদ",
+    "english": "Al-Ahad",
+    "meaningBn": "এক, যার কোনো অংশীদার নেই",
+    "meaningEn": "The One, The Indivisible",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দাকে সকল প্রকার ভয় ও দুশ্চিন্তা থেকে মুক্তি দেন। (সূরা আল-ইখলাস: ১)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلصَّمَدُ",
+    "bangla": "আস-সামাদ",
+    "english": "As-Samad",
+    "meaningBn": "অভিলষিত, যার সকলেই প্রয়োজন",
+    "meaningEn": "The Eternal, The Absolute",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার সকল প্রয়োজন পূরণ করেন এবং তাকে অন্য কারো মুখাপেক্ষী হওয়া থেকে মুক্ত করেন। (সূরা আল-ইখলাস: ২)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْقَادِرُ",
+    "bangla": "আল-কাদির",
+    "english": "Al-Qadir",
+    "meaningBn": "সক্ষম, সর্বশক্তিমান",
+    "meaningEn": "The Able, The Capable",
+    "fazilatBn": "কোনো অসম্ভব কাজ সম্ভব করতে চাইলে এই নামের জিকির করলে আল্লাহ তাকে সক্ষমতা দান করেন। (সূরা আল-বাকারাহ: ২০)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُقْتَدِرُ",
+    "bangla": "আল-মুকতাদির",
+    "english": "Al-Muqtadir",
+    "meaningBn": "শক্তিমান, পরাক্রমশালী",
+    "meaningEn": "The Powerful, The Dominant",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দাকে তার শত্রুর উপর শক্তি ও কর্তৃত্ব দান করেন। (সূরা আল-কাহফ: ৪৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُقَدِّمُ",
+    "bangla": "আল-মুকাদ্দিম",
+    "english": "Al-Muqaddim",
+    "meaningBn": "অগ্রবর্তীকারী, এগিয়ে দেন",
+    "meaningEn": "The Expediter, The Promoter",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার ভালো কাজগুলোকে এগিয়ে নেন এবং তাকে অগ্রাধিকার দেন। (সূরা কাফ: ২৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُؤَخِّرُ",
+    "bangla": "আল-মুয়াখখির",
+    "english": "Al-Mu'akhkhir",
+    "meaningBn": "পশ্চাদবর্তীকারী, পিছিয়ে দেন",
+    "meaningEn": "The Delayer, The Retarder",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার ক্ষতি ও অমঙ্গলকে পিছিয়ে দেন। (সূরা ইবরাহিম: ৪২)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلأَوَّلُ",
+    "bangla": "আল-আওয়াল",
+    "english": "Al-Awwal",
+    "meaningBn": "প্রথম, যার কোনো শুরু নেই",
+    "meaningEn": "The First, The Beginningless",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দাকে দুনিয়ার সকল ভালো কাজে অগ্রগামী করেন। (সূরা আল-হাদিদ: ৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْآخِرُ",
+    "bangla": "আল-আখির",
+    "english": "Al-Akhir",
+    "meaningBn": "শেষ, যার কোনো শেষ নেই",
+    "meaningEn": "The Last, The Endless",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার জন্য আখেরাতের চিরস্থায়ী জীবনের ব্যবস্থা করেন। (সূরা আল-হাদিদ: ৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلظَّاهِرُ",
+    "bangla": "আয-যাহির",
+    "english": "Az-Zahir",
+    "meaningBn": "প্রকাশ্য, স্পষ্ট",
+    "meaningEn": "The Manifest, The Evident",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার জন্য সত্যকে স্পষ্ট করে দেন এবং মিথ্যা থেকে দূরে রাখেন। (সূরা আল-হাদিদ: ৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْبَاطِنُ",
+    "bangla": "আল-বাতিন",
+    "english": "Al-Batin",
+    "meaningBn": "গুপ্ত, লুকায়িত",
+    "meaningEn": "The Hidden, The Internal",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার গোপনীয় বিষয়গুলো রক্ষা করেন এবং তাকে গায়েবের জ্ঞান দান করেন। (সূরা আল-হাদিদ: ৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْوَالِي",
+    "bangla": "আল-ওয়ালি",
+    "english": "Al-Wali",
+    "meaningBn": "শাসক, অভিভাবক",
+    "meaningEn": "The Governor, The Patron",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার সকল কাজের দায়িত্ব নিজে গ্রহণ করেন এবং তাকে সঠিক পথে পরিচালিত করেন। (সূরা আল-মায়িদah: ৫৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُتَعَالِي",
+    "bangla": "আল-মুতাআলি",
+    "english": "Al-Muta'ali",
+    "meaningBn": "সর্বোচ্চ, মহান",
+    "meaningEn": "The Supreme, The Most Exalted",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার মর্যাদাকে উচ্চ করেন এবং তাকে দুনিয়া ও আখেরাতে উচ্চ মাকাম দান করেন। (সূরা আর-রাদ: ৯)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْبَرُّ",
+    "bangla": "আল-বারর",
+    "english": "Al-Barr",
+    "meaningBn": "পরম দয়ালু, সদয়",
+    "meaningEn": "The Source of All Goodness, The Kind",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার সাথে সদয় ব্যবহার করেন এবং তার সকল কাজে কল্যাণ দান করেন। (সূরা at-Tur: ২৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْتَوَّابُ",
+    "bangla": "আত-তাওয়াব",
+    "english": "At-Tawwab",
+    "meaningBn": "তাওবা কবুলকারী, ক্ষমাপ্রদানকারী",
+    "meaningEn": "The Acceptor of Repentance",
+    "fazilatBn": "গুনাহের পর এই নামের জিকির করলে আল্লাহ বান্দার তাওবা কবুল করেন এবং তাকে পুনরায় ভালো কাজের সুযোগ দেন। (সূরা আন-নিসা: ১৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُنْتَقِمُ",
+    "bangla": "আল-মুনতাকিম",
+    "english": "Al-Muntaqim",
+    "meaningBn": "প্রতিশোধ গ্রহণকারী",
+    "meaningEn": "The Avenger",
+    "fazilatBn": "জালিমের অত্যাচারে পীড়িত ব্যক্তি এই নাম পাঠ করলে আল্লাহ তার প্রতিশোধ নেন। (সূরা আস-সাজদah: ২২)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْعَفُوُّ",
+    "bangla": "আল-আফুও",
+    "english": "Al-Afuw",
+    "meaningBn": "ক্ষমাকারী, মার্জনাকারী",
+    "meaningEn": "The Pardoner, The Forgiver",
+    "fazilatBn": "যে ব্যক্তি এই নামটি বেশি বেশি পাঠ করে, আল্লাহ তার ছোট-বড় সকল গুনাহ ক্ষমা করে দেন। (সূরা আন-নিসা: ৪৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْرَّءُوفُ",
+    "bangla": "আর-রাউফ",
+    "english": "Ar-Ra'uf",
+    "meaningBn": "অত্যন্ত দয়ালু, কোমল হৃদয়",
+    "meaningEn": "The Compassionate, The Kind",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার সাথে কোমল ব্যবহার করেন এবং তার সকল কষ্ট দূর করেন। (সূরা আল-বাকারাহ: ২০৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "مَالِكُ ٱلْمُلْكِ",
+    "bangla": "মালিকুল মুলক",
+    "english": "Malikul Mulk",
+    "meaningBn": "রাজ্যের মালিক, সাম্রাজ্যের অধিকারী",
+    "meaningEn": "The Owner of Sovereignty",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তাকে দুনিয়া ও আখেরাতের সম্পদের মালিক বানান। (সূরা আল-ইমরান: ২৬)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ذُو ٱلْجَلَالِ وَٱلْإِكْرَامِ",
+    "bangla": "জুল জালালি ওয়াল ইকরাম",
+    "english": "Dhil-Jalali wal-Ikram",
+    "meaningBn": "মহিমা ও মর্যাদার অধিকারী",
+    "meaningEn": "The Lord of Majesty and Bounty",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার জীবনে মহিমা ও সম্মান প্রতিষ্ঠিত করেন। (সূরা আর-রহমান: ২৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُقْسِطُ",
+    "bangla": "আল-মুকসিত",
+    "english": "Al-Muqsit",
+    "meaningBn": "ন্যায়বিচারক, ইনসাফ প্রতিষ্ঠাকারী",
+    "meaningEn": "The Equitable, The Requiter",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার মধ্যে ন্যায়বিচারের গুণ সৃষ্টি করেন এবং তার বিরুদ্ধে হওয়া যেকোনো জুলুমের প্রতিকার করেন। (সূরা আল-মায়িদah: ৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْجَامِعُ",
+    "bangla": "আল-জামি",
+    "english": "Al-Jami",
+    "meaningBn": "একত্রীকরণকারী, সমবেতকারী",
+    "meaningEn": "The Gatherer, The Uniter",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার সকল ছড়িয়ে ছিটিয়ে থাকা কাজ ও সম্পর্ককে একত্রিত করে দেন। (সূরা আল-ইমরান: ৯)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْغَنِيُّ",
+    "bangla": "আল-গানিয়্যু",
+    "english": "Al-Ghani",
+    "meaningBn": "অভাবমুক্ত, স্বয়ংসম্পূর্ণ",
+    "meaningEn": "The Self-Sufficient, The Rich",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার সকল অভাব দূর করেন এবং তাকে আত্মতৃপ্তি দান করেন। (সূরা আল-বাকারাহ: ২৬৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمُغْنِي",
+    "bangla": "আল-মুগনি",
+    "english": "Al-Mughni",
+    "meaningBn": "সমৃদ্ধিদাতা, ধনীকারী",
+    "meaningEn": "The Enricher, The Bestower of Wealth",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তাকে ধন-সম্পদ ও আধ্যাত্মিক সমৃদ্ধি দান করেন। (সূরা আন-নাজম: ৪৮)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْمَانِعُ",
+    "bangla": "আল-মানি",
+    "english": "Al-Mani",
+    "meaningBn": "নিবারক, বাধাদানকারী",
+    "meaningEn": "The Withholder, The Preventer",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দাকে ক্ষতি, রোগ-শোক ও অমঙ্গল থেকে রক্ষা করেন। (সহীহ বুখারী)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْضَّارُّ",
+    "bangla": "আয-যারর",
+    "english": "Ad-Darr",
+    "meaningBn": "ক্ষতিসাধনকারী, কষ্টদাতা",
+    "meaningEn": "The Distresser, The Harmer",
+    "fazilatBn": "শত্রুর অনিষ্ট থেকে বাঁচতে এই নামের জিকির করা যায়। (সূরা আল-আন'am: ১৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْنَّافِعُ",
+    "bangla": "আন-নাফি",
+    "english": "An-Nafi",
+    "meaningBn": "উপকারী, কল্যাণদাতা",
+    "meaningEn": "The Propitious, The Benefiter",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার সকল কাজে কল্যাণ ও উপকার দান করেন। (সূরা আল-ফাতিহah: ৪)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْنُّورُ",
+    "bangla": "আন-নুর",
+    "english": "An-Nur",
+    "meaningBn": "জ্যোতি, আলো",
+    "meaningEn": "The Light",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দার অন্তর, কবর ও কিয়ামতের দিন নূর দ্বারা আলোকিত করেন। (সূরা আন-নুর: ৩৫)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْهَادِي",
+    "bangla": "আল-হাদি",
+    "english": "Al-Hadi",
+    "meaningBn": "পথপ্রদর্শক, সঠিক পথের দিশারী",
+    "meaningEn": "The Guide",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তাকে সিরাতুল মুস্তাকিমের পথ দেখান এবং জীবননের সকল বিভ্রান্তি দূর করেন। (সূরা আল-হাজ: ৫৪)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْبَدِيعُ",
+    "bangla": "আল-বাদি",
+    "english": "Al-Badi",
+    "meaningBn": "অদ্বিতীয় সৃষ্টিকারী, অতুলনীয়",
+    "meaningEn": "The Originator, The Incomparable",
+    "fazilatBn": "এই নামের জিকির করলে আল্লাহ বান্দার জন্য নতুন নতুন উপায় সৃষ্টি করেন এবং তার সমস্যার অতুলনীয় সমাধান দেন। (সূরা আল-বাকারাহ: ১১৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْبَاقِي",
+    "bangla": "আল-বাকি",
+    "english": "Al-Baqi",
+    "meaningBn": "চিরস্থায়ী, অনন্ত",
+    "meaningEn": "The Everlasting, The Eternal",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তার নেক আমলগুলোকে চিরস্থায়ী করেন এবং তার জন্য জান্নাতের ব্যবস্থা করেন। (সূরা আর-রহমান: ২৭)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْوَارِثُ",
+    "bangla": "আল-ওয়ারিস",
+    "english": "Al-Warith",
+    "meaningBn": "চূড়ান্ত উত্তরাধিকারী",
+    "meaningEn": "The Sole Inheritor",
+    "fazilatBn": "এই নাম পাঠ করলে আল্লাহ বান্দাকে দুনিয়া ও আখেরাতের উত্তম সম্পদের উত্তরাধিকারী বানান। (সূরা আল-হিজর: ২৩)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلْرَّشِيدُ",
+    "bangla": "আর-রশিদ",
+    "english": "Ar-Rashid",
+    "meaningBn": "সঠিক পথের দিশারী, সুপরামর্শদাতা",
+    "meaningEn": "The Guide to the Right Path",
+    "fazilatBn": "যে ব্যক্তি এই নামটি পাঠ করে, আল্লাহ তাকে জীবনের সকল ক্ষেত্রে সঠিক সিদ্ধান্ত নেওয়ার ক্ষমতা দান করেন। (সূরা আল-মুজাদালah: ১০)",
+    "fazilatEn": ""
+  },
+  {
+    "arabic": "ٱلصَّبُورُ",
+    "bangla": "আস-সাবুর",
+    "english": "As-Sabur",
+    "meaningBn": "অত্যন্ত ধৈর্যশীল",
+    "meaningEn": "The Patient",
+    "fazilatBn": "যে ব্যক্তি ধৈর্যহীনতা বা সংকটে এই নাম পাঠ করে, আল্লাহ তাকে অফুরন্ত ধৈর্য ও সহনশীলতা দান করেন। (সূরা আল-বাকারাহ: ১৫৩)",
+    "fazilatEn": ""
   }
 ]

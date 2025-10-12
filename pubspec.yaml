@@ -112,12 +112,19 @@ flutter:
     - assets/salat_doyas.json
     - assets/en_salat_doyas.json
     - assets/quranic_doyas.json
+    - assets/en_quranic_doyas.json
     - assets/copple_doya.json
+    - assets/en_copple_doya.json
     - assets/morning_evening_doya.json
+    - assets/en_morning_evening_doya.json
     - assets/daily_life_doyas.json
+    - assets/en_daily_life_doyas.json
     - assets/rog_mukti_doyas.json
+    - assets/en_rog_mukti_doyas.json
     - assets/fasting_doyas.json
+    - assets/en_fasting_doyas.json
     - assets/misc_doyas.json
+    - assets/en_misc_doyas.json
     - assets/wordquran.json
     - assets/en_wordquran.json
     - assets/districts.json

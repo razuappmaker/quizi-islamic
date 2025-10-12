@@ -8,7 +8,31 @@
   {
     "title": "Kalima Shahadat",
     "text": "أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
-    "transliteration": "Ashhadu alla ilaha illallahu wa ashhadu anna Muhammadan abduhu wa rasuluhu.",
+    "transliteration": "Ashhadu alla ilaha illallahu wa ashhadu anna Muhammadan 'abduhu wa rasuluhu.",
     "meaning": "I bear witness that there is no god but Allah, and I bear witness that Muhammad is His servant and Messenger."
+  },
+  {
+    "title": "Kalima Tamjeed",
+    "text": "سُبْحَانَ ٱللَّٰهِ وَٱلْحَمْدُ لِلَّٰهِ وَلَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَٱللَّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِٱللَّٰهِ ٱلْعَلِيِّ ٱلْعَظِيمِ",
+    "transliteration": "Subhanallahi wal hamdu lillahi wa la ilaha illallahu wallahu akbaru wa la hawla wa la quwwata illa billahil 'aliyyil 'azim.",
+    "meaning": "Glory be to Allah, all praise is for Allah, there is no god but Allah, Allah is the Greatest, and there is no power nor strength except with Allah, the Most High, the Great."
+  },
+  {
+    "title": "Kalima Tawheed",
+    "text": "لَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ ٱلْمُلْكُ وَلَهُ ٱلْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+    "transliteration": "La ilaha illallahu wahdahu la sharika lahu, lahul mulku wa lahul hamdu, yuhyi wa yumitu, wa huwa 'ala kulli shay'in qadir.",
+    "meaning": "There is no god but Allah alone, He has no partner, to Him belongs the kingdom and to Him is all praise, He gives life and causes death, and He has power over everything."
+  },
+  {
+    "title": "Kalima Istighfar",
+    "text": "أَسْتَغْفِرُ ٱللَّٰهَ رَبِّي مِنْ كُلِّ ذَنْبٍ وَأَتُوبُ إِلَيْهِ",
+    "transliteration": "Astaghfirullaha rabbi min kulli dhambin wa atubu ilayhi.",
+    "meaning": "I seek forgiveness from Allah, my Lord, from every sin and I repent to Him."
+  },
+  {
+    "title": "Kalima Radd-e-Kufr",
+    "text": "ٱللَّٰهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ",
+    "transliteration": "Allahumma inni a'udhu bika min an ushrika bika wa ana a'lamu wa astaghfiruka lima la a'lamu.",
+    "meaning": "O Allah, I seek refuge in You from associating partners with You while I know, and I seek Your forgiveness for what I do not know."
   }
 ]

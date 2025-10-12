@@ -19,7 +19,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
   static const Map<String, Map<String, String>> _texts = {
-    'pageTitle': {'en': 'My Profile', 'bn': 'আমার প্রোফাইল'},
+    'pageTitle': {'en': 'Profile', 'bn': 'প্রোফাইল'},
     'loadingProfile': {
       'en': 'Loading profile...',
       'bn': 'প্রোফাইল লোড হচ্ছে...',
@@ -82,13 +82,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'date': {'en': 'Date:', 'bn': 'তারিখ:'},
     'noDate': {'en': 'No date', 'bn': 'তারিখ নেই'},
     'earnPointsFromCategories': {
-      'en': 'Earn points from favorite categories',
-      'bn': 'পছন্দের ক্যাটাগরি থেকে পয়েন্ট অর্জন',
+      'en': 'Choose a favorite category',
+      'bn': 'ক্যাটাগরি বেছে নিন',
     },
     'playQuiz': {'en': 'Play Quiz', 'bn': 'কুইজ খেলুন'},
     'increaseIslamicKnowledge': {
-      'en': 'Increase Islamic knowledge',
-      'bn': 'ইসলামী জ্ঞান বৃদ্ধি করুন',
+      'en': 'Increase your Points',
+      'bn': 'পয়েন্ট বৃদ্ধি করুন',
     },
     'myStatistics': {'en': '📊 My Statistics', 'bn': '📊 আমার স্ট্যাটিস্টিক্স'},
     'pendingPoints': {'en': 'Pending Points', 'bn': 'জমাকৃত পয়েন্ট'},
@@ -101,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'en': 'Total Correct Answers',
       'bn': 'মোট সঠিক উত্তর',
     },
-    'getRealGifts': {'en': '🎁 Get Real Gifts', 'bn': '🎁 রিয়েল গিফট পান'},
+    'getRealGifts': {'en': '🎁 Apply for Gifts', 'bn': '🎁 গিফট এর জন্য আবেদন'},
     'giftDescription': {
       'en': 'Collect 5000 points to win attractive gifts',
       'bn': '৫০০০ পয়েন্ট জমা করে আকর্ষণীয় গিফট জিতুন',
@@ -111,12 +111,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'pointsRemaining': {'en': 'points remaining', 'bn': 'পয়েন্ট বাকি'},
     'pointsCollected': {'en': 'points collected', 'bn': 'পয়েন্ট সংগ্রহ হয়েছে'},
     'earnPointsByWatchingVideos': {
-      'en': '🎬 Earn Points by Watching Videos',
-      'bn': '🎬 ভিডিও দেখে পয়েন্ট অর্জন করুন',
+      'en': '🎬 Earn Points by Watching Ads',
+      'bn': '🎬 অ্যাডস দেখে পয়েন্ট',
     },
     'videoDescription': {
       'en': 'Watch short videos to earn extra points',
-      'bn': 'সংক্ষিপ্ত ভিডিও দেখে অতিরিক্ত পয়েন্ট অর্জন করুন',
+      'bn': 'সংক্ষিপ্ত ভিডিও অ্যাডস দেখে অতিরিক্ত পয়েন্ট অর্জন করুন',
     },
     'watchVideos': {'en': 'Watch Videos', 'bn': 'ভিডিও দেখুন'},
     'premiumExperience': {
@@ -134,9 +134,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'viewPremium': {'en': 'View Premium', 'bn': 'প্রিমিয়াম দেখুন'},
     'infoTitle': {
       'en':
-          '5000 points will be deducted for gift request. Your gift will be delivered within 24 hours InshaAllah.',
+          '5000 points will be deducted for gift request. Your gift will be delivered  within 24 hours InshaAllah.',
       'bn':
-          'গিফট এর জন্য রিকোয়েস্ট করলে ৫০০০ পয়েন্ট কাটা হবে। ২৪ ঘন্টার মধ্যে আপনার গিফট পাঠিয়ে দেয়া হবে ইনশাআল্লাহ ।',
+          'গিফট এর জন্য রিকোয়েস্ট করলে ৫০০০ পয়েন্ট কাটা হবে। এবং ২৪ ঘন্টার মধ্যে আপনার গিফট পৌঁছে দেয়া হবে ইনশাআল্লাহ ।',
     },
     'insufficientPoints': {
       'en': '❌ Insufficient points! Need {points} more points.',
@@ -144,17 +144,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     },
     'requestAccepted': {
       'en':
-          '✅ Your gift request has been accepted! It will be delivered within 24 hours InshaAllah.',
+          '✅ Your gift request has been accepted! It will be notify immediate  InshaAllah.',
       'bn':
-          '✅ আপনার গিফটের জন্য রিকোয়েস্টটি গ্রহণ করা হয়েছে! ২৪ ঘন্টার মধ্যে আপনার কাছে পাঠানো হবে ইনশাল্লাহ ।',
+          '✅ আপনার গিফটের জন্য রিকোয়েস্টটি গ্রহণ করা হয়েছে! কিছুক্ষণের মধ্যে আপনাকে নোটিফাই করা হবে ইনশাল্লাহ ।',
     },
     'requestError': {
       'en': '❌ Problem requesting:',
       'bn': '❌ রিকোয়েস্ট করতে সমস্যা:',
     },
 
-    'defaultUserName': {'en': 'Islamic Quiz User', 'bn': 'ইসলামিক কুইজ ইউজার'},
-    'defaultUserEmail': {'en': 'Islamic Quiz User', 'bn': 'ইসলামিক কুইজ ইউজার'},
+    'defaultUserName': {
+      'en': 'Islamic Day Quiz User',
+      'bn': 'ইসলামিক ডে কুইজ ইউজার',
+    },
+    'defaultUserEmail': {
+      'en': 'Islamic Day Quiz User',
+      'bn': 'ইসলামিক ডে কুইজ ইউজার',
+    },
   };
 
   // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
@@ -468,7 +474,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // 🔥 রিচার্জ রিকোয়েস্ট ফাংশন
+  // 🔥 গিফট রিকোয়েস্ট ফাংশন
   Future<void> _requestRecharge() async {
     if (_pendingPoints < 5000) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -649,7 +655,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         false;
   }
 
-  // 🔥 রিচার্জ হিস্ট্রি দেখানোর ফাংশন
+  // 🔥 গিফট হিস্ট্রি দেখানোর ফাংশন
   Future<void> _showRechargeHistory() async {
     final history = await PointManager.getGiftHistory();
 
@@ -707,7 +713,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // 🔥 রিচার্জ হিস্ট্রি আইটেম
+  // 🔥 গিফট হিস্ট্রি আইটেম
   Widget _buildRechargeHistoryItem(
     Map<String, dynamic> request,
     BuildContext context,
@@ -871,11 +877,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text(
           _text('pageTitle', context),
           style: const TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),
-        centerTitle: true,
+        //centerTitle: true,
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -966,7 +972,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
-                          // SECTION 3: রিয়েল গিফট সেকশন
+                          // SECTION 3: মুল গিফট সেকশন
                           _buildGiftSection(isTablet, isSmallScreen, context),
                           SizedBox(height: isSmallScreen ? 16 : 20),
 
@@ -1182,7 +1188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // SECTION 3: রিয়েল গিফট সেকশন
+  // SECTION 3: মুল গিফট সেকশন
   Widget _buildGiftSection(
     bool isTablet,
     bool isSmallScreen,
@@ -1197,11 +1203,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                /*Icon(
                   Icons.card_giftcard,
                   color: Colors.purple,
                   size: isSmallScreen ? 20 : 24,
-                ),
+                ),*/
                 const SizedBox(width: 8),
                 Text(
                   _text('getRealGifts', context),
@@ -1228,7 +1234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _pendingPoints >= 5000 ? _requestRecharge : null,
-                icon: const Icon(Icons.redeem),
+                //icon: const Icon(Icons.redeem),
                 label: Text(
                   _pendingPoints >= 5000
                       ? _text('getGiftReady', context)
@@ -1287,11 +1293,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Row(
               children: [
-                Icon(
+                /*Icon(
                   Icons.video_library,
                   color: Colors.red,
                   size: isSmallScreen ? 20 : 24,
-                ),
+                ),*/
                 const SizedBox(width: 8),
                 Text(
                   _text('earnPointsByWatchingVideos', context),
