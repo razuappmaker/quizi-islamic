@@ -17,6 +17,7 @@
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="islamicquiz">
+        android:roundIcon="@mipmap/ic_launcher_round" <!-- যদি round icon থাকে -->
 
         <!-- AdMob App ID (Test ID এখন বসানো হয়েছে) -->
         <meta-data

@@ -267,17 +267,10 @@ class _DoyaListPageState extends State<DoyaListPage> {
     super.dispose();
   }
 
-  // ✅ Adaptive Bottom Banner Ad লোড করার মেথড
+  // ✅ Adaptive Bottom Banner Ad লোড করার মেথড - FIXED VERSION
   Future<void> _loadBottomBannerAd() async {
     try {
       // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
-      bool canShowAd = await AdHelper.canShowBannerAd();
-
-      if (!canShowAd) {
-        print('Bottom banner ad limit reached, not showing ad');
-        return;
-      }
-
       _bottomBannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
         context,
         listener: BannerAdListener(
@@ -313,7 +306,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
         ),
       );
 
-      await _bottomBannerAd?.load();
+      // ✅ AdHelper এর ভিতরে ইতিমধ্যে load() কল করা হয়েছে, তাই এখানে আলাদা করে load() কল করার দরকার নেই
     } catch (e) {
       print('Error loading adaptive bottom banner ad: $e');
       _bottomBannerAd?.dispose();
@@ -326,7 +319,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
     }
   }
 
-  // ✅ Adaptive Inline Banner Ad লোড করার মেথড (প্রতি ৬টি দোয়ার পর)
+  // ✅ Adaptive Inline Banner Ad লোড করার মেথড (প্রতি ৬টি দোয়ার পর) - FIXED VERSION
   Future<void> _loadInlineBannerAd(String adKey) async {
     // Prevent duplicate loading
     if (_inlineBannerAds.containsKey(adKey) &&
@@ -336,13 +329,6 @@ class _DoyaListPageState extends State<DoyaListPage> {
 
     try {
       // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
-      bool canShowAd = await AdHelper.canShowBannerAd();
-
-      if (!canShowAd) {
-        print('Inline banner ad limit reached, not showing ad');
-        return;
-      }
-
       final inlineAd = await AdHelper.createAdaptiveBannerAdWithFallback(
         context,
         listener: BannerAdListener(
@@ -380,11 +366,11 @@ class _DoyaListPageState extends State<DoyaListPage> {
         ),
       );
 
-      if (mounted) {
+      if (mounted && inlineAd != null) {
         setState(() {
           _inlineBannerAds[adKey] = inlineAd;
+          // AdHelper এর ভিতরে ইতিমধ্যে load() কল করা হয়েছে, তাই এখানে আলাদা করে load() কল করার দরকার নেই
         });
-        await inlineAd.load();
       }
     } catch (e) {
       print('Error loading adaptive inline banner ad for key $adKey: $e');

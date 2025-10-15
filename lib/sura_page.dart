@@ -1003,9 +1003,13 @@ class _SuraPageState extends State<SuraPage> {
           _text('pageTitle', context),
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 18,
+            fontSize: 16, // ফন্ট সাইজ ছোট করা হয়েছে
             color: Colors.white,
+            height: 1.2, // লাইন হাইট কম করা হয়েছে
           ),
+          maxLines: 2, // সর্বোচ্চ ২ লাইন
+          overflow: TextOverflow.ellipsis, // ২ লাইনের বেশি হলে ... দেখাবে
+          textAlign: TextAlign.start, // টেক্সট অ্যালাইনমেন্ট
         ),
         leading: Container(
           margin: EdgeInsets.all(8),

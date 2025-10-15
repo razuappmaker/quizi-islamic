@@ -75,6 +75,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'en': 'Collect 5000 points to request reward',
       'bn': '৫০০০ পয়েন্ট জমা করে রিওয়ার্ড রিকোয়েস্ট করুন',
     },
+    // অ্যাড সম্পর্কিত যেকোনো মেন্টেশন রিমুভ করুন
+    'videoDescription': {
+      'en': 'Complete short activities to earn bonus points',
+      'bn': 'বোনাস পয়েন্ট অর্জন করতে সংক্ষিপ্ত অ্যাক্টিভিটি সম্পন্ন করুন',
+    },
     'pending': {'en': 'Pending', 'bn': 'বিচারাধীন'},
     'completed': {'en': 'Completed', 'bn': 'সম্পন্ন'},
     'rejected': {'en': 'Rejected', 'bn': 'বাতিল'},
@@ -102,22 +107,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'bn': 'মোট সঠিক উত্তর',
     },
     'getRealGifts': {'en': '🎁 Apply for Gifts', 'bn': '🎁 গিফট এর জন্য আবেদন'},
+    // গিফট সম্পর্কিত টেক্সটও আপডেট করুন
     'giftDescription': {
-      'en': 'Collect 5000 points to win attractive gifts',
-      'bn': '৫০০০ পয়েন্ট জমা করে আকর্ষণীয় গিফট জিতুন',
+      'en': 'Collect 5000 points to redeem exciting rewards',
+      'bn': '৫০০০ পয়েন্ট জমা করে আকর্ষণীয় রিওয়ার্ড রিডিম করুন',
     },
     'getGift': {'en': 'Get Gift', 'bn': 'গিফট নিন'},
     'getGiftReady': {'en': 'Get Gift (Ready)', 'bn': 'গিফট নিন (প্রস্তুত)'},
     'pointsRemaining': {'en': 'points remaining', 'bn': 'পয়েন্ট বাকি'},
     'pointsCollected': {'en': 'points collected', 'bn': 'পয়েন্ট সংগ্রহ হয়েছে'},
-    'earnPointsByWatchingVideos': {
-      'en': '🎬 Earn Points by Watching Ads',
-      'bn': '🎬 অ্যাডস দেখে পয়েন্ট',
+    // ❌ পুরানো টেক্সট রিপ্লেস করুন
+    'earnPointsFromRewards': {
+      'en': '🎬 Earn Points from Rewards',
+      'bn': '🎬 রিওয়ার্ড থেকে পয়েন্ট',
     },
-    'videoDescription': {
-      'en': 'Watch short videos to earn extra points',
-      'bn': 'সংক্ষিপ্ত ভিডিও অ্যাডস দেখে অতিরিক্ত পয়েন্ট অর্জন করুন',
+    'rewardDescription': {
+      'en': 'Complete tasks to earn extra points',
+      'bn': 'অতিরিক্ত পয়েন্ট অর্জন করতে টাস্কগুলি সম্পন্ন করুন',
     },
+    'viewRewards': {'en': 'View Rewards', 'bn': 'রিওয়ার্ড দেখুন'},
+
     'watchVideos': {'en': 'Watch Videos', 'bn': 'ভিডিও দেখুন'},
     'premiumExperience': {
       'en': '⭐ Premium Experience',
@@ -1280,6 +1289,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // SECTION 4: ভিডিও রিওয়ার্ড সেকশন
+  // ✅ সংশোধিত কোড - profile_screen.dart এ পরিবর্তন করুন
+
+  // বাটন টেক্সটও পরিবর্তন করুন
   Widget _buildVideoRewardSection(
     bool isTablet,
     bool isSmallScreen,
@@ -1293,25 +1305,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Row(
               children: [
-                /*Icon(
-                  Icons.video_library,
-                  color: Colors.red,
+                Icon(
+                  Icons.card_giftcard, // অ্যাড আইকন পরিবর্তন করুন
+                  color: Colors.orange,
                   size: isSmallScreen ? 20 : 24,
-                ),*/
+                ),
                 const SizedBox(width: 8),
                 Text(
-                  _text('earnPointsByWatchingVideos', context),
+                  _text('earnPointsFromRewards', context), // আপডেটেড টেক্সট
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.red,
+                    color: Colors.orange,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             Text(
-              _text('videoDescription', context),
+              _text('rewardDescription', context), // আপডেটেড ডেসক্রিপশন
               style: TextStyle(
                 fontSize: isSmallScreen ? 12 : 14,
                 color: Colors.grey,
@@ -1323,16 +1335,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _navigateToReward,
-                icon: const Icon(Icons.play_arrow),
+                icon: const Icon(Icons.card_giftcard),
                 label: Text(
-                  _text('watchVideos', context),
+                  _text('viewRewards', context), // আপডেটেড বাটন টেক্সট
                   style: TextStyle(
                     fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Colors.orange,
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(
                     vertical: isSmallScreen ? 12 : 15,

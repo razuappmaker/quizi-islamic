@@ -92,8 +92,8 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   void _loadBannerAd() async {
-    if (await AdHelper.canShowBannerAd()) {
-      final ad = await AdHelper.createAdaptiveBannerAdWithFallback(
+    try {
+      _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
         context,
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) async {
@@ -106,11 +106,19 @@ class _ResultPageState extends State<ResultPage> {
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
             ad.dispose();
             print("Banner Ad failed: $error");
+            setState(() {
+              _isBannerAdReady = false;
+            });
           },
         ),
       );
 
-      ad.load();
+      // ✅ AdHelper এর ভিতরে ইতিমধ্যে load() কল করা হয়েছে, তাই এখানে আলাদা করে load() কল করার দরকার নেই
+    } catch (e) {
+      print("Error loading banner ad: $e");
+      setState(() {
+        _isBannerAdReady = false;
+      });
     }
   }
 

@@ -358,6 +358,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   }
 
   // সেটিংস মডাল শো করা
+  // prayer_time_page.dart-এ _showSettingsModal মেথডে
+
   void _showSettingsModal() {
     showModalBottomSheet(
       context: context,
@@ -368,10 +370,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         onAdjustmentChanged: _adjustPrayerTimeByName,
         onResetAll: _resetAllAdjustments,
         onSaveAdjustments: _savePrayerTimeAdjustments,
+        onRescheduleNotifications:
+            _rescheduleNotifications, // নতুন callback যোগ করুন
       ),
     );
   }
 
+  // সব অ্যাডজাস্টমেন্ট রিসেট করা
   // সব অ্যাডজাস্টমেন্ট রিসেট করা
   void _resetAllAdjustments() {
     setState(() {
@@ -723,17 +728,41 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
-  // সব নোটিফিকেশন শিডিউল করা
+  // সব নোটিফিকেশন শিডিউল করা (অ্যাডজাস্টেড টাইমস সহ)
   Future<void> _scheduleAllNotifications() async {
     if (prayerTimes.isEmpty) return;
 
-    for (final entry in prayerTimes.entries) {
+    // অ্যাডজাস্ট করা নামাজের সময় ব্যবহার করুন
+    final adjustedTimesForNotifications = _prayerTimeService
+        .getAdjustedPrayerTimesForNotifications(
+          prayerTimes,
+          _prayerTimeAdjustments,
+        );
+
+    for (final entry in adjustedTimesForNotifications.entries) {
       final prayerName = entry.key;
       final time = entry.value;
 
       if (["ফজর", "যোহর", "আসর", "মাগরিব", "ইশা"].contains(prayerName)) {
         await _schedulePrayerNotification(prayerName, time);
       }
+    }
+
+    print('✅ All notifications scheduled with adjusted times');
+  }
+
+  // নোটিফিকেশন রিশিডিউল করা
+  Future<void> _rescheduleNotifications() async {
+    try {
+      // প্রথমে সব পুরানো নোটিফিকেশন ক্যানসেল করুন
+      await AwesomeNotifications().cancelAll();
+
+      // তারপর নতুন অ্যাডজাস্টেড টাইমস দিয়ে রিশিডিউল করুন
+      await _scheduleAllNotifications();
+
+      print('🔄 Notifications rescheduled with adjusted times');
+    } catch (e) {
+      print('Error rescheduling notifications: $e');
     }
   }
 
@@ -750,7 +779,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       final prayerDate = _prayerTimeService.parsePrayerTime(time);
       if (prayerDate == null) return;
 
-      final notificationTime = prayerDate.subtract(const Duration(minutes: 10));
+      final notificationTime = prayerDate.subtract(const Duration(minutes: 5));
       final now = DateTime.now();
 
       if (notificationTime.isAfter(now)) {
@@ -804,8 +833,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       listen: false,
     );
     return languageProvider.isEnglish
-        ? 'prayer starts in 10 minutes'
-        : 'নামাজ শুরু হওয়ার ১০ মিনিট বাকি';
+        ? 'Azan starts in 5 minutes, Prepare for Prayer'
+        : 'আযান এর মাত্র ৫ মিনিট বাকি, নামাজের প্রস্তুতি নিন';
   }
 
   // Prayer time detail dialog
@@ -912,9 +941,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           _text('title'),
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 18,
+            fontSize: 14, // ফন্ট সাইজ ছোট করা হয়েছে
             color: Colors.white,
+            height: 1.2, // লাইন হাইট কম করা হয়েছে
           ),
+          maxLines: 2, // সর্বোচ্চ ২ লাইন
+          overflow: TextOverflow.ellipsis, // ২ লাইনের বেশি হলে ... দেখাবে
+          textAlign: TextAlign.start, // টেক্সট অ্যালাইনমেন্ট
         ),
         centerTitle: false,
         elevation: 0,

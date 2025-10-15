@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../utils/premium_manager.dart'; // এই লাইনটি যোগ করুন
+import '../utils/premium_manager.dart';
 
 class AdHelper {
   static bool _isAdInitialized = false;
@@ -80,7 +80,7 @@ class AdHelper {
   }
 
   // 🔥 স্ট্যান্ডার্ড ব্যানার অ্যাড তৈরি করুন - Version 6.0.0 কম্প্যাটিবল
-  static BannerAd createBannerAd(AdSize adSize, {BannerAdListener? listener}) {
+  static BannerAd? createBannerAd(AdSize adSize, {BannerAdListener? listener}) {
     return BannerAd(
       adUnitId: bannerAdUnitId,
       size: adSize,
@@ -95,17 +95,24 @@ class AdHelper {
     );
   }
 
-  // 🔥 অ্যাডাপ্টিভ ব্যানার অ্যাড তৈরি করুন ফ্যালব্যাক মেকানিজম সহ
-  static Future<BannerAd> createAdaptiveBannerAdWithFallback(
+  // 🔥 অ্যাডাপ্টিভ ব্যানার অ্যাড তৈরি করুন ফ্যালব্যাক মেকানিজম সহ - প্রিমিয়াম চেক সহ
+  static Future<BannerAd?> createAdaptiveBannerAdWithFallback(
     BuildContext context, {
     int? width,
     BannerAdListener? listener,
     Orientation orientation = Orientation.portrait,
   }) async {
     try {
+      bool canShowAd = await canShowBannerAd(); // প্রিমিয়াম চেক সহ
+
+      if (!canShowAd) {
+        print('প্রিমিয়াম ইউজার, অ্যাডাপ্টিভ ব্যানার অ্যাড দেখানো হবে না');
+        return null;
+      }
+
       // প্রথমে অ্যাডাপ্টিভ ব্যানার তৈরি করার চেষ্টা করুন
       final AdSize adSize = await _getAdaptiveAdSize(context, orientation);
-      return BannerAd(
+      final bannerAd = BannerAd(
         adUnitId: bannerAdUnitId,
         size: adSize,
         request: const AdRequest(),
@@ -117,17 +124,23 @@ class AdHelper {
                   print('অ্যাডাপ্টিভ অ্যাড ব্যর্থ: $error'),
             ),
       );
+
+      await bannerAd.load();
+      return bannerAd;
     } catch (e) {
       // অ্যাডাপ্টিভ ব্যর্থ হলে স্ট্যান্ডার্ড ব্যানারে ফ্যালব্যাক করুন
       print(
         'অ্যাডাপ্টিভ ব্যানার ব্যর্থ, স্ট্যান্ডার্ড ব্যানারে ফ্যালব্যাক: $e',
       );
-      return BannerAd(
+      final bannerAd = BannerAd(
         adUnitId: bannerAdUnitId,
         size: AdSize.banner,
         request: const AdRequest(),
         listener: listener ?? BannerAdListener(),
       );
+
+      await bannerAd.load();
+      return bannerAd;
     }
   }
 
@@ -163,7 +176,7 @@ class AdHelper {
   }
 
   // 🔥 ওরিয়েন্টেশন পরিবর্তনে ব্যানার রিলোড করুন
-  static Future<BannerAd> reloadBannerOnOrientationChange(
+  static Future<BannerAd?> reloadBannerOnOrientationChange(
     BuildContext context,
     Orientation currentOrientation, {
     BannerAdListener? listener,
@@ -239,7 +252,7 @@ class AdHelper {
     final shouldShow = await shouldShowAds;
     if (!shouldShow) {
       print('প্রিমিয়াম ইউজার, অ্যাড স্কিপ করা হয়েছে');
-      onAdDismissed?.call();
+      onAdDismissed?.call(); // অ্যাড না দেখালেও onAdDismissed কল করুন
       return;
     }
 
@@ -339,16 +352,16 @@ class AdHelper {
     }
   }
 
-  // 🔥 অ্যাঙ্করড ব্যানার অ্যাড তৈরি করুন
+  // 🔥 অ্যাঙ্করড ব্যানার অ্যাড তৈরি করুন - প্রিমিয়াম চেক সহ
   static Future<BannerAd?> createAnchoredBannerAd(
     BuildContext context, {
     BannerAdListener? listener,
   }) async {
     try {
-      bool canShowAd = await canShowBannerAd();
+      bool canShowAd = await canShowBannerAd(); // প্রিমিয়াম চেক সহ
 
       if (!canShowAd) {
-        print('ব্যানার অ্যাড লিমিট রিচড, অ্যাঙ্করড অ্যাড দেখানো হবে না');
+        print('প্রিমিয়াম ইউজার বা লিমিট রিচড, ব্যানার অ্যাড দেখানো হবে না');
         return null;
       }
 
@@ -394,6 +407,30 @@ class AdHelper {
       return bannerAd;
     } catch (e) {
       print('অ্যাঙ্করড ব্যানার অ্যাড তৈরি করতে ত্রুটি: $e');
+      return null;
+    }
+  }
+
+  // 🔥 সহজ ব্যানার অ্যাড লোড করার মেথড - সবচেয়ে সহজভাবে ব্যবহারের জন্য
+  static Future<BannerAd?> loadSimpleBannerAd(
+    BuildContext context, {
+    BannerAdListener? listener,
+  }) async {
+    try {
+      bool canShowAd = await canShowBannerAd();
+
+      if (!canShowAd) {
+        print('প্রিমিয়াম ইউজার, ব্যানার অ্যাড দেখানো হবে না');
+        return null;
+      }
+
+      final bannerAd = await createAnchoredBannerAd(
+        context,
+        listener: listener,
+      );
+      return bannerAd;
+    } catch (e) {
+      print('সিম্পল ব্যানার অ্যাড লোড করতে ত্রুটি: $e');
       return null;
     }
   }
@@ -599,48 +636,6 @@ class AdLimitManager {
       }
     } catch (e) {
       print('অ্যাড লিমিট রিসেট করতে ত্রুটি: $e');
-    }
-  }
-}
-
-// ==================== প্রিমিয়াম ম্যানেজার ক্লাস (সংক্ষিপ্ত ভার্সন) ====================
-class PremiumManager {
-  static final PremiumManager _instance = PremiumManager._internal();
-
-  factory PremiumManager() => _instance;
-
-  PremiumManager._internal();
-
-  static const String _isPremiumKey = 'is_premium_user';
-  static const String _premiumExpiryKey = 'premium_expiry_date';
-  static const String _lifetimePremiumKey = 'lifetime_premium';
-
-  Future<bool> get isPremiumUser async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-
-      // প্রথমে লাইফটাইম প্রিমিয়াম চেক করুন
-      if (prefs.getBool(_lifetimePremiumKey) == true) {
-        return true;
-      }
-
-      // সাবস্ক্রিপশন এক্সপায়ারি চেক করুন
-      final expiryString = prefs.getString(_premiumExpiryKey);
-      if (expiryString != null) {
-        final expiryDate = DateTime.parse(expiryString);
-        if (expiryDate.isAfter(DateTime.now())) {
-          return true;
-        } else {
-          // সাবস্ক্রিপশন এক্সপায়ার্ড
-          await prefs.setBool(_isPremiumKey, false);
-          return false;
-        }
-      }
-
-      return prefs.getBool(_isPremiumKey) ?? false;
-    } catch (e) {
-      print('প্রিমিয়াম স্ট্যাটাস চেক করতে ত্রুটি: $e');
-      return false;
     }
   }
 }

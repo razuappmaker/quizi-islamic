@@ -161,19 +161,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
   Future<void> _loadBottomBannerAd() async {
     try {
-      bool canShowAd = await AdHelper.canShowBannerAd();
-      if (!canShowAd) {
-        print('Banner ad limit reached, not showing ad');
-        setState(() {
-          _bannerAdHeight = 0.0;
-          _isBottomBannerAdReady = false;
-        });
-        return;
-      }
-
-      final bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
+      _bottomBannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
         context,
-        width: MediaQuery.of(context).size.width.toInt(),
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) {
             print('✅ Adaptive Bottom banner ad loaded successfully');
@@ -207,7 +196,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
         ),
       );
 
-      bannerAd.load();
+      // ✅ AdHelper এর ভিতরে ইতিমধ্যে load() কল করা হয়েছে, তাই এখানে আলাদা করে load() কল করার দরকার নেই
     } catch (e) {
       print('❌ Error loading adaptive bottom banner ad: $e');
       _bottomBannerAd?.dispose();

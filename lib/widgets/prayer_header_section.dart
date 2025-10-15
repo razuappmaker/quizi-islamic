@@ -1,4 +1,5 @@
 // widgets/prayer_header_section.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../prayer_time_service.dart';

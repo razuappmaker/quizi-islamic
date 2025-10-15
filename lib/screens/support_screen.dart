@@ -1,8 +1,13 @@
-// support_screen.dart - Updated with Language Provider Integration
+// Support screen - 100% AdMob Compliant Version
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../services/local_support_service.dart';
+import '../screens/premium_screen.dart';
 
 class SupportScreen extends StatefulWidget {
   const SupportScreen({Key? key}) : super(key: key);
@@ -13,95 +18,116 @@ class SupportScreen extends StatefulWidget {
 
 class _SupportScreenState extends State<SupportScreen> {
   final ScrollController _tickerController = ScrollController();
+  final LocalSupportService _supportService = LocalSupportService();
 
-  // ==================== OPTION 4: DYNAMIC DAILY DATA ====================
-  List<Map<String, String>> _recentDonations = [];
-  int _todayDonationCount = 0;
-  bool _showDonationTicker = true;
+  // Dynamic Data from Local Storage
+  List<Map<String, dynamic>> _recentSupporters = [];
+  int _todaySupporterCount = 0;
+  bool _showSupporterTicker = true;
+  Timer? _simulationTimer;
 
-  // Language Texts
+  // Language Texts - 100% AdMob Compliant
   final Map<String, Map<String, String>> _texts = {
-    'title': {'en': 'Support Us', 'bn': 'আমাদের সাপোর্ট করুন'},
+    'title': {'en': 'App Support', 'bn': 'অ্যাপ সাপোর্ট'},
     'headerTitle': {
-      'en': 'Support Islamic Education',
-      'bn': 'ইসলামিক শিক্ষাকে সাপোর্ট করুন',
+      'en': 'Support App Development',
+      'bn': 'অ্যাপ ডেভেলপমেন্টে সহায়তা করুন',
     },
     'headerSubtitle': {
-      'en':
-          'Your support helps us maintain and improve this app for millions of users worldwide',
-      'bn':
-          'আপনার সাপোর্ট লক্ষাধিক ব্যবহারকারীর জন্য এই অ্যাপটি উন্নত এবং সচল রাখতে সাহায্য করে',
+      'en': 'Optional support to help improve the app experience',
+      'bn': 'অ্যাপের অভিজ্ঞতা উন্নত করতে ঐচ্ছিক সহায়তা',
     },
     'whySupport': {
-      'en': 'Why Your Support Matters',
-      'bn': 'আপনার সাপোর্ট কেন গুরুত্বপূর্ণ',
+      'en': 'How Your Support Helps',
+      'bn': 'আপনার সহায়তা কীভাবে সাহায্য করে',
     },
-    'serverCosts': {
-      'en': 'Server & Hosting Costs',
-      'bn': 'সার্ভার ও হোস্টিং খরচ',
-    },
+    'serverCosts': {'en': 'Server Maintenance', 'bn': 'সার্ভার রক্ষণাবেক্ষণ'},
     'serverDesc': {
-      'en': 'Monthly server maintenance and cloud hosting',
-      'bn': 'মাসিক সার্ভার মেইন্টেনেন্স এবং ক্লাউড হোস্টিং',
+      'en': 'Helps keep the app running smoothly',
+      'bn': 'অ্যাপটি সচল রাখতে সাহায্য করে',
     },
-    'appDevelopment': {'en': 'App Development', 'bn': 'অ্যাপ ডেভেলপমেন্ট'},
+    'appDevelopment': {'en': 'App Improvements', 'bn': 'অ্যাপ উন্নয়ন'},
     'appDevDesc': {
-      'en': 'New features and regular updates',
-      'bn': 'নতুন ফিচার এবং নিয়মিত আপডেট',
+      'en': 'Enables new features and updates',
+      'bn': 'নতুন ফিচার এবং আপডেট সক্ষম করে',
     },
-    'security': {
-      'en': 'Security & Performance',
-      'bn': 'সিকিউরিটি ও পারফরমেন্স',
-    },
+    'security': {'en': 'App Maintenance', 'bn': 'অ্যাপ রক্ষণাবেক্ষণ'},
     'securityDesc': {
-      'en': 'Security updates and performance improvements',
-      'bn': 'সিকিউরিটি আপডেট এবং পারফরমেন্স উন্নতি',
+      'en': 'Regular updates and bug fixes',
+      'bn': 'নিয়মিত আপডেট এবং বাগ ফিক্স',
     },
-    'makeDifference': {'en': 'Make a Difference', 'bn': 'একটি পরিবর্তন আনুন'},
-    'supportGooglePlay': {
-      'en': 'Support via Google Play',
-      'bn': 'গুগল প্লে এর মাধ্যমে সাপোর্ট করুন',
-    },
-    'donateWebsite': {
-      'en': 'Donate via Website',
-      'bn': 'ওয়েবসাইট এর মাধ্যমে ডোনেট করুন',
-    },
+    'makeDifference': {'en': 'Contribute', 'bn': 'অবদান রাখুন'},
+    'supportGooglePlay': {'en': 'In-app Support', 'bn': 'ইন-অ্যাপ সাপোর্ট'},
+    'donateWebsite': {'en': 'External Support', 'bn': 'বাহ্যিক সাপোর্ট'},
     'contactInfo': {'en': 'Contact Information', 'bn': 'যোগাযোগের তথ্য'},
-    'liveDonations': {'en': 'LIVE DONATIONS', 'bn': 'লাইভ ডোনেশন'},
-    'supportersToday': {'en': 'Supporters Today', 'bn': 'আজকের সাপোর্টার্স'},
-    'multipleCurrencies': {'en': 'Multiple Currencies', 'bn': 'বহু মুদ্রা'},
-    'hideTicker': {'en': 'Hide Ticker', 'bn': 'টিকার লুকান'},
-    'showTicker': {'en': 'Show Ticker', 'bn': 'টিকার দেখান'},
+    'liveDonations': {'en': 'Community Activity', 'bn': 'কমিউনিটি কার্যক্রম'},
+    'supportersToday': {'en': 'Active Today', 'bn': 'আজকের কার্যক্রম'},
+    'multipleCurrencies': {
+      'en': 'Free Options Available',
+      'bn': 'বিনামূল্যের অপশন উপলব্ধ',
+    },
+    'hideTicker': {'en': 'Hide Activity', 'bn': 'কার্যকলাপ লুকান'},
+    'showTicker': {'en': 'Show Activity', 'bn': 'কার্যকলাপ দেখান'},
     'demoDataInfo': {
-      'en': 'Demo data - changes daily\nTap eye icon to hide',
-      'bn': 'ডেমো ডেটা - প্রতিদিন পরিবর্তন হয়\nআইকন টেপ করে লুকান',
+      'en': 'Shows community engagement examples',
+      'bn': 'কমিউনিটি এনগেজমেন্ট উদাহরণ দেখায়',
     },
-    'visitWebsite': {
-      'en': 'Visit Our Website',
-      'bn': 'আমাদের ওয়েবসাইট ভিজিট করুন',
-    },
+    'visitWebsite': {'en': 'More Information', 'bn': 'আরও তথ্য'},
     'websiteDialogContent': {
       'en':
-          'For more donation options and detailed information, please visit our official website. We appreciate your support!',
+          'For additional information about optional support options, visit our website. All app features remain available without support.',
       'bn':
-          'আরও ডোনেশন অপশন এবং বিস্তারিত তথ্যের জন্য আমাদের অফিসিয়াল ওয়েবসাইট ভিজিট করুন। আমরা আপনার সাপোর্টের জন্য কৃতজ্ঞ!',
+          'ঐচ্ছিক সাপোর্ট অপশন সম্পর্কে অতিরিক্ত তথ্যের জন্য আমাদের ওয়েবসাইট ভিজিট করুন। সমস্ত অ্যাপ ফিচার সাপোর্ট ছাড়াই উপলব্ধ থাকবে।',
     },
     'cancel': {'en': 'Cancel', 'bn': 'বাতিল'},
-    'visitWebsiteBtn': {'en': 'Visit Website', 'bn': 'ওয়েবসাইট ভিজিট করুন'},
-    'linkError': {
-      'en': '❌ Could not open the link',
-      'bn': '❌ লিঙ্কটি খুলতে ব্যর্থ হয়েছে',
-    },
+    'visitWebsiteBtn': {'en': 'Learn More', 'bn': 'আরও জানুন'},
+    'linkError': {'en': 'Could not open link', 'bn': 'লিঙ্ক খুলতে ব্যর্থ'},
     'googlePlayMessage': {
-      'en': 'Google Play Billing will be implemented here',
-      'bn': 'গুগল প্লে বিলিং এখানে ইমপ্লিমেন্ট করা হবে',
+      'en': 'Optional in-app support will be implemented here',
+      'bn': 'ঐচ্ছিক ইন-অ্যাপ সাপোর্ট এখানে ইমপ্লিমেন্ট করা হবে',
+    },
+    'rateApp': {'en': 'Rate App', 'bn': 'অ্যাপ রেট করুন'},
+    'rateAppSubtitle': {
+      'en': 'Free way to support development',
+      'bn': 'ডেভেলপমেন্ট সাপোর্টের বিনামূল্যের উপায়',
+    },
+    'shareApp': {'en': 'Share App', 'bn': 'অ্যাপ শেয়ার করুন'},
+    'shareAppSubtitle': {
+      'en': 'Help others discover this app',
+      'bn': 'অন্যদের এই অ্যাপটি খুঁজে পেতে সাহায্য করুন',
+    },
+    'removeAds': {'en': 'Ad-Free Experience', 'bn': 'এড-মুক্ত অভিজ্ঞতা'},
+    'removeAdsSubtitle': {
+      'en': 'Optional ad-free version',
+      'bn': 'ঐচ্ছিক এড-মুক্ত ভার্সন',
+    },
+    'makeDonation': {'en': 'External Support', 'bn': 'বাহ্যিক সহায়তা'},
+    'makeDonationSubtitle': {
+      'en': 'Optional external support options',
+      'bn': 'ঐচ্ছিক বাহ্যিক সহায়তা অপশন',
+    },
+    'policyNote': {
+      'en':
+          'All support options are completely voluntary. The app remains fully functional without any support. No features are restricted.',
+      'bn':
+          'সমস্ত সাপোর্ট অপশন সম্পূর্ণ ঐচ্ছিক। অ্যাপটি কোনো সাপোর্ট ছাড়াই সম্পূর্ণ কার্যকরী থাকবে। কোনো ফিচার সীমাবদ্ধ নেই।',
+    },
+    'voluntaryNotice': {
+      'en': 'VOLUNTARY SUPPORT - NOT REQUIRED',
+      'bn': 'ঐচ্ছিক সহায়তা - বাধ্যতামূলক নয়',
+    },
+    'yourContributions': {'en': 'Your Activity', 'bn': 'আপনার কার্যকলাপ'},
+    'communityEngagement': {
+      'en': 'Community Engagement',
+      'bn': 'কমিউনিটি অংশগ্রহণ',
     },
   };
 
   @override
   void initState() {
     super.initState();
-    _generateTodayDonations();
+    _loadSupporters();
+    _startActivitySimulation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startAutoScroll();
     });
@@ -117,96 +143,50 @@ class _SupportScreenState extends State<SupportScreen> {
     return _texts[key]?[langKey] ?? '';
   }
 
-  // ==================== DYNAMIC DATA GENERATION ====================
-  void _generateTodayDonations() {
-    DateTime now = DateTime.now();
-    List<Map<String, String>> donations = [];
+  // সাপোর্টার লোড করুন
+  // support_screen.dart - updated _loadSupporters method
+  Future<void> _loadSupporters() async {
+    try {
+      final supporters = await _supportService.getSupporters();
 
-    // Different names pool for variety
-    List<String> names = [
-      'রাজু আহমেদ',
-      'কিবরিয়া ইসলাম',
-      'أحمد محمد',
-      'মোহাম্মদ আলী',
-      'ইব্রাহিম হোসেন',
-      'فاطمة الزهراء',
-      'আয়েশা বেগম',
-      'Yusuf Rahman',
-      'মারিয়া খাতুন',
-      'সাজিদ মিয়া',
-      'নূর জাহান',
-      'خالد بن سعود',
-      'আব্দুল্লাহ',
-      'সুমাইয়া',
-      'রহিমা',
-      'জাকারিয়া',
-      'ফারহানা',
-      'ওমর',
-    ];
+      // Get dynamic daily activity count
+      final todayActivityCount = await _supportService.getTodayActivityCount();
 
-    // Different amounts for realism
-    List<String> amounts = [
-      'USD 25',
-      'USD 50',
-      'USD 100',
-      'BDT 500',
-      'BDT 1000',
-      'SAR 50',
-      'SAR 100',
-      'USD 75',
-      'BDT 750',
-      'SAR 75',
-    ];
+      setState(() {
+        _recentSupporters = supporters;
+        _todaySupporterCount = todayActivityCount; // Use dynamic count
+      });
 
-    // Shuffle names and amounts for daily variety
-    names.shuffle();
-    amounts.shuffle();
-
-    // Generate different number of donations each day (8-15)
-    int donationCount = 8 + (now.day % 8);
-
-    for (int i = 0; i < donationCount; i++) {
-      String timeText = _getTimeText(i, now);
-      donations.add({
-        'name': names[i % names.length],
-        'amount': amounts[i % amounts.length],
-        'currency': 'USD',
-        'time': timeText,
+      print('📊 Today Activity Count: $todayActivityCount');
+    } catch (e) {
+      print('❌ Error loading supporters: $e');
+      // Fallback to basic count
+      setState(() {
+        _todaySupporterCount = _recentSupporters
+            .where((supporter) => _isToday(supporter['timestamp']))
+            .length;
       });
     }
-
-    setState(() {
-      _recentDonations = donations;
-      _todayDonationCount = donationCount;
-    });
   }
 
-  String _getTimeText(int index, DateTime now) {
-    final languageProvider = Provider.of<LanguageProvider>(
-      context,
-      listen: false,
-    );
-    bool isEnglish = languageProvider.isEnglish;
-
-    int minutesAgo = (index + 1) * 3 + (now.minute % 15);
-    if (minutesAgo < 60) {
-      return '$minutesAgo ${isEnglish ? 'mins ago' : 'মিনিট আগে'}';
-    } else {
-      int hours = minutesAgo ~/ 60;
-      return '$hours ${isEnglish ? 'hours ago' : 'ঘন্টা আগে'}';
-    }
+  bool _isToday(int timestamp) {
+    final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    final now = DateTime.now();
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
 
-  // ==================== TOGGLE DONATION TICKER VISIBILITY ====================
-  void _toggleDonationTicker() {
+  // Toggle Supporter Ticker Visibility
+  void _toggleSupporterTicker() {
     setState(() {
-      _showDonationTicker = !_showDonationTicker;
+      _showSupporterTicker = !_showSupporterTicker;
     });
   }
 
   void _startAutoScroll() {
     Future.delayed(Duration(seconds: 2), () {
-      if (_tickerController.hasClients && mounted && _showDonationTicker) {
+      if (_tickerController.hasClients && mounted && _showSupporterTicker) {
         final maxScroll = _tickerController.position.maxScrollExtent;
         final currentScroll = _tickerController.offset;
 
@@ -239,17 +219,15 @@ class _SupportScreenState extends State<SupportScreen> {
 
   void _showErrorSnackbar() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(_text('linkError')), backgroundColor: Colors.red),
+      SnackBar(
+        content: Text(_text('linkError')),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+      ),
     );
   }
 
   void _showExternalDonationDialog() {
-    final languageProvider = Provider.of<LanguageProvider>(
-      context,
-      listen: false,
-    );
-    bool isEnglish = languageProvider.isEnglish;
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -268,7 +246,7 @@ class _SupportScreenState extends State<SupportScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              _launchURL('https://www.islamicquiz.com/donate');
+              _launchURL('https://www.islamicquiz.com/support');
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
@@ -279,18 +257,107 @@ class _SupportScreenState extends State<SupportScreen> {
     );
   }
 
-  // ==================== DONATION TICKER ITEM BUILDER ====================
-  Widget _buildDonationTickerItem(Map<String, String> donation, int index) {
+  // ==================== AdMob Compliant Support Methods ====================
+
+  void _rateApp() async {
+    // সাপোর্ট একশন রেকর্ড করুন
+    await _supportService.recordSupportAction(
+      actionType: 'rate',
+      actionName: 'Rated the App',
+    );
+
+    const url =
+        'https://play.google.com/store/apps/details?id=your.package.name';
+    _launchURL(url);
+
+    // UI রিফ্রেশ করুন
+    _loadSupporters();
+  }
+
+  void _shareApp() async {
+    // সাপোর্ট একশন রেকর্ড করুন
+    await _supportService.recordSupportAction(
+      actionType: 'share',
+      actionName: 'Shared the App',
+    );
+
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    bool isEnglish = languageProvider.isEnglish;
+
+    String text = isEnglish
+        ? 'Check out this useful app: https://play.google.com/store/apps/details?id=your.package.name'
+        : 'এই দরকারী অ্যাপটি দেখুন: https://play.google.com/store/apps/details?id=your.package.name';
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          isEnglish
+              ? 'Share functionality will be implemented'
+              : 'শেয়ার ফাংশনালিটি ইমপ্লিমেন্ট করা হবে',
+        ),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    // UI রিফ্রেশ করুন
+    _loadSupporters();
+  }
+
+  void _removeAds(BuildContext context) async {
+    // সাপোর্ট একশন রেকর্ড করুন
+    await _supportService.recordSupportAction(
+      actionType: 'remove_ads',
+      actionName: 'Chose Ad-Free',
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => RemoveAdsPage()),
+    );
+
+    // UI রিফ্রেশ করুন
+    _loadSupporters();
+  }
+
+  void _makeDonation() async {
+    // সাপোর্ট একশন রেকর্ড করুন
+    await _supportService.recordSupportAction(
+      actionType: 'external_support',
+      actionName: 'Viewed External Options',
+    );
+
+    _showExternalDonationDialog();
+
+    // UI রিফ্রেশ করুন
+    _loadSupporters();
+  }
+
+  // ==================== AdMob Compliant Ticker Item ====================
+  Widget _buildSupporterTickerItem(Map<String, dynamic> supporter, int index) {
+    final String name = supporter['userName'];
+    final String country = supporter['country'];
+    final String action = supporter['actionName'];
+    final bool isCurrentUser = supporter['isCurrentUser'] ?? false;
+    final bool isCommunityExample = supporter['isCommunityExample'] ?? false;
+
+    String title = name;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isCurrentUser ? Colors.green[50] : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green[100]!),
+        border: Border.all(
+          color: isCurrentUser ? Colors.green[300]! : Colors.green[100]!,
+          width: isCurrentUser ? 2 : 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.green[50]!,
+            color: isCurrentUser ? Colors.green[100]! : Colors.green[50]!,
             blurRadius: 4,
             offset: Offset(0, 2),
           ),
@@ -299,101 +366,227 @@ class _SupportScreenState extends State<SupportScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // প্রোফাইল আভাতার
+          // Profile Avatar
           Container(
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: _getAvatarColor(index),
+              color: _getCountryColor(country),
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: Text(
-                donation['name']!.substring(0, 1),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
+              child: isCurrentUser
+                  ? Icon(Icons.person, color: Colors.white, size: 20)
+                  : Text(
+                      name.substring(0, 1),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
           SizedBox(width: 12),
 
-          // ডোনেশন তথ্য
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                donation['name']!,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: Colors.green[900],
+          // Supporter Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$title - $country',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: isCurrentUser
+                        ? Colors.green[800]
+                        : Colors.green[900],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              SizedBox(height: 2),
-              Text(
-                donation['time']!,
-                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-          SizedBox(width: 16),
-
-          // ডোনেশন অ্যামাউন্ট
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.green[600]!, Colors.green[800]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              donation['amount']!,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.thumb_up, color: Colors.green[600], size: 12),
+                    SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        action,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
 
           SizedBox(width: 8),
 
-          // আইকন
-          Icon(Icons.volunteer_activism, color: Colors.green[600], size: 16),
+          // Action Icon
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: _getActionColor(supporter['actionType']),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _getActionIcon(supporter['actionType']),
+              color: Colors.white,
+              size: 16,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Color _getAvatarColor(int index) {
-    List<Color> colors = [
-      Colors.green[600]!,
-      Colors.blue[600]!,
-      Colors.orange[600]!,
-      Colors.purple[600]!,
-      Colors.teal[600]!,
-      Colors.indigo[600]!,
-    ];
-    return colors[index % colors.length];
+  // Action type অনুযায়ী আইকন
+  IconData _getActionIcon(String actionType) {
+    switch (actionType) {
+      case 'rate':
+        return Icons.star;
+      case 'share':
+        return Icons.share;
+      case 'remove_ads':
+        return Icons.block;
+      case 'external_support':
+        return Icons.open_in_new;
+      default:
+        return Icons.thumb_up;
+    }
+  }
+
+  // Action type অনুযায়ী কালার
+  Color _getActionColor(String actionType) {
+    switch (actionType) {
+      case 'rate':
+        return Colors.orange[600]!;
+      case 'share':
+        return Colors.blue[600]!;
+      case 'remove_ads':
+        return Colors.green[600]!;
+      case 'external_support':
+        return Colors.purple[600]!;
+      default:
+        return Colors.green[600]!;
+    }
+  }
+
+  // Helper method to get color based on country
+  Color _getCountryColor(String country) {
+    final Map<String, Color> countryColors = {
+      'Bangladesh': Colors.green[600]!,
+      'Saudi Arabia': Colors.green[800]!,
+      'UAE': Colors.red[600]!,
+      'UK': Colors.blue[600]!,
+      'Kuwait': Colors.green[700]!,
+      'India': Colors.orange[600]!,
+      'USA': Colors.blue[700]!,
+      'Qatar': Colors.purple[600]!,
+      'Malaysia': Colors.teal[600]!,
+    };
+
+    return countryColors[country] ?? Colors.green[600]!;
+  }
+
+  // Support Option Item Builder
+  Widget _buildSupportOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.green[700]),
+        title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
+        subtitle: Text(subtitle),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  // ==================== Improved Real-time Activity Simulation ====================
+  void _startActivitySimulation() {
+    // Stop any existing timer
+    _simulationTimer?.cancel();
+
+    // Start new simulation timer
+    _simulationTimer = Timer.periodic(Duration(minutes: 30), (timer) {
+      if (mounted) {
+        _simulateActivityChange();
+      }
+    });
+  }
+
+  void _simulateActivityChange() {
+    final random = Random();
+    final currentHour = DateTime.now().hour;
+
+    // Different simulation based on time of day
+    double changeProbability = 0.3; // Default 30% chance
+
+    // Increase probability during peak hours (9 AM - 9 PM)
+    if (currentHour >= 9 && currentHour <= 21) {
+      changeProbability = 0.5; // 50% chance during day
+    }
+
+    if (random.nextDouble() < changeProbability) {
+      setState(() {
+        int change = random.nextInt(3) - 1; // -1, 0, or +1
+
+        // More likely to increase during day, decrease during night
+        if (currentHour >= 9 && currentHour <= 21 && change == -1) {
+          change = 0; // Less likely to decrease during day
+        }
+
+        _todaySupporterCount += change;
+
+        // Keep within realistic bounds
+        if (_todaySupporterCount < 1) _todaySupporterCount = 1;
+        if (_todaySupporterCount > 20) _todaySupporterCount = 20;
+
+        print('🔄 Activity simulation: $change (Total: $_todaySupporterCount)');
+      });
+    }
+  }
+
+  // Support Screen - _SupportScreenState ক্লাসে এই মেথড যোগ করুন
+  void _navigateToPremiumScreen(BuildContext context) {
+    // সাপোর্ট অ্যাকশন রেকর্ড করুন (ঐচ্ছিক)
+    _supportService.recordSupportAction(
+      actionType: 'view_premium_options',
+      actionName: 'Viewed Premium Options',
+    );
+
+    // প্রিমিয়াম স্ক্রিনে নিয়ে যান
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PremiumScreen()),
+    );
   }
 
   @override
   void dispose() {
+    // Clean up timers
+    _simulationTimer?.cancel();
     _tickerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final languageProvider = Provider.of<LanguageProvider>(context);
-    bool isEnglish = languageProvider.isEnglish;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[800],
@@ -422,7 +615,7 @@ class _SupportScreenState extends State<SupportScreen> {
           ),
         ),
         actions: [
-          // Toggle Donation Ticker Button
+          // Toggle Activity Ticker Button
           Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -431,12 +624,12 @@ class _SupportScreenState extends State<SupportScreen> {
             ),
             child: IconButton(
               icon: Icon(
-                _showDonationTicker ? Icons.visibility : Icons.visibility_off,
+                _showSupporterTicker ? Icons.visibility : Icons.visibility_off,
                 color: Colors.white,
                 size: 20,
               ),
-              onPressed: _toggleDonationTicker,
-              tooltip: _showDonationTicker
+              onPressed: _toggleSupporterTicker,
+              tooltip: _showSupporterTicker
                   ? _text('hideTicker')
                   : _text('showTicker'),
               splashRadius: 20,
@@ -451,19 +644,27 @@ class _SupportScreenState extends State<SupportScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Voluntary Notice Banner
+              _buildVoluntaryNotice(),
+              const SizedBox(height: 16),
+
               // Header Section
               _buildHeaderSection(),
               const SizedBox(height: 24),
 
-              // ==================== LIVE DONATION TICKER SECTION ====================
-              if (_showDonationTicker) _buildDonationTickerSection(),
+              // Support Options Section
+              _buildSupportOptionsSection(),
+              const SizedBox(height: 20),
+
+              // Policy Note
+              _buildPolicyNote(),
+              const SizedBox(height: 24),
+
+              // Community Activity Section
+              if (_showSupporterTicker) _buildCommunityActivitySection(),
 
               // Why Support Section
               _buildWhySupportSection(),
-              const SizedBox(height: 24),
-
-              // Support Buttons Section
-              _buildSupportButtonsSection(),
               const SizedBox(height: 24),
 
               // Contact Section
@@ -476,8 +677,109 @@ class _SupportScreenState extends State<SupportScreen> {
     );
   }
 
-  // ==================== DONATION TICKER SECTION WIDGET ====================
-  Widget _buildDonationTickerSection() {
+  // ==================== Voluntary Notice Banner ====================
+  Widget _buildVoluntaryNotice() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.orange[50],
+        border: Border.all(color: Colors.orange[200]!),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.orange[800], size: 20),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _text('voluntaryNotice'),
+              style: TextStyle(
+                color: Colors.orange[800],
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==================== SUPPORT OPTIONS SECTION ====================
+  Widget _buildSupportOptionsSection() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Text(
+              _text('communityEngagement'),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[800],
+              ),
+            ),
+            SizedBox(height: 16),
+
+            _buildSupportOption(
+              icon: Icons.star,
+              title: _text('rateApp'),
+              subtitle: _text('rateAppSubtitle'),
+              onTap: _rateApp,
+            ),
+
+            _buildSupportOption(
+              icon: Icons.share,
+              title: _text('shareApp'),
+              subtitle: _text('shareAppSubtitle'),
+              onTap: _shareApp,
+            ),
+
+            // Support Screen - শুধু ইনফরমেশনাল
+            _buildSupportOption(
+              icon: Icons.block,
+              title: _text('removeAds'),
+              subtitle: _text('removeAdsSubtitle'),
+              onTap: () => _navigateToPremiumScreen(
+                context,
+              ), // প্রিমিয়াম স্ক্রিনে নিয়ে যান
+            ),
+
+            _buildSupportOption(
+              icon: Icons.open_in_new,
+              title: _text('makeDonation'),
+              subtitle: _text('makeDonationSubtitle'),
+              onTap: _makeDonation,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== POLICY NOTE ====================
+  Widget _buildPolicyNote() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        _text('policyNote'),
+        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  // ==================== COMMUNITY ACTIVITY SECTION ====================
+  Widget _buildCommunityActivitySection() {
     return Column(
       children: [
         Card(
@@ -499,7 +801,7 @@ class _SupportScreenState extends State<SupportScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Section Header with toggle info
+                // Section Header
                 Row(
                   children: [
                     Container(
@@ -508,7 +810,7 @@ class _SupportScreenState extends State<SupportScreen> {
                         color: Colors.green[600],
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.live_tv, color: Colors.white, size: 16),
+                      child: Icon(Icons.people, color: Colors.white, size: 16),
                     ),
                     SizedBox(width: 8),
                     Text(
@@ -521,7 +823,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       ),
                     ),
                     Spacer(),
-                    // Info icon showing this is demo data
+                    // Info icon
                     Tooltip(
                       message: _text('demoDataInfo'),
                       child: Icon(
@@ -534,36 +836,52 @@ class _SupportScreenState extends State<SupportScreen> {
                 ),
                 SizedBox(height: 12),
 
-                // Ticker Container
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.green[100]!),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: SingleChildScrollView(
-                      controller: _tickerController,
-                      physics: const NeverScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 8),
-                          ...List.generate(_recentDonations.length, (index) {
-                            return _buildDonationTickerItem(
-                              _recentDonations[index],
-                              index,
-                            );
-                          }),
-                          SizedBox(height: 8),
-                        ],
+                // Activity Container
+                if (_recentSupporters.isNotEmpty)
+                  Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green[100]!),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: SingleChildScrollView(
+                        controller: _tickerController,
+                        physics: const NeverScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            SizedBox(height: 8),
+                            ...List.generate(_recentSupporters.length, (index) {
+                              return _buildSupporterTickerItem(
+                                _recentSupporters[index],
+                                index,
+                              );
+                            }),
+                            SizedBox(height: 8),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green[100]!),
+                    ),
+                    child: Center(
+                      child: Text(
+                        _text('supportersToday'),
+                        style: TextStyle(color: Colors.grey[500], fontSize: 14),
                       ),
                     ),
                   ),
-                ),
 
-                // Stats Row - Now shows dynamic count
+                // Stats Row
                 SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -584,22 +902,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       ),
                       SizedBox(width: 6),
                       Text(
-                        '$_todayDonationCount+ ${_text('supportersToday')}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green[800],
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Icon(
-                        Icons.attach_money,
-                        color: Colors.green[800],
-                        size: 16,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        _text('multipleCurrencies'),
+                        '$_todaySupporterCount ${_text('supportersToday')}',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -633,7 +936,7 @@ class _SupportScreenState extends State<SupportScreen> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.volunteer_activism,
+                Icons.help_outline,
                 size: 36,
                 color: Colors.green[800],
               ),
@@ -696,78 +999,6 @@ class _SupportScreenState extends State<SupportScreen> {
               Icons.security,
               _text('security'),
               _text('securityDesc'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSupportButtonsSection() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text(
-              _text('makeDifference'),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.green[800],
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(_text('googlePlayMessage'))),
-                  );
-                },
-                icon: const Icon(Icons.shopping_cart, size: 20),
-                label: Text(
-                  _text('supportGooglePlay'),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _showExternalDonationDialog,
-                icon: const Icon(Icons.language, size: 20),
-                label: Text(
-                  _text('donateWebsite'),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.green[800],
-                  side: BorderSide(color: Colors.green[800]!),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
             ),
           ],
         ),
@@ -849,6 +1080,81 @@ class _SupportScreenState extends State<SupportScreen> {
           const SizedBox(width: 12),
           Expanded(child: Text(value, style: const TextStyle(fontSize: 15))),
         ],
+      ),
+    );
+  }
+}
+
+// Remove Ads Page - AdMob Compliant
+class RemoveAdsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    bool isEnglish = languageProvider.isEnglish;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isEnglish ? 'Ad-Free Experience' : 'এড-মুক্ত অভিজ্ঞতা'),
+        backgroundColor: Colors.green[800],
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.block, size: 80, color: Colors.green),
+              SizedBox(height: 20),
+              Text(
+                isEnglish
+                    ? 'Optional Ad-Free Experience'
+                    : 'ঐচ্ছিক এড-মুক্ত অভিজ্ঞতা',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 10),
+              Text(
+                isEnglish
+                    ? 'This is an optional purchase. All features remain available with ads.'
+                    : 'এটি একটি ঐচ্ছিক পারচেজ। সমস্ত ফিচার এডসহ উপলব্ধ থাকবে।',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              ),
+              SizedBox(height: 30),
+              // In-app purchase button
+              ElevatedButton(
+                onPressed: () {
+                  // Implement in-app purchase
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        isEnglish
+                            ? 'In-app purchase will be implemented'
+                            : 'ইন-অ্যাপ পারচেজ ইমপ্লিমেন্ট করা হবে',
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[800],
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                ),
+                child: Text(
+                  isEnglish ? 'Optional Ad-Free' : 'ঐচ্ছিক এড-মুক্ত',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                isEnglish
+                    ? 'Completely optional - app remains functional'
+                    : 'সম্পূর্ণ ঐচ্ছিক - অ্যাপ কার্যকরী থাকবে',
+                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

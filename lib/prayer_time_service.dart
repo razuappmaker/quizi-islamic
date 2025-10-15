@@ -637,6 +637,29 @@ class PrayerTimeService {
     return englishText;
   }
 
+  // অ্যাডজাস্ট করা নামাজের সময় রিটার্ন করার মেথড
+  Map<String, String> getAdjustedPrayerTimesForNotifications(
+    Map<String, String> originalTimes,
+    Map<String, int> adjustments,
+  ) {
+    if (originalTimes.isEmpty) return {};
+
+    final adjustedTimes = Map<String, String>.from(originalTimes);
+
+    for (final entry in adjustments.entries) {
+      final prayerName = entry.key;
+      final adjustment = entry.value;
+
+      if (adjustedTimes.containsKey(prayerName) && adjustment != 0) {
+        final originalTime = adjustedTimes[prayerName]!;
+        final adjustedTime = _adjustPrayerTime(originalTime, adjustment);
+        adjustedTimes[prayerName] = adjustedTime;
+      }
+    }
+
+    return adjustedTimes;
+  }
+
   // নামাজের রং পাওয়া
   Color getPrayerColor(String prayerName) {
     switch (prayerName) {

@@ -100,14 +100,6 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
 
   Future<void> _loadBannerAd() async {
     try {
-      // ✅ প্রথমে check করুন আমরা banner ad show করতে পারবো কিনা
-      bool canShowAd = await AdHelper.canShowBannerAd();
-
-      if (!canShowAd) {
-        print('Banner ad limit reached, not showing ad');
-        return;
-      }
-
       // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
       _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
         context,
@@ -121,7 +113,7 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
             print('Banner ad failed to load: $error');
             ad.dispose();
-            _isBannerAdReady = false;
+            setState(() => _isBannerAdReady = false);
           },
           onAdOpened: (Ad ad) {
             // ✅ Ad click রেকর্ড করুন (limit check সহ)
@@ -137,11 +129,10 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
         ),
       );
 
-      // ✅ Banner লোড করুন
-      await _bannerAd?.load();
+      // ✅ AdHelper এর ভিতরে ইতিমধ্যে load() কল করা হয়েছে, তাই এখানে আলাদা করে load() কল করার দরকার নেই
     } catch (e) {
       print('Error loading banner ad: $e');
-      _isBannerAdReady = false;
+      setState(() => _isBannerAdReady = false);
     }
   }
 

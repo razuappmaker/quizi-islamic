@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
-import '../main.dart';
 import '../managers/home_page.dart';
-import '../profile_screen.dart';
 import '../providers/language_provider.dart';
 import '../utils/responsive_utils.dart';
 
@@ -17,15 +15,18 @@ class AboutContactPage extends StatelessWidget {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final isEnglish = languageProvider.isEnglish;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final Tablet = isTablet(context);
+    final tabletSize = isTablet(context);
 
     return Scaffold(
+      backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
       appBar: AppBar(
-        title: ResponsiveText(
-          isEnglish ? 'About & Contact' : 'আমাদের সাথে যোগাযোগ',
-          fontSize: Tablet ? 20 : 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+        title: Text(
+          isEnglish ? 'About & Contact' : 'আমাদের সম্পর্কে',
+          style: TextStyle(
+            fontSize: tabletSize ? 20 : 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: Colors.green[800],
         elevation: 0,
@@ -33,63 +34,46 @@ class AboutContactPage extends StatelessWidget {
           icon: Icon(
             Icons.arrow_back,
             color: Colors.white,
-            size: Tablet ? 28 : 24,
+            size: tabletSize ? 28 : 24,
           ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: EdgeInsets.all(
-                responsiveValue(context, Tablet ? 20 : 16),
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header Section
-                      _buildHeaderSection(context, isEnglish, isDark, Tablet),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(
+            responsiveValue(context, tabletSize ? 20 : 16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Section
+              _buildHeaderSection(context, isEnglish, isDark, tabletSize),
 
-                      SizedBox(
-                        height: responsiveValue(context, Tablet ? 30 : 24),
-                      ),
+              SizedBox(height: responsiveValue(context, tabletSize ? 30 : 24)),
 
-                      // Features Section
-                      _buildFeaturesSection(context, isEnglish, isDark, Tablet),
+              // App Features Section
+              _buildFeaturesSection(context, isEnglish, isDark, tabletSize),
 
-                      SizedBox(
-                        height: responsiveValue(context, Tablet ? 30 : 24),
-                      ),
+              SizedBox(height: responsiveValue(context, tabletSize ? 24 : 20)),
 
-                      // Rewards Section
-                      _buildRewardsSection(context, isEnglish, isDark, Tablet),
+              // Learning Benefits Section
+              _buildBenefitsSection(context, isEnglish, isDark, tabletSize),
 
-                      SizedBox(
-                        height: responsiveValue(context, Tablet ? 30 : 24),
-                      ),
+              SizedBox(height: responsiveValue(context, tabletSize ? 24 : 20)),
 
-                      // Contact Section
-                      _buildContactSection(context, isEnglish, isDark, Tablet),
+              // Contact Section
+              _buildContactSection(context, isEnglish, isDark, tabletSize),
 
-                      SizedBox(
-                        height: responsiveValue(context, Tablet ? 30 : 24),
-                      ),
+              SizedBox(height: responsiveValue(context, tabletSize ? 24 : 20)),
 
-                      // Footer Section
-                      _buildFooterSection(context, isEnglish, isDark, Tablet),
+              // Footer Section
+              _buildFooterSection(context, isEnglish, isDark, tabletSize),
 
-                      // Bottom spacing for safety
-                      SizedBox(height: responsiveValue(context, 20)),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
+              // Bottom spacing
+              SizedBox(height: responsiveValue(context, 20)),
+            ],
+          ),
         ),
       ),
     );
@@ -99,155 +83,118 @@ class AboutContactPage extends StatelessWidget {
     BuildContext context,
     bool isEnglish,
     bool isDark,
-    bool isTablet,
+    bool tabletSize,
   ) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
+        borderRadius: BorderRadius.circular(tabletSize ? 20 : 16),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(responsiveValue(context, isTablet ? 24 : 20)),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(responsiveValue(context, tabletSize ? 24 : 20)),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.green[700]!, Colors.green[600]!],
+          ),
+          borderRadius: BorderRadius.circular(tabletSize ? 20 : 16),
+        ),
         child: Column(
           children: [
-            // App Icon
+            // App Icon with better design
             Container(
-              width: responsiveValue(context, isTablet ? 100 : 80),
-              height: responsiveValue(context, isTablet ? 100 : 80),
+              width: responsiveValue(context, tabletSize ? 120 : 90),
+              height: responsiveValue(context, tabletSize ? 120 : 90),
               decoration: BoxDecoration(
-                color: Colors.green[100],
-                borderRadius: BorderRadius.circular(isTablet ? 25 : 20),
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(tabletSize ? 30 : 24),
                 border: Border.all(
-                  color: Colors.green[300]!,
-                  width: isTablet ? 4 : 3,
+                  color: Colors.white.withOpacity(0.3),
+                  width: tabletSize ? 4 : 3,
                 ),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(isTablet ? 21 : 17),
+                borderRadius: BorderRadius.circular(tabletSize ? 26 : 20),
                 child: Image.asset(
                   'assets/images/logo.png',
-                  width: responsiveValue(context, isTablet ? 100 : 80),
-                  height: responsiveValue(context, isTablet ? 100 : 80),
+                  width: responsiveValue(context, tabletSize ? 100 : 80),
+                  height: responsiveValue(context, tabletSize ? 100 : 80),
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(
-                      Icons.mosque,
-                      size: responsiveValue(context, isTablet ? 40 : 30),
-                      color: Colors.green[700],
+                      Icons.mosque_rounded,
+                      size: responsiveValue(context, tabletSize ? 50 : 40),
+                      color: Colors.white,
                     );
                   },
                 ),
               ),
             ),
-            SizedBox(height: responsiveValue(context, isTablet ? 20 : 16)),
+            SizedBox(height: responsiveValue(context, tabletSize ? 20 : 16)),
 
             // Welcome Text
+            Text(
+              isEnglish
+                  ? 'Welcome to Islamic Learning App'
+                  : 'ইসলামিক লার্নিং অ্যাপে স্বাগতম',
+              style: TextStyle(
+                fontSize: responsiveValue(context, tabletSize ? 22 : 18),
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                height: 1.3,
+              ),
+              textAlign: TextAlign.center,
+            ),
+
+            SizedBox(height: responsiveValue(context, tabletSize ? 12 : 8)),
+
+            // Description
+            Text(
+              isEnglish
+                  ? 'Enhance your Islamic knowledge through interactive learning and authentic content'
+                  : 'ইন্টারেক্টিভ লার্নিং এবং প্রামাণিক কন্টেন্টের মাধ্যমে আপনার ইসলামিক জ্ঞান বৃদ্ধি করুন',
+              style: TextStyle(
+                fontSize: responsiveValue(context, tabletSize ? 16 : 14),
+                color: Colors.white.withOpacity(0.9),
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+
+            SizedBox(height: responsiveValue(context, tabletSize ? 16 : 12)),
+
+            // App Version Info
             Container(
               padding: EdgeInsets.symmetric(
-                horizontal: responsiveValue(context, isTablet ? 20 : 16),
-                vertical: responsiveValue(context, isTablet ? 16 : 12),
+                horizontal: responsiveValue(context, tabletSize ? 16 : 12),
+                vertical: responsiveValue(context, tabletSize ? 8 : 6),
               ),
               decoration: BoxDecoration(
-                color: Colors.green[50],
-                borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
-                border: Border(
-                  left: BorderSide(
-                    color: Colors.green[400]!,
-                    width: isTablet ? 5 : 4,
-                  ),
-                  right: BorderSide(
-                    color: Colors.green[400]!,
-                    width: isTablet ? 5 : 4,
-                  ),
-                ),
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    '✨',
-                    style: TextStyle(
-                      fontSize: responsiveValue(context, isTablet ? 22 : 18),
-                    ),
+                  Icon(
+                    Icons.verified_user_rounded,
+                    size: responsiveValue(context, tabletSize ? 18 : 16),
+                    color: Colors.white,
                   ),
-                  SizedBox(width: responsiveValue(context, isTablet ? 12 : 8)),
-                  Expanded(
-                    child: Text(
-                      isEnglish
-                          ? 'Welcome to Islamic Day App'
-                          : 'ইসলামিক ডে অ্যাপে আপনাকে স্বাগতম',
-                      style: TextStyle(
-                        fontSize: responsiveValue(context, isTablet ? 18 : 16),
-                        fontWeight: FontWeight.w600,
-                        color: Colors.green[800],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  SizedBox(width: responsiveValue(context, isTablet ? 12 : 8)),
+                  SizedBox(width: responsiveValue(context, tabletSize ? 8 : 6)),
                   Text(
-                    '🌙',
+                    isEnglish
+                        ? 'Verified Islamic Content'
+                        : 'যাচাইকৃত ইসলামিক কন্টেন্ট',
                     style: TextStyle(
-                      fontSize: responsiveValue(context, isTablet ? 22 : 18),
+                      fontSize: responsiveValue(context, tabletSize ? 14 : 12),
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
-              ),
-            ),
-
-            SizedBox(height: responsiveValue(context, isTablet ? 20 : 12)),
-
-            // Description
-            Container(
-              padding: EdgeInsets.all(
-                responsiveValue(context, isTablet ? 28 : 24),
-              ),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.green[900]!.withOpacity(0.15)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(isTablet ? 24 : 20),
-                border: Border.all(
-                  color: isDark ? Colors.green[700]! : Colors.green[100]!,
-                  width: 2,
-                ),
-              ),
-              child: Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: isEnglish
-                          ? "We're transforming Islamic learning with "
-                          : "আমরা ইসলামিক শিক্ষাকে রূপান্তর করছি ",
-                      style: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.grey[800],
-                        fontSize: responsiveValue(context, isTablet ? 16 : 15),
-                      ),
-                    ),
-                    TextSpan(
-                      text: isEnglish
-                          ? "digital innovation"
-                          : "ডিজিটাল উদ্ভাবনের",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Colors.green[600],
-                        fontStyle: FontStyle.italic,
-                        fontSize: responsiveValue(context, isTablet ? 16 : 15),
-                      ),
-                    ),
-                    TextSpan(
-                      text: isEnglish
-                          ? ". Engage with interactive quizzes and authentic content to strengthen your spiritual journey."
-                          : " মাধ্যমে। আপনার ইসলামী পথের যাত্রাকে শক্তিশালী করতে ইন্টারেক্টিভ কুইজ এবং প্রামাণিক কন্টেন্টের সাথে যুক্ত হোন।",
-                      style: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.grey[800],
-                        fontSize: responsiveValue(context, isTablet ? 16 : 15),
-                      ),
-                    ),
-                  ],
-                ),
-                style: TextStyle(height: 1.6),
-                textAlign: TextAlign.center,
               ),
             ),
           ],
@@ -260,218 +207,517 @@ class AboutContactPage extends StatelessWidget {
     BuildContext context,
     bool isEnglish,
     bool isDark,
-    bool isTablet,
+    bool tabletSize,
   ) {
-    return Container(
-      height: responsiveValue(context, isTablet ? 80 : 60),
-      margin: EdgeInsets.only(bottom: responsiveValue(context, 12)),
-      child: Stack(
-        children: [
-          // Background Design
-          Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: responsiveValue(context, isTablet ? 30 : 20),
+    final features = [
+      {
+        'icon': Icons.quiz_rounded,
+        'title': isEnglish ? 'Islamic Quizzes' : 'ইসলামিক কুইজ',
+        'description': isEnglish
+            ? 'Test your knowledge with authentic Islamic questions'
+            : 'প্রামাণিক ইসলামিক প্রশ্ন দিয়ে আপনার জ্ঞান যাচাই করুন',
+        'color': Colors.blue,
+        'details': {
+          'en': '''
+🎯 Comprehensive Islamic Learning Categories:
+
+• Islamic Basic Knowledge - Foundational principles and fundamentals
+• Quran Studies - In-depth understanding of divine revelations
+• Life of Prophet Muhammad (PBUH) - Seerah and prophetic biography
+• Worship & Ibadah - Practical aspects of Islamic rituals
+• Akhirah & Afterlife - Concepts of life after death
+• Day of Judgment - Qiyamah and final reckoning
+• Women in Islam - Rights, roles and responsibilities
+• Islamic Ethics & Manners - Moral values and character building
+• Islamic Law - Marriage, divorce and family jurisprudence
+• Etiquette & Conduct - Social and personal manners
+• Marital & Family Relations - Spousal and family dynamics
+• Hadith Studies - Prophetic traditions and teachings
+• Prophets & Messengers - Stories of all prophets
+• Islamic History - Historical development of Islam
+
+📊 Learning Resources:
+• 2800+ Bilingual MCQ Questions in English and Bengali
+• Detailed explanations with authentic references
+• Progressive difficulty levels from beginner to advanced
+• Instant results with performance analytics
+• Bookmark difficult questions for revision
+
+🎯 Educational Approach:
+- Structured learning path with 14 comprehensive categories
+- Bilingual interface supporting both English and Bengali
+- Designed for global Muslim community
+- Special focus for Bangladeshi diaspora
+- Regular content updates with new questions
+- Scholarly verified content from authentic sources
+- Mobile-friendly learning experience
+- Offline access to downloaded content
+''',
+          'bn': '''
+🎯 বিস্তৃত ইসলামিক শিক্ষার বিভাগসমূহ:
+
+• ইসলামী প্রাথমিক জ্ঞান - ইসলামের মৌলিক নীতি ও ভিত্তিমূলক বিষয়াবলী
+• কোরআন অধ্যয়ন - পবিত্র কোরআনের গভীর উপলব্ধি ও ব্যাখ্যা
+• মহানবী সঃ এর জীবনী - রাসূলের পূর্ণাঙ্গ জীবনচরিত ও শিক্ষা
+• ইবাদত - নামাজ, রোজা, হজ্জ ও যাকাতের ব্যবহারিক দিকনির্দেশনা
+• আখিরাত - মৃত্যুপরবর্তী জীবন ও পরকালের বিস্তারিত ধারণা
+• বিচার দিবস - কিয়ামতের দিনের ঘটনাবলী ও চূড়ান্ত ফলাফল
+• নারী ও ইসলাম - ইসলামে নারীর অধিকার, মর্যাদা ও দায়িত্ব
+• ইসলামী নৈতিকতা ও আচার - উত্তম চরিত্র ও সদগুণাবলি গঠন
+• ধর্মীয় আইন (বিবাহ-বিচ্ছেদ) - পারিবারিক জীবন ও সামাজিক বিধান
+• শিষ্টাচার - দৈনন্দিন জীবনের সুন্নাতি আদব ও শিষ্টাচার
+• দাম্পত্য ও পারিবারিক সম্পর্ক - সুখী দাম্পত্য ও পারিবারিক বন্ধন
+• হাদিস - রাসূলের বাণী ও শিক্ষার বিশুদ্ধ সংগ্রহ
+• নবী-রাসূল - সকল নবী-রাসূলের জীবনী ও শিক্ষা
+• ইসলামের ইতিহাস - ইসলামের গৌরবময় ইতিহাস ও সভ্যতা
+
+📊 শিক্ষণীয় উপকরণ:
+• ২৮০০+ দ্বিভাষিক এমসিকিউ প্রশ্ন (ইংরেজি ও বাংলা)
+• প্রামাণিক দলিল-দস্তাবেজ সহ বিশদ ব্যাখ্যা
+• প্রাথমিক থেকে উন্নত পর্যায় পর্যন্ত ধাপে ধাপে শিক্ষা
+• তাত্ক্ষণিক ফলাফল ও performance বিশ্লেষণ
+• পুনরায় দেখার জন্য কঠিন প্রশ্ন সংরক্ষণ
+
+🎯 শিক্ষাদান পদ্ধতি:
+• ১৪টি সুসংগঠিত বিভাগে সাজানো শিক্ষাপদ্ধতি
+• ইংরেজি ও বাংলা উভয় ভাষায় সম্পূর্ণ সমর্থন
+• বিশ্বব্যাপী মুসলিম সম্প্রদায়ের জন্য উপযোগী
+• বাংলাদেশি প্রবাসীদের জন্য বিশেষভাবে উপকরণ
+• নিয়মিত নতুন প্রশ্ন ও বিষয়বস্তু সংযোজন
+• প্রামাণিক সূত্র থেকে যাচাইকৃত শিক্ষাসামগ্রী
+• মোবাইল-বান্ধব ব্যবহারকারী অভিজ্ঞতা
+• অফলাইনেও ডাউনলোডকৃত বিষয়বস্তু ব্যবহার
+''',
+        },
+      },
+      {
+        'icon': Icons.school_rounded,
+        'title': isEnglish ? 'Learning Content' : 'শিক্ষামূলক কন্টেন্ট',
+        'description': isEnglish
+            ? 'Access verified Islamic educational materials'
+            : 'যাচাইকৃত ইসলামিক শিক্ষামূলক উপকরণ অ্যাক্সেস করুন',
+        'color': Colors.green,
+        'details': {
+          'en': '''
+Comprehensive Learning Materials:
+
+Authentic Sources - All content thoroughly verified by qualified Islamic scholars
+Structured Curriculum - Well-organized learning path designed for systematic study
+Visual Learning - Educational infographics, detailed diagrams and clear illustrations
+Audio Support - Beautiful Quran recitations and comprehensive lesson explanations
+Progressive Levels - Carefully designed tracks for Beginner, Intermediate, and Advanced learners
+
+Educational Features:
+Daily Lessons - Bite-sized learning modules perfect for busy schedules
+Revision System - Spaced repetition technique for better knowledge retention
+Progress Tracking - Comprehensive monitoring of your entire learning journey
+Certificate System - Earn meaningful achievements for completed learning levels
+Community Learning - Engage in discussions with fellow learners worldwide
+
+Global Accessibility:
+Specifically designed for Bangladeshi diaspora living worldwide
+Fully bilingual interface supporting both English and Bengali
+Cultural sensitivity carefully maintained throughout all content
+Complete offline access available for downloaded materials
+Regular content updates to ensure fresh learning experiences
+''',
+          'bn': '''
+সম্পূর্ণ শিক্ষামূলক উপকরণ:
+
+প্রামাণিক সূত্র - সকল বিষয়বস্তু যোগ্য ইসলামিক আলেমদের দ্বারা সম্পূর্ণ যাচাইকৃত
+সুসংগঠিত পাঠ্যক্রম - ধারাবাহিক পড়াশোনার জন্য সুনির্দিষ্টভাবে সাজানো শিক্ষাপদ্ধতি
+দৃশ্য শিক্ষণ - শিক্ষামূলক ইনফোগ্রাফিক, বিস্তারিত ডায়াগ্রাম এবং স্পষ্ট ইলাস্ট্রেশন
+অডিও সমর্থন - মনোরম কুরআন তিলাওয়াত এবং পূর্ণাঙ্গ পাঠের ব্যাখ্যা
+ধাপে ধাপে স্তর - শিক্ষানবিস, মধ্যবর্তী এবং উন্নত শিক্ষার্থীদের জন্য বিশেষভাবে তৈরি
+
+শিক্ষামূলক বৈশিষ্ট্য:
+দৈনিক পাঠ - ব্যস্ত সময়সূচীর জন্য উপযুক্ত ছোট ছোট শিক্ষণ মডিউল
+পুনরাবৃত্তি পদ্ধতি -更好的 জ্ঞান ধারণের জন্য নির্দিষ্ট ব্যবধানে পুনরালোচনা
+অগ্রগতি নিরীক্ষণ - আপনার সম্পূর্ণ শিক্ষাযাত্রার সামগ্রিক পর্যবেক্ষণ
+সনদপত্র ব্যবস্থা - সম্পূর্ণ শিক্ষাস্তরের জন্য অর্থপূর্ণ অর্জন লাভ
+সম্প্রদায় শিক্ষণ - বিশ্বজুড়ে সহপাঠীদের সাথে আলোচনায় অংশগ্রহণ
+
+বিশ্বব্যাপী প্রবেশাধিকার:
+বিশ্বব্যাপী বসবাসরত বাংলাদেশি প্রবাসীদের জন্য বিশেষভাবে নকশাকৃত
+ইংরেজি ও বাংলা উভয় ভাষায় সম্পূর্ণ দ্বিভাষিক ইন্টারফেস
+সকল বিষয়বস্তুতে সাংস্কৃতিক সংবেদনশীলতা সযত্নে বজায় রাখা
+ডাউনলোডকৃত উপকরণের জন্য সম্পূর্ণ অফলাইন অ্যাক্সেস উপলব্ধ
+সতেজ শিক্ষার অভিজ্ঞতা নিশ্চিত করতে নিয়মিত বিষয়বস্তু আপডেট
+''',
+        },
+      },
+      {
+        'icon': Icons.update_rounded,
+        'title': isEnglish ? 'Regular Updates' : 'নিয়মিত আপডেট',
+        'description': isEnglish
+            ? 'Fresh content added regularly for continuous learning'
+            : 'ক্রমাগত শেখার জন্য নিয়মিত নতুন কন্টেন্ট যোগ করা হয়',
+        'color': Colors.orange,
+        'details': {
+          'en': '''
+Continuous Content Enhancement:
+
+Weekly New Content - Fresh quizzes and comprehensive learning materials added every week
+Seasonal Specials - Special content for Ramadan, Eid, and other Islamic holidays
+User Requested Topics - Content developed based on valuable community feedback
+Current Affairs - Contemporary Islamic issues and meaningful discussions
+Scholarly Insights - Latest fatwas and authentic Islamic rulings from reputable scholars
+
+Update Schedule:
+Daily - New quiz questions and featured hadith of the day
+Weekly - New learning modules and expanded categories
+Monthly - Major feature updates and significant content expansions
+Seasonally - Special programs and content for important Islamic occasions
+
+Future Roadmap:
+Advanced Islamic courses covering deeper theological aspects
+Live interactive sessions with renowned Islamic scholars
+Community discussion forums for knowledge sharing
+Seamless synchronization between mobile and desktop platforms
+Multi-language expansion to reach wider audience
+Advanced analytics for personalized learning experience
+
+Designed For:
+Bangladeshi Muslims living abroad seeking authentic Islamic knowledge
+Global Muslim community looking for structured learning
+Islamic students and teachers requiring comprehensive resources
+New Muslims and reverts seeking foundational understanding
+Families learning together in supportive environment
+''',
+          'bn': '''
+ক্রমাগত বিষয়বস্তু উন্নয়ন:
+
+সাপ্তাহিক নতুন বিষয়বস্তু - প্রতি সপ্তাহে নতুন কুইজ এবং সম্পূর্ণ শিক্ষণ উপকরণ যোগ করা হয়
+মৌসুমী বিশেষ - রমজান, ঈদ এবং অন্যান্য ইসলামিক ছুটির জন্য বিশেষ বিষয়বস্তু
+ব্যবহারকারীর অনুরোধিত বিষয় - মূল্যবান সম্প্রদায়ের প্রতিক্রিয়া ভিত্তিক তৈরি বিষয়বস্তু
+বর্তমান বিষয় - সমসাময়িক ইসলামিক বিষয় এবং অর্থপূর্ণ আলোচনা
+বিজ্ঞ আলেমদের অন্তর্দৃষ্টি - নির্ভরযোগ্য আলেমদের সর্বশেষ ফতোয়া ও প্রামাণিক ইসলামিক বিধান
+
+আপডেট সময়সূচী:
+দৈনিক - নতুন কুইজ প্রশ্ন এবং দিনের নির্বাচিত হাদিস
+সাপ্তাহিক - নতুন শিক্ষণ মডিউল এবং সম্প্রসারিত বিভাগ
+মাসিক - প্রধান বৈশিষ্ট্য আপডেট এবং উল্লেখযোগ্য বিষয়বস্তু সম্প্রসারণ
+মৌসুমী - গুরুত্বপূর্ণ ইসলামিক উপলক্ষ্যের জন্য বিশেষ 프로그램 ও বিষয়বস্তু
+
+ভবিষ্যত পরিকল্পনা:
+গভীর ধর্মতাত্ত্বিক দিক covering উন্নত ইসলামিক কোর্স
+প্রতিষ্ঠিত ইসলামিক আলেমদের সাথে সরাসরি ইন্টারেক্টিভ সেশন
+জ্ঞান বিনিময়ের জন্য সম্প্রদায় আলোচনা ফোরাম
+মোবাইল এবং ডেস্কটপ প্ল্যাটফর্মের মধ্যে নিরবিচ্ছিন্ন সিঙ্ক্রোনাইজেশন
+ব্যাপক শ্রোতা raggi করার জন্য বহুভাষিক সম্প্রসারণ
+ব্যক্তিগতকৃত শিক্ষার অভিজ্ঞতার জন্য উন্নত বিশ্লেষণ
+
+যাদের জন্য ডিজাইন করা:
+প্রামাণিক ইসলামিক জ্ঞান সন্ধানকারী বিদেশে বসবাসরত বাংলাদেশি মুসলমানরা
+সুসংগঠিত শিক্ষার সন্ধানকারী বিশ্বব্যাপী মুসলিম সম্প্রদায়
+সম্পূর্ণ সম্পদের প্রয়োজন ইসলামিক ছাত্র এবং শিক্ষকরা
+মৌলিক বুঝাপড়া খোঁজা নতুন মুসলিম এবং ধর্মান্তরিতরা
+সহায়ক পরিবেশে একসাথে শেখা পরিবারগুলি
+''',
+        },
+      },
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(
+          context,
+          isEnglish ? '📚 App Features' : '📚 অ্যাপের বৈশিষ্ট্য',
+          Icons.featured_play_list_rounded,
+          tabletSize,
+        ),
+        ...features
+            .map(
+              (feature) => _buildFeatureCard(
+                context: context,
+                icon: feature['icon'] as IconData,
+                title: feature['title'] as String,
+                description: feature['description'] as String,
+                color: feature['color'] as Color,
+                tabletSize: tabletSize,
+                isDark: isDark,
+                details: feature['details'] as Map<String, String>,
+                isEnglish: isEnglish,
+              ),
+            )
+            .toList(),
+      ],
+    );
+  }
+
+  Widget _buildFeatureCard({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String description,
+    required Color color,
+    required bool tabletSize,
+    required bool isDark,
+    required Map<String, String> details,
+    required bool isEnglish,
+  }) {
+    return Card(
+      margin: EdgeInsets.only(
+        bottom: responsiveValue(context, tabletSize ? 12 : 8),
+      ),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(tabletSize ? 16 : 12),
+      ),
+      child: InkWell(
+        onTap: () => _showFeatureDetails(
+          context,
+          title,
+          details,
+          isEnglish,
+          color,
+          tabletSize,
+        ),
+        borderRadius: BorderRadius.circular(tabletSize ? 16 : 12),
+        child: ListTile(
+          leading: Container(
+            padding: EdgeInsets.all(
+              responsiveValue(context, tabletSize ? 12 : 8),
             ),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.green[50]!, Colors.green[100]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(isTablet ? 20 : 15),
-              border: Border.all(color: Colors.green[200]!, width: 1.5),
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(tabletSize ? 12 : 8),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: responsiveValue(context, tabletSize ? 24 : 20),
             ),
           ),
-
-          // Content
-          Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: responsiveValue(context, isTablet ? 40 : 20),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Icon with pulse effect
-                  Container(
-                    width: responsiveValue(context, isTablet ? 45 : 36),
-                    height: responsiveValue(context, isTablet ? 45 : 36),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.green.withOpacity(0.4),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.fiber_new_rounded,
-                      size: responsiveValue(context, isTablet ? 24 : 20),
-                      color: Colors.green[600],
-                    ),
-                  ),
-                  SizedBox(width: responsiveValue(context, isTablet ? 16 : 12)),
-
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isEnglish
-                              ? 'Regular Content Updates'
-                              : 'নিয়মিত কন্টেন্ট আপডেট',
-                          style: TextStyle(
-                            fontSize: responsiveValue(
-                              context,
-                              isTablet ? 16 : 14,
-                            ),
-                            fontWeight: FontWeight.w700,
-                            color: Colors.green[800],
-                          ),
-                        ),
-                        SizedBox(height: responsiveValue(context, 2)),
-                        Text(
-                          isEnglish
-                              ? 'Fresh Islamic knowledge always available'
-                              : 'সর্বদা নতুন ইসলামিক জ্ঞান পাওয়া যাবে',
-                          style: TextStyle(
-                            fontSize: responsiveValue(
-                              context,
-                              isTablet ? 13 : 11,
-                            ),
-                            color: Colors.green[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(width: responsiveValue(context, isTablet ? 12 : 8)),
-
-                  // Live indicator
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: responsiveValue(context, isTablet ? 8 : 6),
-                      vertical: responsiveValue(context, isTablet ? 4 : 2),
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green[500],
-                      borderRadius: BorderRadius.circular(isTablet ? 10 : 8),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: responsiveValue(context, isTablet ? 8 : 6),
-                          height: responsiveValue(context, isTablet ? 8 : 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        SizedBox(
-                          width: responsiveValue(context, isTablet ? 6 : 4),
-                        ),
-                        Text(
-                          isEnglish ? 'LIVE' : 'লাইভ',
-                          style: TextStyle(
-                            fontSize: responsiveValue(
-                              context,
-                              isTablet ? 11 : 9,
-                            ),
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: responsiveValue(context, tabletSize ? 16 : 14),
             ),
           ),
-        ],
+          subtitle: Text(
+            description,
+            style: TextStyle(
+              fontSize: responsiveValue(context, tabletSize ? 14 : 12),
+            ),
+          ),
+          trailing: Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: responsiveValue(context, tabletSize ? 18 : 16),
+            color: color,
+          ),
+          contentPadding: EdgeInsets.all(
+            responsiveValue(context, tabletSize ? 16 : 12),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildRewardsSection(
+  void _showFeatureDetails(
+    BuildContext context,
+    String title,
+    Map<String, String> details,
+    bool isEnglish,
+    Color color,
+    bool tabletSize,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.85,
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: EdgeInsets.all(
+                responsiveValue(context, tabletSize ? 20 : 16),
+              ),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: color,
+                    size: responsiveValue(context, tabletSize ? 28 : 24),
+                  ),
+                  SizedBox(
+                    width: responsiveValue(context, tabletSize ? 12 : 8),
+                  ),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: responsiveValue(
+                          context,
+                          tabletSize ? 20 : 18,
+                        ),
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.close_rounded,
+                      size: responsiveValue(context, tabletSize ? 24 : 20),
+                      color: Colors.grey,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+
+            // Content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(
+                  responsiveValue(context, tabletSize ? 20 : 16),
+                ),
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: details[isEnglish ? 'en' : 'bn'] ?? '',
+                        style: TextStyle(
+                          fontSize: responsiveValue(
+                            context,
+                            tabletSize ? 16 : 14,
+                          ),
+                          height: 1.6,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Close Button
+            Container(
+              padding: EdgeInsets.all(
+                responsiveValue(context, tabletSize ? 16 : 12),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      vertical: responsiveValue(context, tabletSize ? 16 : 14),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(tabletSize ? 12 : 10),
+                    ),
+                  ),
+                  child: Text(
+                    isEnglish ? 'Close' : 'বন্ধ করুন',
+                    style: TextStyle(
+                      fontSize: responsiveValue(context, tabletSize ? 16 : 14),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBenefitsSection(
     BuildContext context,
     bool isEnglish,
     bool isDark,
-    bool isTablet,
+    bool tabletSize,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle(
           context,
-          isEnglish ? '🏆 Quiz Rewards' : '🏆 কুইজ পুরস্কার',
-          Icons.emoji_events,
-          isTablet,
+          isEnglish ? '🎯 Learning Benefits' : '🎯 শিক্ষার সুবিধা',
+          Icons.auto_awesome_rounded,
+          tabletSize,
         ),
         Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(tabletSize ? 16 : 12),
+          ),
           child: Padding(
             padding: EdgeInsets.all(
-              responsiveValue(context, isTablet ? 20 : 16),
+              responsiveValue(context, tabletSize ? 20 : 16),
             ),
             child: Column(
               children: [
-                // Reward Icon
-                Container(
-                  width: responsiveValue(context, isTablet ? 80 : 60),
-                  height: responsiveValue(context, isTablet ? 80 : 60),
-                  decoration: BoxDecoration(
-                    color: Colors.amber[50],
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.amber[300]!,
-                      width: isTablet ? 3 : 2,
+                // Benefits Grid
+                Wrap(
+                  spacing: responsiveValue(context, tabletSize ? 16 : 12),
+                  runSpacing: responsiveValue(context, tabletSize ? 16 : 12),
+                  children: [
+                    _buildBenefitItem(
+                      context,
+                      Icons.lightbulb_rounded,
+                      isEnglish ? 'Knowledge Enhancement' : 'জ্ঞান বৃদ্ধি',
+                      Colors.amber,
+                      tabletSize,
                     ),
-                  ),
-                  child: Icon(
-                    Icons.emoji_events,
-                    size: responsiveValue(context, isTablet ? 40 : 30),
-                    color: Colors.amber[700],
-                  ),
-                ),
-                SizedBox(height: responsiveValue(context, isTablet ? 16 : 12)),
-
-                Text(
-                  isEnglish
-                      ? 'Win Exciting Rewards!'
-                      : 'জিতুন আকর্ষণীয় পুরস্কার!',
-                  style: TextStyle(
-                    fontSize: responsiveValue(context, isTablet ? 18 : 16),
-                    fontWeight: FontWeight.bold,
-                    color: Colors.amber[700],
-                  ),
-                ),
-
-                SizedBox(height: responsiveValue(context, isTablet ? 12 : 8)),
-
-                Text(
-                  isEnglish
-                      ? '• Complete quizzes and earn 5000 points\n• Get amazing gifts and rewards\n• Test your Islamic knowledge\n• Earn free points and bonuses'
-                      : '• কুইজ সম্পন্ন করে ৫০০০ পয়েন্ট অর্জন করুন\n• পেয়ে যান আকর্ষণীয় গিফট ও পুরস্কার\n• ইসলামিক জ্ঞান যাচাই করুন\n• ফ্রি পয়েন্ট ও বোনাস উপভোগ করুন',
-                  style: TextStyle(
-                    fontSize: responsiveValue(context, isTablet ? 15 : 13),
-                    color: isDark ? Colors.white70 : Colors.grey[700],
-                    height: 1.6,
-                  ),
+                    _buildBenefitItem(
+                      context,
+                      Icons.groups_rounded,
+                      isEnglish ? 'Community Learning' : 'কমিউনিটি লার্নিং',
+                      Colors.blue,
+                      tabletSize,
+                    ),
+                    _buildBenefitItem(
+                      context,
+                      Icons.schedule_rounded,
+                      isEnglish ? 'Flexible Timing' : 'নমনীয় সময়',
+                      Colors.green,
+                      tabletSize,
+                    ),
+                    _buildBenefitItem(
+                      context,
+                      Icons.verified_rounded,
+                      isEnglish ? 'Authentic Content' : 'প্রামাণিক কন্টেন্ট',
+                      Colors.purple,
+                      tabletSize,
+                    ),
+                  ],
                 ),
 
-                SizedBox(height: responsiveValue(context, isTablet ? 20 : 16)),
+                SizedBox(
+                  height: responsiveValue(context, tabletSize ? 20 : 16),
+                ),
 
-                // Button 1: Start Quiz (Goes to Home Page)
+                // Start Learning Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.pop(context);
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
@@ -480,13 +726,18 @@ class AboutContactPage extends StatelessWidget {
                       );
                     },
                     icon: Icon(
-                      Icons.quiz,
-                      size: responsiveValue(context, isTablet ? 24 : 20),
+                      Icons.school_rounded,
+                      size: responsiveValue(context, tabletSize ? 24 : 20),
                     ),
                     label: Text(
-                      isEnglish ? 'Start Quiz Now' : 'এখনই কুইজ শুরু করুন',
+                      isEnglish
+                          ? 'Start Learning Journey'
+                          : 'শেখার যাত্রা শুরু করুন',
                       style: TextStyle(
-                        fontSize: responsiveValue(context, isTablet ? 16 : 14),
+                        fontSize: responsiveValue(
+                          context,
+                          tabletSize ? 16 : 14,
+                        ),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -494,56 +745,15 @@ class AboutContactPage extends StatelessWidget {
                       backgroundColor: Colors.green[700],
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(
-                        vertical: responsiveValue(context, isTablet ? 16 : 12),
-                        horizontal: responsiveValue(
+                        vertical: responsiveValue(
                           context,
-                          isTablet ? 20 : 16,
+                          tabletSize ? 16 : 14,
                         ),
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
-                      ),
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: responsiveValue(context, isTablet ? 12 : 8)),
-
-                // Button 2: View Profile
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfileScreen(),
+                        borderRadius: BorderRadius.circular(
+                          tabletSize ? 12 : 10,
                         ),
-                      );
-                    },
-                    icon: Icon(
-                      Icons.person,
-                      size: responsiveValue(context, isTablet ? 24 : 20),
-                    ),
-                    label: Text(
-                      isEnglish ? 'View Your Profile' : 'আপনার প্রোফাইল দেখুন',
-                      style: TextStyle(
-                        fontSize: responsiveValue(context, isTablet ? 16 : 14),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.green[700],
-                      side: BorderSide(color: Colors.green[700]!),
-                      padding: EdgeInsets.symmetric(
-                        vertical: responsiveValue(context, isTablet ? 16 : 12),
-                        horizontal: responsiveValue(
-                          context,
-                          isTablet ? 20 : 16,
-                        ),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
                       ),
                     ),
                   ),
@@ -560,57 +770,60 @@ class AboutContactPage extends StatelessWidget {
     BuildContext context,
     bool isEnglish,
     bool isDark,
-    bool isTablet,
+    bool tabletSize,
   ) {
+    final contactMethods = [
+      {
+        'icon': Icons.email_rounded,
+        'title': isEnglish ? 'Email Support' : 'ইমেইল সাপোর্ট',
+        'value': 'support@islamicday.com',
+        'action': () => _launchEmail(context, 'support@islamicday.com'),
+      },
+      {
+        'icon': Icons.help_rounded,
+        'title': isEnglish ? 'Help Center' : 'হেল্প সেন্টার',
+        'value': isEnglish ? 'Get assistance' : 'সহায়তা নিন',
+        'action': () => _showHelpDialog(context, isEnglish),
+      },
+      {
+        'icon': Icons.feedback_rounded,
+        'title': isEnglish ? 'Send Feedback' : 'ফিডব্যাক পাঠান',
+        'value': isEnglish ? 'Share your thoughts' : 'আপনার মতামত শেয়ার করুন',
+        'action': () => _launchEmail(context, 'feedback@islamicday.com'),
+      },
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle(
           context,
-          isEnglish ? '📞 Contact Us' : '📞 যোগাযোগ করুন',
-          Icons.contact_mail,
-          isTablet,
+          isEnglish ? '💬 Get In Touch' : '💬 যোগাযোগ করুন',
+          Icons.contact_support_rounded,
+          tabletSize,
         ),
         Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(tabletSize ? 16 : 12),
+          ),
           child: Padding(
             padding: EdgeInsets.all(
-              responsiveValue(context, isTablet ? 20 : 16),
+              responsiveValue(context, tabletSize ? 20 : 16),
             ),
             child: Column(
-              children: [
-                _buildContactItem(
-                  context,
-                  Icons.email,
-                  isEnglish ? 'Email Support' : 'ইমেইল সাপোর্ট',
-                  'support@islamicday.com',
-                  isTablet,
-                  onTap: () => _launchEmail('support@islamicday.com'),
-                ),
-                _buildContactItem(
-                  context,
-                  Icons.phone,
-                  isEnglish ? 'Call Us' : 'ফোন করুন',
-                  '+880 1724-184271',
-                  isTablet,
-                  onTap: () => _launchPhone('+8801724184271'),
-                ),
-                _buildContactItem(
-                  context,
-                  Icons.web,
-                  isEnglish ? 'Our Website' : 'আমাদের ওয়েবসাইট',
-                  'www.islamicday.com',
-                  isTablet,
-                  onTap: () => _launchUrl('https://www.islamicday.com'),
-                ),
-                _buildContactItem(
-                  context,
-                  Icons.facebook,
-                  isEnglish ? 'Facebook Page' : 'ফেসবুক পেজ',
-                  'fb.com/islamicday',
-                  isTablet,
-                  onTap: () => _launchUrl('https://fb.com/islamicday'),
-                ),
-              ],
+              children: contactMethods
+                  .map(
+                    (method) => _buildContactCard(
+                      context: context,
+                      icon: method['icon'] as IconData,
+                      title: method['title'] as String,
+                      value: method['value'] as String,
+                      onTap: method['action'] as VoidCallback,
+                      tabletSize: tabletSize,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         ),
@@ -622,59 +835,137 @@ class AboutContactPage extends StatelessWidget {
     BuildContext context,
     bool isEnglish,
     bool isDark,
-    bool isTablet,
+    bool tabletSize,
   ) {
     return Card(
-      color: isDark ? Colors.green[900] : Colors.green[50],
+      color: isDark ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50],
       child: Padding(
-        padding: EdgeInsets.all(responsiveValue(context, isTablet ? 24 : 20)),
+        padding: EdgeInsets.all(responsiveValue(context, tabletSize ? 24 : 20)),
         child: Column(
           children: [
+            Icon(
+              Icons.mosque_rounded,
+              size: responsiveValue(context, tabletSize ? 40 : 32),
+              color: Colors.green[700],
+            ),
+            SizedBox(height: responsiveValue(context, tabletSize ? 16 : 12)),
             Text(
               isEnglish
-                  ? '🤲 May Allah guide us all to the right path of Deen.'
-                  : '🤲 আল্লাহ আমাদের সকলকে দ্বীনের সঠিক পথে পরিচালিত করুন।',
+                  ? 'May Allah accept our efforts in seeking knowledge'
+                  : 'আল্লাহ আমাদের জ্ঞান অর্জনের প্রচেষ্টা কবুল করুন',
               style: TextStyle(
-                fontSize: responsiveValue(context, isTablet ? 16 : 14),
+                fontSize: responsiveValue(context, tabletSize ? 16 : 14),
                 fontStyle: FontStyle.italic,
-                color: isDark ? Colors.white70 : Colors.green[800],
+                color: Colors.green[800],
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: responsiveValue(context, isTablet ? 16 : 12)),
+            SizedBox(height: responsiveValue(context, tabletSize ? 12 : 8)),
             Divider(color: Colors.green[300]),
-            SizedBox(height: responsiveValue(context, isTablet ? 12 : 8)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.people,
-                  size: responsiveValue(context, isTablet ? 20 : 16),
-                  color: Colors.green[700],
-                ),
-                SizedBox(width: responsiveValue(context, isTablet ? 8 : 6)),
-                Text(
-                  isEnglish ? 'Islamic Day Team' : 'ইসলামিক ডে টিম',
-                  style: TextStyle(
-                    fontSize: responsiveValue(context, isTablet ? 16 : 14),
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green[700],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: responsiveValue(context, isTablet ? 8 : 4)),
+            SizedBox(height: responsiveValue(context, tabletSize ? 12 : 8)),
             Text(
-              isEnglish
-                  ? 'For any questions or suggestions'
-                  : 'যেকোনো প্রশ্ন বা পরামর্শের জন্য',
+              'Islamic Day App',
               style: TextStyle(
-                fontSize: responsiveValue(context, isTablet ? 14 : 12),
-                color: isDark ? Colors.white60 : Colors.green[600],
+                fontSize: responsiveValue(context, tabletSize ? 16 : 14),
+                fontWeight: FontWeight.bold,
+                color: Colors.green[700],
+              ),
+            ),
+            SizedBox(height: responsiveValue(context, tabletSize ? 4 : 2)),
+            Text(
+              isEnglish ? 'Version 1.0.0' : 'সংস্করণ ১.০.০',
+              style: TextStyle(
+                fontSize: responsiveValue(context, tabletSize ? 14 : 12),
+                color: Colors.green[600],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBenefitItem(
+    BuildContext context,
+    IconData icon,
+    String text,
+    Color color,
+    bool tabletSize,
+  ) {
+    return Container(
+      width: responsiveValue(context, tabletSize ? 150 : 130),
+      padding: EdgeInsets.all(responsiveValue(context, tabletSize ? 16 : 12)),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(tabletSize ? 12 : 8),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            size: responsiveValue(context, tabletSize ? 32 : 28),
+            color: color,
+          ),
+          SizedBox(height: responsiveValue(context, tabletSize ? 8 : 6)),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: responsiveValue(context, tabletSize ? 14 : 12),
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContactCard({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String value,
+    required VoidCallback onTap,
+    required bool tabletSize,
+  }) {
+    return Card(
+      margin: EdgeInsets.only(
+        bottom: responsiveValue(context, tabletSize ? 12 : 8),
+      ),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(tabletSize ? 12 : 8),
+      ),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: Colors.green[700],
+          size: responsiveValue(context, tabletSize ? 28 : 24),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: responsiveValue(context, tabletSize ? 16 : 14),
+          ),
+        ),
+        subtitle: Text(
+          value,
+          style: TextStyle(
+            fontSize: responsiveValue(context, tabletSize ? 14 : 12),
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios_rounded,
+          size: responsiveValue(context, tabletSize ? 18 : 16),
+          color: Colors.green[700],
+        ),
+        onTap: onTap,
+        contentPadding: EdgeInsets.all(
+          responsiveValue(context, tabletSize ? 12 : 8),
         ),
       ),
     );
@@ -684,25 +975,34 @@ class AboutContactPage extends StatelessWidget {
     BuildContext context,
     String title,
     IconData icon,
-    bool isTablet,
+    bool tabletSize,
   ) {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: responsiveValue(context, isTablet ? 12 : 8),
+        bottom: responsiveValue(context, tabletSize ? 16 : 12),
         left: 4,
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: Colors.green[700],
-            size: responsiveValue(context, isTablet ? 24 : 20),
+          Container(
+            padding: EdgeInsets.all(
+              responsiveValue(context, tabletSize ? 8 : 6),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.green[100],
+              borderRadius: BorderRadius.circular(tabletSize ? 12 : 8),
+            ),
+            child: Icon(
+              icon,
+              color: Colors.green[700],
+              size: responsiveValue(context, tabletSize ? 24 : 20),
+            ),
           ),
-          SizedBox(width: responsiveValue(context, isTablet ? 12 : 8)),
+          SizedBox(width: responsiveValue(context, tabletSize ? 12 : 8)),
           Text(
             title,
             style: TextStyle(
-              fontSize: responsiveValue(context, isTablet ? 18 : 16),
+              fontSize: responsiveValue(context, tabletSize ? 20 : 18),
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
             ),
@@ -712,63 +1012,48 @@ class AboutContactPage extends StatelessWidget {
     );
   }
 
-  Widget _buildContactItem(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String value,
-    bool isTablet, {
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: Colors.green[700],
-        size: responsiveValue(context, isTablet ? 28 : 24),
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: responsiveValue(context, isTablet ? 16 : 14),
+  void _showHelpDialog(BuildContext context, bool isEnglish) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isEnglish ? 'Need Help?' : 'সহায়তা প্রয়োজন?'),
+        content: Text(
+          isEnglish
+              ? 'For any assistance or questions, please email us at support@islamicday.com'
+              : 'যেকোনো সহায়তা বা প্রশ্নের জন্য, আমাদের ইমেইল করুন support@islamicday.com',
         ),
-      ),
-      subtitle: Text(
-        value,
-        style: TextStyle(
-          fontSize: responsiveValue(context, isTablet ? 15 : 13),
-        ),
-      ),
-      trailing: Icon(
-        Icons.arrow_forward_ios,
-        size: responsiveValue(context, isTablet ? 18 : 16),
-        color: Colors.green[700],
-      ),
-      onTap: onTap,
-      contentPadding: EdgeInsets.symmetric(
-        vertical: responsiveValue(context, isTablet ? 8 : 4),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(isEnglish ? 'Close' : 'বন্ধ করুন'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _launchEmail(context, 'support@islamicday.com');
+            },
+            child: Text(isEnglish ? 'Send Email' : 'ইমেইল পাঠান'),
+          ),
+        ],
       ),
     );
   }
 
-  Future<void> _launchEmail(String email) async {
+  Future<void> _launchEmail(BuildContext context, String email) async {
     final Uri uri = Uri.parse('mailto:$email');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
-    }
-  }
-
-  Future<void> _launchPhone(String phone) async {
-    final Uri uri = Uri.parse('tel:$phone');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    }
-  }
-
-  Future<void> _launchUrl(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Email app not found. Please send email to: $email',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 }

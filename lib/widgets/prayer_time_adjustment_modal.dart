@@ -8,6 +8,7 @@ class PrayerTimeAdjustmentModal extends StatefulWidget {
   final Function(String, int) onAdjustmentChanged;
   final VoidCallback onResetAll;
   final VoidCallback onSaveAdjustments;
+  final VoidCallback onRescheduleNotifications; // নতুন callback যোগ করুন
 
   const PrayerTimeAdjustmentModal({
     Key? key,
@@ -15,6 +16,7 @@ class PrayerTimeAdjustmentModal extends StatefulWidget {
     required this.onAdjustmentChanged,
     required this.onResetAll,
     required this.onSaveAdjustments,
+    required this.onRescheduleNotifications, // নতুন parameter
   }) : super(key: key);
 
   @override
@@ -25,7 +27,7 @@ class PrayerTimeAdjustmentModal extends StatefulWidget {
 class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
   Map<String, int> _currentAdjustments = {};
 
-  // Language Texts
+  // Language Texts (একই থাকবে)
   static const Map<String, Map<String, String>> _texts = {
     'adjustPrayerTimes': {
       'en': 'Adjust Prayer Times',
@@ -97,7 +99,6 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final bottomPadding = mediaQuery.padding.bottom;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: EdgeInsets.only(
@@ -147,6 +148,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
               InkWell(
                 onTap: () {
                   widget.onResetAll();
+                  widget.onRescheduleNotifications(); // নোটিফিকেশন রিশিডিউল
                   setState(() {
                     _currentAdjustments = {
                       _text('fajr', context): 0,
@@ -204,7 +206,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
 
           const SizedBox(height: 16),
 
-          // Adjustment List with reduced height
+          // Adjustment List
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.3,
@@ -237,6 +239,7 @@ class _PrayerTimeAdjustmentModalState extends State<PrayerTimeAdjustmentModal> {
                     ),
                     onPressed: () {
                       widget.onSaveAdjustments();
+                      widget.onRescheduleNotifications(); // নোটিফিকেশন রিশিডিউল
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

@@ -1,3 +1,4 @@
+// LOcation Model
 // widgets/location_modal.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';

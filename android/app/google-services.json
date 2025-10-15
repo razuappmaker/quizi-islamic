@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "112879516047",
+    "project_id": "islamic-day-d31dd",
+    "storage_bucket": "islamic-day-d31dd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112879516047:android:a723c30df30b65e1f333fa",
+        "android_client_info": {
+          "package_name": "com.example.islamicquiz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVy3SUOeRTHkFwIm1PdvJSD8NaUDCD1V4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -62,7 +62,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
       {
         'icon': '📱',
         'title': 'ফোন',
-        'value': '+8801303-585259',
+        'value': '+8801724-184271',
         'type': 'phone',
       },
       {
@@ -88,7 +88,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
       {
         'icon': '📱',
         'title': 'Phone',
-        'value': '+8801303-585259',
+        'value': '+8801724-184271',
         'type': 'phone',
       },
       {
@@ -236,7 +236,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                                     child: CircleAvatar(
                                       radius: 56,
                                       backgroundImage: const AssetImage(
-                                        'assets/images/razu.jpg',
+                                        'assets/images/razu.webp',
                                       ),
                                       backgroundColor: Colors.grey[300],
                                     ),

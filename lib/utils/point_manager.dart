@@ -27,7 +27,7 @@ class PointManager with ChangeNotifier {
 
   // ==================== CONSTANTS ====================
   static const int QUIZ_COOLDOWN_MINUTES = 15;
-  static const int MAX_POINTS_PER_DAY = 10000;
+  static const int MAX_POINTS_PER_DAY = 1000; //1000
 
   // ==================== LANGUAGE MANAGEMENT ====================
   String _currentLanguage = 'bn';
