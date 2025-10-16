@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-import 'ad_helper.dart'; // ✅ AdHelper import
+import 'ad_helper.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // AppColors ইম্পোর্ট যোগ
 
 class TasbeehStatsPage extends StatefulWidget {
   const TasbeehStatsPage({Key? key}) : super(key: key);
@@ -76,7 +77,7 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
   void initState() {
     super.initState();
     _loadSavedData();
-    _loadBannerAd(); // ✅ AdHelper ব্যবহার করে banner load
+    _loadBannerAd();
 
     // Fullscreen Ad দেখানো
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -100,13 +101,11 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
 
   Future<void> _loadBannerAd() async {
     try {
-      // ✅ AdHelper ব্যবহার করে adaptive banner তৈরি করুন
       _bannerAd = await AdHelper.createAdaptiveBannerAdWithFallback(
         context,
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) {
             setState(() => _isBannerAdReady = true);
-            // ✅ Banner ad shown রেকর্ড করুন
             AdHelper.recordBannerAdShown();
             print('Banner ad loaded successfully.');
           },
@@ -116,7 +115,6 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
             setState(() => _isBannerAdReady = false);
           },
           onAdOpened: (Ad ad) {
-            // ✅ Ad click রেকর্ড করুন (limit check সহ)
             AdHelper.canClickAd().then((canClick) {
               if (canClick) {
                 AdHelper.recordAdClick();
@@ -128,8 +126,6 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
           },
         ),
       );
-
-      // ✅ AdHelper এর ভিতরে ইতিমধ্যে load() কল করা হয়েছে, তাই এখানে আলাদা করে load() কল করার দরকার নেই
     } catch (e) {
       print('Error loading banner ad: $e');
       setState(() => _isBannerAdReady = false);
@@ -151,17 +147,18 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
       SnackBar(
         content: Text(_text('resetSuccess', context)),
         duration: const Duration(seconds: 2),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.darkPrimary
+            : AppColors.lightPrimary,
       ),
     );
   }
 
   @override
   void dispose() {
-    _bannerAd?.dispose(); // ✅ Null safety সহ dispose
+    _bannerAd?.dispose();
     super.dispose();
   }
-
-  //--------------------------------
 
   Widget _buildStatCard(
     String title,
@@ -179,14 +176,14 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 6,
-      color: isDark ? Colors.grey[850] : color.withOpacity(0.1),
+      color: isDark ? AppColors.darkCard : AppColors.lightCard,
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(
           vertical: 12,
           horizontal: screenWidth > 600 ? 24 : 20,
         ),
         leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.2),
+          backgroundColor: color.withOpacity(isDark ? 0.3 : 0.2),
           child: Icon(Icons.favorite, color: color, size: 20),
         ),
         title: Text(
@@ -194,21 +191,22 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
           style: TextStyle(
             fontSize: screenWidth > 600 ? 22 : 20,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : color.shade800,
+            color: isDark ? AppColors.darkText : AppColors.lightText,
           ),
         ),
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
+            color: color.withOpacity(isDark ? 0.3 : 0.2),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withOpacity(0.5), width: 1),
           ),
           child: Text(
             count.toString(),
             style: TextStyle(
               fontSize: screenWidth > 600 ? 26 : 24,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : color.shade900,
+              color: isDark ? AppColors.darkText : color.shade900,
             ),
           ),
         ),
@@ -227,7 +225,7 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 4,
-      color: isDark ? Colors.grey[800] : Colors.green.shade50,
+      color: isDark ? AppColors.darkCard : AppColors.lightCard,
       child: Padding(
         padding: EdgeInsets.all(screenWidth > 600 ? 20 : 16),
         child: Column(
@@ -237,7 +235,9 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
               children: [
                 Icon(
                   Icons.emoji_events,
-                  color: isDark ? Colors.amber : Colors.green.shade700,
+                  color: isDark
+                      ? AppColors.darkPrimary
+                      : AppColors.lightPrimary,
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -245,7 +245,7 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
                   style: TextStyle(
                     fontSize: screenWidth > 600 ? 20 : 18,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.green.shade900,
+                    color: isDark ? AppColors.darkText : AppColors.lightText,
                   ),
                 ),
               ],
@@ -255,7 +255,10 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
               benefit,
               style: TextStyle(
                 fontSize: screenWidth > 600 ? 17 : 16,
-                color: isDark ? Colors.white70 : Colors.black87,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
+                height: 1.4,
               ),
             ),
           ],
@@ -268,6 +271,7 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final benefits = getBenefits(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final MaterialColor subColor = Colors.green;
     final MaterialColor alhamColor = Colors.blue;
@@ -280,9 +284,12 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
         foregroundColor: Colors.white,
         title: Text(
           _text('pageTitle', context),
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18, // ✅ font size 18 যোগ করা হয়েছে
+          ),
         ),
-        backgroundColor: Colors.green[800],
+        backgroundColor: isDark ? AppColors.darkAppBar : AppColors.lightAppBar,
         leading: Container(
           margin: EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -298,21 +305,26 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
       ),
 
       body: SafeArea(
-        bottom: true, // সবসময় bottom safe area maintain করবে
+        bottom: true,
         child: Column(
           children: [
             // Main Content
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.green.shade50, Colors.green.shade100],
-                  ),
+                  gradient: isDark
+                      ? LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: AppColors.darkBackgroundGradient,
+                        )
+                      : LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: AppColors.lightBackgroundGradient,
+                        ),
                 ),
                 child: SingleChildScrollView(
-                  // ব্যানার না থাকলে extra bottom padding যোগ করুন
                   padding: EdgeInsets.only(
                     bottom: _isBannerAdReady ? 0 : bottomPadding + 20,
                   ),
@@ -353,7 +365,9 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.redAccent,
+                            backgroundColor: isDark
+                                ? AppColors.darkError
+                                : AppColors.lightError,
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(
                               vertical: screenWidth > 600 ? 16 : 14,
@@ -385,11 +399,9 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
                             style: TextStyle(
                               fontSize: screenWidth > 600 ? 26 : 22,
                               fontWeight: FontWeight.bold,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.grey
-                                  : Colors.green.shade800,
+                              color: isDark
+                                  ? AppColors.darkText
+                                  : AppColors.lightText,
                             ),
                           ),
                         ),
@@ -420,7 +432,9 @@ class _TasbeehStatsPageState extends State<TasbeehStatsPage> {
             // Banner Ad (যদি থাকে)
             if (_isBannerAdReady && _bannerAd != null)
               Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
+                color: isDark
+                    ? AppColors.darkBackground
+                    : AppColors.lightBackground,
                 alignment: Alignment.center,
                 width: double.infinity,
                 height: _bannerAd!.size.height.toDouble(),

@@ -7,6 +7,8 @@ import 'ad_helper.dart';
 import 'utils/responsive_utils.dart';
 import 'network_json_loader.dart';
 import '../providers/language_provider.dart';
+import '../providers/theme_provider.dart'; // নতুন ইম্পোর্ট
+import '../utils/app_colors.dart'; // নতুন ইম্পোর্ট
 
 class WordByWordQuranPage extends StatefulWidget {
   const WordByWordQuranPage({Key? key}) : super(key: key);
@@ -61,6 +63,12 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
     );
     final langKey = languageProvider.isEnglish ? 'en' : 'bn';
     return _texts[key]?[langKey] ?? key;
+  }
+
+  // হেল্পার মেথড - ডার্ক মুড চেক করার জন্য
+  bool _isDarkMode(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode;
   }
 
   @override
@@ -211,63 +219,9 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
     });
   }
 
-  // কালার হেল্পার মেথড - SuraPage এর মতো একই
-  Color _getPrimaryColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF2E7D32)
-        : Color(0xFF2E7D32);
-  }
-
-  Color _getBackgroundColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF121212)
-        : Color(0xFFFAFAFA);
-  }
-
-  Color _getCardColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF1E1E1E)
-        : Colors.white;
-  }
-
-  Color _getHeaderColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF2D2D2D)
-        : Colors.white;
-  }
-
-  Color _getTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Color(0xFF37474F);
-  }
-
-  Color _getSecondaryTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey[400]!
-        : Color(0xFF546E7A);
-  }
-
-  Color _getBorderColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF404040)
-        : Color(0xFFE0E0E0);
-  }
-
-  Color _getHeaderTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Color(0xFF2E7D32);
-  }
-
-  Color _getHeaderIconColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Color(0xFF2E7D32);
-  }
-
-  // হেডার সেকশন - SuraPage এর মতো
+  // হেডার সেকশন - AppColors ব্যবহার করে আপডেট
   Widget _buildSuraHeader(Map<String, dynamic> sura, int index) {
+    final isDarkMode = _isDarkMode(context);
     final serial = sura['serial'] ?? (index + 1);
     final type = sura['type'] ?? 'মাক্কি';
     final ayatCount = sura['ayat_count'] ?? sura['ayat']?.length ?? 0;
@@ -285,12 +239,15 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
-        color: _getHeaderColor(context),
+        color: AppColors.getSurfaceColor(isDarkMode),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
-        border: Border.all(color: _getBorderColor(context), width: 1),
+        border: Border.all(
+          color: AppColors.getBorderColor(isDarkMode),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
@@ -298,21 +255,23 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
+              color: isDarkMode
                   ? Colors.white.withOpacity(0.1)
-                  : _getPrimaryColor(context).withOpacity(0.1),
+                  : AppColors.getPrimaryColor(isDarkMode).withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
+                color: isDarkMode
                     ? Colors.white.withOpacity(0.3)
-                    : _getPrimaryColor(context).withOpacity(0.3),
+                    : AppColors.getPrimaryColor(isDarkMode).withOpacity(0.3),
                 width: 1,
               ),
             ),
             child: Text(
               '$serial',
               style: TextStyle(
-                color: _getHeaderTextColor(context),
+                color: isDarkMode
+                    ? Colors.white
+                    : AppColors.getPrimaryColor(isDarkMode),
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -331,7 +290,9 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: _getHeaderTextColor(context),
+                    color: isDarkMode
+                        ? Colors.white
+                        : AppColors.getPrimaryColor(isDarkMode),
                     fontFamily: 'ScheherazadeNew',
                   ),
                   maxLines: 2,
@@ -348,10 +309,10 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                       ),
                       decoration: BoxDecoration(
                         color: type == 'মাক্কি' || type == 'Makki'
-                            ? (Theme.of(context).brightness == Brightness.dark
+                            ? (isDarkMode
                                   ? Color(0xFFFFB74D)
                                   : Color(0xFFFFA000))
-                            : (Theme.of(context).brightness == Brightness.dark
+                            : (isDarkMode
                                   ? Color(0xFF4FC3F7)
                                   : Color(0xFF1976D2)),
                         borderRadius: BorderRadius.circular(12),
@@ -375,28 +336,36 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
+                        color: isDarkMode
                             ? Colors.white.withOpacity(0.1)
-                            : _getPrimaryColor(context).withOpacity(0.1),
+                            : AppColors.getPrimaryColor(
+                                isDarkMode,
+                              ).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Theme.of(context).brightness == Brightness.dark
+                          color: isDarkMode
                               ? Colors.white.withOpacity(0.3)
-                              : _getPrimaryColor(context).withOpacity(0.3),
+                              : AppColors.getPrimaryColor(
+                                  isDarkMode,
+                                ).withOpacity(0.3),
                         ),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             Icons.library_books_rounded,
-                            color: _getHeaderIconColor(context),
+                            color: isDarkMode
+                                ? Colors.white
+                                : AppColors.getPrimaryColor(isDarkMode),
                             size: 14,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             '$ayatCount ${_text('verses', context)}',
                             style: TextStyle(
-                              color: _getHeaderTextColor(context),
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : AppColors.getPrimaryColor(isDarkMode),
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -417,14 +386,16 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
+                color: isDarkMode
                     ? Colors.white.withOpacity(0.2)
-                    : _getPrimaryColor(context).withOpacity(0.1),
+                    : AppColors.getPrimaryColor(isDarkMode).withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.expand_more_rounded,
-                color: _getHeaderIconColor(context),
+                color: isDarkMode
+                    ? Colors.white
+                    : AppColors.getPrimaryColor(isDarkMode),
                 size: 22,
               ),
             ),
@@ -435,15 +406,15 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
   }
 
   Widget _buildWordByWordSection(List<dynamic> arabicWords) {
+    final isDarkMode = _isDarkMode(context);
+
     return Container(
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Color(0xFF252525)
-            : Color(0xFFF8F9FA),
+        color: AppColors.getSurfaceColor(isDarkMode),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _getBorderColor(context)),
+        border: Border.all(color: AppColors.getBorderColor(isDarkMode)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,7 +424,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: _getTextColor(context),
+              color: AppColors.getTextColor(isDarkMode),
             ),
           ),
           const SizedBox(height: 12),
@@ -476,12 +447,10 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Color(0xFF2D2D2D)
-                          : Color(0xFFE8F5E8),
+                      color: isDarkMode ? Color(0xFF2D2D2D) : Color(0xFFE8F5E8),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Theme.of(context).brightness == Brightness.dark
+                        color: isDarkMode
                             ? Color(0xFF404040)
                             : Color(0xFFC8E6C9),
                       ),
@@ -495,7 +464,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                             fontSize: _fontSize + 4,
                             fontFamily: 'ScheherazadeNew',
                             fontWeight: FontWeight.bold,
-                            color: _getTextColor(context),
+                            color: AppColors.getTextColor(isDarkMode),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -503,7 +472,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                           meaning,
                           style: TextStyle(
                             fontSize: _fontSize - 2,
-                            color: _getSecondaryTextColor(context),
+                            color: AppColors.getTextSecondaryColor(isDarkMode),
                             fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.center,
@@ -525,35 +494,39 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
     required VoidCallback onPressed,
     required String tooltip,
   }) {
+    final isDarkMode = _isDarkMode(context);
+
     return IconButton(
       icon: Icon(icon, size: 20),
       onPressed: onPressed,
       tooltip: tooltip,
       style: IconButton.styleFrom(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? Color(0xFF2D2D2D)
-            : Color(0xFFF5F5F5),
+        backgroundColor: AppColors.getSurfaceColor(isDarkMode),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
 
   Widget buildWordSura(Map<String, dynamic> sura, int index) {
+    final isDarkMode = _isDarkMode(context);
     final bool isExpanded = expandedIndices.contains(index);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Material(
         borderRadius: BorderRadius.circular(16),
-        elevation: Theme.of(context).brightness == Brightness.dark ? 1 : 2,
-        shadowColor: Theme.of(context).brightness == Brightness.dark
+        elevation: isDarkMode ? 1 : 2,
+        shadowColor: isDarkMode
             ? Colors.black.withOpacity(0.5)
             : Colors.grey.withOpacity(0.2),
         child: Container(
           decoration: BoxDecoration(
-            color: _getCardColor(context),
+            color: AppColors.getCardColor(isDarkMode),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: _getBorderColor(context), width: 1),
+            border: Border.all(
+              color: AppColors.getBorderColor(isDarkMode),
+              width: 1,
+            ),
           ),
           child: Column(
             children: [
@@ -589,14 +562,10 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                               ),
                               margin: const EdgeInsets.only(bottom: 20),
                               decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Color(0xFF252525)
-                                    : Color(0xFFF8F9FA),
+                                color: AppColors.getSurfaceColor(isDarkMode),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: _getBorderColor(context),
+                                  color: AppColors.getBorderColor(isDarkMode),
                                 ),
                               ),
                               child: Column(
@@ -606,7 +575,9 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                     children: [
                                       Icon(
                                         Icons.text_fields_rounded,
-                                        color: _getPrimaryColor(context),
+                                        color: AppColors.getPrimaryColor(
+                                          isDarkMode,
+                                        ),
                                         size: 18,
                                       ),
                                       const SizedBox(width: 8),
@@ -615,7 +586,9 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
-                                          color: _getTextColor(context),
+                                          color: AppColors.getTextColor(
+                                            isDarkMode,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -639,12 +612,11 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                               _fontSize = value;
                                             });
                                           },
-                                          activeColor: _getPrimaryColor(
-                                            context,
-                                          ),
-                                          inactiveColor:
-                                              Theme.of(context).brightness ==
-                                                  Brightness.dark
+                                          activeColor:
+                                              AppColors.getPrimaryColor(
+                                                isDarkMode,
+                                              ),
+                                          inactiveColor: isDarkMode
                                               ? Color(0xFF404040)
                                               : Color(0xFFBDBDBD),
                                         ),
@@ -656,15 +628,15 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                           vertical: 8,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: _getPrimaryColor(
-                                            context,
+                                          color: AppColors.getPrimaryColor(
+                                            isDarkMode,
                                           ).withOpacity(0.1),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
                                           border: Border.all(
-                                            color: _getPrimaryColor(
-                                              context,
+                                            color: AppColors.getPrimaryColor(
+                                              isDarkMode,
                                             ).withOpacity(0.3),
                                           ),
                                         ),
@@ -673,7 +645,9 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color: _getPrimaryColor(context),
+                                            color: AppColors.getPrimaryColor(
+                                              isDarkMode,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -726,7 +700,9 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                           fontFamily: 'ScheherazadeNew',
                                           fontWeight: FontWeight.bold,
                                           wordSpacing: 2.5,
-                                          color: _getTextColor(context),
+                                          color: AppColors.getTextColor(
+                                            isDarkMode,
+                                          ),
                                           height: 1.6,
                                         ),
                                         textAlign: TextAlign.right,
@@ -750,8 +726,8 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                         gradient: LinearGradient(
                                           colors: [
                                             Colors.transparent,
-                                            _getPrimaryColor(
-                                              context,
+                                            AppColors.getPrimaryColor(
+                                              isDarkMode,
                                             ).withOpacity(0.3),
                                             Colors.transparent,
                                           ],
@@ -767,9 +743,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                       style: TextStyle(
                                         fontSize: _fontSize,
                                         fontStyle: FontStyle.italic,
-                                        color:
-                                            Theme.of(context).brightness ==
-                                                Brightness.dark
+                                        color: isDarkMode
                                             ? Color(0xFF4FC3F7)
                                             : Color(0xFF2E7D32),
                                         height: 1.4,
@@ -783,7 +757,9 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                       '${_text('completeMeaning', context)}: ${ay['meaning'] ?? ''}',
                                       style: TextStyle(
                                         fontSize: _fontSize,
-                                        color: _getSecondaryTextColor(context),
+                                        color: AppColors.getTextSecondaryColor(
+                                          isDarkMode,
+                                        ),
                                         height: 1.4,
                                       ),
                                     ),
@@ -798,16 +774,12 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
+                                  color: isDarkMode
                                       ? Color(0xFF1A1A1A)
                                       : Color(0xFFE8F5E8),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color:
-                                        Theme.of(context).brightness ==
-                                            Brightness.dark
+                                    color: isDarkMode
                                         ? Color(0xFF444444)
                                         : Color(0xFFC8E6C9),
                                   ),
@@ -816,9 +788,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                   children: [
                                     Icon(
                                       Icons.source_rounded,
-                                      color:
-                                          Theme.of(context).brightness ==
-                                              Brightness.dark
+                                      color: isDarkMode
                                           ? Color(0xFF4FC3F7)
                                           : Color(0xFF1976D2),
                                       size: 18,
@@ -830,9 +800,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontStyle: FontStyle.italic,
-                                          color:
-                                              Theme.of(context).brightness ==
-                                                  Brightness.dark
+                                          color: isDarkMode
                                               ? Color(0xFF4FC3F7)
                                               : Color(0xFF1565C0),
                                         ),
@@ -863,10 +831,12 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: _getPrimaryColor(context),
+        backgroundColor: AppColors.getAppBarColor(isDarkMode),
         title: Text(
           _text('pageTitle', context),
           style: TextStyle(
@@ -889,10 +859,15 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
         ),
       ),
       body: SafeArea(
-        // Main SafeArea to handle system UI
         bottom: true,
         child: Container(
-          color: _getBackgroundColor(context),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: AppColors.getBackgroundGradient(isDarkMode),
+            ),
+          ),
           child: Column(
             children: [
               Expanded(
@@ -902,13 +877,15 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CircularProgressIndicator(
-                              color: _getPrimaryColor(context),
+                              color: AppColors.getPrimaryColor(isDarkMode),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               _text('loading', context),
                               style: TextStyle(
-                                color: _getSecondaryTextColor(context),
+                                color: AppColors.getTextSecondaryColor(
+                                  isDarkMode,
+                                ),
                                 fontSize: 16,
                               ),
                             ),
@@ -922,14 +899,18 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                           children: [
                             Icon(
                               Icons.error_outline_rounded,
-                              color: _getSecondaryTextColor(context),
+                              color: AppColors.getTextSecondaryColor(
+                                isDarkMode,
+                              ),
                               size: 64,
                             ),
                             const SizedBox(height: 16),
                             Text(
                               _text('noSuraFound', context),
                               style: TextStyle(
-                                color: _getSecondaryTextColor(context),
+                                color: AppColors.getTextSecondaryColor(
+                                  isDarkMode,
+                                ),
                                 fontSize: 16,
                               ),
                             ),
@@ -943,22 +924,19 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                       ),
               ),
 
-              // Anchor Ad Section - Fixed with proper bottom padding
+              // Anchor Ad Section
               if (_isAnchorAdReady && _showAnchorAd && _anchorAd != null)
                 Container(
                   width: double.infinity,
-                  color: _getCardColor(context),
+                  color: AppColors.getCardColor(isDarkMode),
                   child: Stack(
                     children: [
-                      // Ad Widget
                       Container(
                         width: double.infinity,
                         height: _anchorAd!.size.height.toDouble(),
                         alignment: Alignment.center,
                         child: AdWidget(ad: _anchorAd!),
                       ),
-
-                      // Minimal Close Button
                       Positioned(
                         top: 4,
                         right: 4,
@@ -967,9 +945,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
+                              color: isDarkMode
                                   ? Colors.black54
                                   : Colors.white54,
                               shape: BoxShape.circle,
@@ -977,11 +953,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                             child: Icon(
                               Icons.close,
                               size: 14,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black87,
+                              color: isDarkMode ? Colors.white : Colors.black87,
                             ),
                           ),
                         ),

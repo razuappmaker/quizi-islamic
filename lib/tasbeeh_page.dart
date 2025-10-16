@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'tasbeeh_stats_page.dart';
 import 'ad_helper.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart';
 
 class TasbeehPage extends StatefulWidget {
   const TasbeehPage({Key? key}) : super(key: key);
@@ -27,16 +28,11 @@ class _TasbeehPageState extends State<TasbeehPage> {
     'resetAll': {'en': 'Reset All', 'bn': 'সম্পূর্ণ রিসেট'},
     'lightMode': {'en': 'Light Mode', 'bn': 'লাইট মোড'},
     'darkMode': {'en': 'Dark Mode', 'bn': 'ডার্ক মোড'},
-    'zikrBenefits': {'en': 'Benefits of Zikr', 'bn': 'জিকিরের ফজিলত'},
-    'benefitContent': {
+    'zikrHadith': {
       'en':
-          "The Prophet Muhammad ﷺ said: 'Indeed, the remembrance of Allah brings peace to the heart.'",
+          "The Prophet Muhammad ﷺ said: 'Whoever says: 'Subhanallah wa bihamdihi' (Glory and praise be to Allah) one hundred times in a day, will have his sins forgiven even if they were like the foam of the sea.' (Sahih al-Bukhari)",
       'bn':
-          "রাসূলুল্লাহ ﷺ বলেছেন: 'নিশ্চয়ই আল্লাহর স্মরণ (জিকির) হৃদয়কে শান্ত করে।'",
-    },
-    'peaceAndHappiness': {
-      'en': 'Peace and happiness of mind',
-      'bn': 'সুখ ও মনের প্রশান্তি লাভ',
+          "রাসূলুল্লাহ ﷺ বলেছেন: 'যে ব্যক্তি দিনে একশতবার বলবে: 'সুবহানাল্লাহি ওয়া বিহামদিহী' (আল্লাহর পবিত্রতা ও প্রশংসা), তার সমস্ত গুনাহ মাফ করে দেওয়া হবে, এমনকি যদি সেগুলো সাগরের ফেনার মতো বেশি হয়।' (সহিহ বুখারি)",
     },
   };
 
@@ -70,10 +66,6 @@ class _TasbeehPageState extends State<TasbeehPage> {
 
   Color _backgroundColor = Colors.green.shade100;
   bool _isDarkMode = false;
-
-  final Map<String, String> benefits = {
-    "peaceAndHappiness": _texts['benefitContent']!['en']!,
-  };
 
   BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
@@ -293,7 +285,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
               scaffoldBackgroundColor: Colors.grey[900],
               cardColor: Colors.grey[800],
               appBarTheme: AppBarTheme(
-                backgroundColor: Colors.green[800],
+                backgroundColor: AppColors.darkAppBar,
                 elevation: 0,
               ),
             )
@@ -301,7 +293,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
               primaryColor: Colors.green[800],
               scaffoldBackgroundColor: Colors.grey[100],
               appBarTheme: AppBarTheme(
-                backgroundColor: Colors.green[800],
+                backgroundColor: AppColors.lightAppBar,
                 elevation: 0,
               ),
             ),
@@ -315,7 +307,9 @@ class _TasbeehPageState extends State<TasbeehPage> {
               color: Colors.white,
             ),
           ),
-          backgroundColor: Colors.green[800],
+          backgroundColor: _isDarkMode
+              ? AppColors.darkAppBar
+              : AppColors.lightAppBar,
           elevation: 2,
           leading: Container(
             margin: EdgeInsets.all(8),
@@ -390,7 +384,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
               // Main Content - SafeArea ব্যবহার করে
               Expanded(
                 child: SafeArea(
-                  bottom: false, // নিচের SafeArea বন্ধ
+                  bottom: false,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     color: _backgroundColor,
@@ -515,13 +509,21 @@ class _TasbeehPageState extends State<TasbeehPage> {
                             ),
                           ),
 
-                          // Benefits Card
+                          // Simple Hadith Text (without extra space)
                           Container(
                             width: contentWidth,
-                            child: _buildBenefitCard(
-                              _text('zikrBenefits', context),
-                              _text('benefitContent', context),
-                              context,
+                            margin: EdgeInsets.only(bottom: 8), // কম margin
+                            child: Text(
+                              _text('zikrHadith', context),
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.4,
+                                color: _isDarkMode
+                                    ? Colors.grey[300]
+                                    : Colors.grey[700],
+                                fontStyle: FontStyle.italic,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
 
@@ -534,9 +536,9 @@ class _TasbeehPageState extends State<TasbeehPage> {
                 ),
               ),
 
-              // Bottom Section (Buttons + Ad) - SafeArea ব্যবহার করে
+              // Bottom Section (Buttons + Ad)
               SafeArea(
-                top: false, // উপরের SafeArea বন্ধ
+                top: false,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -747,80 +749,6 @@ class _TasbeehPageState extends State<TasbeehPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 3,
         shadowColor: color.withOpacity(0.3),
-      ),
-    );
-  }
-
-  Widget _buildBenefitCard(String title, String benefit, BuildContext context) {
-    final isDark = _isDarkMode;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 600;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: isDark ? Colors.grey[800] : Colors.green.shade50,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Icon Section
-              Container(
-                width: 40,
-                height: 40,
-                margin: const EdgeInsets.only(right: 12),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.green[800]!.withOpacity(0.3)
-                      : Colors.green.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.emoji_events_rounded,
-                  color: isDark ? Colors.green[300] : Colors.green.shade700,
-                  size: 22,
-                ),
-              ),
-
-              // Text Section
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: isDark
-                            ? Colors.green[300]
-                            : Colors.green.shade800,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      benefit,
-                      style: TextStyle(
-                        fontSize: 14,
-                        height: 1.4,
-                        color: isDark
-                            ? Colors.green[100]
-                            : Colors.green.shade900,
-                      ),
-                      textAlign: TextAlign.left,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

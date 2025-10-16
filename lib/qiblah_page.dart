@@ -9,6 +9,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // AppColors ইম্পোর্ট যোগ
 import 'ad_helper.dart';
 
 class QiblaPage extends StatefulWidget {
@@ -374,22 +375,25 @@ class _QiblaPageState extends State<QiblaPage>
     // ✅ LanguageProvider access করুন
     final languageProvider = Provider.of<LanguageProvider>(context);
     final isEnglish = languageProvider.isEnglish;
-
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: isDarkMode
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
       appBar: AppBar(
         title: Text(
           isEnglish ? "Qibla Compass" : "কিবলা কম্পাস",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.green[700],
+        backgroundColor: isDarkMode
+            ? AppColors.darkAppBar
+            : AppColors.lightAppBar,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         leading: Container(
@@ -443,7 +447,9 @@ class _QiblaPageState extends State<QiblaPage>
                         ),
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
-                          color: Colors.orange[100],
+                          color: isDarkMode
+                              ? Colors.orange[900]!.withOpacity(0.3)
+                              : Colors.orange[100],
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.orange),
                         ),
@@ -508,7 +514,9 @@ class _QiblaPageState extends State<QiblaPage>
                 width: double.infinity,
                 height: _bottomBannerAd!.size.height.toDouble(),
                 alignment: Alignment.center,
-                color: isDarkMode ? Colors.grey[800] : Colors.white,
+                color: isDarkMode
+                    ? AppColors.darkBackground
+                    : AppColors.lightBackground,
                 margin: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
                 child: AdWidget(ad: _bottomBannerAd!),
               ),
@@ -525,7 +533,7 @@ class _QiblaPageState extends State<QiblaPage>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          color: isDarkMode ? AppColors.darkCard : AppColors.lightCard,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -539,7 +547,13 @@ class _QiblaPageState extends State<QiblaPage>
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(Icons.location_pin, color: Colors.green[600], size: 32),
+            Icon(
+              Icons.location_pin,
+              color: isDarkMode
+                  ? AppColors.darkPrimary
+                  : AppColors.lightPrimary,
+              size: 32,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -550,7 +564,9 @@ class _QiblaPageState extends State<QiblaPage>
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green[600],
+                      color: isDarkMode
+                          ? AppColors.darkPrimary
+                          : AppColors.lightPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -559,7 +575,12 @@ class _QiblaPageState extends State<QiblaPage>
                     const SizedBox(height: 2),
                     Text(
                       countryName,
-                      style: TextStyle(fontSize: 14, color: Colors.green[500]),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDarkMode
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -581,7 +602,9 @@ class _QiblaPageState extends State<QiblaPage>
             ),
             Icon(
               Icons.gps_fixed,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode
+                  ? AppColors.darkTextSecondary
+                  : AppColors.lightTextSecondary,
               size: 20,
             ),
           ],
@@ -596,7 +619,11 @@ class _QiblaPageState extends State<QiblaPage>
       child: Column(
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.darkPrimary
+                  : AppColors.lightPrimary,
+            ),
             strokeWidth: 3,
           ),
           const SizedBox(height: 20),
@@ -606,7 +633,9 @@ class _QiblaPageState extends State<QiblaPage>
                 : "কিবলা দিকনির্দেশ লোড হচ্ছে...",
             style: TextStyle(
               fontSize: 16,
-              color: Colors.green[600],
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.darkPrimary
+                  : AppColors.lightPrimary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -651,7 +680,13 @@ class _QiblaPageState extends State<QiblaPage>
   Widget _buildCompassError(bool isEnglish) {
     return Column(
       children: [
-        Icon(Icons.error_outline, color: Colors.red, size: 60),
+        Icon(
+          Icons.error_outline,
+          color: AppColors.getErrorColor(
+            Theme.of(context).brightness == Brightness.dark,
+          ),
+          size: 60,
+        ),
         const SizedBox(height: 16),
         Text(
           isEnglish
@@ -659,7 +694,9 @@ class _QiblaPageState extends State<QiblaPage>
               : "কম্পাস লোড করতে সমস্যা হচ্ছে\nমোবাইলটি সামান্য নাড়ান বা রিফ্রেশ করুন",
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: Colors.red,
+            color: AppColors.getErrorColor(
+              Theme.of(context).brightness == Brightness.dark,
+            ),
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -700,18 +737,24 @@ class _QiblaPageState extends State<QiblaPage>
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  isDarkMode ? Colors.grey[700]! : Colors.grey[200]!,
-                  isDarkMode ? Colors.grey[900]! : Colors.grey[100]!,
+                  isDarkMode ? AppColors.darkSurface : AppColors.lightSurface,
+                  isDarkMode
+                      ? AppColors.darkBackground
+                      : AppColors.lightBackground,
                 ],
               ),
               border: Border.all(
-                color: isDarkMode ? Colors.grey[600]! : Colors.grey[400]!,
+                color: isDarkMode
+                    ? AppColors.darkBorder
+                    : AppColors.lightBorder,
                 width: 4,
               ),
             ),
             child: CustomPaint(
               painter: ProfessionalCompassPainter(
-                textColor: isDarkMode ? Colors.white : Colors.black,
+                textColor: isDarkMode
+                    ? AppColors.darkText
+                    : AppColors.lightText,
                 heading: heading,
               ),
             ),
@@ -823,7 +866,7 @@ class _QiblaPageState extends State<QiblaPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[800] : Colors.white,
+        color: isDarkMode ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -855,7 +898,9 @@ class _QiblaPageState extends State<QiblaPage>
           const SizedBox(height: 16),
           LinearProgressIndicator(
             value: qiblaAngle != null ? 1 - (difference / 180) : 0,
-            backgroundColor: isDarkMode ? Colors.grey[600] : Colors.grey[200],
+            backgroundColor: isDarkMode
+                ? AppColors.darkSurface
+                : AppColors.lightSurface,
             color: _getProgressColor(difference),
             minHeight: 10,
             borderRadius: BorderRadius.circular(5),
@@ -875,7 +920,9 @@ class _QiblaPageState extends State<QiblaPage>
             "${isEnglish ? "Location" : "অবস্থান"}: ${_lastLatitude.toStringAsFixed(4)}°, ${_lastLongitude.toStringAsFixed(4)}°",
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode
+                  ? AppColors.darkTextSecondary
+                  : AppColors.lightTextSecondary,
             ),
           ),
         ],
@@ -891,13 +938,19 @@ class _QiblaPageState extends State<QiblaPage>
   ) {
     return Column(
       children: [
-        Icon(icon, color: Colors.green[600], size: 24),
+        Icon(
+          icon,
+          color: isDarkMode ? AppColors.darkPrimary : AppColors.lightPrimary,
+          size: 24,
+        ),
         const SizedBox(height: 8),
         Text(
           title,
           style: TextStyle(
             fontSize: 12,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: isDarkMode
+                ? AppColors.darkTextSecondary
+                : AppColors.lightTextSecondary,
           ),
         ),
         const SizedBox(height: 4),
@@ -906,7 +959,7 @@ class _QiblaPageState extends State<QiblaPage>
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: isDarkMode ? AppColors.darkText : AppColors.lightText,
           ),
         ),
       ],
@@ -931,7 +984,7 @@ class _QiblaPageState extends State<QiblaPage>
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: isDarkMode ? Colors.grey[800] : Colors.white,
+      color: isDarkMode ? AppColors.darkCard : AppColors.lightCard,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -941,7 +994,9 @@ class _QiblaPageState extends State<QiblaPage>
               children: [
                 Icon(
                   Icons.compass_calibration,
-                  color: Colors.green[600],
+                  color: isDarkMode
+                      ? AppColors.darkPrimary
+                      : AppColors.lightPrimary,
                   size: 24,
                 ),
                 const SizedBox(width: 8),
@@ -952,7 +1007,9 @@ class _QiblaPageState extends State<QiblaPage>
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green[600],
+                    color: isDarkMode
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary,
                   ),
                 ),
               ],
@@ -963,6 +1020,7 @@ class _QiblaPageState extends State<QiblaPage>
                   ? "📱 Keep phone flat and rotate"
                   : "📱 ফোনটি সমতল রাখুন এবং ঘুরান",
               Icons.phone_android,
+              isDarkMode,
             ),
             const SizedBox(height: 8),
             _buildInstructionRow(
@@ -970,6 +1028,7 @@ class _QiblaPageState extends State<QiblaPage>
                   ? "🎯 Red arrow shows Qibla direction"
                   : "🎯 লাল তীর কিবলার দিক দেখাবে",
               Icons.architecture,
+              isDarkMode,
             ),
             const SizedBox(height: 8),
             _buildInstructionRow(
@@ -977,6 +1036,7 @@ class _QiblaPageState extends State<QiblaPage>
                   ? "🧭 N indicates North direction"
                   : "🧭 N দিয়ে উত্তর দিক চিন্হিত",
               Icons.explore,
+              isDarkMode,
             ),
             const SizedBox(height: 8),
             _buildInstructionRow(
@@ -984,6 +1044,7 @@ class _QiblaPageState extends State<QiblaPage>
                   ? "✅ Green bar shows accuracy level"
                   : "✅ সবুজ বার দেখাবে কতটা সঠিক",
               Icons.check_circle,
+              isDarkMode,
             ),
           ],
         ),
@@ -991,14 +1052,25 @@ class _QiblaPageState extends State<QiblaPage>
     );
   }
 
-  Widget _buildInstructionRow(String text, IconData icon) {
+  Widget _buildInstructionRow(String text, IconData icon, bool isDarkMode) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Colors.green[600]),
+        Icon(
+          icon,
+          size: 20,
+          color: isDarkMode ? AppColors.darkPrimary : AppColors.lightPrimary,
+        ),
         const SizedBox(width: 12),
         Expanded(
-          child: Text(text, style: const TextStyle(fontSize: 14, height: 1.4)),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.4,
+              color: isDarkMode ? AppColors.darkText : AppColors.lightText,
+            ),
+          ),
         ),
       ],
     );
@@ -1008,7 +1080,9 @@ class _QiblaPageState extends State<QiblaPage>
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.orange[50],
+      color: isDarkMode
+          ? Colors.orange[900]!.withOpacity(0.3)
+          : Colors.orange[50],
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'ad_helper.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // Import the AppColors class
 
 class IslamicHistoryPage extends StatefulWidget {
   const IslamicHistoryPage({super.key});
@@ -176,35 +177,29 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 4,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                isDarkMode ? Colors.green[900]! : Colors.green[700]!,
-                isDarkMode ? Colors.green[700]! : Colors.green[500]!,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        backgroundColor: AppColors.getAppBarColor(isDarkMode),
         title: Text(
           isEnglish ? 'Brief History of Islam' : 'ইসলামের সংক্ষিপ্ত ইতিহাস',
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
             letterSpacing: 0.5,
-            color: Colors.white,
+            color: Colors.white, // Always white for AppBar title
           ),
         ),
         leading: Container(
           margin: EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
+            // White with opacity for circle
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            icon: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white, // Always white for AppBar icons
+              size: 20,
+            ),
             onPressed: () => Navigator.of(context).pop(),
             splashRadius: 20,
           ),
@@ -219,17 +214,11 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
                 padding: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
                 child: Container(
                   decoration: BoxDecoration(
-                    gradient: isDarkMode
-                        ? LinearGradient(
-                            colors: [Colors.black, Colors.green[900]!],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          )
-                        : LinearGradient(
-                            colors: [Colors.green[50]!, Colors.white],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
+                    gradient: LinearGradient(
+                      colors: AppColors.getBackgroundGradient(isDarkMode),
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
                   ),
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -463,7 +452,7 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
                                     '• সর্বোচ্চ সময়ে সাম্রাজ্যের আয়তন প্রায় ৫ মিলিয়ন বর্গকিলোমিটার ছিল।\n\n'
                                     '### প্রশাসন ও সমাজব্যবস্থা:\n'
                                     '• অটোমানরা অত্যন্ত দক্ষ প্রশাসনিক কাঠামো তৈরি করে, যেখানে মিল্লাত সিস্টেম এর মাধ্যমে বিভিন্ন ধর্মীয় সম্প্রদায়কে স্বায়ত্তশাসন দেওয়া হত।\n'
-                                    '• অটোমান সেনাবাহিনী, বিশেষ করে জানিসারি বাহিনী, বিশ্বের অন্যতম শক্তিশালী সামরিক বাহিনী হিসেবে পরিচিত ছিল।\n'
+                                    '• অটোমান সেনাবাহিনী, বিশেষ করে জানিসারি বাহিনী, বিশ্বের অন্যতম শক্তিশалী সামরিক বাহিনী হিসেবে পরিচিত ছিল।\n'
                                     '• অর্থনীতি কৃষি, বাণিজ্য এবং সিল্ক রোডের উপর নির্ভরশীল ছিল।\n\n'
                                     '### জ্ঞান-বিজ্ঞান ও স্থাপত্য:\n'
                                     '• ইসলামী স্থাপত্যের অসাধারণ নিদর্শন, যেমন **সুলেইমানিয়া মসজিদ** ও নীল মসজিদ (Blue Mosque) অটোমান যুগে নির্মিত হয়।\n'
@@ -515,9 +504,7 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
                             style: TextStyle(
                               fontSize: 14,
                               fontStyle: FontStyle.italic,
-                              color: isDarkMode
-                                  ? Colors.green[200]
-                                  : Colors.green[700],
+                              color: AppColors.getPrimaryColor(isDarkMode),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -551,11 +538,7 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: isDarkMode ? Colors.green[300] : Colors.green[700],
-            size: 20,
-          ),
+          Icon(icon, color: AppColors.getPrimaryColor(isDarkMode), size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -563,7 +546,7 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.green[900],
+                color: AppColors.getTextColor(isDarkMode),
               ),
             ),
           ),
@@ -575,9 +558,9 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
   Widget _buildContentCard(String content, bool isDarkMode) {
     return Card(
       elevation: 3,
-      shadowColor: Colors.black26,
+      shadowColor: AppColors.getBorderColor(isDarkMode).withOpacity(0.3),
       margin: const EdgeInsets.symmetric(vertical: 8),
-      color: isDarkMode ? Colors.grey[850] : Colors.white,
+      color: AppColors.getCardColor(isDarkMode),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -586,7 +569,7 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
           style: TextStyle(
             fontSize: 14,
             height: 1.6,
-            color: isDarkMode ? Colors.white70 : Colors.grey[800],
+            color: AppColors.getTextColor(isDarkMode),
           ),
           textAlign: TextAlign.justify,
         ),
@@ -604,7 +587,7 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
               width: 60,
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.green[700] : Colors.green[500],
+                color: AppColors.getPrimaryColor(isDarkMode),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -620,7 +603,7 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
             Container(
               width: 2,
               height: 25,
-              color: isDarkMode ? Colors.green[700] : Colors.green[300],
+              color: AppColors.getPrimaryColor(isDarkMode).withOpacity(0.6),
             ),
           ],
         ),
@@ -632,7 +615,7 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
               event,
               style: TextStyle(
                 fontSize: 14,
-                color: isDarkMode ? Colors.white70 : Colors.grey[800],
+                color: AppColors.getTextColor(isDarkMode),
                 height: 1.4,
               ),
             ),
@@ -641,37 +624,40 @@ class _IslamicHistoryPageState extends State<IslamicHistoryPage> {
       ],
     );
   }
-}
 
-Widget _buildExpansionItem(String title, String content, bool isDarkMode) {
-  return Card(
-    elevation: 2,
-    margin: const EdgeInsets.symmetric(vertical: 6),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    color: isDarkMode ? Colors.grey[850] : Colors.white,
-    child: ExpansionTile(
-      iconColor: isDarkMode ? Colors.green[300] : Colors.green[700],
-      collapsedIconColor: isDarkMode ? Colors.green[200] : Colors.green[600],
-      childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.bold,
-          color: isDarkMode ? Colors.green[300] : Colors.green[700],
+  Widget _buildExpansionItem(String title, String content, bool isDarkMode) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.getCardColor(isDarkMode),
+      child: ExpansionTile(
+        iconColor: AppColors.getPrimaryColor(isDarkMode),
+        collapsedIconColor: AppColors.getPrimaryColor(isDarkMode),
+        childrenPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 8,
         ),
-      ),
-      children: [
-        Text(
-          content,
+        title: Text(
+          title,
           style: TextStyle(
-            fontSize: 13,
-            color: isDarkMode ? Colors.white70 : Colors.grey[700],
-            height: 1.5,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: AppColors.getPrimaryColor(isDarkMode),
           ),
-          textAlign: TextAlign.justify,
         ),
-      ],
-    ),
-  );
+        children: [
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.getTextColor(isDarkMode),
+              height: 1.5,
+            ),
+            textAlign: TextAlign.justify,
+          ),
+        ],
+      ),
+    );
+  }
 }

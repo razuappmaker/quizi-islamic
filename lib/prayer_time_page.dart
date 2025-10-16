@@ -1,3 +1,4 @@
+// Pyaer time page
 // Prayer Time
 // prayer_time_page.dart - Final Version with Dual Language Support
 
@@ -18,6 +19,7 @@ import '../widgets/prayer_list_section.dart';
 import '../widgets/prohibited_time_section.dart';
 import '../widgets/location_modal.dart';
 import '../widgets/prayer_time_adjustment_modal.dart';
+import '../utils/app_colors.dart'; // Import the AppColors class
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -358,8 +360,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   }
 
   // সেটিংস মডাল শো করা
-  // prayer_time_page.dart-এ _showSettingsModal মেথডে
-
   void _showSettingsModal() {
     showModalBottomSheet(
       context: context,
@@ -376,7 +376,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     );
   }
 
-  // সব অ্যাডজাস্টমেন্ট রিসেট করা
   // সব অ্যাডজাস্টমেন্ট রিসেট করা
   void _resetAllAdjustments() {
     setState(() {
@@ -403,8 +402,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         channelKey: 'prayer_reminder_channel',
         channelName: 'Prayer Reminders',
         channelDescription: 'Notifications for prayer times',
-        defaultColor: Colors.green,
-        ledColor: Colors.green,
+        defaultColor: AppColors.darkPrimary,
+        ledColor: AppColors.darkPrimary,
         importance: NotificationImportance.High,
       ),
     ]);
@@ -839,10 +838,12 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
   // Prayer time detail dialog
   void _showPrayerTimeDetail(String prayerName, String time) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: AppColors.getSurfaceColor(isDarkMode),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -852,14 +853,15 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
               Icon(
                 _prayerTimeService.getPrayerIcon(prayerName),
                 size: 48,
-                color: _prayerTimeService.getPrayerColor(prayerName),
+                color: AppColors.getPrimaryColor(isDarkMode),
               ),
               const SizedBox(height: 16),
               Text(
                 _getPrayerName(prayerName),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: AppColors.getTextColor(isDarkMode),
                 ),
               ),
               const SizedBox(height: 8),
@@ -867,7 +869,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                 _prayerTimeService.formatTimeTo12Hour(time),
                 style: TextStyle(
                   fontSize: 18,
-                  color: Colors.grey[600],
+                  color: AppColors.getTextSecondaryColor(isDarkMode),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -877,16 +879,14 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Monospace',
-                  color: Colors.grey[500],
+                  color: AppColors.getTextSecondaryColor(isDarkMode),
                 ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _prayerTimeService.getPrayerColor(
-                    prayerName,
-                  ),
+                  backgroundColor: AppColors.getPrimaryColor(isDarkMode),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -900,6 +900,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -915,7 +916,10 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      color: Colors.orange,
+      color: AppColors.getAccentColor(
+        'orange',
+        Theme.of(context).brightness == Brightness.dark,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -933,15 +937,16 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF2E7D32),
+        backgroundColor: AppColors.getAppBarColor(isDarkMode),
         title: Text(
           _text('title'),
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 14, // ফন্ট সাইজ ছোট করা হয়েছে
+            fontSize: 16, // ফন্ট সাইজ ছোট করা হয়েছে
             color: Colors.white,
             height: 1.2, // লাইন হাইট কম করা হয়েছে
           ),
@@ -979,7 +984,10 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.green[600]!, Colors.green[800]!],
+                      colors: [
+                        AppColors.getPrimaryColor(isDarkMode),
+                        AppColors.getPrimaryColor(isDarkMode).withOpacity(0.8),
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -992,7 +1000,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       ),
                     ],
                     border: Border.all(
-                      color: Colors.green[100]!.withOpacity(0.3),
+                      color: Colors.white.withOpacity(0.3),
                       width: 1,
                     ),
                   ),
@@ -1037,7 +1045,10 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                   ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.green[600]!, Colors.green[800]!],
+                      colors: [
+                        AppColors.getPrimaryColor(isDarkMode),
+                        AppColors.getPrimaryColor(isDarkMode).withOpacity(0.8),
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -1050,7 +1061,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                       ),
                     ],
                     border: Border.all(
-                      color: Colors.green[100]!.withOpacity(0.3),
+                      color: Colors.white.withOpacity(0.3),
                       width: 1,
                     ),
                   ),
@@ -1087,15 +1098,15 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   // Banner Ad Widget
   Widget _buildBannerAd() {
     if (_isBannerAdReady && _bannerAd != null) {
+      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
       return SafeArea(
         top: false,
         child: Container(
           width: _bannerAd!.size.width.toDouble(),
           height: _bannerAd!.size.height.toDouble(),
           alignment: Alignment.center,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.grey[900]
-              : Colors.white,
+          color: AppColors.getBackgroundColor(isDarkMode),
           child: AdWidget(ad: _bannerAd!),
         ),
       );
@@ -1109,6 +1120,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     if (_prohibitedTimeService == null) {
       return Center(child: CircularProgressIndicator());
     }
+
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -1141,9 +1154,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
             Expanded(
               child: Container(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[900]
-                    : Colors.grey.shade50,
+                color: AppColors.getBackgroundColor(isDarkMode),
                 child: Column(
                   children: [
                     Expanded(
@@ -1181,12 +1192,15 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   }
 
   void _showFloatingInfo(BuildContext context, String title, String message) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
         return Container(
           padding: const EdgeInsets.all(16),
+          color: AppColors.getSurfaceColor(isDarkMode),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1196,19 +1210,30 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.getTextColor(isDarkMode),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.keyboard_arrow_down),
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.getTextColor(isDarkMode),
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              Text(message, style: const TextStyle(fontSize: 14, height: 1.4)),
+              Text(
+                message,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.4,
+                  color: AppColors.getTextColor(isDarkMode),
+                ),
+              ),
               const SizedBox(height: 16),
             ],
           ),

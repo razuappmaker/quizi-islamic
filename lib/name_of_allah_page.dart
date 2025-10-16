@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'ad_helper.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // AppColors ইম্পোর্ট যোগ
 
 class AllahName {
   final String arabic;
@@ -155,7 +156,6 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
             },
           ),
         );
-        // ✅ AdHelper এর ভিতরে ইতিমধ্যে load() কল করা হয়েছে, তাই এখানে আলাদা করে load() কল করার দরকার নেই
         _bannerAds.add(banner);
       } catch (e) {
         print('Error creating in-list adaptive banner: $e');
@@ -186,7 +186,6 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
           },
         ),
       );
-      // ✅ AdHelper এর ভিতরে ইতিমধ্যে load() কল করা হয়েছে, তাই এখানে আলাদা করে load() কল করার দরকার নেই
     } catch (e) {
       print('Error creating bottom adaptive banner: $e');
       _isBottomBannerAdReady = false;
@@ -200,20 +199,29 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
       listen: false,
     );
     final isEnglish = languageProvider.isEnglish;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: isDarkMode
+              ? AppColors.darkCard
+              : AppColors.lightCard,
           title: Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.green[800]),
+              Icon(
+                Icons.info_outline,
+                color: isDarkMode
+                    ? AppColors.darkPrimary
+                    : AppColors.lightPrimary,
+              ),
               SizedBox(width: 8),
               Text(
                 isEnglish ? "Important Note" : "গুরুত্বপূর্ণ নোট",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.green[800],
+                  color: isDarkMode ? AppColors.darkText : AppColors.lightText,
                 ),
               ),
             ],
@@ -223,7 +231,11 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
               isEnglish
                   ? "References from Quranic verses or authentic Hadiths have been mentioned for the virtues (Fazilat) of each name.\n\nSome virtues are related to specific numbers of Dhikr, which are mentioned in various Hadith books and Islamic literature. These are essentially devotional practices.\n\nBefore performing any devotional act, intention (Niyyah) should be pure and it should be done solely for the pleasure of Allah."
                   : "প্রতিটি নামের ফাজিলাতের জন্য কুরআনের আয়াত বা সহীহ হাদিসের রেফারেন্স উল্লেখ করা হয়েছে।\n\nকিছু ফাজিলাত নির্দিষ্ট সংখ্যক জিকিরের সাথে সম্পর্কিত, যা বিভিন্ন হাদিসের বই ও ইসলামিক গ্রন্থে বর্ণিত আছে। এগুলো মূলত প্রার্থনামূলক আমল।\n\nযে কোনো আমল করার আগে নিয়্যাত খালেস করতে হবে এবং শুধুমাত্র আল্লাহর সন্তুষ্টির জন্য করতে হবে।",
-              style: TextStyle(fontSize: 16, height: 1.5),
+              style: TextStyle(
+                fontSize: 16,
+                height: 1.5,
+                color: isDarkMode ? AppColors.darkText : AppColors.lightText,
+              ),
             ),
           ),
           actions: [
@@ -234,7 +246,9 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
               child: Text(
                 isEnglish ? "OK" : "ঠিক আছে",
                 style: TextStyle(
-                  color: Colors.green[800],
+                  color: isDarkMode
+                      ? AppColors.darkPrimary
+                      : AppColors.lightPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -302,29 +316,35 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final isEnglish = languageProvider.isEnglish;
-
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Colors.green[800];
+    final primaryColor = isDarkMode
+        ? AppColors.darkPrimary
+        : AppColors.lightPrimary;
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    //int totalItems = filteredNames.length + (filteredNames.length / 6).floor();
-    // totalItems ক্যালকুলেশন ঠিক করুন
+
     int totalItems = filteredNames.length + ((filteredNames.length - 1) ~/ 6);
+
     return Scaffold(
+      backgroundColor: isDarkMode
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
       appBar: AppBar(
         title: Text(
           isEnglish ? "99 Names of Allah" : "আল্লাহর ৯৯ নাম",
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 16, // ফন্ট সাইজ ছোট করা হয়েছে
+            fontSize: 16,
             color: Colors.white,
-            height: 1.2, // লাইন হাইট কম করা হয়েছে
+            height: 1.2,
           ),
-          maxLines: 2, // সর্বোচ্চ ২ লাইন
-          overflow: TextOverflow.ellipsis, // ২ লাইনের বেশি হলে ... দেখাবে
-          textAlign: TextAlign.start, // টেক্সট অ্যালাইনমেন্ট
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.start,
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: isDarkMode
+            ? AppColors.darkAppBar
+            : AppColors.lightAppBar,
         elevation: 2,
         leading: Container(
           margin: EdgeInsets.all(8),
@@ -349,7 +369,11 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
             onPressed: () {
               showSearch(
                 context: context,
-                delegate: AllahNameSearchDelegate(filteredNames, isEnglish),
+                delegate: AllahNameSearchDelegate(
+                  filteredNames,
+                  isEnglish,
+                  isDarkMode,
+                ),
               );
             },
           ),
@@ -359,25 +383,59 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
               PopupMenuItem(
                 value: 'increase',
                 child: ListTile(
-                  leading: const Icon(Icons.zoom_in),
-                  title: Text(isEnglish ? 'Increase Font' : 'ফন্ট বড় করুন'),
+                  leading: Icon(
+                    Icons.zoom_in,
+                    color: isDarkMode
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary,
+                  ),
+                  title: Text(
+                    isEnglish ? 'Increase Font' : 'ফন্ট বড় করুন',
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? AppColors.darkText
+                          : AppColors.lightText,
+                    ),
+                  ),
                   onTap: _increaseFontSize,
                 ),
               ),
               PopupMenuItem(
                 value: 'decrease',
                 child: ListTile(
-                  leading: const Icon(Icons.zoom_out),
-                  title: Text(isEnglish ? 'Decrease Font' : 'ফন্ট ছোট করুন'),
+                  leading: Icon(
+                    Icons.zoom_out,
+                    color: isDarkMode
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary,
+                  ),
+                  title: Text(
+                    isEnglish ? 'Decrease Font' : 'ফন্ট ছোট করুন',
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? AppColors.darkText
+                          : AppColors.lightText,
+                    ),
+                  ),
                   onTap: _decreaseFontSize,
                 ),
               ),
               PopupMenuItem(
                 value: 'reset',
                 child: ListTile(
-                  leading: const Icon(Icons.restart_alt),
+                  leading: Icon(
+                    Icons.restart_alt,
+                    color: isDarkMode
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary,
+                  ),
                   title: Text(
                     isEnglish ? 'Default Font Size' : 'ডিফল্ট ফন্ট সাইজ',
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? AppColors.darkText
+                          : AppColors.lightText,
+                    ),
                   ),
                   onTap: _resetFontSize,
                 ),
@@ -417,7 +475,6 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                   }
 
                   // ✅ সঠিক নাম ইন্ডেক্স ক্যালকুলেশন
-                  // নাম ইন্ডেক্স ক্যালকুলেশন
                   int nameIndex = index - totalAdsBefore;
                   if (nameIndex >= filteredNames.length) {
                     return const SizedBox.shrink();
@@ -428,7 +485,9 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
-                      color: isDarkMode ? Colors.grey[800] : Colors.white,
+                      color: isDarkMode
+                          ? AppColors.darkCard
+                          : AppColors.lightCard,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
@@ -451,7 +510,7 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: primaryColor!.withOpacity(0.15),
+                                  color: primaryColor.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: primaryColor.withOpacity(0.3),
@@ -478,8 +537,8 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black,
+                                            ? AppColors.darkText
+                                            : AppColors.lightText,
                                       ),
                                     ),
                                     Text(
@@ -488,8 +547,8 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                         fontSize: 16,
                                         fontStyle: FontStyle.italic,
                                         color: isDarkMode
-                                            ? Colors.white70
-                                            : Colors.grey[700],
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.lightTextSecondary,
                                       ),
                                     ),
                                   ],
@@ -504,13 +563,13 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
                               color: isDarkMode
-                                  ? Colors.grey[900]
-                                  : Colors.grey[50],
+                                  ? AppColors.darkSurface
+                                  : AppColors.lightSurface,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: isDarkMode
-                                    ? Colors.grey[700]!
-                                    : Colors.grey[300]!,
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder,
                                 width: 1,
                               ),
                             ),
@@ -524,8 +583,8 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                   fontFamily: 'ScheherazadeNew',
                                   fontWeight: FontWeight.bold,
                                   color: isDarkMode
-                                      ? Colors.white
-                                      : Colors.black,
+                                      ? AppColors.darkText
+                                      : AppColors.lightText,
                                   height: 1.8,
                                   wordSpacing: 2.5,
                                 ),
@@ -539,8 +598,14 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: isDarkMode
-                                  ? Colors.green[900]!.withOpacity(0.2)
-                                  : Colors.green[50],
+                                  ? AppColors.getAccentColor(
+                                      'green',
+                                      isDarkMode,
+                                    ).withOpacity(0.2)
+                                  : AppColors.getAccentColor(
+                                      'green',
+                                      isDarkMode,
+                                    ).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -557,8 +622,14 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                           fontWeight: FontWeight.bold,
                                           fontSize: _textFontSize,
                                           color: isDarkMode
-                                              ? Colors.green[200]
-                                              : Colors.green[800],
+                                              ? AppColors.getAccentColor(
+                                                  'green',
+                                                  isDarkMode,
+                                                )
+                                              : AppColors.getAccentColor(
+                                                  'green',
+                                                  isDarkMode,
+                                                ),
                                         ),
                                       ),
                                       TextSpan(
@@ -568,8 +639,8 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                         style: TextStyle(
                                           fontSize: _textFontSize,
                                           color: isDarkMode
-                                              ? Colors.white
-                                              : Colors.black87,
+                                              ? AppColors.darkText
+                                              : AppColors.lightText,
                                         ),
                                       ),
                                     ],
@@ -587,8 +658,14 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                           fontWeight: FontWeight.bold,
                                           fontSize: _textFontSize,
                                           color: isDarkMode
-                                              ? Colors.green[200]
-                                              : Colors.green[800],
+                                              ? AppColors.getAccentColor(
+                                                  'green',
+                                                  isDarkMode,
+                                                )
+                                              : AppColors.getAccentColor(
+                                                  'green',
+                                                  isDarkMode,
+                                                ),
                                         ),
                                       ),
                                       TextSpan(
@@ -598,8 +675,8 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                         style: TextStyle(
                                           fontSize: _textFontSize,
                                           color: isDarkMode
-                                              ? Colors.white70
-                                              : Colors.black87,
+                                              ? AppColors.darkTextSecondary
+                                              : AppColors.lightTextSecondary,
                                         ),
                                       ),
                                     ],
@@ -614,13 +691,25 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: isDarkMode
-                                  ? Colors.orange[900]!.withOpacity(0.15)
-                                  : Colors.orange[50],
+                                  ? AppColors.getAccentColor(
+                                      'orange',
+                                      isDarkMode,
+                                    ).withOpacity(0.15)
+                                  : AppColors.getAccentColor(
+                                      'orange',
+                                      isDarkMode,
+                                    ).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: isDarkMode
-                                    ? Colors.orange[700]!
-                                    : Colors.orange[300]!,
+                                    ? AppColors.getAccentColor(
+                                        'orange',
+                                        isDarkMode,
+                                      )
+                                    : AppColors.getAccentColor(
+                                        'orange',
+                                        isDarkMode,
+                                      ),
                                 width: 1,
                               ),
                             ),
@@ -633,8 +722,14 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: _textFontSize,
                                     color: isDarkMode
-                                        ? Colors.orange[200]
-                                        : Colors.orange[800],
+                                        ? AppColors.getAccentColor(
+                                            'orange',
+                                            isDarkMode,
+                                          )
+                                        : AppColors.getAccentColor(
+                                            'orange',
+                                            isDarkMode,
+                                          ),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -643,8 +738,8 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
                                   style: TextStyle(
                                     fontSize: _textFontSize,
                                     color: isDarkMode
-                                        ? Colors.white70
-                                        : Colors.black87,
+                                        ? AppColors.darkText
+                                        : AppColors.lightText,
                                     height: 1.5,
                                   ),
                                 ),
@@ -678,17 +773,27 @@ class _NameOfAllahPageState extends State<NameOfAllahPage> {
 class AllahNameSearchDelegate extends SearchDelegate {
   final List<AllahName> allNames;
   final bool isEnglish;
+  final bool isDarkMode;
 
-  AllahNameSearchDelegate(this.allNames, this.isEnglish);
+  AllahNameSearchDelegate(this.allNames, this.isEnglish, this.isDarkMode);
 
   @override
   List<Widget>? buildActions(BuildContext context) => [
-    IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ""),
+    IconButton(
+      icon: Icon(
+        Icons.clear,
+        color: isDarkMode ? AppColors.darkText : AppColors.lightText,
+      ),
+      onPressed: () => query = "",
+    ),
   ];
 
   @override
   Widget? buildLeading(BuildContext context) => IconButton(
-    icon: const Icon(Icons.arrow_back),
+    icon: Icon(
+      Icons.arrow_back,
+      color: isDarkMode ? AppColors.darkText : AppColors.lightText,
+    ),
     onPressed: () => close(context, null),
   );
 
@@ -715,23 +820,78 @@ class AllahNameSearchDelegate extends SearchDelegate {
   }
 
   Widget _buildSearchList(List<AllahName> names) {
-    return ListView.builder(
-      itemCount: names.length,
-      itemBuilder: (context, index) {
-        final name = names[index];
-        return ListTile(
-          title: Text(isEnglish ? name.english : name.bangla),
-          subtitle: Text(isEnglish ? name.meaningEn : name.meaningBn),
-          trailing: Text(
-            name.arabic,
-            style: TextStyle(fontFamily: 'ScheherazadeNew', fontSize: 18),
-          ),
-          onTap: () {
-            query = isEnglish ? name.english : name.bangla;
-            showResults(context);
-          },
-        );
-      },
+    return Container(
+      color: isDarkMode ? AppColors.darkBackground : AppColors.lightBackground,
+      child: ListView.builder(
+        itemCount: names.length,
+        itemBuilder: (context, index) {
+          final name = names[index];
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: isDarkMode ? AppColors.darkCard : AppColors.lightCard,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListTile(
+              title: Text(
+                isEnglish ? name.english : name.bangla,
+                style: TextStyle(
+                  color: isDarkMode ? AppColors.darkText : AppColors.lightText,
+                ),
+              ),
+              subtitle: Text(
+                isEnglish ? name.meaningEn : name.meaningBn,
+                style: TextStyle(
+                  color: isDarkMode
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
+                ),
+              ),
+              trailing: Text(
+                name.arabic,
+                style: TextStyle(
+                  fontFamily: 'ScheherazadeNew',
+                  fontSize: 18,
+                  color: isDarkMode ? AppColors.darkText : AppColors.lightText,
+                ),
+              ),
+              onTap: () {
+                query = isEnglish ? name.english : name.bangla;
+                showResults(context);
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    final theme = Theme.of(context);
+    return theme.copyWith(
+      scaffoldBackgroundColor: isDarkMode
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
+      appBarTheme: AppBarTheme(
+        backgroundColor: isDarkMode
+            ? AppColors.darkAppBar
+            : AppColors.lightAppBar,
+        iconTheme: IconThemeData(color: Colors.white),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: TextStyle(
+          color: isDarkMode
+              ? AppColors.darkTextSecondary
+              : AppColors.lightTextSecondary,
+        ),
+        border: InputBorder.none,
+      ),
     );
   }
 }

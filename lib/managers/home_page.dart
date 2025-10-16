@@ -1,4 +1,4 @@
-// home page
+// home page - COMPACT VERSION
 // lib/home/home_page.dart
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1000), // Reduced duration
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -107,13 +107,15 @@ class _HomePageState extends State<HomePage>
     );
 
     _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, -0.5), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero).animate(
+          // Reduced slide distance
           CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
         );
 
     _animationController.forward();
 
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      // Reduced delay
       if (mounted) {
         _initializeApp();
       }
@@ -123,46 +125,33 @@ class _HomePageState extends State<HomePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Route observer subscribe করুন
     final route = ModalRoute.of(context);
     if (route != null && route is PageRoute) {
       routeObserver.subscribe(this, route);
     }
   }
 
-  // RouteAware methods
-  // RouteAware methods - IMPROVED VERSION
   @override
   void didPopNext() {
-    // যখন অন্য পেজ থেকে ব্যাক করে এই পেজে আসা হয়
-    print('🏠 HomePage didPopNext - Back to HomePage detected');
-    print('📱 Checking if mounted: $mounted');
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        print('✅ HomePage is mounted, refreshing...');
         _refreshHomePage();
-      } else {
-        print('❌ HomePage not mounted, skipping refresh');
       }
     });
   }
 
   @override
   void didPushNext() {
-    // যখন এই পেজ থেকে অন্য পেজে যাওয়া হয়
     print('HomePage didPushNext');
   }
 
   @override
   void didPush() {
-    // যখন এই পেজে push করা হয়
     print('HomePage didPush');
   }
 
   @override
   void didPop() {
-    // যখন এই পেজ থেকে pop করা হয়
     print('HomePage didPop');
   }
 
@@ -184,7 +173,6 @@ class _HomePageState extends State<HomePage>
         if (!_animationController.isAnimating) {
           _animationController.forward();
         }
-        // অ্যাপ রিজিউম হলে অ্যাড রিলোড করুন
         if (_showBannerAd && !_isBannerAdLoaded) {
           _loadAdaptiveBannerAd();
         }
@@ -232,7 +220,6 @@ class _HomePageState extends State<HomePage>
     }
   }
 
-  // Adaptive Banner Ad লোড করার মেথড
   Future<void> _loadAdaptiveBannerAd() async {
     if (!_isConnected || !mounted || _isBannerLoading) return;
 
@@ -243,7 +230,6 @@ class _HomePageState extends State<HomePage>
         _isBannerLoading = true;
       });
 
-      // প্রিমিয়াম ইউজার চেক
       final shouldShow = await AdHelper.shouldShowAds;
       if (!shouldShow) {
         if (mounted) {
@@ -256,7 +242,6 @@ class _HomePageState extends State<HomePage>
         return;
       }
 
-      // ব্যানার অ্যাড লিমিট চেক
       final canShow = await AdHelper.canShowBannerAd();
       if (!canShow) {
         if (mounted) {
@@ -269,7 +254,6 @@ class _HomePageState extends State<HomePage>
         return;
       }
 
-      // Anchored Adaptive Banner Ad তৈরি করুন
       banner = await AdHelper.createAnchoredBannerAd(
         context,
         listener: BannerAdListener(
@@ -337,7 +321,6 @@ class _HomePageState extends State<HomePage>
     }
   }
 
-  // Pull-to-Refresh হ্যান্ডলার
   Future<void> _handleRefresh() async {
     if (_isRefreshing) return;
 
@@ -352,30 +335,23 @@ class _HomePageState extends State<HomePage>
 
     print('🔄 Pull-to-Refresh triggered...');
 
-    // অ্যানিমেশন রিসেট করুন
     _animationController.reset();
-
-    // কানেক্টিভিটি চেক করুন
     await _checkConnectivity();
 
-    // 🔥 গুরুত্বপূর্ণ: রিফ্রেশ হলে সবসময় অ্যাড শো করুন
     if (!_showBannerAd) {
       setState(() {
         _showBannerAd = true;
       });
     }
 
-    // ব্যানার অ্যাড রিফ্রেশ করুন
     if (_showBannerAd) {
       _bannerAd?.dispose();
       _isBannerAdLoaded = false;
       await _loadAdaptiveBannerAd();
     }
 
-    // অ্যানিমেশন পুনরায় শুরু করুন
     _animationController.forward();
 
-    // স্ন্যাকবার দেখান
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -391,7 +367,6 @@ class _HomePageState extends State<HomePage>
       );
     }
 
-    // রিফ্রেশ কমপ্লিট করুন
     setState(() {
       _isRefreshing = false;
     });
@@ -413,14 +388,12 @@ class _HomePageState extends State<HomePage>
     _animationController.reset();
     _animationController.forward();
 
-    // 🔥 গুরুত্বপূর্ণ: রিফ্রেশ হলে সবসময় অ্যাড শো করুন
     if (!_showBannerAd) {
       setState(() {
         _showBannerAd = true;
       });
     }
 
-    // অ্যাড রিফ্রেশ করুন
     if (_showBannerAd) {
       print('🔄 Refreshing banner ad...');
       _bannerAd?.dispose();
@@ -442,7 +415,6 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  // ব্যানার অ্যাড হাইড/শো টগল মেথড
   void _toggleBannerAd() {
     if (mounted) {
       setState(() {
@@ -470,26 +442,28 @@ class _HomePageState extends State<HomePage>
         appBar: AppBar(
           title: ResponsiveText(
             languageProvider.isEnglish ? 'Islamic Day' : 'Islamic Day',
-            fontSize: 22,
+            fontSize: tablet ? 20 : 18, // Reduced font size
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
-          backgroundColor: isDarkMode ? Colors.green[900] : Colors.green[800],
-          elevation: 4,
+          backgroundColor: isDarkMode ? _Colors.darkAppBar : Colors.green[800],
+          elevation: 2,
+          // Reduced elevation
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(12),
+            ), // Reduced radius
           ),
           leading: ResponsiveIconButton(
             icon: Icons.menu,
-            iconSize: 28,
+            iconSize: tablet ? 24 : 22, // Reduced icon size
             onPressed: () => _scaffoldKey.currentState?.openDrawer(),
             color: Colors.white,
           ),
           actions: [
-            // শুধু ভাষা এবং থিম টগল রাখুন
             ResponsiveIconButton(
               icon: Icons.language,
-              iconSize: 28,
+              iconSize: tablet ? 24 : 22, // Reduced icon size
               onPressed: () async {
                 if (mounted) {
                   setState(() {
@@ -506,7 +480,7 @@ class _HomePageState extends State<HomePage>
             ),
             ResponsiveIconButton(
               icon: isDarkMode ? Icons.brightness_7 : Icons.brightness_4,
-              iconSize: 28,
+              iconSize: tablet ? 24 : 22, // Reduced icon size
               onPressed: () =>
                   themeProvider.toggleTheme(!themeProvider.isDarkMode),
               color: Colors.white,
@@ -515,7 +489,7 @@ class _HomePageState extends State<HomePage>
         ),
         drawer: DrawerMenu(scaffoldKey: _scaffoldKey),
         body: SafeArea(
-          bottom: false, // IMPORTANT: bottom false রাখুন
+          bottom: false,
           child: _buildBody(isDarkMode, tablet, landscape, languageProvider),
         ),
         bottomNavigationBar: CustomBottomNavBar(
@@ -539,21 +513,22 @@ class _HomePageState extends State<HomePage>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: isDarkMode
-              ? [Colors.green[900]!, Colors.green[800]!]
-              : [Colors.green[50]!, Colors.green[100]!],
+              ? _Colors.darkBackgroundGradient
+              : _Colors.lightBackgroundGradient,
         ),
       ),
       child: Column(
         children: [
-          // Main Content Area - Takes available space
+          // Main Content Area
           Expanded(
             child: RefreshIndicator(
               onRefresh: _handleRefresh,
-              color: Colors.green,
-              backgroundColor: isDarkMode ? Colors.green[900] : Colors.white,
-              strokeWidth: 3.0,
+              color: isDarkMode ? _Colors.darkPrimary : Colors.green,
+              backgroundColor: isDarkMode ? _Colors.darkCard : Colors.white,
+              strokeWidth: 2.0,
+              // Reduced stroke width
               triggerMode: RefreshIndicatorTriggerMode.onEdge,
-              child: _buildContentList(
+              child: _buildCompactContentList(
                 isDarkMode,
                 tablet,
                 landscape,
@@ -562,10 +537,10 @@ class _HomePageState extends State<HomePage>
             ),
           ),
 
-          // Banner Ad Section - Fixed at bottom
+          // Banner Ad Section
           if (_showBannerAd && _isBannerAdLoaded && _bannerAd != null)
             Container(
-              color: isDarkMode ? Colors.grey[900] : Colors.white,
+              color: isDarkMode ? _Colors.darkSurface : Colors.white,
               width: double.infinity,
               height: _bannerHeight,
               child: Stack(
@@ -573,27 +548,27 @@ class _HomePageState extends State<HomePage>
                 children: [
                   Center(child: AdWidget(ad: _bannerAd!)),
                   Positioned(
-                    top: -8,
-                    right: -8,
+                    top: -6, // Reduced position
+                    right: -6, // Reduced position
                     child: GestureDetector(
                       onTap: _toggleBannerAd,
                       child: Container(
-                        width: 28,
-                        height: 28,
+                        width: 24, // Reduced size
+                        height: 24, // Reduced size
                         decoration: BoxDecoration(
                           color: Colors.red,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                              blurRadius: 3, // Reduced shadow
+                              offset: const Offset(0, 1), // Reduced offset
                             ),
                           ],
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.close,
-                          size: 16,
+                          size: 14, // Reduced icon size
                           color: Colors.white,
                         ),
                       ),
@@ -607,8 +582,8 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  // New method for building the scrollable content
-  Widget _buildContentList(
+  // COMPACT CONTENT LIST - OPTIMIZED FOR MOBILE AND TABLET
+  Widget _buildCompactContentList(
     bool isDarkMode,
     bool tablet,
     bool landscape,
@@ -616,39 +591,876 @@ class _HomePageState extends State<HomePage>
   ) {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: EdgeInsets.zero, // ← সব প্যাডিং রিমুভ করুন
-      /*padding: EdgeInsets.only(
-        bottom: responsiveValue(context, 20), // Extra space at bottom
+      padding: EdgeInsets.only(
+        bottom: tablet ? 8 : 4, // Reduced padding
       ),
-      */
       children: [
-        QuranVerseScroller(
-          isDarkMode: isDarkMode,
-          isTablet: tablet,
-          isLandscape: landscape,
+        // Quran Verse Scroller - Reduced height
+        SizedBox(
+          height: tablet ? 45 : 40, // Reduced height
+          child: QuranVerseScroller(
+            isDarkMode: isDarkMode,
+            isTablet: tablet,
+            isLandscape: landscape,
+          ),
         ),
-        const ResponsiveSizedBox(height: 8),
-        _buildCategorySelector(isDarkMode),
-        const ResponsiveSizedBox(height: 8),
-        _buildQuickAccess(context, isDarkMode, tablet),
-        const ResponsiveSizedBox(height: 8),
-        _buildAdditionalFeatures(context, isDarkMode, tablet),
-        //const ResponsiveSizedBox(height: 8),
+
+        SizedBox(height: tablet ? 6 : 4), // Reduced spacing
+        // Category Selector - Compact version
+        _buildCompactCategorySelector(isDarkMode, tablet),
+
+        SizedBox(height: tablet ? 6 : 4), // Reduced spacing
+        // Quick Access - Compact version
+        _buildCompactQuickAccess(context, isDarkMode, tablet),
+
+        SizedBox(height: tablet ? 6 : 4), // Reduced spacing
+        // Additional Features - Compact version
+        _buildCompactAdditionalFeatures(context, isDarkMode, tablet),
 
         // Banner Ad Loading Indicator
         if (_showBannerAd && !_isBannerAdLoaded && _isBannerLoading)
           Container(
             height: _bannerHeight,
             alignment: Alignment.center,
-            child: const CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            child: CircularProgressIndicator(
+              strokeWidth: 1.5, // Reduced stroke width
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isDarkMode ? _Colors.darkPrimary : Colors.green,
+              ),
             ),
           ),
-
-        // Extra space for when banner is not loaded
-        //if (!_isBannerAdLoaded) SizedBox(height: _bannerHeight + 10),
       ],
+    );
+  }
+
+  // COMPACT CATEGORY SELECTOR
+  Widget _buildCompactCategorySelector(bool isDarkMode, bool tablet) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
+    if (languageProvider.isLoading ||
+        languageProvider.currentLanguage.isEmpty) {
+      return Container(
+        height: tablet ? 80 : 70, // Reduced height
+        alignment: Alignment.center,
+        child: const CircularProgressIndicator(),
+      );
+    }
+
+    final categories = languageProvider.isEnglish
+        ? _categoriesEn
+        : _categoriesBn;
+
+    final Map<String, String> categoryMappings = {
+      'ইসলামী প্রাথমিক জ্ঞান': 'islamic_basic_knowledge',
+      'Basic Islamic Knowledge': 'islamic_basic_knowledge',
+      'কোরআন': 'quran',
+      'Quran': 'quran',
+      'মহানবী সঃ এর জীবনী': 'prophet_biography',
+      'Prophet Biography': 'prophet_biography',
+      'ইবাদত': 'worship',
+      'Worship': 'worship',
+      'আখিরাত': 'hereafter',
+      'Hereafter': 'hereafter',
+      'বিচার দিবস': 'judgment_day',
+      'Judgment Day': 'judgment_day',
+      'নারী ও ইসলাম': 'women_in_islam',
+      'Women in Islam': 'women_in_islam',
+      'ইসলামী নৈতিকতা ও আচার': 'islamic_ethics',
+      'Islamic Ethics & Manners': 'islamic_ethics',
+      'ধর্মীয় আইন(বিবাহ-বিচ্ছেদ)': 'religious_law',
+      'Religious Law (Marriage-Divorce)': 'religious_law',
+      'শিষ্টাচার': 'etiquette',
+      'Etiquette': 'etiquette',
+      'দাম্পত্য ও পারিবারিক সম্পর্ক': 'family_relations',
+      'Marital & Family Relations': 'family_relations',
+      'হাদিস': 'hadith',
+      'Hadith': 'hadith',
+      'নবী-রাসূল': 'prophets',
+      'Prophets': 'prophets',
+      'ইসলামের ইতিহাস': 'islamic_history',
+      'Islamic History': 'islamic_history',
+    };
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: tablet ? 12 : 8),
+      child: Card(
+        elevation: isDarkMode ? 0 : 2,
+        color: isDarkMode ? _Colors.darkCard : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(tablet ? 12 : 8),
+          side: isDarkMode
+              ? BorderSide(color: _Colors.darkBorder.withOpacity(0.3))
+              : BorderSide.none,
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(tablet ? 8 : 6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ResponsiveText(
+                languageProvider.isEnglish
+                    ? 'Islamic Knowledge Test: Quiz'
+                    : 'ইসলামী মেধাযাচাই: জ্ঞান কুইজ',
+                fontSize: tablet ? 18 : 13,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? _Colors.darkText : Colors.green[800]!,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: tablet ? 4 : 3),
+              // Compact Dropdown
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: tablet ? 8 : 6,
+                  vertical: tablet ? 4 : 3,
+                ),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? _Colors.darkSurface : Colors.green[50],
+                  borderRadius: BorderRadius.circular(tablet ? 8 : 6),
+                  border: Border.all(
+                    color: isDarkMode
+                        ? _Colors.darkPrimary
+                        : Colors.green[600]!,
+                    width: 0.8,
+                  ),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: selectedCategory,
+                    hint: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search,
+                          size: tablet ? 14 : 12,
+                          color: isDarkMode
+                              ? _Colors.darkText
+                              : Colors.green[700],
+                        ),
+                        SizedBox(width: tablet ? 4 : 3),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: ResponsiveText(
+                              languageProvider.isEnglish
+                                  ? 'Select Category'
+                                  : 'বিষয় বেছে নিন',
+                              fontSize: tablet ? 11 : 10,
+                              color: isDarkMode
+                                  ? _Colors.darkTextSecondary
+                                  : Colors.black54,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    style: TextStyle(
+                      fontSize: tablet ? 11 : 10,
+                      color: isDarkMode ? _Colors.darkText : Colors.black87,
+                    ),
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      color: isDarkMode ? _Colors.darkText : Colors.green,
+                      size: tablet ? 18 : 16,
+                    ),
+                    isExpanded: true,
+                    dropdownColor: isDarkMode ? _Colors.darkCard : Colors.white,
+                    menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
+                    onChanged: (String? newValue) {
+                      if (mounted) {
+                        setState(() {
+                          selectedCategory = newValue;
+                        });
+                      }
+                    },
+                    items: categories.map((String category) {
+                      return DropdownMenuItem<String>(
+                        value: category,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: tablet ? 6 : 4,
+                            horizontal: tablet ? 4 : 2,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(tablet ? 4 : 3),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? _Colors.darkPrimary.withOpacity(0.2)
+                                      : Colors.green.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.bookmark_border,
+                                  size: tablet ? 12 : 10,
+                                  color: isDarkMode
+                                      ? _Colors.darkPrimary
+                                      : Colors.green[700],
+                                ),
+                              ),
+                              SizedBox(width: tablet ? 8 : 6),
+                              Expanded(
+                                child: Text(
+                                  category,
+                                  style: TextStyle(
+                                    fontSize: tablet ? 11 : 10,
+                                    color: isDarkMode
+                                        ? _Colors.darkText
+                                        : Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              SizedBox(height: tablet ? 6 : 4),
+              // Compact Button
+              SizedBox(
+                height: tablet ? 36 : 32,
+                child: ElevatedButton.icon(
+                  onPressed: selectedCategory == null
+                      ? null
+                      : () {
+                          if (mounted) {
+                            final String quizId =
+                                categoryMappings[selectedCategory!] ??
+                                selectedCategory!;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MCQPage(
+                                  category: selectedCategory!,
+                                  quizId: quizId,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                  icon: Icon(Icons.play_circle_filled, size: tablet ? 16 : 12),
+                  label: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: ResponsiveText(
+                      languageProvider.isEnglish
+                          ? 'Start Quiz'
+                          : 'কুইজ শুরু করুন',
+                      fontSize: _getButtonFontSize(context),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDarkMode
+                        ? _Colors.darkPrimary
+                        : Colors.green[700],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(tablet ? 8 : 6),
+                    ),
+                    elevation: 2,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: tablet ? 16 : 8,
+                      vertical: 8,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper method to calculate dynamic font size
+  double _getButtonFontSize(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
+    if (width < 360) {
+      // Very small phones
+      return 10;
+    } else if (width < 400) {
+      // Small phones
+      return 11;
+    } else if (width < 500) {
+      // Medium phones
+      return 12;
+    } else {
+      // Tablets and large devices
+      return 13;
+    }
+  }
+
+  // COMPACT QUICK ACCESS - UPDATED WITH DARK MODE COLORS
+  Widget _buildCompactQuickAccess(
+    BuildContext context,
+    bool isDarkMode,
+    bool isTablet,
+  ) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
+    final primaryColor = isDarkMode ? _Colors.darkPrimary : Colors.green[700]!;
+    final cardColor = isDarkMode ? _Colors.darkCard : Colors.white;
+    final textColor = isDarkMode ? _Colors.darkText : Colors.green[900]!;
+    final iconColor = isDarkMode ? _Colors.darkPrimary : Colors.green[700]!;
+    final containerColor = isDarkMode
+        ? _Colors.darkSurface
+        : Colors.green[100]!;
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: isTablet ? 12 : 6),
+      padding: EdgeInsets.all(isTablet ? 12 : 6),
+      decoration: BoxDecoration(
+        color: containerColor,
+        borderRadius: BorderRadius.circular(isTablet ? 16 : 10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            languageProvider.isEnglish ? 'Worship & Prayers' : 'ইবাদাত ও দোয়া',
+            style: TextStyle(
+              fontSize: isTablet ? 20 : 14,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? _Colors.darkText : Colors.green[800]!,
+            ),
+          ),
+          SizedBox(height: isTablet ? 12 : 6),
+
+          // FIXED 3x2 GRID - Reduced height for tablet
+          GridView.count(
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: isTablet ? 8 : 6,
+            crossAxisSpacing: isTablet ? 8 : 6,
+            childAspectRatio: isTablet ? 1.2 : 0.8,
+            children: [
+              _buildCompactIslamicCard(
+                context,
+                languageProvider.isEnglish ? 'Prayer Time' : 'নামাজের সময়',
+                Icons.access_time_rounded,
+                iconColor,
+                cardColor,
+                textColor,
+                const PrayerTimePage(),
+                isDarkMode,
+                isTablet,
+              ),
+              _buildCompactIslamicCard(
+                context,
+                languageProvider.isEnglish ? 'Sehri & Iftar' : 'সেহেরী ও ইফতার',
+                Icons.restaurant,
+                iconColor,
+                cardColor,
+                textColor,
+                const IfterTimePage(),
+                isDarkMode,
+                isTablet,
+              ),
+              _buildCompactIslamicCard(
+                context,
+                languageProvider.isEnglish ? 'Short Surahs' : 'ছোট সূরা',
+                Icons.menu_book_rounded,
+                iconColor,
+                cardColor,
+                textColor,
+                const SuraPage(),
+                isDarkMode,
+                isTablet,
+              ),
+              _buildCompactIslamicCard(
+                context,
+                languageProvider.isEnglish ? 'Prayers' : 'দুআ',
+                Icons.lightbulb_outline_rounded,
+                iconColor,
+                cardColor,
+                textColor,
+                const DoyaCategoryPage(),
+                isDarkMode,
+                isTablet,
+              ),
+              _buildCompactIslamicCard(
+                context,
+                languageProvider.isEnglish ? 'Tasbih' : 'তসবিহ',
+                Icons.fingerprint_rounded,
+                iconColor,
+                cardColor,
+                textColor,
+                const TasbeehPage(),
+                isDarkMode,
+                isTablet,
+              ),
+              _buildCompactIslamicCard(
+                context,
+                languageProvider.isEnglish ? 'Qibla' : 'কিবলা',
+                Icons.explore_rounded,
+                iconColor,
+                cardColor,
+                textColor,
+                const QiblaPage(),
+                isDarkMode,
+                isTablet,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UPDATED COMPACT ISLAMIC CARD - IMPROVED DARK MODE
+  Widget _buildCompactIslamicCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color iconColor,
+    Color cardColor,
+    Color textColor,
+    Widget? page,
+    bool isDarkMode,
+    bool isTablet,
+  ) {
+    return Card(
+      elevation: isDarkMode ? 1 : 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(isTablet ? 10 : 8),
+        side: isDarkMode
+            ? BorderSide(color: _Colors.darkBorder.withOpacity(0.2))
+            : BorderSide.none,
+      ),
+      color: cardColor,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(isTablet ? 10 : 8),
+        onTap: page != null && mounted
+            ? () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => page),
+                );
+              }
+            : null,
+        child: Container(
+          padding: EdgeInsets.all(isTablet ? 6 : 5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.all(isTablet ? 8 : 3),
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? _Colors.darkPrimary.withOpacity(0.15)
+                      : iconColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: isTablet ? 30 : 20, color: iconColor),
+              ),
+              SizedBox(height: isTablet ? 4 : 5),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: isTablet ? 16 : 10,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                  height: 1.1,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // COMPACT ADDITIONAL FEATURES - IMPROVED DARK MODE
+  Widget _buildCompactAdditionalFeatures(
+    BuildContext context,
+    bool isDarkMode,
+    bool isTablet,
+  ) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
+    final backgroundColor = isDarkMode ? _Colors.darkCard : Colors.green[50]!;
+    final textColor = isDarkMode ? _Colors.darkText : Colors.green[900]!;
+    final secondaryTextColor = isDarkMode
+        ? _Colors.darkTextSecondary
+        : Colors.green[600]!;
+    final iconColor = isDarkMode ? _Colors.darkPrimary : Colors.green[700]!;
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: isTablet ? 12 : 6),
+      padding: EdgeInsets.all(isTablet ? 12 : 6),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(isTablet ? 16 : 10),
+        border: isDarkMode
+            ? Border.all(color: _Colors.darkBorder.withOpacity(0.3), width: 1)
+            : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Compact Header
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isTablet ? 8 : 6,
+              vertical: isTablet ? 6 : 4,
+            ),
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? _Colors.darkPrimary.withOpacity(0.1)
+                  : Colors.green[100]!,
+              borderRadius: BorderRadius.circular(isTablet ? 12 : 8),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(isTablet ? 8 : 6),
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? _Colors.darkPrimary.withOpacity(0.15)
+                        : Colors.green.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.lightbulb_outline_rounded,
+                    color: isDarkMode
+                        ? _Colors.darkPrimary
+                        : Colors.green[700]!,
+                    size: isTablet ? 22 : 18,
+                  ),
+                ),
+                SizedBox(width: isTablet ? 12 : 8),
+                Expanded(
+                  child: Text(
+                    languageProvider.isEnglish
+                        ? 'Islamic Knowledge Bank'
+                        : 'ইসলামী জ্ঞান ভাণ্ডার',
+                    style: TextStyle(
+                      fontSize: isTablet ? 18 : 14,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: isTablet ? 12 : 8),
+
+          // Compact Grid - ডার্ক মুডে কালার আপডেট করা হয়েছে
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: isTablet ? 12 : 8,
+            mainAxisSpacing: isTablet ? 12 : 8,
+            childAspectRatio: isTablet ? 3.2 : 3.0,
+            children: [
+              _buildUltraCompactCard(
+                context,
+                languageProvider.isEnglish
+                    ? 'Names of Allah'
+                    : 'আল্লাহর নামসমূহ',
+                Icons.auto_awesome_rounded,
+                isDarkMode ? _Colors.darkPrimary : Colors.blue[600]!,
+                // সবগুলোতে darkPrimary
+                isDarkMode ? _Colors.darkSurface : Colors.blue[50]!,
+                // darkSurface ব্যাকগ্রাউন্ড
+                isDarkMode ? _Colors.darkPrimary : Colors.blue[600]!,
+                // darkPrimary বর্ডার
+                textColor,
+                const NameOfAllahPage(),
+                isDarkMode,
+                isTablet,
+              ),
+              _buildUltraCompactCard(
+                context,
+                languageProvider.isEnglish ? 'Kalimah' : 'কালিমাহ',
+                Icons.book_rounded,
+                isDarkMode ? _Colors.darkPrimary : Colors.green[600]!,
+                // সবগুলোতে darkPrimary
+                isDarkMode ? _Colors.darkSurface : Colors.green[50]!,
+                // darkSurface ব্যাকগ্রাউন্ড
+                isDarkMode ? _Colors.darkPrimary : Colors.green[600]!,
+                // darkPrimary বর্ডার
+                textColor,
+                const KalemaPage(),
+                isDarkMode,
+                isTablet,
+              ),
+              _buildUltraCompactCard(
+                context,
+                languageProvider.isEnglish ? 'Quran Learning' : 'কোরআন শিক্ষা',
+                Icons.menu_book_rounded,
+                isDarkMode ? _Colors.darkPrimary : Colors.purple[600]!,
+                // সবগুলোতে darkPrimary
+                isDarkMode ? _Colors.darkSurface : Colors.purple[50]!,
+                // darkSurface ব্যাকগ্রাউন্ড
+                isDarkMode ? _Colors.darkPrimary : Colors.purple[600]!,
+                // darkPrimary বর্ডার
+                textColor,
+                const NadiyatulQuran(),
+                isDarkMode,
+                isTablet,
+              ),
+              _buildUltraCompactCard(
+                context,
+                languageProvider.isEnglish ? 'More' : 'অন্যান্য',
+                Icons.more_horiz_rounded,
+                isDarkMode ? _Colors.darkPrimary : Colors.orange[600]!,
+                // সবগুলোতে darkPrimary
+                isDarkMode ? _Colors.darkSurface : Colors.orange[50]!,
+                // darkSurface ব্যাকগ্রাউন্ড
+                isDarkMode ? _Colors.darkPrimary : Colors.orange[600]!,
+                // darkPrimary বর্ডার
+                textColor,
+                null,
+                isDarkMode,
+                isTablet,
+                onTap: () {
+                  _showCompactMoreOptions(context);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UPDATED ULTRA COMPACT CARD - ডার্ক মুডে ইউনিফাইড কালার
+  Widget _buildUltraCompactCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color iconColor,
+    Color backgroundColor,
+    Color borderColor,
+    Color textColor,
+    Widget? page,
+    bool isDarkMode,
+    bool isTablet, {
+    Function()? onTap,
+  }) {
+    return Card(
+      elevation: isDarkMode ? 1 : 2,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(isTablet ? 12 : 8),
+        side: BorderSide(
+          color: isDarkMode
+              ? _Colors.darkPrimary.withOpacity(
+                  0.3,
+                ) // ডার্ক মুডে সব কার্ডে darkPrimary বর্ডার
+              : borderColor.withOpacity(0.3),
+          width: isTablet ? 1.2 : 0.8,
+        ),
+      ),
+      color: backgroundColor,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(isTablet ? 12 : 8),
+        onTap:
+            onTap ??
+            (page != null && mounted
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => page),
+                    );
+                  }
+                : null),
+        child: Container(
+          padding: EdgeInsets.all(isTablet ? 12 : 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // আইকন কন্টেইনার - ডার্ক মুডে সব আইকনে darkPrimary কালার
+              Container(
+                padding: EdgeInsets.all(isTablet ? 10 : 6),
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? _Colors.darkPrimary.withOpacity(
+                          0.15,
+                        ) // ডার্ক মুডে সব আইকনে darkPrimary ব্যাকগ্রাউন্ড
+                      : iconColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: isDarkMode
+                      ? Border.all(
+                          color: _Colors.darkPrimary.withOpacity(0.3),
+                          width: 1,
+                        )
+                      : null,
+                ),
+                child: Icon(
+                  icon,
+                  size: isTablet ? 24 : 18,
+                  color: isDarkMode
+                      ? _Colors.darkPrimary
+                      : iconColor, // ডার্ক মুডে সব আইকনে darkPrimary কালার
+                ),
+              ),
+              SizedBox(width: isTablet ? 12 : 8),
+              // টাইটেল
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: isTablet ? 16 : 12,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                    height: 1.2,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCompactMoreOptions(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? _Colors.darkCard
+                  : Theme.of(context).cardColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 32,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: isDarkMode
+                          ? _Colors.darkTextSecondary
+                          : Colors.grey[400],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  languageProvider.isEnglish
+                      ? 'More Islamic Knowledge'
+                      : 'আরও ইসলামী জ্ঞান',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? _Colors.darkPrimary : Colors.green[700],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildCompactOptionItem(
+                  context,
+                  Icons.history_rounded,
+                  languageProvider.isEnglish
+                      ? 'Islamic History'
+                      : 'ইসলামের ইতিহাস',
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (mounted) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const IslamicHistoryPage(),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                _buildCompactOptionItem(
+                  context,
+                  Icons.person,
+                  languageProvider.isEnglish
+                      ? 'Prophet Muhammad (PBUH) Biography'
+                      : 'হজরত মুহাম্মাদ (সা.)-এর জীবনী',
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (mounted) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProphetBiographyPage(),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 4),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCompactOptionItem(
+    BuildContext context,
+    IconData icon,
+    String title, {
+    Function()? onTap,
+  }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return ListTile(
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+      leading: Icon(
+        icon,
+        size: 18,
+        color: isDarkMode ? _Colors.darkPrimary : Colors.green[700],
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: isDarkMode ? _Colors.darkText : Colors.black87,
+        ),
+      ),
+      trailing: Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 12,
+        color: isDarkMode ? _Colors.darkTextSecondary : Colors.grey[500],
+      ),
+      onTap: onTap ?? () => Navigator.pop(context),
     );
   }
 
@@ -659,7 +1471,7 @@ class _HomePageState extends State<HomePage>
     );
 
     if (index == 0 && _currentBottomNavIndex == 0) {
-      _handleRefresh(); // হোম বাটনে ট্যাপ করলে রিফ্রেশ করুন
+      _handleRefresh();
     }
 
     if (mounted) {
@@ -703,995 +1515,6 @@ class _HomePageState extends State<HomePage>
     }
   }
 
-  //---------------------------------------
-  //---------------------------------------
-  //---------------------------------------
-
-  Widget _buildCategorySelector(bool isDarkMode) {
-    final languageProvider = Provider.of<LanguageProvider>(context);
-
-    if (languageProvider.isLoading ||
-        languageProvider.currentLanguage.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    final categories = languageProvider.isEnglish
-        ? _categoriesEn
-        : _categoriesBn;
-
-    final Map<String, String> categoryMappings = {
-      'ইসলামী প্রাথমিক জ্ঞান': 'islamic_basic_knowledge',
-      'Basic Islamic Knowledge': 'islamic_basic_knowledge',
-      'কোরআন': 'quran',
-      'Quran': 'quran',
-      'মহানবী সঃ এর জীবনী': 'prophet_biography',
-      'Prophet Biography': 'prophet_biography',
-      'ইবাদত': 'worship',
-      'Worship': 'worship',
-      'আখিরাত': 'hereafter',
-      'Hereafter': 'hereafter',
-      'বিচার দিবস': 'judgment_day',
-      'Judgment Day': 'judgment_day',
-      'নারী ও ইসলাম': 'women_in_islam',
-      'Women in Islam': 'women_in_islam',
-      'ইসলামী নৈতিকতা ও আচার': 'islamic_ethics',
-      'Islamic Ethics & Manners': 'islamic_ethics',
-      'ধর্মীয় আইন(বিবাহ-বিচ্ছেদ)': 'religious_law',
-      'Religious Law (Marriage-Divorce)': 'religious_law',
-      'শিষ্টাচার': 'etiquette',
-      'Etiquette': 'etiquette',
-      'দাম্পত্য ও পারিবারিক সম্পর্ক': 'family_relations',
-      'Marital & Family Relations': 'family_relations',
-      'হাদিস': 'hadith',
-      'Hadith': 'hadith',
-      'নবী-রাসূল': 'prophets',
-      'Prophets': 'prophets',
-      'ইসলামের ইতিহাস': 'islamic_history',
-      'Islamic History': 'islamic_history',
-    };
-
-    if (selectedCategory != null && !categories.contains(selectedCategory)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          setState(() {
-            selectedCategory = null;
-          });
-        }
-      });
-    }
-
-    return ResponsivePadding(
-      horizontal: isTablet(context) ? 16 : 12,
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.all(responsiveValue(context, 10)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ResponsiveText(
-                languageProvider.isEnglish
-                    ? 'Islamic Knowledge Test: Quiz'
-                    : 'ইসলামী মেধাযাচাই: জ্ঞান কুইজ',
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: (isDarkMode ? Colors.white : Colors.green[800]!),
-                textAlign: TextAlign.center,
-              ),
-              const ResponsiveSizedBox(height: 6),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: responsiveValue(context, 10),
-                  vertical: responsiveValue(context, 6),
-                ),
-                decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.green[800] : Colors.green[50],
-                  borderRadius: BorderRadius.circular(
-                    responsiveValue(context, 10),
-                  ),
-                  border: Border.all(
-                    color: Colors.green[600]!,
-                    width: responsiveValue(context, 1),
-                  ),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: selectedCategory,
-                    hint: Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search,
-                            size: responsiveValue(context, 16),
-                            color: isDarkMode
-                                ? Colors.white
-                                : Colors.green[700],
-                          ),
-                          SizedBox(width: responsiveValue(context, 6)),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: ResponsiveText(
-                                languageProvider.isEnglish
-                                    ? 'Select Category'
-                                    : 'বিষয় বেছে নিন',
-                                fontSize: 12,
-                                color: isDarkMode
-                                    ? Colors.white70
-                                    : Colors.black54,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    style: TextStyle(
-                      fontSize: responsiveValue(context, 12),
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
-                    ),
-                    icon: Icon(
-                      Icons.arrow_drop_down,
-                      color: isDarkMode ? Colors.white70 : Colors.green,
-                      size: responsiveValue(context, 20),
-                    ),
-                    isExpanded: true,
-                    dropdownColor: isDarkMode
-                        ? Colors.green[800]
-                        : Colors.white,
-                    menuMaxHeight: MediaQuery.of(context).size.height * 0.5,
-                    alignment: Alignment.bottomCenter,
-                    selectedItemBuilder: (BuildContext context) {
-                      return categories.map<Widget>((String item) {
-                        return Container(
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(
-                            item,
-                            style: TextStyle(
-                              fontSize: responsiveValue(context, 12),
-                              color: isDarkMode
-                                  ? Colors.white
-                                  : Colors.green[800],
-                              fontWeight: FontWeight.w500,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        );
-                      }).toList();
-                    },
-                    onChanged: (String? newValue) {
-                      if (mounted) {
-                        setState(() {
-                          selectedCategory = newValue;
-                        });
-                      }
-                    },
-                    items: categories.map((String category) {
-                      return DropdownMenuItem<String>(
-                        value: category,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: responsiveValue(context, 8),
-                            horizontal: responsiveValue(context, 4),
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Colors.grey[300]!.withOpacity(0.3),
-                                width: 0.5,
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(
-                                  responsiveValue(context, 6),
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.bookmark_border,
-                                  size: responsiveValue(context, 14),
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : Colors.green[700],
-                                ),
-                              ),
-                              SizedBox(width: responsiveValue(context, 10)),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      category,
-                                      style: TextStyle(
-                                        fontSize: responsiveValue(context, 12),
-                                        color:
-                                            Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.white
-                                            : Colors.black87,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                    ),
-                                    SizedBox(
-                                      height: responsiveValue(context, 2),
-                                    ),
-                                    Text(
-                                      languageProvider.isEnglish
-                                          ? 'Quiz: ${categories.indexOf(category) + 1}'
-                                          : 'কুইজ: ${categories.indexOf(category) + 1}',
-                                      style: TextStyle(
-                                        fontSize: responsiveValue(context, 9),
-                                        color:
-                                            Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.white60
-                                            : Colors.grey[600],
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (selectedCategory == category)
-                                Icon(
-                                  Icons.check_circle_rounded,
-                                  size: responsiveValue(context, 16),
-                                  color: Colors.green,
-                                ),
-                              SizedBox(width: responsiveValue(context, 4)),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              const ResponsiveSizedBox(height: 8),
-              SizedBox(
-                height: responsiveValue(context, 42),
-                child: ElevatedButton.icon(
-                  onPressed: selectedCategory == null
-                      ? null
-                      : () {
-                          if (mounted) {
-                            final String quizId =
-                                categoryMappings[selectedCategory!] ??
-                                selectedCategory!;
-
-                            print('Selected Category: $selectedCategory');
-                            print('Mapped Quiz ID: $quizId');
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => MCQPage(
-                                  category: selectedCategory!,
-                                  quizId: quizId,
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                  icon: Icon(
-                    Icons.play_circle_filled,
-                    size: responsiveValue(context, 18),
-                  ),
-                  label: ResponsiveText(
-                    languageProvider.isEnglish
-                        ? 'Start Quiz and Win Rewards'
-                        : 'কুইজ শুরু করুন এবং পুরস্কার জিতুন',
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[700],
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        responsiveValue(context, 10),
-                      ),
-                    ),
-                    elevation: 4,
-                    shadowColor: Colors.green.withOpacity(0.5),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    return Container(); // Placeholder //==============
-  }
-
-  Widget _buildQuickAccess(
-    BuildContext context,
-    bool isDarkMode,
-    bool isTablet,
-  ) {
-    final languageProvider = Provider.of<LanguageProvider>(context);
-
-    if (!mounted) return const SizedBox();
-
-    final primaryColor = isDarkMode ? Colors.green[400]! : Colors.green[700]!;
-    final cardColor = isDarkMode ? Colors.green[700]! : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.green[900]!;
-    final secondaryTextColor = isDarkMode ? Colors.white70 : Colors.green[600]!;
-    final iconColor = isDarkMode ? Colors.white : Colors.green[700]!;
-
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: responsiveValue(context, 10),
-        vertical: responsiveValue(context, 8),
-      ),
-      padding: EdgeInsets.all(responsiveValue(context, 12)),
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900]! : Colors.green[100]!,
-        borderRadius: BorderRadius.circular(responsiveValue(context, 16)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            languageProvider.isEnglish ? 'Worship & Prayers' : 'ইবাদাত ও দোয়া',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.green[800]!,
-            ),
-          ),
-          SizedBox(height: responsiveValue(context, 6)),
-          GridView.count(
-            crossAxisCount: isTablet ? 6 : 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: responsiveValue(context, 10),
-            crossAxisSpacing: responsiveValue(context, 10),
-            childAspectRatio: 1.0,
-            children: [
-              _buildIslamicKnowledgeCard(
-                context,
-                languageProvider.isEnglish ? 'Prayer Time' : 'নামাজের সময়',
-                Icons.access_time_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const PrayerTimePage(),
-                isDarkMode,
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                languageProvider.isEnglish ? 'Sehri & Iftar' : 'সেহেরী ও ইফতার',
-                Icons.restaurant,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const IfterTimePage(),
-                isDarkMode,
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                languageProvider.isEnglish ? 'Short Surahs' : 'ছোট সূরা',
-                Icons.menu_book_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const SuraPage(),
-                isDarkMode,
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                languageProvider.isEnglish ? 'Prayers' : 'দুআ',
-                Icons.lightbulb_outline_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const DoyaCategoryPage(),
-                isDarkMode,
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                languageProvider.isEnglish ? 'Tasbih' : 'তসবিহ',
-                Icons.fingerprint_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const TasbeehPage(),
-                isDarkMode,
-              ),
-              _buildIslamicKnowledgeCard(
-                context,
-                languageProvider.isEnglish ? 'Qibla' : 'কিবলা',
-                Icons.explore_rounded,
-                iconColor,
-                cardColor,
-                textColor,
-                secondaryTextColor,
-                const QiblaPage(),
-                isDarkMode,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-    return Container(); // Placeholder//==========
-  }
-
-  Widget _buildAdditionalFeatures(
-    BuildContext context,
-    bool isDarkMode,
-    bool isTablet,
-  ) {
-    final languageProvider = Provider.of<LanguageProvider>(context);
-
-    if (!mounted) return const SizedBox();
-
-    final primaryColor = isDarkMode ? Colors.green[400]! : Colors.green[700]!;
-    final accentColor = isDarkMode ? Colors.amber[300]! : Colors.amber[700]!;
-    final backgroundColor = isDarkMode ? Colors.grey[900]! : Colors.green[50]!;
-    final textColor = isDarkMode ? Colors.white : Colors.green[900]!;
-    final secondaryTextColor = isDarkMode
-        ? Colors.green[200]!
-        : Colors.green[600]!;
-    final iconColor = isDarkMode ? Colors.green[100]! : Colors.green[700]!;
-
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: isTablet
-            ? MediaQuery.of(context).size.width * 0.025
-            : MediaQuery.of(context).size.width * 0.04,
-        vertical: MediaQuery.of(context).size.height * 0.015,
-      ),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(
-          isTablet
-              ? MediaQuery.of(context).size.width * 0.018
-              : MediaQuery.of(context).size.width * 0.025,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildCompactHeader(
-              context,
-              isDarkMode,
-              primaryColor,
-              accentColor,
-              textColor,
-              isTablet,
-              languageProvider,
-            ),
-            SizedBox(
-              height: isTablet
-                  ? MediaQuery.of(context).size.height * 0.012
-                  : MediaQuery.of(context).size.height * 0.012,
-            ),
-            _buildCompactCardGrid(
-              context,
-              iconColor,
-              textColor,
-              secondaryTextColor,
-              isDarkMode,
-              isTablet,
-              languageProvider,
-            ),
-          ],
-        ),
-      ),
-    );
-    return Container(); // Placeholder //================
-  }
-
-  Widget _buildCompactHeader(
-    BuildContext context,
-    bool isDarkMode,
-    Color primaryColor,
-    Color accentColor,
-    Color textColor,
-    bool isTablet,
-    LanguageProvider languageProvider,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          padding: EdgeInsets.all(
-            isTablet
-                ? MediaQuery.of(context).size.width * 0.018
-                : MediaQuery.of(context).size.width * 0.014,
-          ),
-          decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.lightbulb_outline_rounded,
-            color: accentColor,
-            size: isTablet
-                ? MediaQuery.of(context).size.width * 0.035
-                : MediaQuery.of(context).size.width * 0.045,
-          ),
-        ),
-        SizedBox(
-          width: isTablet
-              ? MediaQuery.of(context).size.width * 0.012
-              : MediaQuery.of(context).size.width * 0.018,
-        ),
-        Expanded(
-          child: Text(
-            languageProvider.isEnglish
-                ? 'Islamic Knowledge Bank'
-                : 'ইসলামী জ্ঞান ভাণ্ডার',
-            style: TextStyle(
-              fontSize: isTablet
-                  ? MediaQuery.of(context).size.width * 0.022
-                  : MediaQuery.of(context).size.width * 0.032,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCompactCardGrid(
-    BuildContext context,
-    Color iconColor,
-    Color textColor,
-    Color secondaryTextColor,
-    bool isDarkMode,
-    bool isTablet,
-    LanguageProvider languageProvider,
-  ) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      crossAxisSpacing: isTablet ? screenWidth * 0.018 : screenWidth * 0.018,
-      mainAxisSpacing: isTablet ? screenHeight * 0.008 : screenHeight * 0.008,
-      childAspectRatio: isTablet ? 3.2 : 1.8,
-      children: [
-        _buildUltraCompactIslamicCard(
-          context,
-          languageProvider.isEnglish ? 'Names of Allah' : 'আল্লাহর নামসমূহ',
-          Icons.auto_awesome_rounded,
-          iconColor,
-          isDarkMode ? Colors.blue[900]! : Colors.blue[50]!,
-          isDarkMode ? Colors.blue[200]! : Colors.blue[600]!,
-          textColor,
-          secondaryTextColor,
-          const NameOfAllahPage(),
-          isDarkMode,
-          isTablet,
-          description: languageProvider.isEnglish
-              ? '99 Sacred Names'
-              : '৯৯টি পবিত্র নাম',
-        ),
-        _buildUltraCompactIslamicCard(
-          context,
-          languageProvider.isEnglish ? 'Kalimah' : 'কালিমাহ',
-          Icons.book_rounded,
-          iconColor,
-          isDarkMode ? Colors.green[900]! : Colors.green[50]!,
-          isDarkMode ? Colors.green[200]! : Colors.green[600]!,
-          textColor,
-          secondaryTextColor,
-          const KalemaPage(),
-          isDarkMode,
-          isTablet,
-          description: languageProvider.isEnglish
-              ? 'Six Basic Kalimahs'
-              : 'ছয়টি মূল কালিমা',
-        ),
-        _buildUltraCompactIslamicCard(
-          context,
-          languageProvider.isEnglish ? 'Quran Learning' : 'কোরআন শিক্ষা',
-          Icons.menu_book_rounded,
-          iconColor,
-          isDarkMode ? Colors.purple[900]! : Colors.purple[50]!,
-          isDarkMode ? Colors.purple[200]! : Colors.purple[600]!,
-          textColor,
-          secondaryTextColor,
-          const NadiyatulQuran(),
-          isDarkMode,
-          isTablet,
-          description: languageProvider.isEnglish
-              ? 'Nadiyatul Quran'
-              : 'নাদিয়াতুল কুরআন',
-        ),
-        _buildUltraCompactIslamicCard(
-          context,
-          languageProvider.isEnglish ? 'More' : 'অন্যান্য',
-          Icons.more_horiz_rounded,
-          iconColor,
-          isDarkMode ? Colors.orange[900]! : Colors.orange[50]!,
-          isDarkMode ? Colors.orange[200]! : Colors.orange[600]!,
-          textColor,
-          secondaryTextColor,
-          null,
-          isDarkMode,
-          isTablet,
-          description: languageProvider.isEnglish
-              ? 'Prophet Biography'
-              : 'মুহাম্মাদ (সঃ) জীবনী',
-          onTap: () {
-            _showMoreOptions(context);
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUltraCompactIslamicCard(
-    BuildContext context,
-    String title,
-    IconData icon,
-    Color iconColor,
-    Color backgroundColor,
-    Color borderColor,
-    Color textColor,
-    Color secondaryTextColor,
-    Widget? page,
-    bool isDarkMode,
-    bool isTablet, {
-    String? description,
-    Function()? onTap,
-  }) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return Card(
-      elevation: isTablet ? 0.8 : 1.5,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: BorderSide(
-          color: borderColor.withOpacity(isTablet ? 0.2 : 0.3),
-          width: isTablet ? 0.8 : 1.2,
-        ),
-      ),
-      color: backgroundColor,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap:
-            onTap ??
-            () {
-              if (page != null && mounted) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => page),
-                );
-              }
-            },
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: isTablet ? screenWidth * 0.02 : screenWidth * 0.025,
-            vertical: isTablet ? screenHeight * 0.008 : screenHeight * 0.015,
-          ),
-          constraints: BoxConstraints(
-            minHeight: isTablet ? screenHeight * 0.05 : screenHeight * 0.075,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.all(
-                  isTablet ? screenWidth * 0.01 : screenWidth * 0.018,
-                ),
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: iconColor.withOpacity(isTablet ? 0.15 : 0.2),
-                    width: isTablet ? 0.8 : 1.2,
-                  ),
-                ),
-                child: Icon(
-                  icon,
-                  size: isTablet ? screenWidth * 0.028 : screenWidth * 0.04,
-                  color: iconColor,
-                ),
-              ),
-              SizedBox(
-                width: isTablet ? screenWidth * 0.018 : screenWidth * 0.02,
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: isTablet
-                            ? screenWidth * 0.02
-                            : screenWidth * 0.03,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (description != null) ...[
-                      SizedBox(
-                        height: isTablet
-                            ? screenHeight * 0.002
-                            : screenHeight * 0.004,
-                      ),
-                      Text(
-                        description,
-                        style: TextStyle(
-                          fontSize: isTablet
-                              ? screenWidth * 0.015
-                              : screenWidth * 0.026,
-                          color: secondaryTextColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: isTablet ? screenWidth * 0.02 : screenWidth * 0.03,
-                color: secondaryTextColor,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showMoreOptions(BuildContext context) {
-    final languageProvider = Provider.of<LanguageProvider>(
-      context,
-      listen: false,
-    );
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        return SafeArea(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
-            ),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[400],
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  languageProvider.isEnglish
-                      ? 'More Islamic Knowledge'
-                      : 'আরও ইসলামী জ্ঞান',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green[700],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildCompactOptionItem(
-                  context,
-                  Icons.history_rounded,
-                  languageProvider.isEnglish
-                      ? 'Islamic History'
-                      : 'ইসলামের ইতিহাস',
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (mounted) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const IslamicHistoryPage(),
-                        ),
-                      );
-                    }
-                  },
-                ),
-                _buildCompactOptionItem(
-                  context,
-                  Icons.person,
-                  languageProvider.isEnglish
-                      ? 'Prophet Muhammad (PBUH) Biography'
-                      : 'হজরত মুহাম্মাদ (সা.)-এর জীবনী',
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (mounted) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProphetBiographyPage(),
-                        ),
-                      );
-                    }
-                  },
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildCompactOptionItem(
-    BuildContext context,
-    IconData icon,
-    String title, {
-    Function()? onTap,
-  }) {
-    return ListTile(
-      dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-      leading: Icon(icon, size: 20, color: Colors.green[700]),
-      title: Text(
-        title,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      ),
-      trailing: Icon(
-        Icons.arrow_forward_ios_rounded,
-        size: 14,
-        color: Colors.grey[500],
-      ),
-      onTap: onTap ?? () => Navigator.pop(context),
-    );
-  }
-
-  Widget _buildIslamicKnowledgeCard(
-    BuildContext context,
-    String title,
-    IconData icon,
-    Color iconColor,
-    Color cardColor,
-    Color textColor,
-    Color secondaryTextColor,
-    Widget? page,
-    bool isDarkMode, {
-    String? url,
-    String? description,
-    Function()? onTap,
-    String? semanticsLabel,
-  }) {
-    final tablet = isTablet(context);
-
-    return Container(
-      width: tablet
-          ? responsiveValue(context, 120)
-          : responsiveValue(context, 170),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(responsiveValue(context, 16)),
-        ),
-        color: cardColor,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(responsiveValue(context, 16)),
-          onTap:
-              onTap ??
-              () async {
-                if (url != null) {
-                  try {
-                    final Uri uri = Uri.parse(url);
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(
-                        uri,
-                        mode: LaunchMode.externalApplication,
-                      );
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: ResponsiveText(
-                            'লিঙ্ক খোলা যায়নি',
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
-                      );
-                    }
-                  }
-                } else if (page != null && mounted) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => page),
-                  );
-                }
-              },
-          child: Container(
-            padding: EdgeInsets.all(responsiveValue(context, 6)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(responsiveValue(context, 6)),
-                  decoration: BoxDecoration(
-                    color: iconColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    icon,
-                    size: responsiveValue(context, 20),
-                    color: iconColor,
-                  ),
-                ),
-                ResponsiveSizedBox(height: 6),
-                ResponsiveText(
-                  title,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (description != null) ...[
-                  ResponsiveSizedBox(height: 2),
-                  ResponsiveText(
-                    description,
-                    fontSize: 9,
-                    color: secondaryTextColor,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Future<void> _launchPlayStore() async {
     try {
       final Uri ratingUri = Uri.parse(
@@ -1718,10 +1541,55 @@ class _HomePageState extends State<HomePage>
   }
 }
 
-// Route Observer যোগ করুন
+// Enhanced Color Scheme for Dark Mode
+class _Colors {
+  // Dark Mode Colors - Professional Islamic Theme
+  static const Color darkPrimary = Color(0xFF10B981); // Emerald Green
+  static const Color darkPrimaryVariant = Color(0xFF059669); // Darker Emerald
+  static const Color darkSecondary = Color(0xFF8B5CF6); // Violet
+  static const Color darkBackground = Color(0xFF111827); // Dark Blue-Gray
+  static const Color darkSurface = Color(0xFF1F2937); // Dark Gray
+  static const Color darkCard = Color(0xFF374151); // Medium Gray
+  static const Color darkError = Color(0xFFEF4444); // Red
+  static const Color darkText = Color(0xFFF9FAFB); // White
+  static const Color darkTextSecondary = Color(0xFFD1D5DB); // Light Gray
+
+  // Dark Mode Gradients
+  static const List<Color> darkBackgroundGradient = [
+    Color(0xFF111827), // Dark Blue-Gray
+    Color(0xFF1F2937), // Dark Gray
+  ];
+
+  // Dark Mode Card Colors
+  static const Color darkBlueCard = Color(0xFF1E3A8A);
+  static const Color darkGreenCard = Color(0xFF065F46);
+  static const Color darkPurpleCard = Color(0xFF5B21B6);
+  static const Color darkOrangeCard = Color(0xFF9A3412);
+
+  // Dark Mode Accent Colors
+  static const Color darkBlueAccent = Color(0xFF60A5FA);
+  static const Color darkGreenAccent = Color(0xFF34D399);
+  static const Color darkPurpleAccent = Color(0xFFA78BFA);
+  static const Color darkOrangeAccent = Color(0xFFFB923C);
+
+  // Dark Mode Border
+  static const Color darkBorder = Color(0xFF4B5563);
+
+  // Light Mode Colors (Existing)
+  static const List<Color> lightBackgroundGradient = [
+    Color(0xFFF0FDF4), // Very Light Green
+    Color(0xFFDCFCE7), // Light Green
+  ];
+
+  // App Bar
+  //static const Color darkAppBar = Color(0xFF1B5E20); // Dark Emerald
+  static const Color darkAppBar = Color(0xFF065F46); // Dark Emerald
+}
+
+// Route Observer
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
-// RefreshController ক্লাস যোগ করুন (যদি আগে থেকে না থাকে)
+// RefreshController
 class RefreshController {
   void refreshCompleted() {}
 

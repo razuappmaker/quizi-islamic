@@ -1,3 +1,4 @@
+// Prayer header section
 // widgets/prayer_header_section.dart
 
 import 'package:flutter/material.dart';

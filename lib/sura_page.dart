@@ -1,4 +1,4 @@
-// sura_page.dart (আপডেটেড - মাল্টি-ল্যাঙ্গুয়েজ সাপোর্ট সহ)
+// sura_page.dart (আপডেটেড - শুধু ডার্ক মুড সাপোর্ট)
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +6,8 @@ import 'json_loader.dart';
 import 'ad_helper.dart';
 import 'word_by_word_quran_page.dart';
 import '../providers/language_provider.dart';
+import '../providers/theme_provider.dart';
+import '../utils/app_colors.dart';
 
 class SuraPage extends StatefulWidget {
   const SuraPage({Key? key}) : super(key: key);
@@ -228,62 +230,82 @@ class _SuraPageState extends State<SuraPage> {
     super.dispose();
   }
 
-  // কালার হেল্পার মেথড - ইম্প্রুভড
+  // কালার হেল্পার মেথড - শুধু ডার্ক মুডের জন্য আপডেট
   Color _getPrimaryColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF2E7D32) // Light green for dark mode
-        : Color(0xFF2E7D32); // Nature Green for light mode
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors
+              .darkPrimary // ডার্ক মুডে প্রাইমারী কালার
+        : Color(0xFF2E7D32); // লাইট মুডে আগের কালার
   }
 
   Color _getBackgroundColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF121212) // Dark background
-        : Color(0xFFFAFAFA); // Very light background
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors
+              .darkBackground // ডার্ক মুডে ব্যাকগ্রাউন্ড
+        : Color(0xFFFAFAFA); // লাইট মুডে আগের কালার
   }
 
   Color _getCardColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF1E1E1E) // Dark card
-        : Colors.white70; // Pure white card
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors
+              .darkCard // ডার্ক মুডে কার্ড কালার
+        : Colors.white70; // লাইট মুডে আগের কালার
   }
 
   Color _getHeaderColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF2D2D2D) // Dark header
-        : Colors.white10; // White header - লাইট মোডে সাদা
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors
+              .darkSurface // ডার্ক মুডে হেডার কালার
+        : Colors.white10; // লাইট মুডে আগের কালার
   }
 
   Color _getTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Color(0xFF37474F); // Dark gray for light mode
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors
+              .darkText // ডার্ক মুডে টেক্সট কালার
+        : Color(0xFF37474F); // লাইট মুডে আগের কালার
   }
 
   Color _getSecondaryTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey[400]!
-        : Color(0xFF546E7A); // Medium gray for light mode
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors
+              .darkTextSecondary // ডার্ক মুডে সেকেন্ডারী টেক্সট
+        : Color(0xFF546E7A); // লাইট মুডে আগের কালার
   }
 
   Color _getBorderColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Color(0xFF404040)
-        : Color(0xFFE0E0E0); // Light gray border for light mode
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors
+              .darkBorder // ডার্ক মুডে বর্ডার কালার
+        : Color(0xFFE0E0E0); // লাইট মুডে আগের কালার
   }
 
   Color _getHeaderTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Color(0xFF2E7D32); // Green text for white header in light mode
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? Colors
+              .white // ডার্ক মুডে হেডার টেক্সট
+        : Color(0xFF2E7D32); // লাইট মুডে আগের কালার
   }
 
   Color _getHeaderIconColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Color(0xFF2E7D32); // Green icons for white header in light mode
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? Colors
+              .white // ডার্ক মুডে হেডার আইকন
+        : Color(0xFF2E7D32); // লাইট মুডে আগের কালার
   }
 
   Widget _buildWarningWidget(int index) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
     final bool showFull = _showFullWarning[index] ?? false;
 
     return showFull
@@ -292,13 +314,9 @@ class _SuraPageState extends State<SuraPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Color(0xFF1A1A1A)
-                  : Color(0xFFFFF8E1),
+              color: isDarkMode ? AppColors.darkCard : Color(0xFFFFF8E1),
               border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Color(0xFF444444)
-                    : Color(0xFFFFD54F),
+                color: isDarkMode ? AppColors.darkBorder : Color(0xFFFFD54F),
                 width: 1.5,
               ),
               borderRadius: BorderRadius.circular(14),
@@ -310,9 +328,7 @@ class _SuraPageState extends State<SuraPage> {
                   children: [
                     Icon(
                       Icons.warning_amber_rounded,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Color(0xFFFFB74D)
-                          : Color(0xFFF57C00),
+                      color: isDarkMode ? Color(0xFFFFB74D) : Color(0xFFF57C00),
                       size: 22,
                     ),
                     const SizedBox(width: 10),
@@ -321,7 +337,7 @@ class _SuraPageState extends State<SuraPage> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: Theme.of(context).brightness == Brightness.dark
+                        color: isDarkMode
                             ? Color(0xFFFFB74D)
                             : Color(0xFFE65100),
                       ),
@@ -356,7 +372,7 @@ class _SuraPageState extends State<SuraPage> {
                       child: Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 14,
-                        color: Theme.of(context).brightness == Brightness.dark
+                        color: isDarkMode
                             ? Color(0xFFFFB74D)
                             : Color(0xFFF57C00),
                       ),
@@ -391,12 +407,8 @@ class _SuraPageState extends State<SuraPage> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            Theme.of(context).brightness == Brightness.dark
-                                ? Color(0xFFFFB74D)
-                                : Color(0xFFFFB300),
-                            Theme.of(context).brightness == Brightness.dark
-                                ? Color(0xFFFF9800)
-                                : Color(0xFFF57C00),
+                            isDarkMode ? Color(0xFFFFB74D) : Color(0xFFFFB300),
+                            isDarkMode ? Color(0xFFFF9800) : Color(0xFFF57C00),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -404,8 +416,7 @@ class _SuraPageState extends State<SuraPage> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
+                            color: isDarkMode
                                 ? Color(0xFFFFB74D).withOpacity(0.3)
                                 : Color(0xFFFFB300).withOpacity(0.3),
                             blurRadius: 4,
@@ -441,12 +452,10 @@ class _SuraPageState extends State<SuraPage> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Color(0xFF1A1A1A)
-                      : Color(0xFFFFF8E1),
+                  color: isDarkMode ? AppColors.darkCard : Color(0xFFFFF8E1),
                   border: Border.all(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Color(0xFF444444)
+                    color: isDarkMode
+                        ? AppColors.darkBorder
                         : Color(0xFFFFD54F),
                     width: 1,
                   ),
@@ -457,9 +466,7 @@ class _SuraPageState extends State<SuraPage> {
                   children: [
                     Icon(
                       Icons.info_outline_rounded,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Color(0xFFFFB74D)
-                          : Color(0xFFF57C00),
+                      color: isDarkMode ? Color(0xFFFFB74D) : Color(0xFFF57C00),
                       size: 18,
                     ),
                     const SizedBox(width: 6),
@@ -468,7 +475,7 @@ class _SuraPageState extends State<SuraPage> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Theme.of(context).brightness == Brightness.dark
+                        color: isDarkMode
                             ? Color(0xFFFFB74D)
                             : Color(0xFFE65100),
                       ),
@@ -481,6 +488,8 @@ class _SuraPageState extends State<SuraPage> {
   }
 
   Widget _buildSuraHeader(Map<String, dynamic> sura, int index) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
     final serial = sura['serial'] ?? (index + 1);
     final type = sura['type'] ?? 'মাক্কি';
     final ayatCount =
@@ -512,12 +521,12 @@ class _SuraPageState extends State<SuraPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
+              color: isDarkMode
                   ? Colors.white.withOpacity(0.1)
                   : _getPrimaryColor(context).withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
+                color: isDarkMode
                     ? Colors.white.withOpacity(0.3)
                     : _getPrimaryColor(context).withOpacity(0.3),
                 width: 1,
@@ -562,10 +571,10 @@ class _SuraPageState extends State<SuraPage> {
                       ),
                       decoration: BoxDecoration(
                         color: type == 'মাক্কি' || type == 'Makki'
-                            ? (Theme.of(context).brightness == Brightness.dark
+                            ? (isDarkMode
                                   ? Color(0xFFFFB74D)
                                   : Color(0xFFFFA000))
-                            : (Theme.of(context).brightness == Brightness.dark
+                            : (isDarkMode
                                   ? Color(0xFF4FC3F7)
                                   : Color(0xFF1976D2)),
                         borderRadius: BorderRadius.circular(12),
@@ -589,12 +598,12 @@ class _SuraPageState extends State<SuraPage> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
+                        color: isDarkMode
                             ? Colors.white.withOpacity(0.1)
                             : _getPrimaryColor(context).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Theme.of(context).brightness == Brightness.dark
+                          color: isDarkMode
                               ? Colors.white.withOpacity(0.3)
                               : _getPrimaryColor(context).withOpacity(0.3),
                         ),
@@ -631,7 +640,7 @@ class _SuraPageState extends State<SuraPage> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
+                color: isDarkMode
                     ? Colors.white.withOpacity(0.2)
                     : _getPrimaryColor(context).withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -703,11 +712,7 @@ class _SuraPageState extends State<SuraPage> {
                               ),
                               margin: const EdgeInsets.only(bottom: 20),
                               decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Color(0xFF252525)
-                                    : Color(0xFFF8F9FA),
+                                color: _getBackgroundColor(context),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: _getBorderColor(context),
@@ -826,11 +831,7 @@ class _SuraPageState extends State<SuraPage> {
                                   margin: const EdgeInsets.only(bottom: 24),
                                   padding: const EdgeInsets.all(20),
                                   decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? Color(0xFF252525)
-                                        : Color(0xFFF8F9FA),
+                                    color: _getBackgroundColor(context),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
                                       color: _getBorderColor(context),
@@ -886,11 +887,7 @@ class _SuraPageState extends State<SuraPage> {
                                         style: TextStyle(
                                           fontSize: _fontSize,
                                           fontStyle: FontStyle.italic,
-                                          color:
-                                              Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Color(0xFF4FC3F7)
-                                              : Color(0xFF2E7D32),
+                                          color: _getPrimaryColor(context),
                                           height: 1.4,
                                         ),
                                       ),
@@ -919,29 +916,17 @@ class _SuraPageState extends State<SuraPage> {
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Color(0xFF1A1A1A)
-                                      : Color(0xFFE8F5E8),
+                                  color: _getHeaderColor(context),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color:
-                                        Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? Color(0xFF444444)
-                                        : Color(0xFFC8E6C9),
+                                    color: _getBorderColor(context),
                                   ),
                                 ),
                                 child: Row(
                                   children: [
                                     Icon(
                                       Icons.source_rounded,
-                                      color:
-                                          Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Color(0xFF4FC3F7)
-                                          : Color(0xFF1976D2),
+                                      color: _getPrimaryColor(context),
                                       size: 18,
                                     ),
                                     const SizedBox(width: 12),
@@ -951,11 +936,7 @@ class _SuraPageState extends State<SuraPage> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontStyle: FontStyle.italic,
-                                          color:
-                                              Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Color(0xFF4FC3F7)
-                                              : Color(0xFF1565C0),
+                                          color: _getPrimaryColor(context),
                                         ),
                                       ),
                                     ),
@@ -979,14 +960,15 @@ class _SuraPageState extends State<SuraPage> {
     required VoidCallback onPressed,
     required String tooltip,
   }) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
+
     return IconButton(
       icon: Icon(icon, size: 20),
       onPressed: onPressed,
       tooltip: tooltip,
       style: IconButton.styleFrom(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? Color(0xFF2D2D2D)
-            : Color(0xFFF5F5F5),
+        backgroundColor: isDarkMode ? AppColors.darkSurface : Color(0xFFF5F5F5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
@@ -995,21 +977,24 @@ class _SuraPageState extends State<SuraPage> {
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: _getPrimaryColor(context),
+        backgroundColor: isDarkMode ? AppColors.darkAppBar : Color(0xFF2E7D32),
+        // শুধু ডার্ক মুডে আপডেট
         title: Text(
           _text('pageTitle', context),
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 16, // ফন্ট সাইজ ছোট করা হয়েছে
+            fontSize: 18,
             color: Colors.white,
-            height: 1.2, // লাইন হাইট কম করা হয়েছে
+            height: 1.2,
           ),
-          maxLines: 2, // সর্বোচ্চ ২ লাইন
-          overflow: TextOverflow.ellipsis, // ২ লাইনের বেশি হলে ... দেখাবে
-          textAlign: TextAlign.start, // টেক্সট অ্যালাইনমেন্ট
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.start,
         ),
         leading: Container(
           margin: EdgeInsets.all(8),
@@ -1042,9 +1027,10 @@ class _SuraPageState extends State<SuraPage> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.green[600]!
+                backgroundColor: isDarkMode
+                    ? AppColors.darkPrimary
                     : Colors.green[800]!,
+                // শুধু ডার্ক মুডে আপডেট
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -1062,10 +1048,9 @@ class _SuraPageState extends State<SuraPage> {
         ],
       ),
       body: SafeArea(
-        // Main SafeArea to handle system UI
         bottom: true,
         child: Container(
-          color: _getBackgroundColor(context),
+          color: _getBackgroundColor(context), // কালার হেল্পার মেথড ব্যবহার
           child: Column(
             children: [
               Expanded(
@@ -1116,22 +1101,19 @@ class _SuraPageState extends State<SuraPage> {
                       ),
               ),
 
-              // Anchor Ad Section - Fixed with proper bottom padding
+              // Anchor Ad Section
               if (_isAnchorAdReady && _showAnchorAd && _anchorAd != null)
                 Container(
                   width: double.infinity,
-                  color: _getCardColor(context),
+                  color: _getCardColor(context), // কালার হেল্পার মেথড ব্যবহার
                   child: Stack(
                     children: [
-                      // Ad Widget
                       Container(
                         width: double.infinity,
                         height: _anchorAd!.size.height.toDouble(),
                         alignment: Alignment.center,
                         child: AdWidget(ad: _anchorAd!),
                       ),
-
-                      // Minimal Close Button
                       Positioned(
                         top: 4,
                         right: 4,
@@ -1140,9 +1122,7 @@ class _SuraPageState extends State<SuraPage> {
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
+                              color: isDarkMode
                                   ? Colors.black54
                                   : Colors.white54,
                               shape: BoxShape.circle,
@@ -1150,11 +1130,7 @@ class _SuraPageState extends State<SuraPage> {
                             child: Icon(
                               Icons.close,
                               size: 14,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black87,
+                              color: isDarkMode ? Colors.white : Colors.black87,
                             ),
                           ),
                         ),

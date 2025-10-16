@@ -10,6 +10,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:provider/provider.dart';
 import 'ad_helper.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // Import the AppColors class
 
 class NadiyatulQuran extends StatefulWidget {
   const NadiyatulQuran({Key? key}) : super(key: key);
@@ -167,23 +168,36 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
 
   // ✅ ইংরেজি ইউজারদের জন্য সতর্কবার্তা ডায়ালগ
   void _showEnglishWarningDialog() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: AppColors.getSurfaceColor(isDark),
           title: Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.orange[800]),
+              Icon(
+                Icons.info_outline,
+                color: AppColors.getAccentColor('orange', isDark),
+              ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 "Important Information",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.getTextColor(isDark),
+                ),
               ),
             ],
           ),
-          content: const Text(
+          content: Text(
             "These PDFs are available only in Bengali language. They have not been translated to English. The same PDF will be used for all language users.",
-            style: TextStyle(fontSize: 15, height: 1.4),
+            style: TextStyle(
+              fontSize: 15,
+              height: 1.4,
+              color: AppColors.getTextSecondaryColor(isDark),
+            ),
           ),
           actions: [
             TextButton(
@@ -193,7 +207,10 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                   _showEnglishWarning = false;
                 });
               },
-              child: const Text("OK"),
+              child: Text(
+                "OK",
+                style: TextStyle(color: AppColors.getPrimaryColor(isDark)),
+              ),
             ),
           ],
         );
@@ -234,25 +251,32 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final isEnglish = languageProvider.isEnglish;
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[700],
+        backgroundColor: AppColors.getAppBarColor(isDark),
         title: Text(
           isEnglish ? 'Quran Learning' : 'কোরআন শিক্ষা',
-          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: AppColors.getTextColor(isDark),
+          ),
         ),
         leading: Container(
           margin: EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: AppColors.getTextColor(isDark).withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            icon: Icon(
+              Icons.arrow_back_rounded,
+              color: AppColors.getTextColor(isDark),
+              size: 18,
+            ),
             onPressed: () => Navigator.of(context).pop(),
             splashRadius: 20,
           ),
@@ -261,7 +285,10 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
           // ✅ শুধুমাত্র ইংরেজি ইউজারদের জন্য এবং একবারের বেশি না দেখালে আইকন দেখান
           if (isEnglish && _showEnglishWarning)
             IconButton(
-              icon: Icon(Icons.info_outline, color: Colors.yellow[700]),
+              icon: Icon(
+                Icons.info_outline,
+                color: AppColors.getAccentColor('orange', isDark),
+              ),
               tooltip: "Important Information",
               onPressed: _showEnglishWarningDialog,
             ),
@@ -279,15 +306,23 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                 padding: const EdgeInsets.all(12),
                 margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.orange[50],
+                  color: AppColors.getAccentColor(
+                    'orange',
+                    isDark,
+                  ).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.orange[300]!),
+                  border: Border.all(
+                    color: AppColors.getAccentColor(
+                      'orange',
+                      isDark,
+                    ).withOpacity(0.3),
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.info_outline,
-                      color: Colors.orange[800],
+                      color: AppColors.getAccentColor('orange', isDark),
                       size: 20,
                     ),
                     const SizedBox(width: 8),
@@ -295,7 +330,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                       child: Text(
                         "PDFs are in Bengali only. Tap for details.",
                         style: TextStyle(
-                          color: Colors.orange[900],
+                          color: AppColors.getAccentColor('orange', isDark),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -305,7 +340,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                       icon: Icon(
                         Icons.close,
                         size: 18,
-                        color: Colors.orange[700],
+                        color: AppColors.getAccentColor('orange', isDark),
                       ),
                       onPressed: () {
                         setState(() {
@@ -326,7 +361,11 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                   top: 16.0,
                 ),
                 child: guides.isEmpty
-                    ? Center(child: CircularProgressIndicator())
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.getPrimaryColor(isDark),
+                        ),
+                      )
                     : ListView(
                         children: [
                           ...List<Widget>.generate(guides.length, (index) {
@@ -379,7 +418,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
 
     return Card(
       elevation: 6,
-      shadowColor: Colors.green.withOpacity(0.2),
+      shadowColor: AppColors.getPrimaryColor(isDark).withOpacity(0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         decoration: BoxDecoration(
@@ -387,10 +426,16 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDark
-                ? [Colors.green[900]!, Colors.green[800]!]
-                : [Colors.white, Colors.green[50]!],
+                ? [
+                    AppColors.darkSurface.withOpacity(0.8),
+                    AppColors.darkCard.withOpacity(0.6),
+                  ]
+                : [AppColors.lightSurface, AppColors.lightBackground],
           ),
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.getBorderColor(isDark).withOpacity(0.3),
+          ),
         ),
         child: Material(
           color: Colors.transparent,
@@ -409,7 +454,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                         width: 100,
                         height: 140,
                         decoration: BoxDecoration(
-                          color: isDark ? Colors.green[800] : Colors.white,
+                          color: AppColors.getCardColor(isDark),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
@@ -419,9 +464,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                             ),
                           ],
                           border: Border.all(
-                            color: isDark
-                                ? Colors.green[600]!
-                                : Colors.green[200]!,
+                            color: AppColors.getBorderColor(isDark),
                             width: 1,
                           ),
                         ),
@@ -434,27 +477,23 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
-                                color: isDark
-                                    ? Colors.green[800]
-                                    : Colors.white,
+                                color: AppColors.getCardColor(isDark),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
                                       Icons.article,
                                       size: 40,
-                                      color: isDark
-                                          ? Colors.green[200]
-                                          : Colors.green[600],
+                                      color: AppColors.getPrimaryColor(isDark),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       isEnglish ? "Preview" : "প্রিভিউ",
                                       style: TextStyle(
                                         fontSize: 10,
-                                        color: isDark
-                                            ? Colors.green[300]
-                                            : Colors.green[700],
+                                        color: AppColors.getPrimaryColor(
+                                          isDark,
+                                        ),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -477,9 +516,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: isDark
-                                    ? Colors.white
-                                    : Colors.green[900],
+                                color: AppColors.getTextColor(isDark),
                                 height: 1.2,
                               ),
                             ),
@@ -488,9 +525,7 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                               description,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: isDark
-                                    ? Colors.green[200]
-                                    : Colors.green[700],
+                                color: AppColors.getTextSecondaryColor(isDark),
                                 height: 1.4,
                               ),
                             ),
@@ -524,14 +559,18 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    Colors.green[600]!,
-                                    Colors.green[700]!,
+                                    AppColors.getPrimaryColor(isDark),
+                                    AppColors.getPrimaryColor(
+                                      isDark,
+                                    ).withOpacity(0.8),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(25),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.green.withOpacity(0.3),
+                                    color: AppColors.getPrimaryColor(
+                                      isDark,
+                                    ).withOpacity(0.3),
                                     blurRadius: 6,
                                     offset: const Offset(0, 3),
                                   ),
@@ -579,26 +618,20 @@ class _NadiyatulQuranState extends State<NadiyatulQuran> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.green[800]!.withOpacity(0.5)
-            : Colors.green[100]!,
+        color: AppColors.getPrimaryColor(isDark).withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 12,
-            color: isDark ? Colors.green[200] : Colors.green[600],
-          ),
+          Icon(icon, size: 12, color: AppColors.getPrimaryColor(isDark)),
           const SizedBox(width: 4),
           Text(
             text,
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.green[200] : Colors.green[700],
+              color: AppColors.getPrimaryColor(isDark),
             ),
           ),
         ],
@@ -740,10 +773,11 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                   ? "Download completed: ${widget.title}.pdf"
                   : "ডাউনলোড সম্পন্ন: ${widget.title}.pdf",
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.darkPrimary,
             duration: const Duration(seconds: 3),
             action: SnackBarAction(
               label: isEnglish ? "Open Folder" : "ফোল্ডার দেখুন",
+              textColor: Colors.white,
               onPressed: () {
                 _openDownloadsFolder(downloadsDir.path);
               },
@@ -769,7 +803,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                   ? "Download failed: ${e.toString()}"
                   : "ডাউনলোড ব্যর্থ: ${e.toString()}",
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.darkError,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -828,7 +862,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                   ? "Share failed: ${e.toString()}"
                   : "শেয়ার করতে ব্যর্থ: ${e.toString()}",
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.darkError,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -851,13 +885,14 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
       listen: false,
     );
     final isEnglish = languageProvider.isEnglish;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: AppColors.getSurfaceColor(isDark),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -873,7 +908,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[400],
+                  color: AppColors.getBorderColor(isDark),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -884,7 +919,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
+                color: AppColors.getPrimaryColor(isDark),
               ),
             ),
             const SizedBox(height: 16),
@@ -893,26 +928,31 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
               isEnglish
                   ? "First, browse through the entire PDF once"
                   : "প্রথমে সম্পূর্ণ PDF টি একবার দেখে নিন",
+              isDark: isDark,
             ),
             _buildGuideItem(
               "🔍",
               isEnglish
                   ? "Zoom in to see important parts"
                   : "জরুরি অংশগুলো জুম করে দেখুন",
+              isDark: isDark,
             ),
             _buildGuideItem(
               "📑",
               isEnglish
                   ? "Use page navigation to move around easily"
                   : "পৃষ্ঠা নেভিগেশন ব্যবহার করে সহজে চলাফেরা করুন",
+              isDark: isDark,
             ),
             _buildGuideItem(
               "💾",
               isEnglish ? "Download if needed" : "প্রয়োজনে ডাউনলোড করে নিন",
+              isDark: isDark,
             ),
             _buildGuideItem(
               "📤",
               isEnglish ? "Share with others" : "অন্যদের সাথে শেয়ার করুন",
+              isDark: isDark,
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -920,12 +960,16 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
+                  backgroundColor: AppColors.getPrimaryColor(isDark),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 child: Text(
                   isEnglish ? "Got it" : "বুঝেছি",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -935,7 +979,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
     );
   }
 
-  Widget _buildGuideItem(String emoji, String text) {
+  Widget _buildGuideItem(String emoji, String text, {required bool isDark}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -946,7 +990,11 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 14, height: 1.4),
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.4,
+                color: AppColors.getTextColor(isDark),
+              ),
             ),
           ),
         ],
@@ -960,11 +1008,16 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
       listen: false,
     );
     final isEnglish = languageProvider.isEnglish;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(isEnglish ? "Enter Page Number" : "পৃষ্ঠা নং লিখুন"),
+        backgroundColor: AppColors.getSurfaceColor(isDark),
+        title: Text(
+          isEnglish ? "Enter Page Number" : "পৃষ্ঠা নং লিখুন",
+          style: TextStyle(color: AppColors.getTextColor(isDark)),
+        ),
         content: TextField(
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
@@ -972,6 +1025,8 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                 ? "Enter between 1 and $_totalPages"
                 : "১ থেকে $_totalPages এর মধ্যে লিখুন",
             border: const OutlineInputBorder(),
+            filled: true,
+            fillColor: AppColors.getBackgroundColor(isDark),
           ),
           onChanged: (value) {
             final page = int.tryParse(value);
@@ -984,7 +1039,10 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(isEnglish ? "Cancel" : "বাতিল"),
+            child: Text(
+              isEnglish ? "Cancel" : "বাতিল",
+              style: TextStyle(color: AppColors.getPrimaryColor(isDark)),
+            ),
           ),
         ],
       ),
@@ -1015,14 +1073,17 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final isEnglish = languageProvider.isEnglish;
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[700],
-        title: Text(widget.title),
+        backgroundColor: AppColors.getAppBarColor(isDark),
+        title: Text(
+          widget.title,
+          style: TextStyle(color: AppColors.getTextColor(isDark)),
+        ),
+        iconTheme: IconThemeData(color: AppColors.getTextColor(isDark)),
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outlined),
@@ -1066,7 +1127,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
         child: Column(
           children: [
             Container(
-              color: isDark ? Colors.grey[900] : Colors.grey[100],
+              color: AppColors.getSurfaceColor(isDark),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
@@ -1087,12 +1148,10 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         decoration: BoxDecoration(
-                          color: isDark ? Colors.grey[800] : Colors.white,
+                          color: AppColors.getCardColor(isDark),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: isDark
-                                ? Colors.grey[600]!
-                                : Colors.grey[300]!,
+                            color: AppColors.getBorderColor(isDark),
                           ),
                         ),
                         child: Center(
@@ -1102,7 +1161,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                                 : "পৃষ্ঠা: $_currentPage/$_totalPages",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black,
+                              color: AppColors.getTextColor(isDark),
                             ),
                           ),
                         ),
@@ -1148,7 +1207,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
                             children: [
                               CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.green[700]!,
+                                  AppColors.getPrimaryColor(isDark),
                                 ),
                               ),
                               const SizedBox(height: 16),
@@ -1188,7 +1247,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
         children: [
           FloatingActionButton(
             onPressed: _showPageInputDialog,
-            backgroundColor: Colors.blue[700],
+            backgroundColor: AppColors.getAccentColor('blue', isDark),
             mini: true,
             tooltip: isEnglish ? "Search Page" : "পৃষ্ঠা খুঁজুন",
             child: const Icon(Icons.search, color: Colors.white, size: 20),
@@ -1196,7 +1255,7 @@ class _AdvancedPdfViewerPageState extends State<AdvancedPdfViewerPage> {
           const SizedBox(height: 8),
           FloatingActionButton(
             onPressed: _showReadingGuide,
-            backgroundColor: Colors.green[700],
+            backgroundColor: AppColors.getPrimaryColor(isDark),
             tooltip: isEnglish ? "Reading Guide" : "পড়ার গাইড",
             child: const Icon(Icons.help_outline, color: Colors.white),
           ),

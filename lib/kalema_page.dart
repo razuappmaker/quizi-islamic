@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
-import 'dart:convert'; // ✅ Add this import
+import 'dart:convert';
 import 'ad_helper.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // AppColors ইম্পোর্ট যোগ
 
 class KalemaPage extends StatefulWidget {
   const KalemaPage({super.key});
@@ -66,7 +67,7 @@ class _KalemaPageState extends State<KalemaPage> {
       final String response = await DefaultAssetBundle.of(
         context,
       ).loadString(jsonFile);
-      final List<dynamic> data = json.decode(response); // ✅ Now json will work
+      final List<dynamic> data = json.decode(response);
 
       if (mounted) {
         setState(() {
@@ -129,7 +130,7 @@ class _KalemaPageState extends State<KalemaPage> {
         {
           "title": "কালেমা রুদ্দে কুফর",
           "text":
-              "ٱللَّٰهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ أَنْ أُشْرِكَ بِكَ شَيْئًا وَأَنَا أَعْلَمُ بِهِ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ بِهِ، تُبْتُ عَنْهُ، وَتَبَرَّأْتُ مِنَ ٱلْكُفْرِ وَٱلشِّرْكِ وَٱلْكَذِبِ وَٱلْغِيبَةِ وَٱلْبِدْعَةِ وَٱلنَّمِيمَةِ وَٱلْفَوَاحِشِ وَٱلْبُهْتَانِ وَٱلْمَعَاصِي كُلِّهَا، أَسْلَمْتُ وَآمَنْتُ وَأَقُولُ لَا إِلَٰهَ إِلَّا ٱللَّٰهُ مُحَمَّدٌ رَسُولُ ٱللَّٰهِ",
+              "ٱللَّٰهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ أَنْ أُشْرِكَ بِكَ شَيْئًا وَأَنَا أَعْلَمُ بِهِ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ بِهِ، تُبْتُ عَنْهُ، وَتَبَرَّأْتُ مِنَ ٱلْكُفْرِ وَٱلشِّرْكِ وَٱلْكَذِبِ وَٱلْغِيبَةِ وَٱلْبِدْعَةِ وَٱلْنَمِيمَةِ وَٱلْفَوَاحِشِ وَٱلْبُهْتَانِ وَٱلْمَعَاصِي كُلِّهَا، أَسْلَمْتُ وَآمَنْتُ وَأَقُولُ لَا إِلَٰهَ إِلَّا ٱللَّٰهُ مُحَمَّدٌ رَسُولُ ٱللَّٰهِ",
           "transliteration":
               "আল্লাহুম্মা ইন্নি আউযু বিকা মিন আন উশরিকা বিকা শাইয়্যান ওয়া আনা আ'লামু বিহি... লা-ইলাহা ইল্লাল্লাহু মুহাম্মাদুর রাসূলুল্লাহ।",
           "meaning":
@@ -224,18 +225,30 @@ class _KalemaPageState extends State<KalemaPage> {
       listen: false,
     );
     final isEnglish = languageProvider.isEnglish;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: isDarkMode
+              ? AppColors.darkCard
+              : AppColors.lightCard,
           title: Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.orange[800]),
+              Icon(
+                Icons.info_outline,
+                color: isDarkMode
+                    ? AppColors.getAccentColor('orange', isDarkMode)
+                    : AppColors.getAccentColor('orange', isDarkMode),
+              ),
               const SizedBox(width: 8),
               Text(
                 isEnglish ? "Warning" : "সতর্কবার্তা",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? AppColors.darkText : AppColors.lightText,
+                ),
               ),
             ],
           ),
@@ -243,14 +256,25 @@ class _KalemaPageState extends State<KalemaPage> {
             isEnglish
                 ? "Arabic verses cannot be fully accurately represented in English. The transliteration is only a guide, please recite in Arabic for proper pronunciation."
                 : "আরবি আয়াত বাংলায় সম্পূর্ণ সুদ্ধভাবে প্রকাশ করা যায় না। বাংলা উচ্চারণ সহায়ক মাত্র, সঠিক তিলাওয়াতের জন্য আরবিতেই পড়ুন।",
-            style: TextStyle(fontSize: 15, height: 1.4),
+            style: TextStyle(
+              fontSize: 15,
+              height: 1.4,
+              color: isDarkMode ? AppColors.darkText : AppColors.lightText,
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(isEnglish ? "OK" : "ঠিক আছে"),
+              child: Text(
+                isEnglish ? "OK" : "ঠিক আছে",
+                style: TextStyle(
+                  color: isDarkMode
+                      ? AppColors.darkPrimary
+                      : AppColors.lightPrimary,
+                ),
+              ),
             ),
           ],
         );
@@ -282,13 +306,17 @@ class _KalemaPageState extends State<KalemaPage> {
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final isEnglish = languageProvider.isEnglish;
-
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Colors.green[800];
+    final primaryColor = isDarkMode
+        ? AppColors.darkPrimary
+        : AppColors.lightPrimary;
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
 
     return Scaffold(
+      backgroundColor: isDarkMode
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
       appBar: AppBar(
         title: Text(
           isEnglish ? "The Kalemas" : "কালেমা সমূহ",
@@ -298,7 +326,9 @@ class _KalemaPageState extends State<KalemaPage> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: isDarkMode
+            ? AppColors.darkAppBar
+            : AppColors.lightAppBar,
         elevation: 2,
         leading: Container(
           margin: EdgeInsets.all(8),
@@ -324,25 +354,59 @@ class _KalemaPageState extends State<KalemaPage> {
               PopupMenuItem(
                 value: 'increase',
                 child: ListTile(
-                  leading: const Icon(Icons.zoom_in),
-                  title: Text(isEnglish ? 'Increase Font' : 'ফন্ট বড় করুন'),
+                  leading: Icon(
+                    Icons.zoom_in,
+                    color: isDarkMode
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary,
+                  ),
+                  title: Text(
+                    isEnglish ? 'Increase Font' : 'ফন্ট বড় করুন',
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? AppColors.darkText
+                          : AppColors.lightText,
+                    ),
+                  ),
                   onTap: _increaseFontSize,
                 ),
               ),
               PopupMenuItem(
                 value: 'decrease',
                 child: ListTile(
-                  leading: const Icon(Icons.zoom_out),
-                  title: Text(isEnglish ? 'Decrease Font' : 'ফন্ট ছোট করুন'),
+                  leading: Icon(
+                    Icons.zoom_out,
+                    color: isDarkMode
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary,
+                  ),
+                  title: Text(
+                    isEnglish ? 'Decrease Font' : 'ফন্ট ছোট করুন',
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? AppColors.darkText
+                          : AppColors.lightText,
+                    ),
+                  ),
                   onTap: _decreaseFontSize,
                 ),
               ),
               PopupMenuItem(
                 value: 'reset',
                 child: ListTile(
-                  leading: const Icon(Icons.restart_alt),
+                  leading: Icon(
+                    Icons.restart_alt,
+                    color: isDarkMode
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary,
+                  ),
                   title: Text(
                     isEnglish ? 'Default Font Size' : 'ডিফল্ট ফন্ট সাইজ',
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? AppColors.darkText
+                          : AppColors.lightText,
+                    ),
                   ),
                   onTap: _resetFontSize,
                 ),
@@ -353,7 +417,13 @@ class _KalemaPageState extends State<KalemaPage> {
         ],
       ),
       body: kalemaList.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isDarkMode ? AppColors.darkPrimary : AppColors.lightPrimary,
+                ),
+              ),
+            )
           : SafeArea(
               bottom: true,
               child: Column(
@@ -369,8 +439,8 @@ class _KalemaPageState extends State<KalemaPage> {
                             margin: const EdgeInsets.only(bottom: 20),
                             decoration: BoxDecoration(
                               color: isDarkMode
-                                  ? Colors.grey[800]
-                                  : Colors.white,
+                                  ? AppColors.darkCard
+                                  : AppColors.lightCard,
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
@@ -394,9 +464,7 @@ class _KalemaPageState extends State<KalemaPage> {
                                           vertical: 8,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: primaryColor!.withOpacity(
-                                            0.15,
-                                          ),
+                                          color: primaryColor.withOpacity(0.15),
                                           borderRadius: BorderRadius.circular(
                                             20,
                                           ),
@@ -424,8 +492,8 @@ class _KalemaPageState extends State<KalemaPage> {
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                             color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
+                                                ? AppColors.darkText
+                                                : AppColors.lightText,
                                           ),
                                         ),
                                       ),
@@ -439,13 +507,13 @@ class _KalemaPageState extends State<KalemaPage> {
                                     padding: const EdgeInsets.all(24),
                                     decoration: BoxDecoration(
                                       color: isDarkMode
-                                          ? Colors.grey[900]
-                                          : const Color(0xFFF8F6F0),
+                                          ? AppColors.darkSurface
+                                          : AppColors.lightSurface,
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
                                         color: isDarkMode
-                                            ? Colors.grey[700]!
-                                            : const Color(0xFFE8E6DF),
+                                            ? AppColors.darkBorder
+                                            : AppColors.lightBorder,
                                         width: 2,
                                       ),
                                     ),
@@ -459,10 +527,8 @@ class _KalemaPageState extends State<KalemaPage> {
                                                 child: CustomPaint(
                                                   painter: _ArabicLinePainter(
                                                     lineColor: isDarkMode
-                                                        ? Colors.grey[700]!
-                                                        : const Color(
-                                                            0xFFE8E6DF,
-                                                          ),
+                                                        ? AppColors.darkBorder
+                                                        : AppColors.lightBorder,
                                                   ),
                                                 ),
                                               ),
@@ -473,8 +539,8 @@ class _KalemaPageState extends State<KalemaPage> {
                                                   fontFamily: 'ScheherazadeNew',
                                                   fontWeight: FontWeight.bold,
                                                   color: isDarkMode
-                                                      ? const Color(0xFFE8D5A7)
-                                                      : const Color(0xFF8B4513),
+                                                      ? AppColors.darkText
+                                                      : AppColors.lightText,
                                                   height: 2.2,
                                                   wordSpacing: 3.0,
                                                   letterSpacing: 1.0,
@@ -494,17 +560,27 @@ class _KalemaPageState extends State<KalemaPage> {
                                           padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
                                             color: isDarkMode
-                                                ? Colors.blue[900]!.withOpacity(
-                                                    0.15,
-                                                  )
-                                                : const Color(0xFFE3F2FD),
+                                                ? AppColors.getAccentColor(
+                                                    'blue',
+                                                    isDarkMode,
+                                                  ).withOpacity(0.15)
+                                                : AppColors.getAccentColor(
+                                                    'blue',
+                                                    isDarkMode,
+                                                  ).withOpacity(0.1),
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
                                             border: Border.all(
                                               color: isDarkMode
-                                                  ? Colors.blue[700]!
-                                                  : const Color(0xFFBBDEFB),
+                                                  ? AppColors.getAccentColor(
+                                                      'blue',
+                                                      isDarkMode,
+                                                    )
+                                                  : AppColors.getAccentColor(
+                                                      'blue',
+                                                      isDarkMode,
+                                                    ),
                                               width: 1,
                                             ),
                                           ),
@@ -514,8 +590,14 @@ class _KalemaPageState extends State<KalemaPage> {
                                               fontSize: _textFontSize,
                                               fontStyle: FontStyle.italic,
                                               color: isDarkMode
-                                                  ? Colors.blue[200]
-                                                  : Colors.blue[800],
+                                                  ? AppColors.getAccentColor(
+                                                      'blue',
+                                                      isDarkMode,
+                                                    )
+                                                  : AppColors.getAccentColor(
+                                                      'blue',
+                                                      isDarkMode,
+                                                    ),
                                               height: 1.6,
                                             ),
                                             textAlign: TextAlign.center,
@@ -531,15 +613,25 @@ class _KalemaPageState extends State<KalemaPage> {
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
                                       color: isDarkMode
-                                          ? Colors.purple[900]!.withOpacity(
-                                              0.15,
-                                            )
-                                          : const Color(0xFFF3E5F5),
+                                          ? AppColors.getAccentColor(
+                                              'purple',
+                                              isDarkMode,
+                                            ).withOpacity(0.15)
+                                          : AppColors.getAccentColor(
+                                              'purple',
+                                              isDarkMode,
+                                            ).withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color: isDarkMode
-                                            ? Colors.purple[700]!
-                                            : const Color(0xFFE1BEE7),
+                                            ? AppColors.getAccentColor(
+                                                'purple',
+                                                isDarkMode,
+                                              )
+                                            : AppColors.getAccentColor(
+                                                'purple',
+                                                isDarkMode,
+                                              ),
                                         width: 1,
                                       ),
                                     ),
@@ -553,8 +645,14 @@ class _KalemaPageState extends State<KalemaPage> {
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: isDarkMode
-                                                ? Colors.purple[200]
-                                                : Colors.purple[800],
+                                                ? AppColors.getAccentColor(
+                                                    'purple',
+                                                    isDarkMode,
+                                                  )
+                                                : AppColors.getAccentColor(
+                                                    'purple',
+                                                    isDarkMode,
+                                                  ),
                                           ),
                                         ),
                                         const SizedBox(height: 8),
@@ -563,8 +661,8 @@ class _KalemaPageState extends State<KalemaPage> {
                                           style: TextStyle(
                                             fontSize: _textFontSize,
                                             color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.black87,
+                                                ? AppColors.darkText
+                                                : AppColors.lightText,
                                             height: 1.6,
                                           ),
                                         ),

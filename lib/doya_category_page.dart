@@ -7,6 +7,8 @@ import 'ad_helper.dart';
 import 'network_json_loader.dart';
 import 'doya_list_page.dart';
 import '../providers/language_provider.dart';
+import '../providers/theme_provider.dart';
+import '../utils/app_colors.dart';
 
 class DoyaCategoryPage extends StatefulWidget {
   const DoyaCategoryPage({Key? key}) : super(key: key);
@@ -69,12 +71,13 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       listen: false,
     );
     final isEnglish = languageProvider.isEnglish;
+    final isDarkMode = _isDarkMode(context);
 
     return [
       {
         'title': _text('salat', context),
         'icon': Icons.mosque,
-        'color': Colors.blue,
+        'color': isDarkMode ? Color(0xFF3B82F6) : Color(0xFF1E88E5), // Blue
         'jsonFile': isEnglish
             ? 'assets/en_salat_doyas.json'
             : 'assets/salat_doyas.json',
@@ -82,7 +85,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       {
         'title': _text('quranic', context),
         'icon': Icons.menu_book,
-        'color': Colors.deepPurple,
+        'color': isDarkMode ? Color(0xFF8B5CF6) : Color(0xFF7E57C2), // Purple
         'jsonFile': isEnglish
             ? 'assets/en_quranic_doyas.json'
             : 'assets/quranic_doyas.json',
@@ -90,7 +93,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       {
         'title': _text('marriage', context),
         'icon': Icons.family_restroom,
-        'color': Colors.teal,
+        'color': isDarkMode ? Color(0xFF10B981) : Color(0xFF009688), // Teal
         'jsonFile': isEnglish
             ? 'assets/en_copple_doya.json'
             : 'assets/copple_doya.json',
@@ -98,7 +101,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       {
         'title': _text('morningEvening', context),
         'icon': Icons.wb_sunny,
-        'color': Colors.orange,
+        'color': isDarkMode ? Color(0xFFF59E0B) : Color(0xFFFF9800), // Orange
         'jsonFile': isEnglish
             ? 'assets/en_morning_evening_doya.json'
             : 'assets/morning_evening_doya.json',
@@ -106,7 +109,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       {
         'title': _text('dailyLife', context),
         'icon': Icons.home,
-        'color': Colors.green,
+        'color': isDarkMode ? Color(0xFF22C55E) : Color(0xFF4CAF50), // Green
         'jsonFile': isEnglish
             ? 'assets/en_daily_life_doyas.json'
             : 'assets/daily_life_doyas.json',
@@ -114,7 +117,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       {
         'title': _text('healing', context),
         'icon': Icons.local_hospital,
-        'color': Colors.red,
+        'color': isDarkMode ? Color(0xFFEF4444) : Color(0xFFF44336), // Red
         'jsonFile': isEnglish
             ? 'assets/en_rog_mukti_doyas.json'
             : 'assets/rog_mukti_doyas.json',
@@ -122,7 +125,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       {
         'title': _text('fasting', context),
         'icon': Icons.nightlight_round,
-        'color': Colors.purple,
+        'color': isDarkMode ? Color(0xFFA855F7) : Color(0xFF9C27B0),
+        // Deep Purple
         'jsonFile': isEnglish
             ? 'assets/en_fasting_doyas.json'
             : 'assets/fasting_doyas.json',
@@ -130,7 +134,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       {
         'title': _text('miscellaneous', context),
         'icon': Icons.category,
-        'color': Colors.brown,
+        'color': isDarkMode ? Color(0xFF8B4513) : Color(0xFF795548), // Brown
         'jsonFile': isEnglish
             ? 'assets/en_misc_doyas.json'
             : 'assets/misc_doyas.json',
@@ -147,6 +151,12 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
   // রেসপনসিভ লেআউট ভেরিয়েবল
   bool _isTablet = false;
+
+  // হেল্পার মেথড - ডার্ক মুড চেক করার জন্য
+  bool _isDarkMode(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode;
+  }
 
   @override
   void initState() {
@@ -195,8 +205,6 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           onAdClosed: (ad) => print('🔵 Bottom banner ad closed'),
         ),
       );
-
-      // ✅ AdHelper এর ভিতরে ইতিমধ্যে load() কল করা হয়েছে, তাই এখানে আলাদা করে load() কল করার দরকার নেই
     } catch (e) {
       print('❌ Error loading adaptive bottom banner ad: $e');
       _bottomBannerAd?.dispose();
@@ -304,7 +312,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           for (var doya in convertedData) {
             doya['category'] = category['title'];
             doya['categoryColor'] = category['color'].toString();
-            doya['jsonFile'] = category['jsonFile']; // JSON file যোগ করা
+            doya['jsonFile'] = category['jsonFile'];
           }
           allDoyas.addAll(convertedData);
         } catch (e) {
@@ -376,7 +384,6 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     );
   }
 
-  // আপডেট করা মেথড: সরাসরি দোয়া ওপেন করবে
   void _navigateToSearchedDoya(BuildContext context, Map<String, String> doya) {
     final categories = getCategories(context);
     final category = categories.firstWhere(
@@ -384,11 +391,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       orElse: () => categories.last,
     );
 
-    // দোয়া কার্ড ওপেন হলে parent কে নোটিফাই করুন
     _incrementDoyaCardCount();
 
-    // সরাসরি DoyaDetailPage-এ নিয়ে যান (আপনার যদি থাকে) অথবা
-    // DoyaListPage-এ নিয়ে গিয়ে সরাসরি সেই দোয়াটি হাইলাইট/এক্সপ্যান্ড করুন
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -397,9 +401,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
           jsonFile: category['jsonFile'],
           categoryColor: category['color'],
           initialSearchQuery: doya['title'],
-          // সার্চ কোয়েরি পাঠানো
           preSelectedDoyaTitle: doya['title'],
-          // নতুন প্যারামিটার - সরাসরি দোয়া সিলেক্ট করার জন্য
           onDoyaCardOpen: _incrementDoyaCardCount,
         ),
       ),
@@ -410,10 +412,13 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     Map<String, dynamic> category,
     BuildContext context,
   ) {
+    final isDarkMode = _isDarkMode(context);
+
     return Card(
       elevation: 4,
       margin: EdgeInsets.all(_isTablet ? 12 : 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: AppColors.getCardColor(isDarkMode),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () => _navigateToCategoryDoyas(context, category),
@@ -462,6 +467,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     Map<String, String> doya,
     BuildContext context,
   ) {
+    final isDarkMode = _isDarkMode(context);
     Color categoryColor = Colors.teal;
     try {
       categoryColor = Color(int.parse(doya['categoryColor'] ?? '0xFF009688'));
@@ -472,6 +478,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
     return Card(
       elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      color: AppColors.getCardColor(isDarkMode),
       child: ListTile(
         leading: Icon(Icons.search, color: categoryColor),
         title: Text(
@@ -485,10 +492,16 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
               doya['bangla'] ?? '',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: AppColors.getTextSecondaryColor(isDarkMode),
+              ),
             ),
             Text(
               '${_text('category', context)}: ${doya['category']}',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.getTextSecondaryColor(isDarkMode),
+              ),
             ),
           ],
         ),
@@ -498,9 +511,20 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   }
 
   Widget _buildBodyContent(BuildContext context) {
-    return _isSearching
-        ? _buildSearchResults(context)
-        : _buildCategoryGrid(context);
+    final isDarkMode = _isDarkMode(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: AppColors.getBackgroundGradient(isDarkMode),
+        ),
+      ),
+      child: _isSearching
+          ? _buildSearchResults(context)
+          : _buildCategoryGrid(context),
+    );
   }
 
   Widget _buildBottomBannerAd() {
@@ -510,13 +534,13 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       return const SizedBox.shrink();
     }
 
+    final isDarkMode = _isDarkMode(context);
+
     return Container(
       width: double.infinity,
       height: _bannerAdHeight,
       alignment: Alignment.center,
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[900]
-          : Colors.white,
+      color: AppColors.getSurfaceColor(isDarkMode),
       child: AdWidget(ad: _bottomBannerAd!),
     );
   }
@@ -524,6 +548,8 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkDeviceType(context);
@@ -531,7 +557,7 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[700],
+        backgroundColor: AppColors.getAppBarColor(isDarkMode),
         title: _isSearching
             ? TextField(
                 controller: _searchController,
@@ -539,17 +565,17 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
                 decoration: InputDecoration(
                   hintText: _text('searchHint', context),
                   border: InputBorder.none,
-                  hintStyle: const TextStyle(color: Colors.white70),
+                  hintStyle: TextStyle(color: Colors.white70),
                 ),
-                style: const TextStyle(color: Colors.white, fontSize: 18),
+                style: TextStyle(color: Colors.white, fontSize: 18),
                 cursorColor: Colors.white,
                 onChanged: _searchAllDoyas,
               )
             : Text(
                 _text('pageTitle', context),
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: 20,
+                  fontSize: 18,
                   color: Colors.white,
                 ),
               ),
@@ -570,11 +596,11 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
         actions: [
           _isSearching
               ? IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
+                  icon: Icon(Icons.close, color: Colors.white),
                   onPressed: _stopSearch,
                 )
               : IconButton(
-                  icon: const Icon(Icons.search, color: Colors.white),
+                  icon: Icon(Icons.search, color: Colors.white),
                   onPressed: _startSearch,
                 ),
         ],
@@ -582,10 +608,10 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Main Content - সম্পূর্ণ জায়গা নেয়
+            // Main Content
             Expanded(child: _buildBodyContent(context)),
 
-            // Banner Ad - শুধুমাত্র যখন প্রয়োজন
+            // Banner Ad
             _buildBottomBannerAd(),
           ],
         ),
@@ -612,15 +638,24 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   }
 
   Widget _buildSearchResults(BuildContext context) {
+    final isDarkMode = _isDarkMode(context);
+
     if (_isLoadingAllDoyas) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: CircularProgressIndicator(
+          color: AppColors.getPrimaryColor(isDarkMode),
+        ),
+      );
     }
 
     if (_searchController.text.isEmpty) {
       return Center(
         child: Text(
           _text('searching', context),
-          style: const TextStyle(fontSize: 16, color: Colors.grey),
+          style: TextStyle(
+            fontSize: 16,
+            color: AppColors.getTextSecondaryColor(isDarkMode),
+          ),
         ),
       );
     }
@@ -630,11 +665,18 @@ class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.search_off, size: 60, color: Colors.grey),
+            Icon(
+              Icons.search_off,
+              size: 60,
+              color: AppColors.getTextSecondaryColor(isDarkMode),
+            ),
             const SizedBox(height: 16),
             Text(
               '${_text('noResults', context)} "${_searchController.text}"',
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.getTextColor(isDarkMode),
+              ),
             ),
           ],
         ),

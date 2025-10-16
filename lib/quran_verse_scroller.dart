@@ -1,4 +1,4 @@
-// lib/widgets/quran_verse_scroller.dart - IMPROVED VERSION
+// lib/widgets/quran_verse_scroller.dart - WITH ALTERNATIVE ICONS
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -22,13 +22,33 @@ class QuranVerseScroller extends StatefulWidget {
 class _QuranVerseScrollerState extends State<QuranVerseScroller> {
   final ScrollController _scrollController = ScrollController();
   bool _isScrolling = true;
+  int _currentIconIndex = 0; // For rotating icons
+
+  // List of alternative icons
+  final List<IconData> _alternativeIcons = [
+    Icons.mosque, // Original mosque
+    Icons.auto_awesome, // Sparkle/star
+    Icons.light_mode, // Light/moon
+    Icons.eco, // Leaf/eco
+    Icons.water_drop, // Water drop (purity)
+    Icons.architecture, // Islamic architecture
+    Icons.flag, // Islamic flag
+    Icons.book, // Quran book
+    Icons.import_contacts, // Another book style
+    Icons.auto_awesome_mosaic, // Geometric pattern
+    Icons.brightness_1, // Circle
+    Icons.workspace_premium, // Premium/badge
+    Icons.verified, // Verified
+    Icons.favorite, // Heart
+    Icons.psychology, // Wisdom
+  ];
 
   // Arabic verses (always show)
   final List<String> _arabicVerses = [
-    "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
-    "وَتَوَ كَّلْ عَلَى اللَّهِ",
-    "رَبِّ زِدْنِي عِلْمًا",
     "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
+    "وَتَوَكَّلْ عَلَى اللَّهِ ۚ إِنَّ اللَّهَ يُحِبُّ الْمُتَوَكِّلِينَ",
+    "رَّبِّ زِدْنِي عِلْمًا",
+    "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
     "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
     "وَاصْبِرْ فَإِنَّ اللَّهَ لَا يُضِيعُ أَجْرَ الْمُحْسِنِينَ",
     "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
@@ -37,26 +57,26 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
 
   // English translations
   final List<String> _englishTranslations = [
-    "Indeed, with hardship comes ease (Al-Inshirah- 94:6)",
-    "And rely upon Allah (3:159)",
-    "My Lord, increase me in knowledge (20:114)",
-    "Indeed, with hardship comes ease (94:5)",
-    "Allah does not burden a soul beyond that it can bear (2:286)",
-    "Be patient, for indeed Allah does not allow the reward of the good-doers to be lost (11:115)",
-    "Indeed, Allah is with the patient (2:153)",
-    "But perhaps you hate a thing and it is good for you (2:216)",
+    "Remember, after every difficulty comes relief (94:5)",
+    "Put your trust in Allah - He loves those who rely on Him (3:159)",
+    "My Lord, increase me in knowledge and understanding (20:114)",
+    "Know that with every hardship comes ease (94:6)",
+    "Allah never burdens you beyond what you can bear (2:286)",
+    "Remain patient - Allah never wastes the reward of good deeds (11:115)",
+    "Allah is always with those who patiently persevere (2:153)",
+    "What you dislike today may be best for you tomorrow (2:216)",
   ];
 
   // Bengali translations
   final List<String> _bengaliTranslations = [
-    "নিশ্চয় কষ্টের সাথে স্বস্তি আছে (সূরা: সূরা আল-ইনশিরাহ ৯৪:৬)",
-    "আর আল্লাহর উপর ভরসা করুন (৩:১৫৯)",
-    "হে আমার রব, আমার জ্ঞান বৃদ্ধি করুন (২০:১১৪)",
-    "নিশ্চয় কষ্টের সাথে স্বস্তি আছে (৯৪:৫)",
-    "আল্লাহ কোন প্রাণকে তার সামর্থ্যের অতিরিক্ত দায়িত্ব দেন না (২:২৮৬)",
-    "ধৈর্য ধারণ করুন, নিশ্চয় আল্লাহ সৎকর্মশীলদের সওয়াব নষ্ট করেন না (১১:১১৫)",
-    "নিশ্চয় আল্লাহ ধৈর্যশীলদের সাথে আছেন (২:১৫৩)",
-    "হতে পারে তোমরা কোন কিছু অপছন্দ কর, অথচ তা তোমাদের জন্য কল্যাণকর (২:২১৬)",
+    "নিশ্চয় কষ্টের সাথে স্বস্তি আছে (সূরা আল-ইনশিরাহ ৯৪:৫)",
+    "আর আল্লাহর উপর ভরসা কর, নিশ্চয় আল্লাহ ভরসাকারীদেরকে ভালোবাসেন (সূরা আলে-ইমরান ৩:১৫৯)",
+    "হে আমার রব, আমার জ্ঞান বৃদ্ধি করুন (সূরা ত্বাহা ২০:১১৪)",
+    "নিশ্চয় কষ্টের সাথে স্বস্তি আছে (সূরা আল-ইনশিরাহ ৯৪:৬)",
+    "আল্লাহ কোন প্রাণকে তার সাধ্যের অতিরিক্ত দায়িত্ব দেন না (সূরা আল-বাকারা ২:২৮৬)",
+    "আর তুমি ধৈর্য ধারণ কর, নিশ্চয় আল্লাহ সৎকর্মশীলদের সওয়াব নষ্ট করেন না (সূরা হুদ ১১:১১৫)",
+    "নিশ্চয় আল্লাহ ধৈর্যশীলদের সাথে আছেন (সূরা আল-বাকারা ২:১৫৩)",
+    "হতে পারে তোমরা কোন কিছু অপছন্দ কর, অথচ তা তোমাদের জন্য কল্যাণকর (সূরা আল-বাকারা ২:২১৬)",
   ];
 
   @override
@@ -77,6 +97,8 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
 
         if (currentScroll >= maxScroll) {
           _scrollController.jumpTo(0);
+          // Change icon when resetting scroll
+          _changeIcon();
         } else {
           _scrollController.animateTo(
             currentScroll + 100,
@@ -87,6 +109,14 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
         _startAutoScroll();
       }
     });
+  }
+
+  void _changeIcon() {
+    if (mounted) {
+      setState(() {
+        _currentIconIndex = (_currentIconIndex + 1) % _alternativeIcons.length;
+      });
+    }
   }
 
   void _pauseScrolling() {
@@ -114,6 +144,7 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
+    final currentIcon = _alternativeIcons[_currentIconIndex];
 
     return Container(
       width: double.infinity,
@@ -139,6 +170,8 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
             onTapDown: (_) => _pauseScrolling(),
             onTapCancel: _resumeScrolling,
             onTapUp: (_) => _resumeScrolling(),
+            onDoubleTap: _changeIcon,
+            // Double tap to change icon
             child: SingleChildScrollView(
               controller: _scrollController,
               scrollDirection: Axis.horizontal,
@@ -152,15 +185,15 @@ class _QuranVerseScrollerState extends State<QuranVerseScroller> {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Row(
                           children: [
+                            // 🔥 UPDATED: Dynamic icon that changes
                             Icon(
-                              Icons.mosque,
+                              currentIcon,
                               color: widget.isDarkMode
                                   ? Colors.green[300]
                                   : Colors.green[600],
                               size: widget.isTablet ? 20 : 16,
                             ),
                             SizedBox(width: 8),
-                            // 🔥 UPDATED: Single line display with language support
                             Text(
                               "${_arabicVerses[index]} - ${languageProvider.isEnglish ? _englishTranslations[index] : _bengaliTranslations[index]}",
                               style: TextStyle(

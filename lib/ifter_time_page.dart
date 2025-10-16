@@ -7,6 +7,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // নতুন কালার সিস্টেম ইম্পোর্ট
 import 'ad_helper.dart';
 
 class IfterTimePage extends StatefulWidget {
@@ -126,7 +127,7 @@ class _IfterTimePageState extends State<IfterTimePage>
       'en':
           "O Allah! I fasted for You and I believe in You and I put my trust in You and I break my fast with Your sustenance.",
       'bn':
-          "আল্লাহুম্মা ইন্নি লাকা সুমতু, ওয়া বিকা আমানতু, ওয়া 'আলাইكا তাওয়াক্কালতু, ওয়া 'আলা রিজকিকা আফতারতু।",
+          "আল্লাহুম্মা ইন্নি লাকা সুমতু, ওয়া বিকা আমানতু, ওয়া 'আলাইকা তাওয়াক্কালতু, ওয়া 'আলা রিজকিকা আফতারতু।",
     },
     'prophetSaidContent': {
       'en':
@@ -397,12 +398,18 @@ class _IfterTimePageState extends State<IfterTimePage>
     void Function(void Function()) setState,
     BuildContext context,
   ) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return AlertDialog(
+      backgroundColor: AppColors.getCardColor(isDarkMode),
       title: Row(
         children: [
-          Icon(Icons.schedule, color: Colors.green),
+          Icon(Icons.schedule, color: AppColors.getPrimaryColor(isDarkMode)),
           SizedBox(width: 8),
-          Text(_text('adjustTime', context)),
+          Text(
+            _text('adjustTime', context),
+            style: TextStyle(color: AppColors.getTextColor(isDarkMode)),
+          ),
         ],
       ),
       content: Column(
@@ -410,13 +417,16 @@ class _IfterTimePageState extends State<IfterTimePage>
         children: [
           Text(
             _text('adjustDescription', context),
-            style: TextStyle(fontSize: 14),
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.getTextSecondaryColor(isDarkMode),
+            ),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
           _buildCurrentAdjustmentDisplay(context),
           SizedBox(height: 20),
-          _buildAdjustmentButtons(setState),
+          _buildAdjustmentButtons(setState, context),
         ],
       ),
       actions: [
@@ -427,7 +437,12 @@ class _IfterTimePageState extends State<IfterTimePage>
               _showAdjustmentDialog = false;
             });
           },
-          child: Text(_text('cancel', context)),
+          child: Text(
+            _text('cancel', context),
+            style: TextStyle(
+              color: AppColors.getTextSecondaryColor(isDarkMode),
+            ),
+          ),
         ),
         ElevatedButton(
           onPressed: () {
@@ -438,7 +453,9 @@ class _IfterTimePageState extends State<IfterTimePage>
             });
             _showAdjustmentSuccessSnackbar(context);
           },
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.getPrimaryColor(isDarkMode),
+          ),
           child: Text(_text('save', context)),
         ),
       ],
@@ -447,17 +464,23 @@ class _IfterTimePageState extends State<IfterTimePage>
 
   // ---------- বর্তমান অ্যাডজাস্টমেন্ট ডিসপ্লে ----------
   Widget _buildCurrentAdjustmentDisplay(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: AppColors.getSurfaceColor(isDarkMode),
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.getBorderColor(isDarkMode)),
       ),
       child: Column(
         children: [
           Text(
             _text('currentAdjustment', context),
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.getTextSecondaryColor(isDarkMode),
+            ),
           ),
           SizedBox(height: 5),
           Text(
@@ -466,10 +489,10 @@ class _IfterTimePageState extends State<IfterTimePage>
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: iftarTimeAdjustment == 0
-                  ? Colors.grey
+                  ? AppColors.getTextSecondaryColor(isDarkMode)
                   : iftarTimeAdjustment > 0
-                  ? Colors.green
-                  : Colors.red,
+                  ? AppColors.getAccentColor('green', isDarkMode)
+                  : AppColors.getErrorColor(isDarkMode),
             ),
           ),
         ],
@@ -478,19 +501,39 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- অ্যাডজাস্টমেন্ট বাটন ----------
-  Widget _buildAdjustmentButtons(void Function(void Function()) setState) {
+  Widget _buildAdjustmentButtons(
+    void Function(void Function()) setState,
+    BuildContext context,
+  ) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildAdjustmentButton(Icons.remove, Colors.red, () {
-          setState(() => iftarTimeAdjustment -= 1);
-        }),
-        _buildAdjustmentButton(Icons.refresh, Colors.orange, () {
-          setState(() => iftarTimeAdjustment = 0);
-        }),
-        _buildAdjustmentButton(Icons.add, Colors.green, () {
-          setState(() => iftarTimeAdjustment += 1);
-        }),
+        _buildAdjustmentButton(
+          Icons.remove,
+          AppColors.getErrorColor(isDarkMode),
+          () {
+            setState(() => iftarTimeAdjustment -= 1);
+          },
+          context,
+        ),
+        _buildAdjustmentButton(
+          Icons.refresh,
+          AppColors.getAccentColor('orange', isDarkMode),
+          () {
+            setState(() => iftarTimeAdjustment = 0);
+          },
+          context,
+        ),
+        _buildAdjustmentButton(
+          Icons.add,
+          AppColors.getAccentColor('green', isDarkMode),
+          () {
+            setState(() => iftarTimeAdjustment += 1);
+          },
+          context,
+        ),
       ],
     );
   }
@@ -500,6 +543,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     IconData icon,
     Color color,
     VoidCallback onPressed,
+    BuildContext context,
   ) {
     return ElevatedButton(
       onPressed: onPressed,
@@ -514,6 +558,8 @@ class _IfterTimePageState extends State<IfterTimePage>
 
   // ---------- অ্যাডজাস্টমেন্ট স্ন্যাকবার ----------
   void _showAdjustmentSuccessSnackbar(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -523,8 +569,8 @@ class _IfterTimePageState extends State<IfterTimePage>
         ),
         duration: Duration(seconds: 2),
         backgroundColor: iftarTimeAdjustment == 0
-            ? Colors.orange
-            : Colors.green,
+            ? AppColors.getAccentColor('orange', isDarkMode)
+            : AppColors.getAccentColor('green', isDarkMode),
       ),
     );
   }
@@ -717,15 +763,15 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- কাউন্টডাউন কালার নির্ধারণ ----------
-  Color _getCountdownColor(Duration remainingTime) {
+  Color _getCountdownColor(Duration remainingTime, bool isDarkMode) {
     final hours = remainingTime.inHours;
     final minutes = remainingTime.inMinutes % 60;
 
-    if (hours > 1) return Colors.greenAccent;
-    if (hours == 1) return Colors.orangeAccent;
+    if (hours > 1) return AppColors.getAccentColor('green', isDarkMode);
+    if (hours == 1) return AppColors.getAccentColor('orange', isDarkMode);
     if (minutes > 30) return Colors.orange;
     if (minutes > 10) return Colors.deepOrange;
-    return Colors.redAccent;
+    return AppColors.getErrorColor(isDarkMode);
   }
 
   // ---------- প্রোগ্রেস টেক্সট ----------
@@ -747,27 +793,36 @@ class _IfterTimePageState extends State<IfterTimePage>
     final themeProvider = Provider.of<ThemeProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    final primaryColor = Colors.green;
-    final backgroundColor = isDarkMode ? Colors.grey[900] : Colors.grey[50];
+    final primaryColor = AppColors.getPrimaryColor(isDarkMode);
+    final backgroundColor = AppColors.getBackgroundColor(isDarkMode);
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: _buildAppBar(primaryColor, context),
-      body: _buildBody(isDarkMode, primaryColor, context),
+      appBar: _buildAppBar(context),
+      body: _buildBody(isDarkMode, context),
       bottomNavigationBar: _buildBannerAd(),
     );
   }
 
   // ---------- অ্যাপবার বিল্ড ----------
-  AppBar _buildAppBar(Color primaryColor, BuildContext context) {
+  AppBar _buildAppBar(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return AppBar(
-      backgroundColor: primaryColor,
+      backgroundColor: AppColors.getAppBarColor(isDarkMode),
       title: Text(
         _text('pageTitle', context),
         style: TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 18,
-          color: Colors.white,
+          color: Colors.white, // সবসময় সাদা টেক্সট
+          shadows: [
+            Shadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 2,
+              offset: Offset(1, 1),
+            ),
+          ],
         ),
       ),
       leading: Container(
@@ -775,6 +830,13 @@ class _IfterTimePageState extends State<IfterTimePage>
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.2),
           shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
@@ -792,26 +854,29 @@ class _IfterTimePageState extends State<IfterTimePage>
               borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
+                  horizontal: 16,
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.green[600]!, Colors.green[800]!],
+                    colors: [
+                      Colors.white.withOpacity(0.9),
+                      Colors.white.withOpacity(0.7),
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6,
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
                   ],
                   border: Border.all(
-                    color: Colors.green[100]!.withOpacity(0.3),
-                    width: 1,
+                    color: Colors.white.withOpacity(0.5),
+                    width: 1.5,
                   ),
                 ),
                 child: Row(
@@ -820,15 +885,16 @@ class _IfterTimePageState extends State<IfterTimePage>
                     Icon(
                       Icons.edit_calendar_rounded,
                       size: 14,
-                      color: Colors.white,
+                      color: AppColors.lightPrimary, // সবসময় প্রাইমারী কালার
                     ),
                     const SizedBox(width: 6),
                     Text(
                       _text('timeSetting', context),
                       style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.lightPrimary, // সবসময় প্রাইমারী কালার
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ],
@@ -842,7 +908,7 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- বডি বিল্ড ----------
-  Widget _buildBody(bool isDarkMode, Color primaryColor, BuildContext context) {
+  Widget _buildBody(bool isDarkMode, BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > 600;
@@ -881,7 +947,7 @@ class _IfterTimePageState extends State<IfterTimePage>
         vertical: isTablet ? 12 : 8,
       ),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.green[900] : Colors.green[100],
+        color: AppColors.getSurfaceColor(isDarkMode),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -890,19 +956,20 @@ class _IfterTimePageState extends State<IfterTimePage>
             offset: Offset(0, 2),
           ),
         ],
+        border: Border.all(color: AppColors.getBorderColor(isDarkMode)),
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(isTablet ? 6 : 4),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.green[800] : Colors.green[200],
+              color: AppColors.getPrimaryColor(isDarkMode).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.location_on,
               size: isTablet ? 20 : 18,
-              color: isDarkMode ? Colors.green[300] : Colors.green[700],
+              color: AppColors.getPrimaryColor(isDarkMode),
             ),
           ),
           SizedBox(width: isTablet ? 10 : 8),
@@ -916,7 +983,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                   style: TextStyle(
                     fontSize: isTablet ? 16 : 14,
                     fontWeight: FontWeight.w600,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppColors.getTextColor(isDarkMode),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -930,14 +997,14 @@ class _IfterTimePageState extends State<IfterTimePage>
           ),
           Container(
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.green[800] : Colors.green[200],
+              color: AppColors.getPrimaryColor(isDarkMode).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: IconButton(
               icon: Icon(
                 Icons.refresh,
                 size: isTablet ? 20 : 18,
-                color: isDarkMode ? Colors.green[300] : Colors.green[700],
+                color: AppColors.getPrimaryColor(isDarkMode),
               ),
               onPressed: _loadSavedData,
               tooltip: _text('refreshData', context),
@@ -958,17 +1025,16 @@ class _IfterTimePageState extends State<IfterTimePage>
     bool isDarkMode,
     BuildContext context,
   ) {
+    final adjustmentColor = iftarTimeAdjustment > 0
+        ? AppColors.getAccentColor('green', isDarkMode)
+        : AppColors.getErrorColor(isDarkMode);
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: iftarTimeAdjustment > 0
-            ? Colors.green.withOpacity(0.15)
-            : Colors.red.withOpacity(0.15),
+        color: adjustmentColor.withOpacity(0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: iftarTimeAdjustment > 0 ? Colors.green : Colors.red,
-          width: 0.5,
-        ),
+        border: Border.all(color: adjustmentColor, width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -976,7 +1042,7 @@ class _IfterTimePageState extends State<IfterTimePage>
           Icon(
             iftarTimeAdjustment > 0 ? Icons.arrow_upward : Icons.arrow_downward,
             size: 10,
-            color: iftarTimeAdjustment > 0 ? Colors.green : Colors.red,
+            color: adjustmentColor,
           ),
           SizedBox(width: 2),
           Text(
@@ -984,7 +1050,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              color: iftarTimeAdjustment > 0 ? Colors.green : Colors.red,
+              color: adjustmentColor,
             ),
           ),
         ],
@@ -993,46 +1059,57 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- কাউন্টডাউন UI সেকশন ----------
+  // ---------- কাউন্টডাউন UI সেকশন ----------
   Widget _buildCountdownSection(
     bool isDarkMode,
     bool isTablet,
     BuildContext context,
   ) {
-    final countdownSize = isTablet ? 260.0 : 180.0;
-    final countdownColor = _getCountdownColor(iftarCountdown);
+    final countdownSize = isTablet ? 320.0 : 240.0; // বড় করা হয়েছে
+    final countdownColor = _getCountdownColor(iftarCountdown, isDarkMode);
     final progressValue = _calculateProgress(iftarCountdown);
 
     return Container(
-      padding: EdgeInsets.all(isTablet ? 24 : 20),
+      padding: EdgeInsets.all(isTablet ? 28 : 20), // padding বড় করা
+      margin: EdgeInsets.symmetric(vertical: 8), // margin যোগ করা
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDarkMode
-              ? [Colors.green[900]!, Colors.green[800]!, Colors.green[700]!]
-              : [Colors.green[700]!, Colors.green[600]!, Colors.green[500]!],
+              ? AppColors.darkHeaderGradient
+              : [Color(0xFF2E7D32), Color(0xFF4CAF50)],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24), // borderRadius বড় করা
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: Offset(0, 6),
-            spreadRadius: 1,
+            blurRadius: 25, // blurRadius বড় করা
+            offset: Offset(0, 8), // offset বড় করা
+            spreadRadius: 2,
           ),
           BoxShadow(
             color: countdownColor.withOpacity(0.3),
-            blurRadius: 30,
+            blurRadius: 40, // blurRadius বড় করা
             offset: Offset(0, 0),
-            spreadRadius: 2,
+            spreadRadius: 3,
           ),
         ],
+        border: Border.all(
+          color: AppColors.getBorderColor(isDarkMode),
+          width: 2,
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildEnhancedCountdownHeader(isTablet, countdownColor, context),
-          SizedBox(height: isTablet ? 20 : 16),
+          _buildEnhancedCountdownHeader(
+            isTablet,
+            countdownColor,
+            isDarkMode,
+            context,
+          ),
+          SizedBox(height: isTablet ? 24 : 20), // spacing বড় করা
           Stack(
             alignment: Alignment.center,
             children: [
@@ -1040,20 +1117,23 @@ class _IfterTimePageState extends State<IfterTimePage>
                 countdownSize,
                 countdownColor,
                 progressValue,
+                isDarkMode,
               ),
               _buildEnhancedCountdownTimer(
                 countdownSize,
                 countdownColor,
                 isTablet,
+                isDarkMode,
                 context,
               ),
             ],
           ),
-          SizedBox(height: isTablet ? 20 : 16),
+          SizedBox(height: isTablet ? 24 : 20), // spacing বড় করা
           _buildEnhancedIftarTimeDisplay(
             isTablet,
             countdownColor,
             progressValue,
+            isDarkMode,
             context,
           ),
         ],
@@ -1065,23 +1145,31 @@ class _IfterTimePageState extends State<IfterTimePage>
   Widget _buildEnhancedCountdownHeader(
     bool isTablet,
     Color accentColor,
+    bool isDarkMode,
     BuildContext context,
   ) {
+    final textColor = isDarkMode
+        ? Colors.white
+        : Colors.white; // লাইট মুডেও সাদা টেক্সট
+
     return Column(
       children: [
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withOpacity(isDarkMode ? 0.1 : 0.2),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+            border: Border.all(
+              color: Colors.white.withOpacity(isDarkMode ? 0.3 : 0.4),
+              width: 1,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.nightlight_round,
-                color: Colors.white.withOpacity(0.9),
+                color: textColor.withOpacity(0.9),
                 size: isTablet ? 22 : 18,
               ),
               SizedBox(width: 8),
@@ -1090,7 +1178,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                 style: TextStyle(
                   fontSize: isTablet ? 18 : 16,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: textColor,
                   letterSpacing: 0.8,
                 ),
               ),
@@ -1102,14 +1190,14 @@ class _IfterTimePageState extends State<IfterTimePage>
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withOpacity(isDarkMode ? 0.15 : 0.25),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               "${iftarTimeAdjustment >= 0 ? '+' : ''}$iftarTimeAdjustment ${_text('adjusted', context)}",
               style: TextStyle(
                 fontSize: isTablet ? 12 : 10,
-                color: Colors.white.withOpacity(0.9),
+                color: textColor.withOpacity(0.9),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1119,10 +1207,12 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- ব্যাকগ্রাউন্ড ইফেক্টস ----------
+  // ---------- ব্যাকগ্রাউন্ড ইফেক্টস ----------
   Widget _buildBackgroundEffects(
     double size,
     Color accentColor,
     double progress,
+    bool isDarkMode,
   ) {
     return SizedBox(
       width: size,
@@ -1131,17 +1221,17 @@ class _IfterTimePageState extends State<IfterTimePage>
         alignment: Alignment.center,
         children: [
           Container(
-            width: size * 1.1,
-            height: size * 1.1,
+            width: size * 1.15, // বড় করা
+            height: size * 1.15, // বড় করা
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  accentColor.withOpacity(0.2),
-                  accentColor.withOpacity(0.05),
+                  accentColor.withOpacity(0.25), // opacity বাড়ানো
+                  accentColor.withOpacity(0.08), // opacity বাড়ানো
                   Colors.transparent,
                 ],
-                stops: [0.1, 0.5, 1.0],
+                stops: [0.1, 0.6, 1.0], // stops সামঞ্জস্য করা
               ),
             ),
           ),
@@ -1150,10 +1240,12 @@ class _IfterTimePageState extends State<IfterTimePage>
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withOpacity(isDarkMode ? 0.08 : 0.15),
+              // opacity বাড়ানো
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
-                width: 2,
+                color: Colors.white.withOpacity(isDarkMode ? 0.15 : 0.25),
+                // opacity বাড়ানো
+                width: 3, // border width বড় করা
               ),
             ),
           ),
@@ -1167,21 +1259,31 @@ class _IfterTimePageState extends State<IfterTimePage>
     double size,
     Color accentColor,
     bool isTablet,
+    bool isDarkMode,
     BuildContext context,
   ) {
+    final textColor = isDarkMode ? Colors.white : Colors.white;
+
     return SizedBox(
       width: size,
       height: size,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          _buildDualProgressIndicator(size, accentColor),
+          _buildDualProgressIndicator(size, accentColor, isDarkMode),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildCompactTimeUnits(accentColor, isTablet, context),
+              _buildCompactTimeUnits(
+                accentColor,
+                isTablet,
+                textColor,
+                isDarkMode,
+                context,
+              ),
+              // আপডেট
               SizedBox(height: 8),
-              _buildProgressStatus(accentColor, isTablet, context),
+              _buildProgressStatus(accentColor, isTablet, textColor, context),
             ],
           ),
         ],
@@ -1190,7 +1292,11 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- ডুয়েল প্রোগ্রেস ইন্ডিকেটর ----------
-  Widget _buildDualProgressIndicator(double size, Color accentColor) {
+  Widget _buildDualProgressIndicator(
+    double size,
+    Color accentColor,
+    bool isDarkMode,
+  ) {
     final progress = _calculateProgress(iftarCountdown);
 
     return SizedBox(
@@ -1204,22 +1310,24 @@ class _IfterTimePageState extends State<IfterTimePage>
             height: size,
             child: CircularProgressIndicator(
               value: progress,
-              strokeWidth: 6,
-              backgroundColor: Colors.white.withOpacity(0.15),
+              strokeWidth: 8,
+              // strokeWidth বড় করা
+              backgroundColor: Colors.white.withOpacity(isDarkMode ? 0.2 : 0.3),
+              // opacity বাড়ানো
               valueColor: AlwaysStoppedAnimation<Color>(
-                accentColor.withOpacity(0.6),
+                accentColor.withOpacity(0.7), // opacity বাড়ানো
               ),
             ),
           ),
           Container(
-            width: size * 0.6,
-            height: size * 0.6,
+            width: size * 0.65, // বড় করা
+            height: size * 0.65, // বড় করা
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  accentColor.withOpacity(0.3),
-                  accentColor.withOpacity(0.1),
+                  accentColor.withOpacity(0.4), // opacity বাড়ানো
+                  accentColor.withOpacity(0.15), // opacity বাড়ানো
                   Colors.transparent,
                 ],
               ),
@@ -1231,35 +1339,87 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- কম্প্যাক্ট টাইম ইউনিটস ----------
+  // ---------- কম্প্যাক্ট টাইম ইউনিটস ----------
+  // ---------- কম্প্যাক্ট টাইম ইউনিটস ----------
   Widget _buildCompactTimeUnits(
     Color accentColor,
     bool isTablet,
+    Color textColor,
+    bool isDarkMode,
     BuildContext context,
   ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildEnhancedTimeUnit(
-          _text('hours', context),
-          iftarCountdown.inHours,
-          accentColor,
-          isTablet,
-        ),
-        _buildTimeSeparator(accentColor, isTablet),
-        _buildEnhancedTimeUnit(
-          _text('minutesShort', context),
-          iftarCountdown.inMinutes % 60,
-          accentColor,
-          isTablet,
-        ),
-        _buildTimeSeparator(accentColor, isTablet),
-        _buildEnhancedTimeUnit(
-          _text('seconds', context),
-          iftarCountdown.inSeconds % 60,
-          accentColor,
-          isTablet,
-        ),
-      ],
+    return IntrinsicHeight(
+      // সব children এর height সমান করবে
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildEnhancedTimeUnit(
+            _text('hours', context),
+            iftarCountdown.inHours,
+            accentColor,
+            isTablet,
+            textColor,
+          ),
+          _buildTimeSeparator(accentColor, isTablet, isDarkMode),
+          _buildEnhancedTimeUnit(
+            _text('minutesShort', context),
+            iftarCountdown.inMinutes % 60,
+            accentColor,
+            isTablet,
+            textColor,
+          ),
+          _buildTimeSeparator(accentColor, isTablet, isDarkMode),
+          _buildEnhancedTimeUnit(
+            _text('seconds', context),
+            iftarCountdown.inSeconds % 60,
+            accentColor,
+            isTablet,
+            textColor,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------- টাইম সেপারেটর ----------
+  // ---------- টাইম সেপারেটর ----------
+  Widget _buildTimeSeparator(Color color, bool isTablet, bool isDarkMode) {
+    final separatorColor = isDarkMode ? color.withOpacity(0.9) : Colors.white;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isTablet ? 8 : 6),
+      // left-right padding যোগ
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: isTablet ? 16 : 12),
+          Text(
+            ":",
+            style: TextStyle(
+              fontSize: isTablet ? 28 : 24,
+              fontWeight: FontWeight.w900,
+              color: separatorColor,
+              height: 1.0,
+              shadows: isDarkMode
+                  ? null
+                  : [
+                      Shadow(
+                        color: Colors.black.withOpacity(0.4),
+                        blurRadius: 3,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+            ),
+          ),
+          SizedBox(height: isTablet ? 32 : 28),
+          Opacity(
+            opacity: 0,
+            child: Text(" ", style: TextStyle(fontSize: isTablet ? 14 : 12)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1269,68 +1429,63 @@ class _IfterTimePageState extends State<IfterTimePage>
     int value,
     Color color,
     bool isTablet,
+    Color textColor,
   ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           padding: EdgeInsets.symmetric(
-            horizontal: isTablet ? 10 : 8,
-            vertical: isTablet ? 8 : 6,
+            horizontal: isTablet ? 14 : 10, // padding বড় করা
+            vertical: isTablet ? 12 : 8, // padding বড় করা
           ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [color.withOpacity(0.3), color.withOpacity(0.1)],
+              colors: [
+                color.withOpacity(0.4),
+                color.withOpacity(0.15),
+              ], // opacity বাড়ানো
             ),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withOpacity(0.5), width: 1.5),
+            borderRadius: BorderRadius.circular(12),
+            // borderRadius বড় করা
+            border: Border.all(color: color.withOpacity(0.6), width: 2),
+            // border width বড় করা
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.2),
-                blurRadius: 8,
-                offset: Offset(0, 3),
+                color: color.withOpacity(0.3), // opacity বাড়ানো
+                blurRadius: 12, // blurRadius বড় করা
+                offset: Offset(0, 4), // offset বড় করা
               ),
             ],
           ),
           child: Text(
             value.toString().padLeft(2, '0'),
             style: TextStyle(
-              fontSize: isTablet ? 18 : 16,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
+              fontSize: isTablet ? 24 : 20,
+              // ফন্ট সাইজ বড় করা
+              fontWeight: FontWeight.w900,
+              // ফন্ট ওয়েট বাড়ানো
+              color: textColor,
               fontFeatures: [FontFeature.tabularFigures()],
+              letterSpacing: 1.0, // letter spacing যোগ করা
             ),
           ),
         ),
-        SizedBox(height: 4),
+        SizedBox(height: 6), // spacing বড় করা
         Text(
           label,
           style: TextStyle(
-            fontSize: isTablet ? 11 : 10,
-            fontWeight: FontWeight.w600,
-            color: Colors.white.withOpacity(0.8),
-            letterSpacing: 0.5,
+            fontSize: isTablet ? 14 : 12, // ফন্ট সাইজ বড় করা
+            fontWeight: FontWeight.w700, // ফন্ট ওয়েট বাড়ানো
+            color: textColor.withOpacity(0.9), // opacity বাড়ানো
+            letterSpacing: 0.8, // letter spacing বাড়ানো
           ),
         ),
       ],
-    );
-  }
-
-  // ---------- টাইম সেপারেটর ----------
-  Widget _buildTimeSeparator(Color color, bool isTablet) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: isTablet ? 6 : 4),
-      child: Text(
-        ":",
-        style: TextStyle(
-          fontSize: isTablet ? 18 : 16,
-          fontWeight: FontWeight.w800,
-          color: color.withOpacity(0.8),
-          height: 1.2,
-        ),
-      ),
     );
   }
 
@@ -1338,6 +1493,7 @@ class _IfterTimePageState extends State<IfterTimePage>
   Widget _buildProgressStatus(
     Color accentColor,
     bool isTablet,
+    Color textColor,
     BuildContext context,
   ) {
     return Column(
@@ -1355,7 +1511,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             style: TextStyle(
               fontSize: isTablet ? 13 : 12,
               fontWeight: FontWeight.w600,
-              color: Colors.white.withOpacity(0.9),
+              color: textColor.withOpacity(0.9), // সাদা টেক্সট ব্যবহার
               letterSpacing: 0.5,
             ),
           ),
@@ -1369,14 +1525,23 @@ class _IfterTimePageState extends State<IfterTimePage>
     bool isTablet,
     Color accentColor,
     double progress,
+    bool isDarkMode,
     BuildContext context,
   ) {
+    final textColor = isDarkMode ? Colors.white : Colors.white;
+
     return Container(
-      padding: EdgeInsets.all(isTablet ? 16 : 12),
+      padding: EdgeInsets.all(isTablet ? 20 : 16), // padding বড় করা
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
+        color: Colors.white.withOpacity(isDarkMode ? 0.12 : 0.2),
+        // opacity বাড়ানো
+        borderRadius: BorderRadius.circular(20),
+        // borderRadius বড় করা
+        border: Border.all(
+          color: Colors.white.withOpacity(isDarkMode ? 0.25 : 0.35),
+          // opacity বাড়ানো
+          width: 2, // border width বড় করা
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1385,18 +1550,18 @@ class _IfterTimePageState extends State<IfterTimePage>
             child: Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(isTablet ? 12 : 10), // padding বড় করা
                   decoration: BoxDecoration(
-                    color: accentColor.withOpacity(0.2),
+                    color: accentColor.withOpacity(0.3), // opacity বাড়ানো
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.access_time_filled,
-                    color: Colors.white,
-                    size: isTablet ? 20 : 18,
+                    color: textColor,
+                    size: isTablet ? 28 : 20, // আইকন সাইজ বড় করা
                   ),
                 ),
-                SizedBox(width: 12),
+                SizedBox(width: isTablet ? 16 : 12), // spacing বড় করা
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1404,17 +1569,19 @@ class _IfterTimePageState extends State<IfterTimePage>
                       Text(
                         _text('iftarTime', context),
                         style: TextStyle(
-                          fontSize: isTablet ? 14 : 12,
-                          color: Colors.white.withOpacity(0.8),
-                          fontWeight: FontWeight.w500,
+                          fontSize: isTablet ? 18 : 14, // ফন্ট সাইজ বড় করা
+                          color: textColor.withOpacity(0.9), // opacity বাড়ানো
+                          fontWeight: FontWeight.w600, // ফন্ট ওয়েট বাড়ানো
                         ),
                       ),
+                      SizedBox(height: 4), // spacing যোগ করা
                       Text(
                         _getIftarTime(),
                         style: TextStyle(
-                          fontSize: isTablet ? 18 : 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                          fontSize: isTablet ? 18 : 14, // ফন্ট সাইজ বড় করা
+                          color: textColor,
+                          fontWeight: FontWeight.w800, // ফন্ট ওয়েট বাড়ানো
+                          letterSpacing: 0.5, // letter spacing যোগ করা
                         ),
                       ),
                     ],
@@ -1424,26 +1591,29 @@ class _IfterTimePageState extends State<IfterTimePage>
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: EdgeInsets.symmetric(
+              horizontal: isTablet ? 14 : 12, // padding বড় করা
+              vertical: isTablet ? 10 : 8, // padding বড় করা
+            ),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  accentColor.withOpacity(0.3),
-                  accentColor.withOpacity(0.1),
+                  accentColor.withOpacity(0.4), // opacity বাড়ানো
+                  accentColor.withOpacity(0.2), // opacity বাড়ানো
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16), // borderRadius বড় করা
               border: Border.all(
-                color: accentColor.withOpacity(0.5),
-                width: 1.5,
+                color: accentColor.withOpacity(0.6), // opacity বাড়ানো
+                width: 2, // border width বড় করা
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
+                  color: Colors.black.withOpacity(0.15), // opacity বাড়ানো
+                  blurRadius: 8, // blurRadius বড় করা
+                  offset: Offset(0, 3), // offset বড় করা
                 ),
               ],
             ),
@@ -1452,16 +1622,16 @@ class _IfterTimePageState extends State<IfterTimePage>
               children: [
                 Icon(
                   Icons.dining,
-                  size: isTablet ? 16 : 14,
-                  color: Colors.white,
+                  size: isTablet ? 20 : 18, // আইকন সাইজ বড় করা
+                  color: textColor,
                 ),
-                SizedBox(width: 6),
+                SizedBox(width: isTablet ? 8 : 6), // spacing বড় করা
                 Text(
                   "${_text('fastingRemaining', context)} ${(progress * 100).toStringAsFixed(0)}%",
                   style: TextStyle(
-                    fontSize: isTablet ? 13 : 11,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    fontSize: isTablet ? 15 : 13, // ফন্ট সাইজ বড় করা
+                    fontWeight: FontWeight.w800, // ফন্ট ওয়েট বাড়ানো
+                    color: textColor,
                   ),
                 ),
               ],
@@ -1482,10 +1652,10 @@ class _IfterTimePageState extends State<IfterTimePage>
       width: double.infinity,
       padding: EdgeInsets.all(isTablet ? 24 : 16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.blue[900] : Colors.blue[50],
+        color: AppColors.getCardColor(isDarkMode),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDarkMode ? Colors.blue[700]! : Colors.blue[200]!,
+          color: AppColors.getBorderColor(isDarkMode),
           width: 2,
         ),
         boxShadow: [
@@ -1504,7 +1674,7 @@ class _IfterTimePageState extends State<IfterTimePage>
               Icon(
                 Icons.lightbulb_outline,
                 size: isTablet ? 28 : 24,
-                color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
+                color: AppColors.getAccentColor('blue', isDarkMode),
               ),
               SizedBox(width: 12),
               Text(
@@ -1512,7 +1682,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                 style: TextStyle(
                   fontSize: isTablet ? 20 : 16,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: AppColors.getTextColor(isDarkMode),
                 ),
               ),
             ],
@@ -1521,14 +1691,14 @@ class _IfterTimePageState extends State<IfterTimePage>
           Container(
             padding: EdgeInsets.all(isTablet ? 20 : 16),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.blue[800] : Colors.white,
+              color: AppColors.getSurfaceColor(isDarkMode),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               _currentHadith,
               style: TextStyle(
                 fontSize: isTablet ? 16 : 14,
-                color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
+                color: AppColors.getTextColor(isDarkMode),
                 fontStyle: FontStyle.italic,
                 height: 1.5,
               ),
@@ -1541,9 +1711,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             child: ElevatedButton(
               onPressed: _selectRandomHadith,
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDarkMode
-                    ? Colors.blue[700]
-                    : Colors.blue[600],
+                backgroundColor: AppColors.getAccentColor('blue', isDarkMode),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1588,7 +1756,7 @@ class _IfterTimePageState extends State<IfterTimePage>
       width: double.infinity,
       padding: EdgeInsets.all(isTablet ? 24 : 16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[800] : Colors.white,
+        color: AppColors.getCardColor(isDarkMode),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1597,6 +1765,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             offset: Offset(0, 6),
           ),
         ],
+        border: Border.all(color: AppColors.getBorderColor(isDarkMode)),
       ),
       child: Column(
         children: [
@@ -1605,7 +1774,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             style: TextStyle(
               fontSize: isTablet ? 22 : 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: AppColors.getTextColor(isDarkMode),
             ),
           ),
           SizedBox(height: isTablet ? 24 : 16),
@@ -1616,7 +1785,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                   icon: Icons.nights_stay,
                   title: _text('sehriEnd', context),
                   time: _calculateSehriTime(),
-                  color: Colors.orange,
+                  color: AppColors.getAccentColor('orange', isDarkMode),
                   isDarkMode: isDarkMode,
                   isTablet: isTablet,
                 ),
@@ -1627,7 +1796,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                   icon: Icons.wb_sunny,
                   title: _text('iftar', context),
                   time: _getIftarTime(),
-                  color: Colors.green,
+                  color: AppColors.getPrimaryColor(isDarkMode),
                   isDarkMode: isDarkMode,
                   isTablet: isTablet,
                 ),
@@ -1651,7 +1820,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     return Container(
       padding: EdgeInsets.all(isTablet ? 20 : 16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[700] : Colors.grey[50],
+        color: AppColors.getSurfaceColor(isDarkMode),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: color.withOpacity(0.3), width: 2),
       ),
@@ -1672,7 +1841,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             style: TextStyle(
               fontSize: isTablet ? 16 : 14,
               fontWeight: FontWeight.w600,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: AppColors.getTextColor(isDarkMode),
             ),
             textAlign: TextAlign.center,
           ),
@@ -1700,7 +1869,7 @@ class _IfterTimePageState extends State<IfterTimePage>
       width: double.infinity,
       padding: EdgeInsets.all(isTablet ? 24 : 16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[800] : Colors.white,
+        color: AppColors.getCardColor(isDarkMode),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1709,6 +1878,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             offset: Offset(0, 4),
           ),
         ],
+        border: Border.all(color: AppColors.getBorderColor(isDarkMode)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1717,7 +1887,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             children: [
               Icon(
                 Icons.info_outline,
-                color: isDarkMode ? Colors.blue[300] : Colors.blue[600],
+                color: AppColors.getAccentColor('blue', isDarkMode),
                 size: isTablet ? 28 : 24,
               ),
               SizedBox(width: 12),
@@ -1726,7 +1896,7 @@ class _IfterTimePageState extends State<IfterTimePage>
                 style: TextStyle(
                   fontSize: isTablet ? 20 : 16,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: AppColors.getTextColor(isDarkMode),
                 ),
               ),
             ],
@@ -1775,7 +1945,7 @@ class _IfterTimePageState extends State<IfterTimePage>
       width: double.infinity,
       padding: EdgeInsets.all(isTablet ? 16 : 12),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[700] : Colors.grey[50],
+        color: AppColors.getSurfaceColor(isDarkMode),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -1786,7 +1956,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             style: TextStyle(
               fontSize: isTablet ? 16 : 14,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.blue[300] : Colors.blue[600],
+              color: AppColors.getAccentColor('blue', isDarkMode),
             ),
           ),
           SizedBox(height: 6),
@@ -1794,7 +1964,7 @@ class _IfterTimePageState extends State<IfterTimePage>
             description,
             style: TextStyle(
               fontSize: isTablet ? 14 : 12,
-              color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
+              color: AppColors.getTextColor(isDarkMode),
               height: 1.4,
             ),
             textAlign: TextAlign.justify,
@@ -1814,8 +1984,8 @@ class _IfterTimePageState extends State<IfterTimePage>
           height: _bannerAd!.size.height.toDouble(),
           alignment: Alignment.center,
           color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.grey[900]
-              : Colors.white,
+              ? AppColors.darkBackground
+              : AppColors.lightBackground,
           child: AdWidget(ad: _bannerAd!),
         ),
       );
