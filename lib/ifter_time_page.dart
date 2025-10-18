@@ -1,6 +1,7 @@
 // lib/pages/ifter_time_page.dart
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -147,6 +148,9 @@ class _IfterTimePageState extends State<IfterTimePage>
       'bn':
           "রমজানের প্রতিটি নেকির সওয়াব ৭০ গুণ বেশি। তাই বেশি বেশি নেক আমল করুন।",
     },
+    'fastingProgress': {'en': 'Fasting Progress', 'bn': 'রোজার অগ্রগতি'},
+    'remaining': {'en': 'Remaining', 'bn': 'বাকি'},
+    'completed': {'en': 'Completed', 'bn': 'সম্পন্ন'},
   };
 
   // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
@@ -177,11 +181,14 @@ class _IfterTimePageState extends State<IfterTimePage>
   late Animation<double> _animation;
 
   // ---------- বিজ্ঞাপন ভেরিয়েবল ----------
+  // ---------- বিজ্ঞাপন ভেরিয়েবল ----------
   BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
   Timer? _interstitialTimer;
-  bool _interstitialAdShownToday = false;
+  int _interstitialAdCountToday = 0;
   bool _showInterstitialAds = true;
+  final int _maxInterstitialPerDay = 3;
+  List<DateTime> _interstitialShowTimes = []; // 👈 কখন কখন অ্যাড শো হয়েছে
 
   // ---------- হাদিস ভেরিয়েবল ----------
   String _currentHadith = "";
@@ -208,6 +215,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     _initializeAds();
     _loadAdjustmentSettings();
     _loadAd();
+    _startInterstitialTimers(); // 👈 মাল্টিপল টাইমার শুরু
   }
 
   // ---------- অ্যানিমেশন ইনিশিয়ালাইজেশন ----------
@@ -276,6 +284,8 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- অ্যাড সিস্টেম ইনিশিয়ালাইজেশন ----------
+  // ---------- অ্যাড সিস্টেম ইনিশিয়ালাইজেশন ----------
+  // ---------- অ্যাড সিস্টেম ইনিশিয়ালাইজেশন ----------
   Future<void> _initializeAds() async {
     try {
       await AdHelper.initialize();
@@ -286,18 +296,87 @@ class _IfterTimePageState extends State<IfterTimePage>
       final lastShownDate = prefs.getString('last_interstitial_date_ifter');
       final today = DateTime.now().toIso8601String().split('T')[0];
 
-      setState(() {
-        _interstitialAdShownToday = (lastShownDate == today);
-      });
+      if (lastShownDate == today) {
+        _interstitialAdCountToday =
+            prefs.getInt('interstitial_count_ifter') ?? 0;
 
-      _startInterstitialTimer();
+        // 👈 পূর্বের শো টাইমস লোড করুন
+        final savedTimes = prefs.getStringList('interstitial_times_ifter');
+        if (savedTimes != null) {
+          _interstitialShowTimes = savedTimes
+              .map((timeStr) => DateTime.parse(timeStr))
+              .toList();
+        }
+      } else {
+        _interstitialAdCountToday = 0;
+        _interstitialShowTimes = []; // 👈 নতুন দিন - টাইমস ক্লিয়ার
+        await prefs.setInt('interstitial_count_ifter', 0);
+        await prefs.setString('last_interstitial_date_ifter', today);
+        await prefs.setStringList('interstitial_times_ifter', []);
+      }
 
       print(
-        'ইফতার পেজ - অ্যাড সিস্টেম ইনিশিয়ালাইজড: interstitial অ্যাড = $_showInterstitialAds, আজকে দেখানো হয়েছে = $_interstitialAdShownToday',
+        'ইফতার পেজ - অ্যাড সিস্টেম ইনিশিয়ালাইজড: আজকে দেখানো হয়েছে = $_interstitialAdCountToday/$_maxInterstitialPerDay',
       );
+
+      // 👈 অ্যাড শিডিউল শুরু করুন
+      _scheduleInterstitialAds();
     } catch (e) {
       print('ইফতার পেজ - অ্যাড ইনিশিয়ালাইজেশনে ত্রুটি: $e');
     }
+  }
+
+  // ---------- অ্যাড শিডিউলিং ----------
+  void _scheduleInterstitialAds() {
+    if (_interstitialAdCountToday >= _maxInterstitialPerDay) {
+      print('আজকের জন্য সব অ্যাড শো করা已完成');
+      return;
+    }
+
+    final now = DateTime.now();
+
+    // 👈 বিভিন্ন সময়ের জন্য শিডিউল
+    final scheduledTimes = _calculateAdScheduleTimes();
+
+    for (final scheduledTime in scheduledTimes) {
+      if (scheduledTime.isAfter(now)) {
+        final duration = scheduledTime.difference(now);
+
+        print(
+          'অ্যাড শিডিউলড: ${scheduledTime.hour}:${scheduledTime.minute} - ${duration.inMinutes} মিনিট পর',
+        );
+
+        Timer(duration, () {
+          if (_interstitialAdCountToday < _maxInterstitialPerDay) {
+            _showInterstitialAdIfNeeded();
+          }
+        });
+      }
+    }
+  }
+
+  // ---------- অ্যাড শিডিউল টাইমস ক্যালকুলেশন ----------
+  List<DateTime> _calculateAdScheduleTimes() {
+    final now = DateTime.now();
+    final List<DateTime> scheduledTimes = [];
+
+    // 👈 প্রথম অ্যাড - ১০ সেকেন্ড পর (যদি আজকে ০টি শো হয়ে থাকে)
+    if (_interstitialAdCountToday == 0) {
+      scheduledTimes.add(now.add(Duration(seconds: 10)));
+    }
+
+    // 👈 বাকি অ্যাডগুলোর জন্য র্যান্ডম/ফিক্সড টাইমস
+    if (_interstitialAdCountToday < _maxInterstitialPerDay) {
+      final remainingAds = _maxInterstitialPerDay - _interstitialAdCountToday;
+
+      for (int i = 0; i < remainingAds; i++) {
+        // র্যান্ডম সময় (৩০ মিনিট থেকে ২ ঘন্টার মধ্যে)
+        final randomMinutes = 30 + (i * 90); // 30min, 2h, 3.5h
+        scheduledTimes.add(now.add(Duration(minutes: randomMinutes)));
+      }
+    }
+
+    return scheduledTimes;
   }
 
   // ---------- ইন্টারস্টিশিয়াল অ্যাড টাইমার শুরু ----------
@@ -309,43 +388,123 @@ class _IfterTimePageState extends State<IfterTimePage>
   }
 
   // ---------- ইন্টারস্টিশিয়াল অ্যাড শো ----------
+  // ---------- ইন্টারস্টিশিয়াল অ্যাড শো ----------
+  // ---------- ইন্টারস্টিশিয়াল অ্যাড শো ----------
   Future<void> _showInterstitialAdIfNeeded() async {
     try {
       if (!_showInterstitialAds) return;
-      if (_interstitialAdShownToday) return;
+
+      if (_interstitialAdCountToday >= _maxInterstitialPerDay) {
+        print(
+          'ডেইলি interstitial লিমিট reached: $_interstitialAdCountToday/$_maxInterstitialPerDay',
+        );
+        return;
+      }
+
+      // 👈 শেষ অ্যাড শো হওয়ার কমপক্ষে ১৫ মিনিট পর চেক
+      if (_interstitialShowTimes.isNotEmpty) {
+        final lastShowTime = _interstitialShowTimes.last;
+        final timeSinceLastAd = DateTime.now().difference(lastShowTime);
+
+        if (timeSinceLastAd.inMinutes < 15) {
+          print('অ্যাড শো করতে কমপক্ষে ১৫ মিনিট অপেক্ষা করুন');
+          return;
+        }
+      }
 
       await AdHelper.showInterstitialAd(
         onAdShowed: () {
-          print('ইফতার পেজ - Interstitial অ্যাড শো করা হলো');
+          print('Interstitial অ্যাড শো করা হলো');
           _recordInterstitialShown();
         },
         onAdDismissed: () {
-          print('ইফতার পেজ - Interstitial অ্যাড ডিসমিস করা হলো');
+          print('Interstitial অ্যাড ডিসমিস করা হলো');
         },
         onAdFailedToShow: () {
-          print('ইফতার পেজ - Interstitial অ্যাড শো করতে ব্যর্থ');
+          print('Interstitial অ্যাড শো করতে ব্যর্থ');
         },
         adContext: 'IfterTimePage',
       );
     } catch (e) {
-      print('ইফতার পেজ - Interstitial অ্যাড শো করতে ত্রুটি: $e');
+      print('Interstitial অ্যাড শো করতে ত্রুটি: $e');
     }
   }
 
+  // ---------- ইন্টারস্টিশিয়াল অ্যাড রেকর্ড ----------
+  // ---------- ইন্টারস্টিশিয়াল অ্যাড রেকর্ড ----------
   // ---------- ইন্টারস্টিশিয়াল অ্যাড রেকর্ড ----------
   void _recordInterstitialShown() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final today = DateTime.now().toIso8601String().split('T')[0];
+      final currentTime = DateTime.now();
+
+      _interstitialAdCountToday++;
+      _interstitialShowTimes.add(currentTime);
 
       await prefs.setString('last_interstitial_date_ifter', today);
+      await prefs.setInt('interstitial_count_ifter', _interstitialAdCountToday);
 
-      setState(() {
-        _interstitialAdShownToday = true;
-      });
+      // 👈 টাইমস সেভ করুন
+      final timeStrings = _interstitialShowTimes
+          .map((time) => time.toIso8601String())
+          .toList();
+      await prefs.setStringList('interstitial_times_ifter', timeStrings);
+
+      print(
+        'Interstitial অ্যাড কাউন্ট আপডেট: $_interstitialAdCountToday/$_maxInterstitialPerDay',
+      );
+      print('শো টাইমস: $_interstitialShowTimes');
+
+      // 👈 পরবর্তী অ্যাডের শিডিউল
+      _scheduleNextAd();
     } catch (e) {
-      print('ইফতার পেজ - Interstitial অ্যাড রেকর্ড করতে ত্রুটি: $e');
+      print('Interstitial অ্যাড রেকর্ড করতে ত্রুটি: $e');
     }
+  }
+
+  // ---------- পরবর্তী অ্যাড শিডিউল ----------
+  void _scheduleNextAd() {
+    if (_interstitialAdCountToday >= _maxInterstitialPerDay) {
+      print('আজকের জন্য সব অ্যাড শো করা已完成');
+      return;
+    }
+
+    final now = DateTime.now();
+
+    // 👈 পরবর্তী অ্যাডের সময় (বর্তমান সময় + ২-৪ ঘন্টা)
+    final nextAdMinutes = 120 + (Random().nextInt(120)); // ২-৪ ঘন্টা
+    final nextAdTime = now.add(Duration(minutes: nextAdMinutes));
+
+    print(
+      'পরবর্তী অ্যাড শিডিউলড: ${nextAdTime.hour}:${nextAdTime.minute} - $nextAdMinutes মিনিট পর',
+    );
+
+    Timer(Duration(minutes: nextAdMinutes), () {
+      if (_interstitialAdCountToday < _maxInterstitialPerDay) {
+        _showInterstitialAdIfNeeded();
+      }
+    });
+  }
+
+  // ---------- মাল্টিপল ইন্টারস্টিশিয়াল টাইমার শুরু ----------
+  void _startInterstitialTimers() {
+    _interstitialTimer?.cancel();
+
+    // 👈 ৩টি টাইমার - ভিন্ন ভিন্ন সময়ে
+    _interstitialTimer = Timer(Duration(seconds: 10), () {
+      _showInterstitialAdIfNeeded();
+    });
+
+    // দ্বিতীয় অ্যাড - ৩০ সেকেন্ড পর
+    Timer(Duration(seconds: 30), () {
+      _showInterstitialAdIfNeeded();
+    });
+
+    // তৃতীয় অ্যাড - ৬০ সেকেন্ড পর
+    Timer(Duration(seconds: 60), () {
+      _showInterstitialAdIfNeeded();
+    });
   }
 
   // ==================== সময় অ্যাডজাস্টমেন্ট মেথড ====================
@@ -922,9 +1081,9 @@ class _IfterTimePageState extends State<IfterTimePage>
               SizedBox(height: isTablet ? 32 : 24),
               _buildCountdownSection(isDarkMode, isTablet, context),
               SizedBox(height: isTablet ? 32 : 24),
-              _buildHadithSection(isDarkMode, isTablet, context),
-              SizedBox(height: isTablet ? 32 : 24),
               _buildTimeSection(isDarkMode, isTablet, context),
+              SizedBox(height: isTablet ? 32 : 24),
+              _buildHadithSection(isDarkMode, isTablet, context),
               SizedBox(height: isTablet ? 32 : 24),
               _buildInfoSection(isDarkMode, isTablet, context),
             ],
@@ -1520,6 +1679,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     );
   }
 
+  //============
   // ---------- এনহ্যান্সড ইফতার সময় ডিসপ্লে ----------
   Widget _buildEnhancedIftarTimeDisplay(
     bool isTablet,
@@ -1530,109 +1690,273 @@ class _IfterTimePageState extends State<IfterTimePage>
   ) {
     final textColor = isDarkMode ? Colors.white : Colors.white;
 
+    // Screen width based responsive sizing
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallMobile = screenWidth < 360;
+    final isMediumMobile = screenWidth < 400;
+    final isLargeMobile = screenWidth < 480;
+
+    // Calculate remaining fasting percentage with safety checks
+    final remainingPercentage = (progress * 100)
+        .clamp(0, 100)
+        .toStringAsFixed(0);
+    final completedPercentage = ((100 - progress * 100).clamp(
+      0,
+      100,
+    )).toStringAsFixed(0);
+
+    // Safe progress value (0 to 1)
+    final safeProgress = progress.clamp(0.0, 1.0);
+
     return Container(
-      padding: EdgeInsets.all(isTablet ? 20 : 16), // padding বড় করা
+      padding: EdgeInsets.all(
+        isTablet
+            ? 24
+            : isSmallMobile
+            ? 16
+            : isMediumMobile
+            ? 18
+            : 20,
+      ),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(isDarkMode ? 0.12 : 0.2),
-        // opacity বাড়ানো
-        borderRadius: BorderRadius.circular(20),
-        // borderRadius বড় করা
+        borderRadius: BorderRadius.circular(
+          isTablet
+              ? 24
+              : isSmallMobile
+              ? 18
+              : 20,
+        ),
         border: Border.all(
           color: Colors.white.withOpacity(isDarkMode ? 0.25 : 0.35),
-          // opacity বাড়ানো
-          width: 2, // border width বড় করা
+          width: isTablet ? 2 : 1.5,
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(isTablet ? 12 : 10), // padding বড় করা
-                  decoration: BoxDecoration(
-                    color: accentColor.withOpacity(0.3), // opacity বাড়ানো
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.access_time_filled,
-                    color: textColor,
-                    size: isTablet ? 28 : 20, // আইকন সাইজ বড় করা
+          // Progress Circle with percentage
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // Background circle
+              Container(
+                width: isTablet
+                    ? 80
+                    : isSmallMobile
+                    ? 50
+                    : isMediumMobile
+                    ? 60
+                    : 70,
+                height: isTablet
+                    ? 80
+                    : isSmallMobile
+                    ? 50
+                    : isMediumMobile
+                    ? 60
+                    : 70,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: accentColor.withOpacity(0.1),
+                  border: Border.all(
+                    color: accentColor.withOpacity(0.3),
+                    width: isTablet ? 3 : 2,
                   ),
                 ),
-                SizedBox(width: isTablet ? 16 : 12), // spacing বড় করা
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              // Progress indicator
+              SizedBox(
+                width: isTablet
+                    ? 80
+                    : isSmallMobile
+                    ? 50
+                    : isMediumMobile
+                    ? 60
+                    : 70,
+                height: isTablet
+                    ? 80
+                    : isSmallMobile
+                    ? 50
+                    : isMediumMobile
+                    ? 60
+                    : 70,
+                child: CircularProgressIndicator(
+                  value: 1 - safeProgress, // Show completed progress
+                  strokeWidth: isTablet ? 4 : 3,
+                  backgroundColor: accentColor.withOpacity(0.2),
+                  valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+                ),
+              ),
+              // Percentage text
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '$remainingPercentage%',
+                    style: TextStyle(
+                      fontSize: isTablet
+                          ? 18
+                          : isSmallMobile
+                          ? 12
+                          : isMediumMobile
+                          ? 14
+                          : 16,
+                      fontWeight: FontWeight.w900,
+                      color: textColor,
+                    ),
+                  ),
+                  Text(
+                    _text('remaining', context),
+                    style: TextStyle(
+                      fontSize: isTablet
+                          ? 10
+                          : isSmallMobile
+                          ? 6
+                          : isMediumMobile
+                          ? 8
+                          : 9,
+                      fontWeight: FontWeight.w600,
+                      color: textColor.withOpacity(0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          SizedBox(
+            width: isTablet
+                ? 20
+                : isSmallMobile
+                ? 12
+                : isMediumMobile
+                ? 15
+                : 18,
+          ),
+
+          // Progress details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _text('fastingProgress', context),
+                  style: TextStyle(
+                    fontSize: isTablet
+                        ? 18
+                        : isSmallMobile
+                        ? 12
+                        : isMediumMobile
+                        ? 14
+                        : 16,
+                    fontWeight: FontWeight.w700,
+                    color: textColor.withOpacity(0.9),
+                  ),
+                ),
+                SizedBox(
+                  height: isTablet
+                      ? 8
+                      : isSmallMobile
+                      ? 4
+                      : isMediumMobile
+                      ? 5
+                      : 6,
+                ),
+
+                // Progress bar - FIXED
+                Container(
+                  height: isTablet
+                      ? 12
+                      : isSmallMobile
+                      ? 6
+                      : isMediumMobile
+                      ? 8
+                      : 10,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Stack(
                     children: [
-                      Text(
-                        _text('iftarTime', context),
-                        style: TextStyle(
-                          fontSize: isTablet ? 18 : 14, // ফন্ট সাইজ বড় করা
-                          color: textColor.withOpacity(0.9), // opacity বাড়ানো
-                          fontWeight: FontWeight.w600, // ফন্ট ওয়েট বাড়ানো
+                      // Background
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      SizedBox(height: 4), // spacing যোগ করা
-                      Text(
-                        _getIftarTime(),
-                        style: TextStyle(
-                          fontSize: isTablet ? 18 : 14, // ফন্ট সাইজ বড় করা
-                          color: textColor,
-                          fontWeight: FontWeight.w800, // ফন্ট ওয়েট বাড়ানো
-                          letterSpacing: 0.5, // letter spacing যোগ করা
-                        ),
+                      // Progress - FIXED WIDTH CALCULATION
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Safe width calculation
+                          final maxWidth = constraints.maxWidth;
+                          final progressWidth = maxWidth * (1 - safeProgress);
+
+                          // Ensure width is not negative and within bounds
+                          final safeWidth = progressWidth.clamp(0.0, maxWidth);
+
+                          return AnimatedContainer(
+                            duration: Duration(milliseconds: 500),
+                            width: safeWidth,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  accentColor,
+                                  accentColor.withOpacity(0.7),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isTablet ? 14 : 12, // padding বড় করা
-              vertical: isTablet ? 10 : 8, // padding বড় করা
-            ),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  accentColor.withOpacity(0.4), // opacity বাড়ানো
-                  accentColor.withOpacity(0.2), // opacity বাড়ানো
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16), // borderRadius বড় করা
-              border: Border.all(
-                color: accentColor.withOpacity(0.6), // opacity বাড়ানো
-                width: 2, // border width বড় করা
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15), // opacity বাড়ানো
-                  blurRadius: 8, // blurRadius বড় করা
-                  offset: Offset(0, 3), // offset বড় করা
+                SizedBox(
+                  height: isTablet
+                      ? 8
+                      : isSmallMobile
+                      ? 4
+                      : isMediumMobile
+                      ? 5
+                      : 6,
                 ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.dining,
-                  size: isTablet ? 20 : 18, // আইকন সাইজ বড় করা
-                  color: textColor,
-                ),
-                SizedBox(width: isTablet ? 8 : 6), // spacing বড় করা
-                Text(
-                  "${_text('fastingRemaining', context)} ${(progress * 100).toStringAsFixed(0)}%",
-                  style: TextStyle(
-                    fontSize: isTablet ? 15 : 13, // ফন্ট সাইজ বড় করা
-                    fontWeight: FontWeight.w800, // ফন্ট ওয়েট বাড়ানো
-                    color: textColor,
-                  ),
+
+                // Progress stats
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${_text('completed', context)}: $completedPercentage%',
+                      style: TextStyle(
+                        fontSize: isTablet
+                            ? 12
+                            : isSmallMobile
+                            ? 8
+                            : isMediumMobile
+                            ? 10
+                            : 11,
+                        color: textColor.withOpacity(0.8),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '${_text('remaining', context)}: $remainingPercentage%',
+                      style: TextStyle(
+                        fontSize: isTablet
+                            ? 12
+                            : isSmallMobile
+                            ? 8
+                            : isMediumMobile
+                            ? 10
+                            : 11,
+                        color: accentColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -1642,6 +1966,7 @@ class _IfterTimePageState extends State<IfterTimePage>
     );
   }
 
+  //====================
   // ---------- হাদিস UI সেকশন ----------
   Widget _buildHadithSection(
     bool isDarkMode,

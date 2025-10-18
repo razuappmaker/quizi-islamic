@@ -3,8 +3,10 @@
 // main.dart
 //main.dart
 // main.dart - CORRECTED VERSION
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:islamicquiz/utils/notification_manager.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/theme_provider.dart';
@@ -29,7 +31,8 @@ void main() async {
   } catch (e) {
     print('Initialization error: $e');
   }
-
+  // AwesomeNotifications initialize করুন main এ
+  await NotificationManager().initializeNotificationChannel();
   runApp(
     MultiProvider(
       providers: [

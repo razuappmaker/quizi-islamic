@@ -20,10 +20,7 @@ class DoyaCategoryPage extends StatefulWidget {
 class _DoyaCategoryPageState extends State<DoyaCategoryPage> {
   // ==================== ভাষা টেক্সট ডিক্লেয়ারেশন ====================
   static const Map<String, Map<String, String>> _texts = {
-    'pageTitle': {
-      'en': 'Dua Collection (With Meaning)',
-      'bn': 'দুআর সংকলন (অর্থসহ)',
-    },
+    'pageTitle': {'en': 'Dua Collection', 'bn': 'দুআর সংকলন (অর্থসহ)'},
     'searchHint': {'en': 'Search all duas...', 'bn': 'সকল দোয়া খুঁজুন...'},
     'searching': {
       'en': 'Type to search duas...',

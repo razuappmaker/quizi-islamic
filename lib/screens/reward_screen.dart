@@ -6,6 +6,7 @@ import '../ad_helper.dart';
 import '../utils/point_manager.dart';
 import 'package:islamicquiz/mcq_page.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // ✅ AppColors import
 
 class RewardScreen extends StatefulWidget {
   const RewardScreen({Key? key}) : super(key: key);
@@ -27,28 +28,32 @@ class _RewardScreenState extends State<RewardScreen> {
   // Language Texts - Policy Compliant
   late Map<String, Map<String, String>> _texts;
 
-  // Green Color Scheme for Light/Dark Mode
-  Color get _primaryColor => Colors.green[800]!;
+  // Color getters using AppColors
+  Color _primaryColor(BuildContext context) => ThemeHelper.primary(context);
 
-  Color get _secondaryColor => Colors.green[600]!;
+  Color _secondaryColor(BuildContext context) => AppColors.getAccentColor(
+    'green',
+    Theme.of(context).brightness == Brightness.dark,
+  );
 
-  Color get _accentColor => Colors.lightGreen[700]!;
+  Color _accentColor(BuildContext context) => AppColors.getAccentColor(
+    'blue',
+    Theme.of(context).brightness == Brightness.dark,
+  );
 
-  Color get _successColor => Colors.green;
+  Color _successColor(BuildContext context) => Colors.green;
 
-  Color get _warningColor => Colors.amber[700]!;
+  Color _warningColor(BuildContext context) => Colors.amber[700]!;
 
-  Color _cardColor(BuildContext context) =>
-      Theme.of(context).colorScheme.surface;
+  Color _cardColor(BuildContext context) => ThemeHelper.card(context);
 
-  Color _textColor(BuildContext context) =>
-      Theme.of(context).colorScheme.onSurface;
+  Color _textColor(BuildContext context) => ThemeHelper.text(context);
 
   Color _subtitleColor(BuildContext context) =>
-      Theme.of(context).colorScheme.onSurface.withOpacity(0.7);
+      ThemeHelper.textSecondary(context);
 
   Color _backgroundColor(BuildContext context) =>
-      Theme.of(context).colorScheme.background;
+      ThemeHelper.background(context);
 
   @override
   void initState() {
@@ -129,7 +134,6 @@ class _RewardScreenState extends State<RewardScreen> {
         'en': "🌟 Collect 5000 points to redeem exclusive Islamic gifts",
         'bn': "🌟 ৫০০০ পয়েন্ট সংগ্রহ করে এক্সক্লুসিভ ইসলামিক গিফট রিডিম করুন",
       },
-      // ✅ নতুন টেক্সট যোগ করুন
       'completed': {'en': 'Completed', 'bn': 'সম্পন্ন'},
       'earned': {'en': 'Earned', 'bn': 'অর্জিত'},
     };
@@ -225,12 +229,12 @@ class _RewardScreenState extends State<RewardScreen> {
 
   Future<void> _showRewardedAd() async {
     if (!_isRewardedAdLoaded || _rewardedAd == null) {
-      _showSnackBar(_text('taskNotLoaded'), _primaryColor);
+      _showSnackBar(_text('taskNotLoaded'), _primaryColor(context));
       return;
     }
 
     if (_todayRewards >= _maxDailyRewards) {
-      _showSnackBar(_text('maxTasksCompleted'), _successColor);
+      _showSnackBar(_text('maxTasksCompleted'), _successColor(context));
       return;
     }
 
@@ -253,7 +257,7 @@ class _RewardScreenState extends State<RewardScreen> {
 
       _showSnackBar(
         _text('pointsAdded'),
-        _successColor,
+        _successColor(context),
         duration: const Duration(seconds: 3),
       );
 
@@ -322,6 +326,8 @@ class _RewardScreenState extends State<RewardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: _backgroundColor(context),
       appBar: AppBar(
@@ -333,7 +339,7 @@ class _RewardScreenState extends State<RewardScreen> {
             fontSize: 18,
           ),
         ),
-        backgroundColor: _primaryColor,
+        backgroundColor: ThemeHelper.appBar(context),
         foregroundColor: Colors.white,
         centerTitle: true,
         elevation: 2,
@@ -350,7 +356,7 @@ class _RewardScreenState extends State<RewardScreen> {
         ],
       ),
       body: _isLoading
-          ? _buildLoadingShimmer()
+          ? _buildLoadingShimmer(context)
           : SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -390,7 +396,10 @@ class _RewardScreenState extends State<RewardScreen> {
     );
   }
 
-  Widget _buildLoadingShimmer() {
+  Widget _buildLoadingShimmer(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final shimmerColor = isDarkMode ? Colors.grey[800] : Colors.grey[300];
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -400,7 +409,7 @@ class _RewardScreenState extends State<RewardScreen> {
               height: 140,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: Colors.grey[300],
+                color: shimmerColor,
               ),
             ),
             const SizedBox(height: 20),
@@ -408,7 +417,7 @@ class _RewardScreenState extends State<RewardScreen> {
               height: 80,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.grey[300],
+                color: shimmerColor,
               ),
             ),
             const SizedBox(height: 20),
@@ -419,7 +428,7 @@ class _RewardScreenState extends State<RewardScreen> {
                     height: 100,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: Colors.grey[300],
+                      color: shimmerColor,
                     ),
                   ),
                 ),
@@ -429,7 +438,7 @@ class _RewardScreenState extends State<RewardScreen> {
                     height: 100,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: Colors.grey[300],
+                      color: shimmerColor,
                     ),
                   ),
                 ),
@@ -440,7 +449,7 @@ class _RewardScreenState extends State<RewardScreen> {
               height: 180,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: Colors.grey[300],
+                color: shimmerColor,
               ),
             ),
           ],
@@ -453,6 +462,7 @@ class _RewardScreenState extends State<RewardScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 380;
     final isTablet = screenWidth > 600;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       width: double.infinity,
@@ -461,12 +471,14 @@ class _RewardScreenState extends State<RewardScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [_primaryColor, _secondaryColor],
+          colors: isDarkMode
+              ? AppColors.darkHeaderGradient
+              : [_primaryColor(context), _secondaryColor(context)],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: _primaryColor.withOpacity(0.4),
+            color: _primaryColor(context).withOpacity(isDarkMode ? 0.3 : 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -661,288 +673,38 @@ class _RewardScreenState extends State<RewardScreen> {
     );
   }
 
-  // Alternative: Even more advanced version with animated elements
-  Widget _buildPremiumHeaderCardAdvanced(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 380;
-    final isTablet = screenWidth > 600;
-    final remainingTasks = _maxDailyRewards - _todayRewards;
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(isSmallScreen ? 16 : 24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [_primaryColor, _secondaryColor],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: _primaryColor.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Main Content with Smart Layout
-                _buildHeaderContent(
-                  context,
-                  isSmallScreen,
-                  isTablet,
-                  remainingTasks,
-                ),
-              ],
-            ),
-          ),
-
-          SizedBox(width: isSmallScreen ? 12 : 16),
-
-          // Animated Trophy Icon
-          _buildAnimatedTrophyIcon(isSmallScreen, remainingTasks),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeaderContent(
-    BuildContext context,
-    bool isSmallScreen,
-    bool isTablet,
-    int remainingTasks,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Icon and Title in single row
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon Container
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.auto_awesome_rounded,
-                size: isSmallScreen ? 18 : 20,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(width: 8),
-
-            // Title and Subtitle
-            Expanded(
-              child: _buildResponsiveTextSection(isSmallScreen, isTablet),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 12),
-
-        // Progress and Stats Row
-        _buildProgressStatsRow(isSmallScreen, isTablet, remainingTasks),
-      ],
-    );
-  }
-
-  Widget _buildResponsiveTextSection(bool isSmallScreen, bool isTablet) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Main Title - Smart text sizing
-        Text(
-          _text('headerTitle'),
-          style: TextStyle(
-            fontSize: isSmallScreen ? 16 : (isTablet ? 22 : 20),
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
-            height: 1.3,
-          ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-
-        const SizedBox(height: 6),
-
-        // Subtitle - Responsive
-        Text(
-          _text('headerSubtitle'),
-          style: TextStyle(
-            fontSize: isSmallScreen ? 12 : 14,
-            color: Colors.white.withOpacity(0.9),
-            fontWeight: FontWeight.w500,
-            height: 1.4,
-          ),
-          maxLines: isSmallScreen ? 2 : 3,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProgressStatsRow(
-    bool isSmallScreen,
-    bool isTablet,
-    int remainingTasks,
-  ) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        // Remaining Tasks Badge
-        Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: isSmallScreen ? 10 : 12,
-            vertical: isSmallScreen ? 4 : 6,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.star_rounded,
-                size: isSmallScreen ? 12 : 14,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                "$remainingTasks ${_text('remaining')}",
-                style: TextStyle(
-                  fontSize: isSmallScreen ? 10 : 12,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Points per task (visible on larger screens)
-        if (!isSmallScreen)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.bolt_rounded,
-                  size: 12,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  "+${_pointsPerReward}",
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.white.withOpacity(0.8),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-        // Daily progress (for tablets)
-        if (isTablet)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.trending_up_rounded,
-                  size: 12,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  "${_todayRewards}/$_maxDailyRewards",
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.white.withOpacity(0.8),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildAnimatedTrophyIcon(bool isSmallScreen, int remainingTasks) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.emoji_events_rounded,
-            size: isSmallScreen ? 24 : 32,
-            color: Colors.white,
-          ),
-        ),
-
-        // Animated ring for completed tasks
-        if (remainingTasks == 0)
-          Container(
-            width: isSmallScreen ? 32 : 40,
-            height: isSmallScreen ? 32 : 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.amber, width: 2),
-            ),
-          ),
-      ],
-    );
-  }
-
   Widget _buildRewardNoteCard(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _accentColor.withOpacity(0.1),
+        color: isDarkMode
+            ? AppColors.darkCard.withOpacity(0.6)
+            : _accentColor(context).withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _accentColor.withOpacity(0.3)),
+        border: Border.all(
+          color: isDarkMode
+              ? AppColors.darkBorder
+              : _accentColor(context).withOpacity(0.3),
+        ),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: _accentColor.withOpacity(0.2),
+              color: isDarkMode
+                  ? AppColors.darkBlueAccent.withOpacity(0.2)
+                  : _accentColor(context).withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.info_outline_rounded,
-              color: _accentColor,
+              color: isDarkMode
+                  ? AppColors.darkBlueAccent
+                  : _accentColor(context),
               size: 20,
             ),
           ),
@@ -965,7 +727,8 @@ class _RewardScreenState extends State<RewardScreen> {
   Widget _buildAdvancedTaskProgressBar(BuildContext context) {
     final completedTasks = _todayRewards;
     final totalTasks = _maxDailyRewards;
-    final points = _pointsPerReward; // ✅ points variable declare করুন
+    final points = _pointsPerReward;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -974,7 +737,7 @@ class _RewardScreenState extends State<RewardScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.1),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -988,12 +751,12 @@ class _RewardScreenState extends State<RewardScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: _primaryColor.withOpacity(0.1),
+                  color: _primaryColor(context).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.auto_awesome_rounded,
-                  color: _primaryColor,
+                  color: _primaryColor(context),
                   size: 20,
                 ),
               ),
@@ -1014,7 +777,7 @@ class _RewardScreenState extends State<RewardScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: _primaryColor.withOpacity(0.1),
+                  color: _primaryColor(context).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -1022,7 +785,7 @@ class _RewardScreenState extends State<RewardScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: _primaryColor,
+                    color: _primaryColor(context),
                   ),
                 ),
               ),
@@ -1034,9 +797,13 @@ class _RewardScreenState extends State<RewardScreen> {
           Container(
             height: 60,
             decoration: BoxDecoration(
-              color: _backgroundColor(context).withOpacity(0.3),
+              color: isDarkMode
+                  ? AppColors.darkSurface.withOpacity(0.5)
+                  : _backgroundColor(context).withOpacity(0.3),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _primaryColor.withOpacity(0.1)),
+              border: Border.all(
+                color: _primaryColor(context).withOpacity(0.1),
+              ),
             ),
             child: Row(
               children: List.generate(totalTasks, (index) {
@@ -1067,22 +834,21 @@ class _RewardScreenState extends State<RewardScreen> {
                 icon: Icons.check_circle_rounded,
                 value: completedTasks,
                 label: _text('completed'),
-                color: _successColor,
+                color: _successColor(context),
                 context: context,
               ),
               _buildProgressStat(
                 icon: Icons.pending_actions_rounded,
                 value: totalTasks - completedTasks,
                 label: _text('remaining'),
-                color: _warningColor,
+                color: _warningColor(context),
                 context: context,
               ),
               _buildProgressStat(
                 icon: Icons.emoji_events_rounded,
                 value: completedTasks * points,
-                // ✅ এখন points variable available
                 label: _text('earned'),
-                color: _accentColor,
+                color: _accentColor(context),
                 context: context,
               ),
             ],
@@ -1101,6 +867,8 @@ class _RewardScreenState extends State<RewardScreen> {
     required int points,
     required bool isLast,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: EdgeInsets.only(right: isLast ? 0 : 4),
       decoration: BoxDecoration(
@@ -1119,10 +887,14 @@ class _RewardScreenState extends State<RewardScreen> {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: _getIconColor(isCompleted, isCurrent),
+                    color: _getIconColor(isCompleted, isCurrent, context),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: _getIconBorderColor(isCompleted, isCurrent),
+                      color: _getIconBorderColor(
+                        isCompleted,
+                        isCurrent,
+                        context,
+                      ),
                       width: 2,
                     ),
                   ),
@@ -1138,7 +910,11 @@ class _RewardScreenState extends State<RewardScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
-                              color: _getTextColor(isCompleted, isCurrent),
+                              color: _getTextColor(
+                                isCompleted,
+                                isCurrent,
+                                context,
+                              ),
                             ),
                           ),
                   ),
@@ -1165,11 +941,15 @@ class _RewardScreenState extends State<RewardScreen> {
               right: 2,
               child: Container(
                 padding: const EdgeInsets.all(2),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: isDarkMode ? AppColors.darkText : Colors.white,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.star_rounded, size: 10, color: _accentColor),
+                child: Icon(
+                  Icons.star_rounded,
+                  size: 10,
+                  color: _accentColor(context),
+                ),
               ),
             ),
 
@@ -1183,7 +963,7 @@ class _RewardScreenState extends State<RewardScreen> {
                 height: 3,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [_primaryColor, _secondaryColor],
+                    colors: [_primaryColor(context), _secondaryColor(context)],
                   ),
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -1200,42 +980,57 @@ class _RewardScreenState extends State<RewardScreen> {
     bool isCompleted,
     bool isCurrent,
   ) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     if (isCompleted) {
-      return _successColor.withOpacity(0.15);
+      return _successColor(context).withOpacity(0.15);
     } else if (isCurrent) {
-      return _primaryColor.withOpacity(0.1);
+      return _primaryColor(context).withOpacity(0.1);
     } else {
-      return _backgroundColor(context).withOpacity(0.5);
+      return isDarkMode
+          ? AppColors.darkSurface.withOpacity(0.3)
+          : _backgroundColor(context).withOpacity(0.5);
     }
   }
 
-  Color _getIconColor(bool isCompleted, bool isCurrent) {
+  Color _getIconColor(bool isCompleted, bool isCurrent, BuildContext context) {
     if (isCompleted) {
-      return _successColor;
+      return _successColor(context);
     } else if (isCurrent) {
-      return _primaryColor;
+      return _primaryColor(context);
     } else {
-      return Colors.grey.withOpacity(0.3);
+      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+      return isDarkMode
+          ? AppColors.darkTextSecondary
+          : Colors.grey.withOpacity(0.3);
     }
   }
 
-  Color _getIconBorderColor(bool isCompleted, bool isCurrent) {
+  Color _getIconBorderColor(
+    bool isCompleted,
+    bool isCurrent,
+    BuildContext context,
+  ) {
     if (isCompleted) {
-      return _successColor.withOpacity(0.5);
+      return _successColor(context).withOpacity(0.5);
     } else if (isCurrent) {
-      return _primaryColor.withOpacity(0.5);
+      return _primaryColor(context).withOpacity(0.5);
     } else {
-      return Colors.grey.withOpacity(0.2);
+      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+      return isDarkMode ? AppColors.darkBorder : Colors.grey.withOpacity(0.2);
     }
   }
 
-  Color _getTextColor(bool isCompleted, bool isCurrent) {
+  Color _getTextColor(bool isCompleted, bool isCurrent, BuildContext context) {
     if (isCompleted) {
       return Colors.white;
     } else if (isCurrent) {
-      return _primaryColor;
+      return _primaryColor(context);
     } else {
-      return Colors.grey.withOpacity(0.5);
+      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+      return isDarkMode
+          ? AppColors.darkTextSecondary
+          : Colors.grey.withOpacity(0.5);
     }
   }
 
@@ -1245,9 +1040,9 @@ class _RewardScreenState extends State<RewardScreen> {
     BuildContext context,
   ) {
     if (isCompleted) {
-      return _successColor;
+      return _successColor(context);
     } else if (isCurrent) {
-      return _primaryColor;
+      return _primaryColor(context);
     } else {
       return _subtitleColor(context);
     }
@@ -1269,10 +1064,12 @@ class _RewardScreenState extends State<RewardScreen> {
     required Color color,
     required BuildContext context,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withOpacity(isDarkMode ? 0.15 : 0.08),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -1306,58 +1103,10 @@ class _RewardScreenState extends State<RewardScreen> {
     );
   }
 
-  // Individual Task Segment Widget
-
-  Widget _buildPointsStat(
-    IconData icon,
-    String title,
-    String value,
-    Color color,
-    BuildContext context,
-  ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
-        ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 18, color: color),
-                const SizedBox(width: 6),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: _subtitleColor(context),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: color,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildMainTaskCard(BuildContext context) {
     final isMaxReached = _todayRewards >= _maxDailyRewards;
     final isDisabled = isMaxReached || _isLoadingAd || !_isRewardedAdLoaded;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -1366,7 +1115,7 @@ class _RewardScreenState extends State<RewardScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.1),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -1380,12 +1129,12 @@ class _RewardScreenState extends State<RewardScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: _primaryColor.withOpacity(0.1),
+                  color: _primaryColor(context).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.task_alt_rounded,
-                  color: _primaryColor,
+                  color: _primaryColor(context),
                   size: 22,
                 ),
               ),
@@ -1407,13 +1156,18 @@ class _RewardScreenState extends State<RewardScreen> {
             decoration: BoxDecoration(
               gradient: isDisabled
                   ? null
-                  : LinearGradient(colors: [_primaryColor, _secondaryColor]),
+                  : LinearGradient(
+                      colors: [
+                        _primaryColor(context),
+                        _secondaryColor(context),
+                      ],
+                    ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: isDisabled
                   ? null
                   : [
                       BoxShadow(
-                        color: _primaryColor.withOpacity(0.4),
+                        color: _primaryColor(context).withOpacity(0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -1421,7 +1175,9 @@ class _RewardScreenState extends State<RewardScreen> {
             ),
             child: Material(
               color: isDisabled
-                  ? Colors.grey.withOpacity(0.2)
+                  ? (isDarkMode
+                        ? AppColors.darkSurface
+                        : Colors.grey.withOpacity(0.2))
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(16),
               child: InkWell(
@@ -1450,7 +1206,11 @@ class _RewardScreenState extends State<RewardScreen> {
                               ? Icons.check_circle_rounded
                               : Icons.play_arrow_rounded,
                           size: 28,
-                          color: isDisabled ? Colors.grey : Colors.white,
+                          color: isDisabled
+                              ? (isDarkMode
+                                    ? AppColors.darkTextSecondary
+                                    : Colors.grey)
+                              : Colors.white,
                         ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -1461,7 +1221,9 @@ class _RewardScreenState extends State<RewardScreen> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: isDisabled
-                                      ? Colors.grey
+                                      ? (isDarkMode
+                                            ? AppColors.darkTextSecondary
+                                            : Colors.grey)
                                       : Colors.white,
                                 ),
                               )
@@ -1472,7 +1234,9 @@ class _RewardScreenState extends State<RewardScreen> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: isDisabled
-                                      ? Colors.grey
+                                      ? (isDarkMode
+                                            ? AppColors.darkTextSecondary
+                                            : Colors.grey)
                                       : Colors.white,
                                 ),
                               )
@@ -1483,7 +1247,9 @@ class _RewardScreenState extends State<RewardScreen> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: isDisabled
-                                      ? Colors.grey
+                                      ? (isDarkMode
+                                            ? AppColors.darkTextSecondary
+                                            : Colors.grey)
                                       : Colors.white,
                                 ),
                               )
@@ -1537,19 +1303,30 @@ class _RewardScreenState extends State<RewardScreen> {
   }
 
   Widget _buildQuizSectionCard(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            _accentColor.withOpacity(0.1),
-            _accentColor.withOpacity(0.05),
-          ],
+          colors: isDarkMode
+              ? [
+                  AppColors.darkSurface.withOpacity(0.8),
+                  AppColors.darkCard.withOpacity(0.6),
+                ]
+              : [
+                  _accentColor(context).withOpacity(0.1),
+                  _accentColor(context).withOpacity(0.05),
+                ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _accentColor.withOpacity(0.2)),
+        border: Border.all(
+          color: isDarkMode
+              ? AppColors.darkBorder
+              : _accentColor(context).withOpacity(0.2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1559,12 +1336,16 @@ class _RewardScreenState extends State<RewardScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: _accentColor.withOpacity(0.2),
+                  color: isDarkMode
+                      ? AppColors.darkBlueAccent.withOpacity(0.2)
+                      : _accentColor(context).withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.rocket_launch_rounded,
-                  color: _accentColor,
+                  color: isDarkMode
+                      ? AppColors.darkBlueAccent
+                      : _accentColor(context),
                   size: 20,
                 ),
               ),
@@ -1574,7 +1355,9 @@ class _RewardScreenState extends State<RewardScreen> {
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
-                  color: _accentColor,
+                  color: isDarkMode
+                      ? AppColors.darkBlueAccent
+                      : _accentColor(context),
                 ),
               ),
             ],
@@ -1592,12 +1375,24 @@ class _RewardScreenState extends State<RewardScreen> {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [_accentColor, _accentColor.withOpacity(0.8)],
+                colors: isDarkMode
+                    ? [
+                        AppColors.darkBlueAccent,
+                        AppColors.darkBlueAccent.withOpacity(0.7),
+                      ]
+                    : [
+                        _accentColor(context),
+                        _accentColor(context).withOpacity(0.8),
+                      ],
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: _accentColor.withOpacity(0.3),
+                  color:
+                      (isDarkMode
+                              ? AppColors.darkBlueAccent
+                              : _accentColor(context))
+                          .withOpacity(0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -1645,24 +1440,36 @@ class _RewardScreenState extends State<RewardScreen> {
   }
 
   Widget _buildInfoCard(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _primaryColor.withOpacity(0.08),
+        color: isDarkMode
+            ? AppColors.darkSurface.withOpacity(0.6)
+            : _primaryColor(context).withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _primaryColor.withOpacity(0.2)),
+        border: Border.all(
+          color: isDarkMode
+              ? AppColors.darkBorder
+              : _primaryColor(context).withOpacity(0.2),
+        ),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: _primaryColor.withOpacity(0.15),
+              color: isDarkMode
+                  ? AppColors.darkPrimary.withOpacity(0.2)
+                  : _primaryColor(context).withOpacity(0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.access_time_rounded,
-              color: _primaryColor,
+              color: isDarkMode
+                  ? AppColors.darkPrimary
+                  : _primaryColor(context),
               size: 20,
             ),
           ),
@@ -1687,7 +1494,9 @@ class _RewardScreenState extends State<RewardScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
-                          color: _primaryColor,
+                          color: isDarkMode
+                              ? AppColors.darkPrimary
+                              : _primaryColor(context),
                         ),
                       ),
                     ],

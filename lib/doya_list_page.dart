@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'ad_helper.dart';
 import 'network_json_loader.dart'; // নতুন নেটওয়ার্ক লোডার
 import '../providers/language_provider.dart';
+import '../providers/theme_provider.dart'; // নতুন ইম্পোর্ট
+import '../utils/app_colors.dart'; // নতুন ইম্পোর্ট
 
 class DoyaListPage extends StatefulWidget {
   final String categoryTitle;
@@ -36,15 +38,31 @@ class _DoyaListPageState extends State<DoyaListPage> {
     'loading': {'en': 'Loading duas...', 'bn': 'দোয়া লোড হচ্ছে...'},
     'noDuaFound': {'en': 'No duas found', 'bn': 'কোন দোয়া পাওয়া যায়নি'},
     'searchHint': {'en': 'Search duas...', 'bn': 'দোয়া অনুসন্ধান করুন...'},
-    'warning': {'en': 'Warning', 'bn': 'সতর্কবার্তা'},
-    'warningContent': {
-      'en':
-          'When reading Quranic verses or Arabic prayers in Bengali/English pronunciation, meaning distortion often occurs. So take this pronunciation only as a helper. Let us learn to read the Quran correctly.',
-      'bn':
-          'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে অনেক সময় অর্থের বিকৃতি ঘটে। তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন। আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি।',
+    'importantWarning': {
+      'en': 'Important Warning',
+      'bn': 'গুরুত্বপূর্ণ সতর্কবার্তা',
     },
-    'understood': {'en': 'Understood', 'bn': 'বুঝেছি'},
-    'bengaliPronunciation': {'en': 'Pronunciation', 'bn': 'উচ্চরণ'},
+    'warningTitle': {'en': 'English Pronunciation', 'bn': 'বাংলা উচ্চরণ'},
+    'warningContent1': {
+      'en':
+          'When reading Quranic verses or Arabic prayers in English pronunciation, ',
+      'bn': 'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে ',
+    },
+    'warningContent2': {
+      'en': 'meaning distortion often occurs',
+      'bn': 'অনেক সময় অর্থের বিকৃতি ঘটে',
+    },
+    'warningContent3': {
+      'en': '. So take this pronunciation only as a helper.',
+      'bn': '। তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন।',
+    },
+    'warningContent4': {
+      'en':
+          'Let us learn to read the Quran correctly. Learning to read the Quran correctly is obligatory for every Muslim.',
+      'bn':
+          'আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি। শুদ্ধ করে কুরআন শিক্ষা করা প্রত্যেক মুসলিমের উপর ফরজ।',
+    },
+    'understoodThanks': {'en': 'Understood, Thanks', 'bn': 'বুঝেছি, ধন্যবাদ'},
     'meaning': {'en': 'Meaning', 'bn': 'অর্থ'},
     'reference': {'en': 'Reference', 'bn': 'রেফারেন্স'},
     'copy': {'en': 'Copy', 'bn': 'কপি'},
@@ -63,6 +81,43 @@ class _DoyaListPageState extends State<DoyaListPage> {
     );
     final langKey = languageProvider.isEnglish ? 'en' : 'bn';
     return _texts[key]?[langKey] ?? key;
+  }
+
+  // কালার হেল্পার মেথড - SuraPage এর মতোই
+  Color _getPrimaryColor(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors.darkPrimary
+        : widget.categoryColor;
+  }
+
+  Color _getBackgroundColor(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors.darkBackground
+        : Color(0xFFFAFAFA);
+  }
+
+  Color _getCardColor(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode ? AppColors.darkCard : Colors.white70;
+  }
+
+  Color _getBorderColor(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode ? AppColors.darkBorder : Color(0xFFE0E0E0);
+  }
+
+  Color _getTextColor(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode ? AppColors.darkText : Color(0xFF37474F);
+  }
+
+  Color _getSecondaryTextColor(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return themeProvider.isDarkMode
+        ? AppColors.darkTextSecondary
+        : Color(0xFF546E7A);
   }
 
   List<Map<String, String>> doyas = [];
@@ -470,24 +525,24 @@ class _DoyaListPageState extends State<DoyaListPage> {
     );
   }
 
-  // সতর্কবার্তা উইজেট বিল্ড করার মেথড
+  // ==================== সতর্কবার্তা উইজেট - SuraPage এর মতোই ====================
   Widget _buildWarningWidget(int index, BuildContext context) {
-    final showFullWarning = _showFullWarningStates[index] ?? false;
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
+    final bool showFull = _showFullWarningStates[index] ?? false;
 
-    return showFullWarning
+    return showFull
         ? Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.orange[900]?.withOpacity(0.1)
-                  : Colors.orange[50],
+              color: isDarkMode ? AppColors.darkCard : Color(0xFFFFF8E1),
               border: Border.all(
-                color: Colors.orange.withOpacity(0.3),
-                width: 1.2,
+                color: isDarkMode ? AppColors.darkBorder : Color(0xFFFFD54F),
+                width: 1.5,
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -495,38 +550,70 @@ class _DoyaListPageState extends State<DoyaListPage> {
                 Row(
                   children: [
                     Icon(
-                      Icons.info_outline_rounded,
-                      color: Colors.orange[700],
-                      size: 20,
+                      Icons.warning_amber_rounded,
+                      color: isDarkMode ? Color(0xFFFFB74D) : Color(0xFFF57C00),
+                      size: 22,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Text(
-                      _text('warning', context),
+                      _text('importantWarning', context),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Colors.orange[800],
+                        fontSize: 16,
+                        color: isDarkMode
+                            ? Color(0xFFFFB74D)
+                            : Color(0xFFE65100),
                       ),
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 10),
-
-                Text(
-                  _text('warningContent', context),
-                  style: TextStyle(
-                    fontSize: 14,
-                    height: 1.5,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white70
-                        : Colors.black87,
+                const SizedBox(height: 12),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      height: 1.6,
+                      color: _getSecondaryTextColor(context),
+                    ),
+                    children: [
+                      TextSpan(text: _text('warningContent1', context)),
+                      TextSpan(
+                        text: _text('warningContent2', context),
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      TextSpan(text: _text('warningContent3', context)),
+                    ],
                   ),
                   textAlign: TextAlign.justify,
                 ),
-
-                const SizedBox(height: 12),
-
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, right: 8),
+                      child: Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                        color: isDarkMode
+                            ? Color(0xFFFFB74D)
+                            : Color(0xFFF57C00),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        _text('warningContent4', context),
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          height: 1.6,
+                          color: _getSecondaryTextColor(context),
+                        ),
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
@@ -537,23 +624,35 @@ class _DoyaListPageState extends State<DoyaListPage> {
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 6,
+                        horizontal: 16,
+                        vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.orange.withOpacity(0.3),
-                          width: 1,
+                        gradient: LinearGradient(
+                          colors: [
+                            isDarkMode ? Color(0xFFFFB74D) : Color(0xFFFFB300),
+                            isDarkMode ? Color(0xFFFF9800) : Color(0xFFF57C00),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDarkMode
+                                ? Color(0xFFFFB74D).withOpacity(0.3)
+                                : Color(0xFFFFB300).withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Text(
-                        _text('understood', context),
+                        _text('understoodThanks', context),
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.orange[800],
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -562,38 +661,50 @@ class _DoyaListPageState extends State<DoyaListPage> {
               ],
             ),
           )
-        : GestureDetector(
-            onTap: () {
-              setState(() {
-                _showFullWarningStates[index] = true;
-              });
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.orange[900]?.withOpacity(0.1)
-                    : Colors.orange[50],
-                border: Border.all(
-                  color: Colors.orange.withOpacity(0.3),
-                  width: 1,
+        : Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showFullWarningStates[index] = true;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
                 ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    color: Colors.orange[700],
-                    size: 16,
+                decoration: BoxDecoration(
+                  color: isDarkMode ? AppColors.darkCard : Color(0xFFFFF8E1),
+                  border: Border.all(
+                    color: isDarkMode
+                        ? AppColors.darkBorder
+                        : Color(0xFFFFD54F),
+                    width: 1,
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    _text('bengaliPronunciation', context),
-                    style: TextStyle(fontSize: 12, color: Colors.orange[800]),
-                  ),
-                ],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      color: isDarkMode ? Color(0xFFFFB74D) : Color(0xFFF57C00),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      _text('warningTitle', context),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: isDarkMode
+                            ? Color(0xFFFFB74D)
+                            : Color(0xFFE65100),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -731,7 +842,7 @@ class _DoyaListPageState extends State<DoyaListPage> {
               if (isExpanded) ...[
                 const SizedBox(height: 16),
 
-                // Warning message
+                // Warning message - SuraPage এর মতোই
                 _buildWarningWidget(index, context),
 
                 const SizedBox(height: 16),

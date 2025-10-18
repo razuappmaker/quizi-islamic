@@ -73,7 +73,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    final tablet = isTablet(context);
+    final screenSize = MediaQuery.of(context).size;
+    final isTablet = screenSize.width > 600;
+    final isSmallPhone = screenSize.height < 600;
 
     return GestureDetector(
       onTapDown: (_) {
@@ -88,13 +90,23 @@ class _DrawerMenuState extends State<DrawerMenu> {
         _isLongPressing = false;
       },
       child: Drawer(
-        width: tablet ? MediaQuery.of(context).size.width * 0.4 : null,
+        width: isTablet ? screenSize.width * 0.4 : null,
         backgroundColor: isDarkMode ? _Colors.darkSurface : Colors.white,
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Column(
           children: [
-            _buildDrawerHeader(context, languageProvider, tablet, isDarkMode),
-            _buildDrawerBody(context, languageProvider, themeProvider),
+            _buildDrawerHeader(
+              context,
+              languageProvider,
+              isTablet,
+              isSmallPhone,
+              isDarkMode,
+            ),
+            _buildDrawerBody(
+              context,
+              languageProvider,
+              themeProvider,
+              isSmallPhone,
+            ),
           ],
         ),
       ),
@@ -116,11 +128,30 @@ class _DrawerMenuState extends State<DrawerMenu> {
   Widget _buildDrawerHeader(
     BuildContext context,
     LanguageProvider languageProvider,
-    bool tablet,
+    bool isTablet,
+    bool isSmallPhone,
     bool isDarkMode,
   ) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // ডিভাইসের স্ক্রিন সাইজ অনুযায়ী হাইট সেট করা
+    double headerHeight;
+    if (isTablet) {
+      headerHeight = screenHeight * 0.14; // ট্যাবলেটের জন্য 14%
+    } else if (isSmallPhone) {
+      headerHeight = screenHeight * 0.16; // ছোট ফোনের জন্য 16%
+    } else {
+      headerHeight = screenHeight * 0.18; // সাধারণ ফোনের জন্য 18%
+    }
+
+    // ফন্ট সাইজ ডাইনামিকভাবে সেট করা
+    double titleFontSize = isTablet ? 16 : (isSmallPhone ? 12 : 14);
+    double subtitleFontSize = isTablet ? 12 : (isSmallPhone ? 9 : 10);
+    double iconSize = isTablet ? 30 : (isSmallPhone ? 22 : 26);
+    double avatarRadius = isTablet ? 25 : (isSmallPhone ? 18 : 22);
+
     return Container(
-      height: responsiveValue(context, tablet ? 100 : 120),
+      height: headerHeight,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -130,56 +161,70 @@ class _DrawerMenuState extends State<DrawerMenu> {
               : _Colors.lightHeaderGradient,
         ),
       ),
-      child: Stack(
-        children: [
-          Column(
+      child: SafeArea(
+        bottom: false,
+        child: Center(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
+              // আইকন সেকশন
               CircleAvatar(
-                radius: responsiveValue(context, tablet ? 20 : 25),
+                radius: avatarRadius,
                 backgroundColor: Colors.white,
                 child: Icon(
                   Icons.menu_book,
-                  size: responsiveValue(context, tablet ? 25 : 28),
+                  size: iconSize,
                   color: isDarkMode ? _Colors.darkPrimary : Colors.green[800],
                 ),
               ),
-              const ResponsiveSizedBox(height: 6),
-              // প্রথম টেক্সট
+
+              SizedBox(height: isSmallPhone ? 4 : 6),
+
+              // প্রধান টাইটেল
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: responsiveValue(context, 12),
+                  horizontal: isSmallPhone ? 8 : 12,
                 ),
-                child: ResponsiveText(
+                child: Text(
                   languageProvider.isEnglish
                       ? 'Islamic Day - Global Bangladesh'
                       : 'ইসলামিক ডে - Islamic Day',
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    height: 1.2,
+                  ),
                   textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
 
-              const ResponsiveSizedBox(height: 4),
-              // দ্বিতীয় টেক্সট
-              if (!tablet)
+              // সাবটাইটেল (শুধুমাত্র ট্যাবলেট এবং বড় ফোনে দেখাবে)
+              if (!isSmallPhone) SizedBox(height: isTablet ? 6 : 4),
+
+              if (!isSmallPhone)
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: responsiveValue(context, 16),
-                  ),
-                  child: ResponsiveText(
+                  padding: EdgeInsets.symmetric(horizontal: isTablet ? 20 : 16),
+                  child: Text(
                     languageProvider.isEnglish
                         ? 'For the Global Bangladeshi Community'
                         : 'বিশ্বব্যাপী বাংলাদেশী কমিউনিটির জন্য',
-                    fontSize: 10,
-                    color: Colors.white70,
+                    style: TextStyle(
+                      fontSize: subtitleFontSize,
+                      color: Colors.white70,
+                      height: 1.2,
+                    ),
                     textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -188,106 +233,138 @@ class _DrawerMenuState extends State<DrawerMenu> {
     BuildContext context,
     LanguageProvider languageProvider,
     ThemeProvider themeProvider,
+    bool isSmallPhone,
   ) {
     final isDarkMode = themeProvider.isDarkMode;
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: isDarkMode
-            ? LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: _Colors.darkBackgroundGradient,
-              )
-            : null,
-        color: isDarkMode ? null : Colors.white,
-      ),
-      child: Column(
-        children: [
-          _buildShareAppItem(context, languageProvider),
-          _buildDivider(isDarkMode),
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: isDarkMode
+              ? LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: _Colors.darkBackgroundGradient,
+                )
+              : null,
+          color: isDarkMode ? null : Colors.white,
+        ),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            _buildShareAppItem(context, languageProvider, isSmallPhone),
+            _buildDivider(isDarkMode),
 
-          _buildDrawerItem(
-            context,
-            Icons.access_time_rounded,
-            languageProvider.isEnglish ? 'Prayer Time' : 'নামাজের সময়',
-            const PrayerTimePage(),
-            isDarkMode: isDarkMode,
-          ),
-          _buildDivider(isDarkMode),
+            _buildDrawerItem(
+              context,
+              Icons.access_time_rounded,
+              languageProvider.isEnglish ? 'Prayer Time' : 'নামাজের সময়',
+              const PrayerTimePage(),
+              isDarkMode: isDarkMode,
+              isSmallPhone: isSmallPhone,
+            ),
+            _buildDivider(isDarkMode),
 
-          _buildDrawerItem(
-            context,
-            Icons.mosque_rounded,
-            languageProvider.isEnglish ? 'Nearby Mosques' : 'নিকটবর্তী মসজিদ',
-            null,
-            isDarkMode: isDarkMode,
-            url: 'https://www.google.com/maps/search/?api=1&query=মসজিদ',
-          ),
-          _buildDivider(isDarkMode),
+            // ✅ FIXED: Nearby Mosques - Language specific search
+            _buildDrawerItem(
+              context,
+              Icons.mosque_rounded,
+              languageProvider.isEnglish ? 'Nearby Mosques' : 'নিকটবর্তী মসজিদ',
+              null,
+              isDarkMode: isDarkMode,
+              isSmallPhone: isSmallPhone,
+              url: languageProvider.isEnglish
+                  ? 'https://www.google.com/maps/search/?api=1&query=Mosque'
+                  : 'https://www.google.com/maps/search/?api=1&query=মসজিদ',
+            ),
+            _buildDivider(isDarkMode),
 
-          _buildDrawerItem(
-            context,
-            Icons.emoji_events_rounded,
-            languageProvider.isEnglish ? 'Rewards' : 'পুরস্কার',
-            const RewardScreen(),
-            isDarkMode: isDarkMode,
-          ),
-          _buildDivider(isDarkMode),
+            _buildDrawerItem(
+              context,
+              Icons.emoji_events_rounded,
+              languageProvider.isEnglish ? 'Rewards' : 'পুরস্কার',
+              const RewardScreen(),
+              isDarkMode: isDarkMode,
+              isSmallPhone: isSmallPhone,
+            ),
+            _buildDivider(isDarkMode),
 
-          _buildDrawerItem(
-            context,
-            Icons.contact_page_rounded,
-            languageProvider.isEnglish ? 'About & Contact' : 'আমাদের সম্পর্কে',
-            const AboutContactPage(),
-            isDarkMode: isDarkMode,
-          ),
-          _buildDivider(isDarkMode),
+            _buildDrawerItem(
+              context,
+              Icons.contact_page_rounded,
+              languageProvider.isEnglish
+                  ? 'About & Contact'
+                  : 'আমাদের সম্পর্কে',
+              const AboutContactPage(),
+              isDarkMode: isDarkMode,
+              isSmallPhone: isSmallPhone,
+            ),
+            _buildDivider(isDarkMode),
 
-          _buildLanguageSwitchItem(context, languageProvider, isDarkMode),
-          _buildDivider(isDarkMode),
+            _buildLanguageSwitchItem(
+              context,
+              languageProvider,
+              isDarkMode,
+              isSmallPhone,
+            ),
+            _buildDivider(isDarkMode),
 
-          _buildDrawerItem(
-            context,
-            Icons.volunteer_activism_rounded,
-            languageProvider.isEnglish ? 'Support Us' : 'সাপোর্ট করুন',
-            const SupportScreen(),
-            isDarkMode: isDarkMode,
-          ),
-          _buildDivider(isDarkMode),
+            _buildDrawerItem(
+              context,
+              Icons.volunteer_activism_rounded,
+              languageProvider.isEnglish ? 'Support Us' : 'সাপোর্ট করুন',
+              const SupportScreen(),
+              isDarkMode: isDarkMode,
+              isSmallPhone: isSmallPhone,
+            ),
+            _buildDivider(isDarkMode),
 
-          _buildDrawerItem(
-            context,
-            Icons.developer_mode_rounded,
-            languageProvider.isEnglish ? 'Developer' : 'ডেভেলপার',
-            DeveloperPage(),
-            isDarkMode: isDarkMode,
-          ),
-          _buildDivider(isDarkMode),
+            _buildDrawerItem(
+              context,
+              Icons.developer_mode_rounded,
+              languageProvider.isEnglish ? 'Developer' : 'ডেভেলপার',
+              DeveloperPage(),
+              isDarkMode: isDarkMode,
+              isSmallPhone: isSmallPhone,
+            ),
+            _buildDivider(isDarkMode),
 
-          if (_showAdminPanel)
-            _buildAdminPanelItem(context, languageProvider, isDarkMode),
+            if (_showAdminPanel)
+              _buildAdminPanelItem(
+                context,
+                languageProvider,
+                isDarkMode,
+                isSmallPhone,
+              ),
 
-          _buildDrawerItem(
-            context,
-            Icons.privacy_tip_rounded,
-            'Privacy Policy',
-            null,
-            isDarkMode: isDarkMode,
-            url: 'https://sites.google.com/view/islamicquize/home',
-          ),
-          _buildDivider(isDarkMode),
+            _buildDrawerItem(
+              context,
+              Icons.privacy_tip_rounded,
+              'Privacy Policy',
+              null,
+              isDarkMode: isDarkMode,
+              isSmallPhone: isSmallPhone,
+              url: 'https://sites.google.com/view/islamicquize/home',
+            ),
+            _buildDivider(isDarkMode),
 
-          _buildDataDeletionItem(context, languageProvider, isDarkMode),
-          _buildDivider(isDarkMode),
+            _buildDataDeletionItem(
+              context,
+              languageProvider,
+              isDarkMode,
+              isSmallPhone,
+            ),
+            _buildDivider(isDarkMode),
 
-          _buildThemeSwitchItem(
-            context,
-            languageProvider,
-            themeProvider,
-            isDarkMode,
-          ),
-        ],
+            _buildThemeSwitchItem(
+              context,
+              languageProvider,
+              themeProvider,
+              isDarkMode,
+              isSmallPhone,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -307,17 +384,18 @@ class _DrawerMenuState extends State<DrawerMenu> {
   Widget _buildShareAppItem(
     BuildContext context,
     LanguageProvider languageProvider,
+    bool isSmallPhone,
   ) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.symmetric(
-        horizontal: responsiveValue(context, 12),
-        vertical: responsiveValue(context, 4),
+        horizontal: isSmallPhone ? 8 : 12,
+        vertical: isSmallPhone ? 2 : 4,
       ),
       leading: Container(
-        padding: EdgeInsets.all(responsiveValue(context, 6)),
+        padding: EdgeInsets.all(isSmallPhone ? 4 : 6),
         decoration: BoxDecoration(
           color: isDarkMode
               ? _Colors.darkBlueAccent.withOpacity(0.2)
@@ -327,20 +405,20 @@ class _DrawerMenuState extends State<DrawerMenu> {
         child: Icon(
           Icons.share_rounded,
           color: isDarkMode ? _Colors.darkBlueAccent : Colors.blue,
-          size: responsiveValue(context, 20),
+          size: isSmallPhone ? 16 : 20,
         ),
       ),
       title: Text(
         languageProvider.isEnglish ? 'Share App' : 'অ্যাপ শেয়ার করুন',
         style: TextStyle(
-          fontSize: 14,
+          fontSize: isSmallPhone ? 12 : 14,
           fontWeight: FontWeight.w500,
           color: isDarkMode ? _Colors.darkText : Colors.black87,
         ),
       ),
       trailing: Icon(
         Icons.arrow_forward_ios,
-        size: responsiveValue(context, 14),
+        size: isSmallPhone ? 12 : 14,
         color: isDarkMode ? _Colors.darkTextSecondary : Colors.green[700]!,
       ),
       onTap: () {
@@ -355,6 +433,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
     BuildContext context,
     LanguageProvider languageProvider,
     bool isDarkMode,
+    bool isSmallPhone,
   ) {
     return Column(
       children: [
@@ -362,11 +441,11 @@ class _DrawerMenuState extends State<DrawerMenu> {
         ListTile(
           dense: true,
           contentPadding: EdgeInsets.symmetric(
-            horizontal: responsiveValue(context, 12),
-            vertical: responsiveValue(context, 4),
+            horizontal: isSmallPhone ? 8 : 12,
+            vertical: isSmallPhone ? 2 : 4,
           ),
           leading: Container(
-            padding: EdgeInsets.all(responsiveValue(context, 6)),
+            padding: EdgeInsets.all(isSmallPhone ? 4 : 6),
             decoration: BoxDecoration(
               color: isDarkMode
                   ? _Colors.darkPrimary.withOpacity(0.2)
@@ -376,20 +455,20 @@ class _DrawerMenuState extends State<DrawerMenu> {
             child: Icon(
               Icons.admin_panel_settings_rounded,
               color: isDarkMode ? _Colors.darkPrimary : Colors.green[700],
-              size: responsiveValue(context, 20),
+              size: isSmallPhone ? 16 : 20,
             ),
           ),
           title: Text(
             languageProvider.isEnglish ? 'Admin Panel' : 'এডমিন প্যানেল',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: isSmallPhone ? 12 : 14,
               fontWeight: FontWeight.bold,
               color: isDarkMode ? _Colors.darkText : Colors.black87,
             ),
           ),
           trailing: Icon(
             Icons.arrow_forward_ios,
-            size: responsiveValue(context, 14),
+            size: isSmallPhone ? 12 : 14,
             color: isDarkMode ? _Colors.darkTextSecondary : Colors.green[700]!,
           ),
           onTap: () {
@@ -412,17 +491,18 @@ class _DrawerMenuState extends State<DrawerMenu> {
     String title,
     Widget? page, {
     required bool isDarkMode,
+    required bool isSmallPhone,
     String? url,
     Function()? onTap,
   }) {
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.symmetric(
-        horizontal: responsiveValue(context, 12),
-        vertical: responsiveValue(context, 4),
+        horizontal: isSmallPhone ? 8 : 12,
+        vertical: isSmallPhone ? 2 : 4,
       ),
       leading: Container(
-        padding: EdgeInsets.all(responsiveValue(context, 6)),
+        padding: EdgeInsets.all(isSmallPhone ? 4 : 6),
         decoration: BoxDecoration(
           color: isDarkMode
               ? _Colors.darkPrimary.withOpacity(0.15)
@@ -432,20 +512,20 @@ class _DrawerMenuState extends State<DrawerMenu> {
         child: Icon(
           icon,
           color: isDarkMode ? _Colors.darkPrimary : Colors.green[700],
-          size: responsiveValue(context, 20),
+          size: isSmallPhone ? 16 : 20,
         ),
       ),
       title: Text(
         title,
         style: TextStyle(
-          fontSize: 14,
+          fontSize: isSmallPhone ? 12 : 14,
           fontWeight: FontWeight.w500,
           color: isDarkMode ? _Colors.darkText : Colors.black87,
         ),
       ),
       trailing: Icon(
         Icons.arrow_forward_ios,
-        size: responsiveValue(context, 14),
+        size: isSmallPhone ? 12 : 14,
         color: isDarkMode ? _Colors.darkTextSecondary : Colors.green[700]!,
       ),
       onTap: onTap ?? () => _handleDrawerItemTap(context, page, url),
@@ -485,15 +565,16 @@ class _DrawerMenuState extends State<DrawerMenu> {
     BuildContext context,
     LanguageProvider languageProvider,
     bool isDarkMode,
+    bool isSmallPhone,
   ) {
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.symmetric(
-        horizontal: responsiveValue(context, 12),
-        vertical: responsiveValue(context, 4),
+        horizontal: isSmallPhone ? 8 : 12,
+        vertical: isSmallPhone ? 2 : 4,
       ),
       leading: Container(
-        padding: EdgeInsets.all(responsiveValue(context, 6)),
+        padding: EdgeInsets.all(isSmallPhone ? 4 : 6),
         decoration: BoxDecoration(
           color: isDarkMode
               ? _Colors.darkPurpleAccent.withOpacity(0.2)
@@ -503,13 +584,13 @@ class _DrawerMenuState extends State<DrawerMenu> {
         child: Icon(
           Icons.language_rounded,
           color: isDarkMode ? _Colors.darkPurpleAccent : Colors.purple,
-          size: responsiveValue(context, 20),
+          size: isSmallPhone ? 16 : 20,
         ),
       ),
       title: Text(
         languageProvider.isEnglish ? 'Language' : 'ভাষা',
         style: TextStyle(
-          fontSize: 14,
+          fontSize: isSmallPhone ? 12 : 14,
           fontWeight: FontWeight.w500,
           color: isDarkMode ? _Colors.darkText : Colors.black87,
         ),
@@ -535,15 +616,16 @@ class _DrawerMenuState extends State<DrawerMenu> {
     BuildContext context,
     LanguageProvider languageProvider,
     bool isDarkMode,
+    bool isSmallPhone,
   ) {
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.symmetric(
-        horizontal: responsiveValue(context, 12),
-        vertical: responsiveValue(context, 4),
+        horizontal: isSmallPhone ? 8 : 12,
+        vertical: isSmallPhone ? 2 : 4,
       ),
       leading: Container(
-        padding: EdgeInsets.all(responsiveValue(context, 6)),
+        padding: EdgeInsets.all(isSmallPhone ? 4 : 6),
         decoration: BoxDecoration(
           color: isDarkMode
               ? _Colors.darkError.withOpacity(0.2)
@@ -553,20 +635,20 @@ class _DrawerMenuState extends State<DrawerMenu> {
         child: Icon(
           Icons.delete_forever_rounded,
           color: isDarkMode ? _Colors.darkError : Colors.red,
-          size: responsiveValue(context, 20),
+          size: isSmallPhone ? 16 : 20,
         ),
       ),
       title: Text(
         languageProvider.isEnglish ? 'Delete All Data' : 'সব তথ্য মুছুন',
         style: TextStyle(
-          fontSize: 14,
+          fontSize: isSmallPhone ? 12 : 14,
           fontWeight: FontWeight.w500,
           color: isDarkMode ? _Colors.darkText : Colors.black87,
         ),
       ),
       trailing: Icon(
         Icons.arrow_forward_ios,
-        size: responsiveValue(context, 14),
+        size: isSmallPhone ? 12 : 14,
         color: isDarkMode ? _Colors.darkTextSecondary : Colors.green[700]!,
       ),
       onTap: () {
@@ -582,15 +664,16 @@ class _DrawerMenuState extends State<DrawerMenu> {
     LanguageProvider languageProvider,
     ThemeProvider themeProvider,
     bool isDarkMode,
+    bool isSmallPhone,
   ) {
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.symmetric(
-        horizontal: responsiveValue(context, 12),
-        vertical: responsiveValue(context, 4),
+        horizontal: isSmallPhone ? 8 : 12,
+        vertical: isSmallPhone ? 2 : 4,
       ),
       leading: Container(
-        padding: EdgeInsets.all(responsiveValue(context, 6)),
+        padding: EdgeInsets.all(isSmallPhone ? 4 : 6),
         decoration: BoxDecoration(
           color: isDarkMode
               ? _Colors.darkOrangeAccent.withOpacity(0.2)
@@ -600,13 +683,13 @@ class _DrawerMenuState extends State<DrawerMenu> {
         child: Icon(
           Icons.brightness_6_rounded,
           color: isDarkMode ? _Colors.darkOrangeAccent : Colors.orange,
-          size: responsiveValue(context, 20),
+          size: isSmallPhone ? 16 : 20,
         ),
       ),
       title: Text(
         languageProvider.isEnglish ? 'Dark Mode' : 'ডার্ক মোড',
         style: TextStyle(
-          fontSize: 14,
+          fontSize: isSmallPhone ? 12 : 14,
           fontWeight: FontWeight.w500,
           color: isDarkMode ? _Colors.darkText : Colors.black87,
         ),
@@ -661,10 +744,10 @@ class _Colors {
   // Dark Mode Border
   static const Color darkBorder = Color(0xFF4B5563);
 
-  // Light Mode Colors
+  // Light Mode Colors - ✅ UPDATED: Green 900 for light mode header
   static const List<Color> lightHeaderGradient = [
-    Color(0xFF059669), // Emerald
-    Color(0xFF10B981), // Light Emerald
+    Color(0xFF1B5E20), // Green 900 - Darker Green
+    Color(0xFF2E7D32), // Green 800
   ];
 
   static const List<Color> lightBackgroundGradient = [

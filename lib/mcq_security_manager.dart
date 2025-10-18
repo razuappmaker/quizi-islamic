@@ -104,6 +104,7 @@ class MCQSecurityManager {
     },
     'quizNotAvailable': {'en': 'Quiz not available', 'bn': 'কুইজ খেলা যাবে না'},
     'unknownReason': {'en': 'Unknown reason', 'bn': 'অজানা কারণ'},
+    'islamicQuestions': {'en': 'Islamic questions', 'bn': 'ইসলামিক প্রশ্ন'},
   };
 
   // ==================== HELPER METHOD ====================
@@ -464,7 +465,9 @@ class MCQSecurityManager {
       );
 
       if (shouldSearch == true) {
-        final encodedQuestion = Uri.encodeComponent('$question ইসলামিক প্রশ্ন');
+        // ✅ FIXED: Now "Islamic questions" text will change with language
+        final islamicText = _text('islamicQuestions', context);
+        final encodedQuestion = Uri.encodeComponent('$question $islamicText');
         final url = 'https://www.google.com/search?q=$encodedQuestion';
 
         if (await canLaunchUrl(Uri.parse(url))) {

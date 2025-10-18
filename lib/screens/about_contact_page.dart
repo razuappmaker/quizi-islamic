@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../managers/home_page.dart';
 import '../providers/language_provider.dart';
 import '../utils/responsive_utils.dart';
+import '../utils/app_colors.dart'; // ✅ AppColors import
 
 class AboutContactPage extends StatelessWidget {
   const AboutContactPage({super.key});
@@ -18,7 +19,7 @@ class AboutContactPage extends StatelessWidget {
     final tabletSize = isTablet(context);
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: isDark ? AppColors.darkBackground : Colors.grey[50],
       appBar: AppBar(
         title: Text(
           isEnglish ? 'About & Contact' : 'আমাদের সম্পর্কে',
@@ -28,7 +29,7 @@ class AboutContactPage extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.green[800],
+        backgroundColor: ThemeHelper.appBar(context),
         elevation: 0,
         leading: IconButton(
           icon: Icon(
@@ -97,7 +98,9 @@ class AboutContactPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Colors.green[700]!, Colors.green[600]!],
+            colors: isDark
+                ? AppColors.darkHeaderGradient
+                : [Colors.green[700]!, Colors.green[600]!],
           ),
           borderRadius: BorderRadius.circular(tabletSize ? 20 : 16),
         ),
@@ -216,7 +219,7 @@ class AboutContactPage extends StatelessWidget {
         'description': isEnglish
             ? 'Test your knowledge with authentic Islamic questions'
             : 'প্রামাণিক ইসলামিক প্রশ্ন দিয়ে আপনার জ্ঞান যাচাই করুন',
-        'color': Colors.blue,
+        'color': isDark ? AppColors.darkBlueAccent : Colors.blue,
         'details': {
           'en': '''
 🎯 Comprehensive Islamic Learning Categories:
@@ -296,7 +299,7 @@ class AboutContactPage extends StatelessWidget {
         'description': isEnglish
             ? 'Access verified Islamic educational materials'
             : 'যাচাইকৃত ইসলামিক শিক্ষামূলক উপকরণ অ্যাক্সেস করুন',
-        'color': Colors.green,
+        'color': isDark ? AppColors.darkGreenAccent : Colors.green,
         'details': {
           'en': '''
 Comprehensive Learning Materials:
@@ -332,7 +335,7 @@ Regular content updates to ensure fresh learning experiences
 
 শিক্ষামূলক বৈশিষ্ট্য:
 দৈনিক পাঠ - ব্যস্ত সময়সূচীর জন্য উপযুক্ত ছোট ছোট শিক্ষণ মডিউল
-পুনরাবৃত্তি পদ্ধতি -更好的 জ্ঞান ধারণের জন্য নির্দিষ্ট ব্যবধানে পুনরালোচনা
+পুনরাবৃত্তি পদ্ধতি -更好 জ্ঞান ধারণের জন্য নির্দিষ্ট ব্যবধানে পুনরালোচনা
 অগ্রগতি নিরীক্ষণ - আপনার সম্পূর্ণ শিক্ষাযাত্রার সামগ্রিক পর্যবেক্ষণ
 সনদপত্র ব্যবস্থা - সম্পূর্ণ শিক্ষাস্তরের জন্য অর্থপূর্ণ অর্জন লাভ
 সম্প্রদায় শিক্ষণ - বিশ্বজুড়ে সহপাঠীদের সাথে আলোচনায় অংশগ্রহণ
@@ -352,7 +355,7 @@ Regular content updates to ensure fresh learning experiences
         'description': isEnglish
             ? 'Fresh content added regularly for continuous learning'
             : 'ক্রমাগত শেখার জন্য নিয়মিত নতুন কন্টেন্ট যোগ করা হয়',
-        'color': Colors.orange,
+        'color': isDark ? AppColors.darkOrangeAccent : Colors.orange,
         'details': {
           'en': '''
 Continuous Content Enhancement:
@@ -426,6 +429,7 @@ Families learning together in supportive environment
           isEnglish ? '📚 App Features' : '📚 অ্যাপের বৈশিষ্ট্য',
           Icons.featured_play_list_rounded,
           tabletSize,
+          isDark,
         ),
         ...features
             .map(
@@ -462,6 +466,7 @@ Families learning together in supportive environment
         bottom: responsiveValue(context, tabletSize ? 12 : 8),
       ),
       elevation: 2,
+      color: isDark ? AppColors.darkCard : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(tabletSize ? 16 : 12),
       ),
@@ -473,6 +478,7 @@ Families learning together in supportive environment
           isEnglish,
           color,
           tabletSize,
+          isDark,
         ),
         borderRadius: BorderRadius.circular(tabletSize ? 16 : 12),
         child: ListTile(
@@ -481,7 +487,7 @@ Families learning together in supportive environment
               responsiveValue(context, tabletSize ? 12 : 8),
             ),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withOpacity(isDark ? 0.2 : 0.1),
               borderRadius: BorderRadius.circular(tabletSize ? 12 : 8),
             ),
             child: Icon(
@@ -495,12 +501,14 @@ Families learning together in supportive environment
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: responsiveValue(context, tabletSize ? 16 : 14),
+              color: isDark ? AppColors.darkText : Colors.black87,
             ),
           ),
           subtitle: Text(
             description,
             style: TextStyle(
               fontSize: responsiveValue(context, tabletSize ? 14 : 12),
+              color: isDark ? AppColors.darkTextSecondary : Colors.black54,
             ),
           ),
           trailing: Icon(
@@ -523,6 +531,7 @@ Families learning together in supportive environment
     bool isEnglish,
     Color color,
     bool tabletSize,
+    bool isDark,
   ) {
     showModalBottomSheet(
       context: context,
@@ -531,7 +540,7 @@ Families learning together in supportive environment
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: isDark ? AppColors.darkBackground : Colors.white,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -545,7 +554,7 @@ Families learning together in supportive environment
                 responsiveValue(context, tabletSize ? 20 : 16),
               ),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withOpacity(isDark ? 0.3 : 0.1),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -578,7 +587,7 @@ Families learning together in supportive environment
                     icon: Icon(
                       Icons.close_rounded,
                       size: responsiveValue(context, tabletSize ? 24 : 20),
-                      color: Colors.grey,
+                      color: isDark ? AppColors.darkTextSecondary : Colors.grey,
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -603,7 +612,7 @@ Families learning together in supportive environment
                             tabletSize ? 16 : 14,
                           ),
                           height: 1.6,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: isDark ? AppColors.darkText : Colors.black87,
                         ),
                       ),
                     ],
@@ -661,9 +670,11 @@ Families learning together in supportive environment
           isEnglish ? '🎯 Learning Benefits' : '🎯 শিক্ষার সুবিধা',
           Icons.auto_awesome_rounded,
           tabletSize,
+          isDark,
         ),
         Card(
           elevation: 2,
+          color: isDark ? AppColors.darkCard : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(tabletSize ? 16 : 12),
           ),
@@ -682,29 +693,33 @@ Families learning together in supportive environment
                       context,
                       Icons.lightbulb_rounded,
                       isEnglish ? 'Knowledge Enhancement' : 'জ্ঞান বৃদ্ধি',
-                      Colors.amber,
+                      isDark ? AppColors.darkOrangeAccent : Colors.amber,
                       tabletSize,
+                      isDark,
                     ),
                     _buildBenefitItem(
                       context,
                       Icons.groups_rounded,
                       isEnglish ? 'Community Learning' : 'কমিউনিটি লার্নিং',
-                      Colors.blue,
+                      isDark ? AppColors.darkBlueAccent : Colors.blue,
                       tabletSize,
+                      isDark,
                     ),
                     _buildBenefitItem(
                       context,
                       Icons.schedule_rounded,
                       isEnglish ? 'Flexible Timing' : 'নমনীয় সময়',
-                      Colors.green,
+                      isDark ? AppColors.darkGreenAccent : Colors.green,
                       tabletSize,
+                      isDark,
                     ),
                     _buildBenefitItem(
                       context,
                       Icons.verified_rounded,
                       isEnglish ? 'Authentic Content' : 'প্রামাণিক কন্টেন্ট',
-                      Colors.purple,
+                      isDark ? AppColors.darkPurpleAccent : Colors.purple,
                       tabletSize,
+                      isDark,
                     ),
                   ],
                 ),
@@ -742,7 +757,9 @@ Families learning together in supportive environment
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[700],
+                      backgroundColor: isDark
+                          ? AppColors.darkPrimary
+                          : Colors.green[700],
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(
                         vertical: responsiveValue(
@@ -783,7 +800,7 @@ Families learning together in supportive environment
         'icon': Icons.help_rounded,
         'title': isEnglish ? 'Help Center' : 'হেল্প সেন্টার',
         'value': isEnglish ? 'Get assistance' : 'সহায়তা নিন',
-        'action': () => _showHelpDialog(context, isEnglish),
+        'action': () => _showHelpDialog(context, isEnglish, isDark),
       },
       {
         'icon': Icons.feedback_rounded,
@@ -801,9 +818,11 @@ Families learning together in supportive environment
           isEnglish ? '💬 Get In Touch' : '💬 যোগাযোগ করুন',
           Icons.contact_support_rounded,
           tabletSize,
+          isDark,
         ),
         Card(
           elevation: 2,
+          color: isDark ? AppColors.darkCard : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(tabletSize ? 16 : 12),
           ),
@@ -821,6 +840,7 @@ Families learning together in supportive environment
                       value: method['value'] as String,
                       onTap: method['action'] as VoidCallback,
                       tabletSize: tabletSize,
+                      isDark: isDark,
                     ),
                   )
                   .toList(),
@@ -837,8 +857,12 @@ Families learning together in supportive environment
     bool isDark,
     bool tabletSize,
   ) {
+    final primaryColor = isDark ? AppColors.darkPrimary : Colors.green[700];
+    final backgroundColor = isDark ? AppColors.darkSurface : Colors.green[50];
+    final textColor = isDark ? AppColors.darkText : Colors.green[800];
+
     return Card(
-      color: isDark ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50],
+      color: backgroundColor,
       child: Padding(
         padding: EdgeInsets.all(responsiveValue(context, tabletSize ? 24 : 20)),
         child: Column(
@@ -846,7 +870,7 @@ Families learning together in supportive environment
             Icon(
               Icons.mosque_rounded,
               size: responsiveValue(context, tabletSize ? 40 : 32),
-              color: Colors.green[700],
+              color: primaryColor,
             ),
             SizedBox(height: responsiveValue(context, tabletSize ? 16 : 12)),
             Text(
@@ -856,20 +880,20 @@ Families learning together in supportive environment
               style: TextStyle(
                 fontSize: responsiveValue(context, tabletSize ? 16 : 14),
                 fontStyle: FontStyle.italic,
-                color: Colors.green[800],
+                color: textColor,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: responsiveValue(context, tabletSize ? 12 : 8)),
-            Divider(color: Colors.green[300]),
+            Divider(color: isDark ? AppColors.darkBorder : Colors.green[300]),
             SizedBox(height: responsiveValue(context, tabletSize ? 12 : 8)),
             Text(
               'Islamic Day App',
               style: TextStyle(
                 fontSize: responsiveValue(context, tabletSize ? 16 : 14),
                 fontWeight: FontWeight.bold,
-                color: Colors.green[700],
+                color: primaryColor,
               ),
             ),
             SizedBox(height: responsiveValue(context, tabletSize ? 4 : 2)),
@@ -877,7 +901,7 @@ Families learning together in supportive environment
               isEnglish ? 'Version 1.0.0' : 'সংস্করণ ১.০.০',
               style: TextStyle(
                 fontSize: responsiveValue(context, tabletSize ? 14 : 12),
-                color: Colors.green[600],
+                color: isDark ? AppColors.darkTextSecondary : Colors.green[600],
               ),
             ),
           ],
@@ -892,14 +916,15 @@ Families learning together in supportive environment
     String text,
     Color color,
     bool tabletSize,
+    bool isDark,
   ) {
     return Container(
       width: responsiveValue(context, tabletSize ? 150 : 130),
       padding: EdgeInsets.all(responsiveValue(context, tabletSize ? 16 : 12)),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(isDark ? 0.2 : 0.1),
         borderRadius: BorderRadius.circular(tabletSize ? 12 : 8),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withOpacity(isDark ? 0.4 : 0.2)),
       ),
       child: Column(
         children: [
@@ -930,19 +955,23 @@ Families learning together in supportive environment
     required String value,
     required VoidCallback onTap,
     required bool tabletSize,
+    required bool isDark,
   }) {
+    final primaryColor = isDark ? AppColors.darkPrimary : Colors.green[700];
+
     return Card(
       margin: EdgeInsets.only(
         bottom: responsiveValue(context, tabletSize ? 12 : 8),
       ),
       elevation: 1,
+      color: isDark ? AppColors.darkSurface : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(tabletSize ? 12 : 8),
       ),
       child: ListTile(
         leading: Icon(
           icon,
-          color: Colors.green[700],
+          color: primaryColor,
           size: responsiveValue(context, tabletSize ? 28 : 24),
         ),
         title: Text(
@@ -950,18 +979,20 @@ Families learning together in supportive environment
           style: TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: responsiveValue(context, tabletSize ? 16 : 14),
+            color: isDark ? AppColors.darkText : Colors.black87,
           ),
         ),
         subtitle: Text(
           value,
           style: TextStyle(
             fontSize: responsiveValue(context, tabletSize ? 14 : 12),
+            color: isDark ? AppColors.darkTextSecondary : Colors.black54,
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios_rounded,
           size: responsiveValue(context, tabletSize ? 18 : 16),
-          color: Colors.green[700],
+          color: primaryColor,
         ),
         onTap: onTap,
         contentPadding: EdgeInsets.all(
@@ -976,7 +1007,14 @@ Families learning together in supportive environment
     String title,
     IconData icon,
     bool tabletSize,
+    bool isDark,
   ) {
+    final primaryColor = isDark ? AppColors.darkPrimary : Colors.green[700];
+    final backgroundColor = isDark
+        ? AppColors.darkPrimary.withOpacity(0.2)
+        : Colors.green[100];
+    final textColor = isDark ? AppColors.darkText : Colors.green[800];
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: responsiveValue(context, tabletSize ? 16 : 12),
@@ -989,12 +1027,12 @@ Families learning together in supportive environment
               responsiveValue(context, tabletSize ? 8 : 6),
             ),
             decoration: BoxDecoration(
-              color: Colors.green[100],
+              color: backgroundColor,
               borderRadius: BorderRadius.circular(tabletSize ? 12 : 8),
             ),
             child: Icon(
               icon,
-              color: Colors.green[700],
+              color: primaryColor,
               size: responsiveValue(context, tabletSize ? 24 : 20),
             ),
           ),
@@ -1004,7 +1042,7 @@ Families learning together in supportive environment
             style: TextStyle(
               fontSize: responsiveValue(context, tabletSize ? 20 : 18),
               fontWeight: FontWeight.bold,
-              color: Colors.green[800],
+              color: textColor,
             ),
           ),
         ],
@@ -1012,27 +1050,47 @@ Families learning together in supportive environment
     );
   }
 
-  void _showHelpDialog(BuildContext context, bool isEnglish) {
+  void _showHelpDialog(BuildContext context, bool isEnglish, bool isDark) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(isEnglish ? 'Need Help?' : 'সহায়তা প্রয়োজন?'),
+        backgroundColor: isDark ? AppColors.darkCard : Colors.white,
+        title: Text(
+          isEnglish ? 'Need Help?' : 'সহায়তা প্রয়োজন?',
+          style: TextStyle(color: isDark ? AppColors.darkText : Colors.black87),
+        ),
         content: Text(
           isEnglish
               ? 'For any assistance or questions, please email us at support@islamicday.com'
               : 'যেকোনো সহায়তা বা প্রশ্নের জন্য, আমাদের ইমেইল করুন support@islamicday.com',
+          style: TextStyle(
+            color: isDark ? AppColors.darkTextSecondary : Colors.black54,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(isEnglish ? 'Close' : 'বন্ধ করুন'),
+            child: Text(
+              isEnglish ? 'Close' : 'বন্ধ করুন',
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextSecondary : Colors.grey[700],
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               _launchEmail(context, 'support@islamicday.com');
             },
-            child: Text(isEnglish ? 'Send Email' : 'ইমেইল পাঠান'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark
+                  ? AppColors.darkPrimary
+                  : Colors.green[700],
+            ),
+            child: Text(
+              isEnglish ? 'Send Email' : 'ইমেইল পাঠান',
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

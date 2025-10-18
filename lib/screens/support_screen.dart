@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../services/local_support_service.dart';
 import '../screens/premium_screen.dart';
+import '../utils/app_colors.dart'; // ✅ AppColors import
 
 class SupportScreen extends StatefulWidget {
   const SupportScreen({Key? key}) : super(key: key);
@@ -123,6 +124,19 @@ class _SupportScreenState extends State<SupportScreen> {
     },
   };
 
+  // Color getters using AppColors
+  Color _primaryColor(BuildContext context) => ThemeHelper.primary(context);
+
+  Color _cardColor(BuildContext context) => ThemeHelper.card(context);
+
+  Color _textColor(BuildContext context) => ThemeHelper.text(context);
+
+  Color _subtitleColor(BuildContext context) =>
+      ThemeHelper.textSecondary(context);
+
+  Color _backgroundColor(BuildContext context) =>
+      ThemeHelper.background(context);
+
   @override
   void initState() {
     super.initState();
@@ -144,7 +158,6 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   // সাপোর্টার লোড করুন
-  // support_screen.dart - updated _loadSupporters method
   Future<void> _loadSupporters() async {
     try {
       final supporters = await _supportService.getSupporters();
@@ -228,28 +241,45 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   void _showExternalDonationDialog() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkCard : Colors.white,
         title: Text(
           _text('visitWebsite'),
-          style: TextStyle(color: Colors.green[800]),
+          style: TextStyle(
+            color: isDark ? AppColors.darkPrimary : Colors.green[800],
+          ),
         ),
         content: Text(
           _text('websiteDialogContent'),
-          style: TextStyle(fontSize: 14),
+          style: TextStyle(
+            fontSize: 14,
+            color: isDark ? AppColors.darkTextSecondary : Colors.black54,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(_text('cancel')),
+            child: Text(
+              _text('cancel'),
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextSecondary : Colors.grey[700],
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               _launchURL('https://www.islamicquiz.com/support');
               Navigator.pop(context);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark
+                  ? AppColors.darkPrimary
+                  : Colors.green[800],
+            ),
             child: Text(_text('visitWebsiteBtn')),
           ),
         ],
@@ -342,6 +372,7 @@ class _SupportScreenState extends State<SupportScreen> {
     final String action = supporter['actionName'];
     final bool isCurrentUser = supporter['isCurrentUser'] ?? false;
     final bool isCommunityExample = supporter['isCommunityExample'] ?? false;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     String title = name;
 
@@ -349,18 +380,25 @@ class _SupportScreenState extends State<SupportScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isCurrentUser ? Colors.green[50] : Colors.white,
+        color: isCurrentUser
+            ? (isDark
+                  ? AppColors.darkPrimary.withOpacity(0.2)
+                  : Colors.green[50])
+            : (isDark ? AppColors.darkCard : Colors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCurrentUser ? Colors.green[300]! : Colors.green[100]!,
+          color: isCurrentUser
+              ? (isDark ? AppColors.darkPrimary : Colors.green[300]!)
+              : (isDark ? AppColors.darkBorder : Colors.green[100]!),
           width: isCurrentUser ? 2 : 1,
         ),
         boxShadow: [
-          BoxShadow(
-            color: isCurrentUser ? Colors.green[100]! : Colors.green[50]!,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: isCurrentUser ? Colors.green[100]! : Colors.green[50]!,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
         ],
       ),
       child: Row(
@@ -400,8 +438,8 @@ class _SupportScreenState extends State<SupportScreen> {
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                     color: isCurrentUser
-                        ? Colors.green[800]
-                        : Colors.green[900],
+                        ? (isDark ? AppColors.darkPrimary : Colors.green[800])
+                        : (isDark ? AppColors.darkText : Colors.green[900]),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -409,14 +447,20 @@ class _SupportScreenState extends State<SupportScreen> {
                 SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.thumb_up, color: Colors.green[600], size: 12),
+                    Icon(
+                      Icons.thumb_up,
+                      color: isDark ? AppColors.darkPrimary : Colors.green[600],
+                      size: 12,
+                    ),
                     SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         action,
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey[600],
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : Colors.grey[600],
                           fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
@@ -505,13 +549,34 @@ class _SupportScreenState extends State<SupportScreen> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
+      color: isDark ? AppColors.darkCard : Colors.white,
       child: ListTile(
-        leading: Icon(icon, color: Colors.green[700]),
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: Text(subtitle),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16),
+        leading: Icon(
+          icon,
+          color: isDark ? AppColors.darkPrimary : Colors.green[700],
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            color: isDark ? AppColors.darkText : Colors.black87,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            color: isDark ? AppColors.darkTextSecondary : Colors.black54,
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: isDark ? AppColors.darkTextSecondary : Colors.green[700],
+        ),
         onTap: onTap,
       ),
     );
@@ -587,9 +652,12 @@ class _SupportScreenState extends State<SupportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: _backgroundColor(context),
       appBar: AppBar(
-        backgroundColor: Colors.green[800],
+        backgroundColor: ThemeHelper.appBar(context),
         title: Text(
           _text('title'),
           style: const TextStyle(
@@ -614,28 +682,6 @@ class _SupportScreenState extends State<SupportScreen> {
             splashRadius: 20,
           ),
         ),
-        actions: [
-          // Toggle Activity Ticker Button
-          Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: Icon(
-                _showSupporterTicker ? Icons.visibility : Icons.visibility_off,
-                color: Colors.white,
-                size: 20,
-              ),
-              onPressed: _toggleSupporterTicker,
-              tooltip: _showSupporterTicker
-                  ? _text('hideTicker')
-                  : _text('showTicker'),
-              splashRadius: 20,
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         bottom: true,
@@ -679,23 +725,33 @@ class _SupportScreenState extends State<SupportScreen> {
 
   // ==================== Voluntary Notice Banner ====================
   Widget _buildVoluntaryNotice() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orange[50],
-        border: Border.all(color: Colors.orange[200]!),
+        color: isDark
+            ? Colors.orange[900]!.withOpacity(0.3)
+            : Colors.orange[50],
+        border: Border.all(
+          color: isDark ? Colors.orange[700]! : Colors.orange[200]!,
+        ),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: Colors.orange[800], size: 20),
+          Icon(
+            Icons.info_outline,
+            color: isDark ? Colors.orange[300] : Colors.orange[800],
+            size: 20,
+          ),
           SizedBox(width: 8),
           Expanded(
             child: Text(
               _text('voluntaryNotice'),
               style: TextStyle(
-                color: Colors.orange[800],
+                color: isDark ? Colors.orange[300] : Colors.orange[800],
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
               ),
@@ -709,8 +765,11 @@ class _SupportScreenState extends State<SupportScreen> {
 
   // ==================== SUPPORT OPTIONS SECTION ====================
   Widget _buildSupportOptionsSection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 2,
+      color: isDark ? AppColors.darkCard : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -721,7 +780,7 @@ class _SupportScreenState extends State<SupportScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.green[800],
+                color: isDark ? AppColors.darkPrimary : Colors.green[800],
               ),
             ),
             SizedBox(height: 16),
@@ -740,14 +799,11 @@ class _SupportScreenState extends State<SupportScreen> {
               onTap: _shareApp,
             ),
 
-            // Support Screen - শুধু ইনফরমেশনাল
             _buildSupportOption(
               icon: Icons.block,
               title: _text('removeAds'),
               subtitle: _text('removeAdsSubtitle'),
-              onTap: () => _navigateToPremiumScreen(
-                context,
-              ), // প্রিমিয়াম স্ক্রিনে নিয়ে যান
+              onTap: () => _navigateToPremiumScreen(context),
             ),
 
             _buildSupportOption(
@@ -764,15 +820,20 @@ class _SupportScreenState extends State<SupportScreen> {
 
   // ==================== POLICY NOTE ====================
   Widget _buildPolicyNote() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: isDark ? AppColors.darkSurface : Colors.grey[100],
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         _text('policyNote'),
-        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        style: TextStyle(
+          fontSize: 12,
+          color: isDark ? AppColors.darkTextSecondary : Colors.grey[600],
+        ),
         textAlign: TextAlign.center,
       ),
     );
@@ -780,10 +841,13 @@ class _SupportScreenState extends State<SupportScreen> {
 
   // ==================== COMMUNITY ACTIVITY SECTION ====================
   Widget _buildCommunityActivitySection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         Card(
           elevation: 3,
+          color: isDark ? AppColors.darkCard : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -791,11 +855,17 @@ class _SupportScreenState extends State<SupportScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.green[50]!, Colors.blue[50]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: isDark
+                  ? LinearGradient(
+                      colors: [AppColors.darkSurface, AppColors.darkCard],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : LinearGradient(
+                      colors: [Colors.green[50]!, Colors.blue[50]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -807,7 +877,9 @@ class _SupportScreenState extends State<SupportScreen> {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.green[600],
+                        color: isDark
+                            ? AppColors.darkPrimary
+                            : Colors.green[600],
                         shape: BoxShape.circle,
                       ),
                       child: Icon(Icons.people, color: Colors.white, size: 16),
@@ -818,7 +890,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.green[800],
+                        color: isDark ? AppColors.darkText : Colors.green[800],
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -828,7 +900,9 @@ class _SupportScreenState extends State<SupportScreen> {
                       message: _text('demoDataInfo'),
                       child: Icon(
                         Icons.info_outline,
-                        color: Colors.green[600],
+                        color: isDark
+                            ? AppColors.darkPrimary
+                            : Colors.green[600],
                         size: 18,
                       ),
                     ),
@@ -841,9 +915,13 @@ class _SupportScreenState extends State<SupportScreen> {
                   Container(
                     height: 120,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? AppColors.darkBackground : Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.green[100]!),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : Colors.green[100]!,
+                      ),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
@@ -869,14 +947,23 @@ class _SupportScreenState extends State<SupportScreen> {
                   Container(
                     height: 120,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? AppColors.darkBackground : Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.green[100]!),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : Colors.green[100]!,
+                      ),
                     ),
                     child: Center(
                       child: Text(
                         _text('supportersToday'),
-                        style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                        style: TextStyle(
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : Colors.grey[500],
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ),
@@ -889,7 +976,9 @@ class _SupportScreenState extends State<SupportScreen> {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green[100],
+                    color: isDark
+                        ? AppColors.darkPrimary.withOpacity(0.2)
+                        : Colors.green[100],
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -897,7 +986,9 @@ class _SupportScreenState extends State<SupportScreen> {
                     children: [
                       Icon(
                         Icons.people_alt,
-                        color: Colors.green[800],
+                        color: isDark
+                            ? AppColors.darkPrimary
+                            : Colors.green[800],
                         size: 16,
                       ),
                       SizedBox(width: 6),
@@ -906,7 +997,9 @@ class _SupportScreenState extends State<SupportScreen> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Colors.green[800],
+                          color: isDark
+                              ? AppColors.darkText
+                              : Colors.green[800],
                         ),
                       ),
                     ],
@@ -922,8 +1015,11 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   Widget _buildHeaderSection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 2,
+      color: isDark ? AppColors.darkCard : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -932,13 +1028,15 @@ class _SupportScreenState extends State<SupportScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.green[100],
+                color: isDark
+                    ? AppColors.darkPrimary.withOpacity(0.2)
+                    : Colors.green[100],
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.help_outline,
                 size: 36,
-                color: Colors.green[800],
+                color: isDark ? AppColors.darkPrimary : Colors.green[800],
               ),
             ),
             const SizedBox(height: 12),
@@ -947,7 +1045,7 @@ class _SupportScreenState extends State<SupportScreen> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.green[800],
+                color: isDark ? AppColors.darkText : Colors.green[800],
               ),
               textAlign: TextAlign.center,
             ),
@@ -956,7 +1054,7 @@ class _SupportScreenState extends State<SupportScreen> {
               _text('headerSubtitle'),
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: isDark ? AppColors.darkTextSecondary : Colors.grey[600],
                 height: 1.4,
               ),
               textAlign: TextAlign.center,
@@ -968,8 +1066,11 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   Widget _buildWhySupportSection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 2,
+      color: isDark ? AppColors.darkCard : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -981,7 +1082,7 @@ class _SupportScreenState extends State<SupportScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.green[800],
+                color: isDark ? AppColors.darkText : Colors.green[800],
               ),
             ),
             const SizedBox(height: 16),
@@ -1007,6 +1108,8 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   Widget _buildReasonItem(IconData icon, String title, String description) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -1015,10 +1118,16 @@ class _SupportScreenState extends State<SupportScreen> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: Colors.green[100],
+              color: isDark
+                  ? AppColors.darkPrimary.withOpacity(0.2)
+                  : Colors.green[100],
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Colors.green[800], size: 18),
+            child: Icon(
+              icon,
+              color: isDark ? AppColors.darkPrimary : Colors.green[800],
+              size: 18,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1027,15 +1136,21 @@ class _SupportScreenState extends State<SupportScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.darkText : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   description,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey[600],
+                  ),
                 ),
               ],
             ),
@@ -1046,8 +1161,11 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   Widget _buildContactSection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 2,
+      color: isDark ? AppColors.darkCard : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1059,7 +1177,7 @@ class _SupportScreenState extends State<SupportScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.green[800],
+                color: isDark ? AppColors.darkText : Colors.green[800],
               ),
             ),
             const SizedBox(height: 16),
@@ -1072,13 +1190,27 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   Widget _buildContactItem(IconData icon, String value) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icon, color: Colors.green, size: 20),
+          Icon(
+            icon,
+            color: isDark ? AppColors.darkPrimary : Colors.green,
+            size: 20,
+          ),
           const SizedBox(width: 12),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 15))),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 15,
+                color: isDark ? AppColors.darkText : Colors.black87,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1091,11 +1223,12 @@ class RemoveAdsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
     bool isEnglish = languageProvider.isEnglish;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(isEnglish ? 'Ad-Free Experience' : 'এড-মুক্ত অভিজ্ঞতা'),
-        backgroundColor: Colors.green[800],
+        backgroundColor: ThemeHelper.appBar(context),
       ),
       body: Center(
         child: Padding(
@@ -1103,13 +1236,21 @@ class RemoveAdsPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.block, size: 80, color: Colors.green),
+              Icon(
+                Icons.block,
+                size: 80,
+                color: isDark ? AppColors.darkPrimary : Colors.green,
+              ),
               SizedBox(height: 20),
               Text(
                 isEnglish
                     ? 'Optional Ad-Free Experience'
                     : 'ঐচ্ছিক এড-মুক্ত অভিজ্ঞতা',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.darkText : Colors.black87,
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 10),
@@ -1118,7 +1259,12 @@ class RemoveAdsPage extends StatelessWidget {
                     ? 'This is an optional purchase. All features remain available with ads.'
                     : 'এটি একটি ঐচ্ছিক পারচেজ। সমস্ত ফিচার এডসহ উপলব্ধ থাকবে।',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : Colors.grey[600],
+                ),
               ),
               SizedBox(height: 30),
               // In-app purchase button
@@ -1136,7 +1282,9 @@ class RemoveAdsPage extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[800],
+                  backgroundColor: isDark
+                      ? AppColors.darkPrimary
+                      : Colors.green[800],
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 ),
                 child: Text(
@@ -1149,7 +1297,12 @@ class RemoveAdsPage extends StatelessWidget {
                 isEnglish
                     ? 'Completely optional - app remains functional'
                     : 'সম্পূর্ণ ঐচ্ছিক - অ্যাপ কার্যকরী থাকবে',
-                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : Colors.grey[500],
+                ),
                 textAlign: TextAlign.center,
               ),
             ],

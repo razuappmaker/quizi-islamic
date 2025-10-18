@@ -255,7 +255,7 @@ class _KalemaPageState extends State<KalemaPage> {
           content: Text(
             isEnglish
                 ? "Arabic verses cannot be fully accurately represented in English. The transliteration is only a guide, please recite in Arabic for proper pronunciation."
-                : "আরবি আয়াত বাংলায় সম্পূর্ণ সুদ্ধভাবে প্রকাশ করা যায় না। বাংলা উচ্চারণ সহায়ক মাত্র, সঠিক তিলাওয়াতের জন্য আরবিতেই পড়ুন।",
+                : "আরবি আয়াত- বাংলায় সম্পূর্ণ সুদ্ধভাবে প্রকাশ করা যায় না। উচ্চারণ শুধুমাত্র সহায়ক মাত্র, সঠিক তিলাওয়াতের জন্য আরবিতেই পড়ুন।",
             style: TextStyle(
               fontSize: 15,
               height: 1.4,

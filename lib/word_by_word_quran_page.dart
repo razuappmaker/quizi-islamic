@@ -7,8 +7,8 @@ import 'ad_helper.dart';
 import 'utils/responsive_utils.dart';
 import 'network_json_loader.dart';
 import '../providers/language_provider.dart';
-import '../providers/theme_provider.dart'; // নতুন ইম্পোর্ট
-import '../utils/app_colors.dart'; // নতুন ইম্পোর্ট
+import '../providers/theme_provider.dart';
+import '../utils/app_colors.dart';
 
 class WordByWordQuranPage extends StatefulWidget {
   const WordByWordQuranPage({Key? key}) : super(key: key);
@@ -25,6 +25,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
   final double _minFontSize = 12.0;
   final double _maxFontSize = 28.0;
   final double _fontSizeStep = 2.0;
+  Map<int, bool> _showFullWarning = {};
 
   // Anchor Ads related variables
   BannerAd? _anchorAd;
@@ -53,6 +54,31 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
     'madani': {'en': 'Madani', 'bn': 'মাদিনী'},
     'verses': {'en': 'verses', 'bn': 'আয়াত'},
     'close': {'en': 'Close', 'bn': 'বন্ধ'},
+    'importantWarning': {
+      'en': 'Important Warning',
+      'bn': 'গুরুত্বপূর্ণ সতর্কবার্তা',
+    },
+    'warningTitle': {'en': 'English Pronunciation', 'bn': 'বাংলা উচ্চরণ'},
+    'warningContent1': {
+      'en':
+          'When reading Quranic verses or Arabic prayers in English pronunciation, ',
+      'bn': 'কুরআনের আয়াত বা আরবি দুআ বাংলায় উচ্চারণ করে পড়লে ',
+    },
+    'warningContent2': {
+      'en': 'meaning distortion often occurs',
+      'bn': 'অনেক সময় অর্থের বিকৃতি ঘটে',
+    },
+    'warningContent3': {
+      'en': '. So take this pronunciation only as a helper.',
+      'bn': '। তাই এ উচ্চারণকে শুধু সহায়ক হিসেবে গ্রহণ করুন।',
+    },
+    'warningContent4': {
+      'en':
+          'Let us learn to read the Quran correctly. Learning to read the Quran correctly is obligatory for every Muslim.',
+      'bn':
+          'আসুন, আমরা শুদ্ধভাবে কুরআন পড়া শিখি। শুদ্ধ করে কুরআন শিক্ষা করা প্রত্যেক মুসলিমের উপর ফরজ।',
+    },
+    'understoodThanks': {'en': 'Understood, Thanks', 'bn': 'বুঝেছি, ধন্যবাদ'},
   };
 
   // হেল্পার মেথড - ভাষা অনুযায়ী টেক্সট পাওয়ার জন্য
@@ -76,6 +102,190 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
     super.initState();
     _loadWordQuranData();
     _loadAnchorAd();
+  }
+
+  // ==================== সতর্কবার্তা উইজেট ====================
+  Widget _buildWarningWidget(int index) {
+    final isDarkMode = _isDarkMode(context);
+    final bool showFull = _showFullWarning[index] ?? false;
+
+    return showFull
+        ? Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: isDarkMode ? AppColors.darkCard : Color(0xFFFFF8E1),
+              border: Border.all(
+                color: isDarkMode ? AppColors.darkBorder : Color(0xFFFFD54F),
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: isDarkMode ? Color(0xFFFFB74D) : Color(0xFFF57C00),
+                      size: 22,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      _text('importantWarning', context),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: isDarkMode
+                            ? Color(0xFFFFB74D)
+                            : Color(0xFFE65100),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      height: 1.6,
+                      color: AppColors.getTextSecondaryColor(isDarkMode),
+                    ),
+                    children: [
+                      TextSpan(text: _text('warningContent1', context)),
+                      TextSpan(
+                        text: _text('warningContent2', context),
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      TextSpan(text: _text('warningContent3', context)),
+                    ],
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, right: 8),
+                      child: Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                        color: isDarkMode
+                            ? Color(0xFFFFB74D)
+                            : Color(0xFFF57C00),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        _text('warningContent4', context),
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          height: 1.6,
+                          color: AppColors.getTextSecondaryColor(isDarkMode),
+                        ),
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showFullWarning[index] = false;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            isDarkMode ? Color(0xFFFFB74D) : Color(0xFFFFB300),
+                            isDarkMode ? Color(0xFFFF9800) : Color(0xFFF57C00),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDarkMode
+                                ? Color(0xFFFFB74D).withOpacity(0.3)
+                                : Color(0xFFFFB300).withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        _text('understoodThanks', context),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        : Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showFullWarning[index] = true;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? AppColors.darkCard : Color(0xFFFFF8E1),
+                  border: Border.all(
+                    color: isDarkMode
+                        ? AppColors.darkBorder
+                        : Color(0xFFFFD54F),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      color: isDarkMode ? Color(0xFFFFB74D) : Color(0xFFF57C00),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      _text('warningTitle', context),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: isDarkMode
+                            ? Color(0xFFFFB74D)
+                            : Color(0xFFE65100),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
   }
 
   Future<void> _loadWordQuranData() async {
@@ -217,6 +427,14 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
     setState(() {
       _fontSize = 16.0;
     });
+  }
+
+  @override
+  void dispose() {
+    _anchorAd?.dispose();
+    expandedIndices.clear();
+    _showFullWarning.clear();
+    super.dispose();
   }
 
   // হেডার সেকশন - AppColors ব্যবহার করে আপডেট
@@ -536,6 +754,7 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                   setState(() {
                     if (isExpanded) {
                       expandedIndices.remove(index);
+                      _showFullWarning[index] = false;
                     } else {
                       expandedIndices.add(index);
                     }
@@ -554,6 +773,9 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            // সতর্কবার্তা
+                            _buildWarningWidget(index),
+
                             // ফন্ট কন্ট্রোল
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -819,13 +1041,6 @@ class _WordByWordQuranPageState extends State<WordByWordQuranPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _anchorAd?.dispose();
-    expandedIndices.clear();
-    super.dispose();
   }
 
   @override

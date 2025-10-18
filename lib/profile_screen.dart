@@ -7,7 +7,8 @@ import 'ad_helper.dart';
 import '../screens/premium_screen.dart';
 import '../screens/reward_screen.dart';
 import 'mcq_page.dart';
-import '../providers/language_provider.dart'; // ✅ Language Provider import
+import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // ✅ AppColors import
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -75,7 +76,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'en': 'Collect 5000 points to request reward',
       'bn': '৫০০০ পয়েন্ট জমা করে রিওয়ার্ড রিকোয়েস্ট করুন',
     },
-    // অ্যাড সম্পর্কিত যেকোনো মেন্টেশন রিমুভ করুন
     'videoDescription': {
       'en': 'Complete short activities to earn bonus points',
       'bn': 'বোনাস পয়েন্ট অর্জন করতে সংক্ষিপ্ত অ্যাক্টিভিটি সম্পন্ন করুন',
@@ -107,7 +107,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'bn': 'মোট সঠিক উত্তর',
     },
     'getRealGifts': {'en': '🎁 Apply for Gifts', 'bn': '🎁 গিফট এর জন্য আবেদন'},
-    // গিফট সম্পর্কিত টেক্সটও আপডেট করুন
     'giftDescription': {
       'en': 'Collect 5000 points to redeem exciting rewards',
       'bn': '৫০০০ পয়েন্ট জমা করে আকর্ষণীয় রিওয়ার্ড রিডিম করুন',
@@ -116,7 +115,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'getGiftReady': {'en': 'Get Gift (Ready)', 'bn': 'গিফট নিন (প্রস্তুত)'},
     'pointsRemaining': {'en': 'points remaining', 'bn': 'পয়েন্ট বাকি'},
     'pointsCollected': {'en': 'points collected', 'bn': 'পয়েন্ট সংগ্রহ হয়েছে'},
-    // ❌ পুরানো টেক্সট রিপ্লেস করুন
     'earnPointsFromRewards': {
       'en': '🎬 Earn Points from Rewards',
       'bn': '🎬 রিওয়ার্ড থেকে পয়েন্ট',
@@ -126,7 +124,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'bn': 'অতিরিক্ত পয়েন্ট অর্জন করতে টাস্কগুলি সম্পন্ন করুন',
     },
     'viewRewards': {'en': 'View Rewards', 'bn': 'রিওয়ার্ড দেখুন'},
-
     'watchVideos': {'en': 'Watch Videos', 'bn': 'ভিডিও দেখুন'},
     'premiumExperience': {
       'en': '⭐ Premium Experience',
@@ -161,7 +158,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'en': '❌ Problem requesting:',
       'bn': '❌ রিকোয়েস্ট করতে সমস্যা:',
     },
-
     'defaultUserName': {
       'en': 'Islamic Day Quiz User',
       'bn': 'ইসলামিক ডে কুইজ ইউজার',
@@ -199,9 +195,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
   bool _isRequesting = false;
   bool _isEditingProfile = false;
-
-  // ✅ নতুন ভেরিয়েবল যোগ করুন
-  //int _profileCompleteness = 0;
 
   // Ad variables
   BannerAd? _bannerAd;
@@ -332,9 +325,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _userName = userData['userName'] ?? defaultName;
         _userMobile = userData['userMobile'] ?? '';
         _isLoading = false;
-
-        // ❌ এই লাইনটি ডিলিট করুন
-        // _profileCompleteness = _calculateProfileCompleteness(userData, defaultName);
       });
     } catch (e) {
       print("Data load error: $e");
@@ -343,8 +333,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
-
-  // ✅ প্রফাইল কমপ্লিটনেস ক্যালকুলেশন মেথড
 
   // ✅ ADDED: _formatDate মেথড
   String _formatDate(String dateString) {
@@ -377,7 +365,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       MaterialPageRoute(
         builder: (context) => MCQPage(
           category: _text('defaultUserName', context),
-          // ভাষা অনুযায়ী ক্যাটাগরি
           quizId: 'islamic_basic_knowledge',
         ),
       ),
@@ -392,7 +379,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_getInsufficientPointsText(context)),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.getErrorColor(
+            Theme.of(context).brightness == Brightness.dark,
+          ),
         ),
       );
     }
@@ -403,26 +392,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _nameController.text = _userName;
     _mobileController.text = _userMobile;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(_text('editProfile', context)),
+        backgroundColor: AppColors.getCardColor(isDark),
+        title: Text(
+          _text('editProfile', context),
+          style: TextStyle(color: AppColors.getTextColor(isDark)),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.getPrimaryColor(isDark),
                 child: Icon(Icons.person, size: 30, color: Colors.white),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _nameController,
+                style: TextStyle(color: AppColors.getTextColor(isDark)),
                 decoration: InputDecoration(
                   labelText: _text('yourName', context),
+                  labelStyle: TextStyle(
+                    color: AppColors.getTextSecondaryColor(isDark),
+                  ),
                   border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.person),
+                  prefixIcon: Icon(
+                    Icons.person,
+                    color: AppColors.getPrimaryColor(isDark),
+                  ),
+                  filled: true,
+                  fillColor: AppColors.getSurfaceColor(isDark),
                 ),
               ),
               const SizedBox(height: 12),
@@ -430,11 +434,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 controller: _mobileController,
                 keyboardType: TextInputType.phone,
                 maxLength: 11,
+                style: TextStyle(color: AppColors.getTextColor(isDark)),
                 decoration: InputDecoration(
                   labelText: _text('mobileNumber', context),
+                  labelStyle: TextStyle(
+                    color: AppColors.getTextSecondaryColor(isDark),
+                  ),
                   border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.phone),
+                  prefixIcon: Icon(
+                    Icons.phone,
+                    color: AppColors.getPrimaryColor(isDark),
+                  ),
                   counterText: "",
+                  filled: true,
+                  fillColor: AppColors.getSurfaceColor(isDark),
                 ),
               ),
             ],
@@ -456,6 +469,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pop(context);
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.getPrimaryColor(isDark),
+            ),
             child: Text(_text('save', context)),
           ),
         ],
@@ -477,7 +493,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("${_text('profileSaveError', context)} $e"),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.getErrorColor(
+            Theme.of(context).brightness == Brightness.dark,
+          ),
         ),
       );
     }
@@ -489,7 +507,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_getInsufficientPointsText(context)),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.getErrorColor(
+            Theme.of(context).brightness == Brightness.dark,
+          ),
         ),
       );
       return;
@@ -513,7 +533,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       await PointManager.deductPoints(5000);
       await PointManager.saveGiftRequest(mobileNumber, _userEmail);
-      await _loadUserData(); // ✅ আবার ডাটা লোড করুন যাতে আপডেটেড ভ্যালু দেখায়
+      await _loadUserData();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -526,7 +546,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("${_text('requestError', context)} $e"),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.getErrorColor(
+            Theme.of(context).brightness == Brightness.dark,
+          ),
         ),
       );
     } finally {
@@ -539,15 +561,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // 🔥 মোবাইল নম্বর ডায়ালগ
   Future<String?> _showMobileNumberDialog() async {
     TextEditingController mobileController = TextEditingController();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: AppColors.getCardColor(isDark),
           title: Text(
             _text('enterMobile', context),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.getTextColor(isDark),
+            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -555,19 +583,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(
                 _text('mobileInstruction', context),
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.getTextSecondaryColor(isDark),
+                ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: mobileController,
                 keyboardType: TextInputType.phone,
                 maxLength: 11,
+                style: TextStyle(color: AppColors.getTextColor(isDark)),
                 decoration: InputDecoration(
                   hintText: _text('mobileHint', context),
+                  hintStyle: TextStyle(
+                    color: AppColors.getTextSecondaryColor(isDark),
+                  ),
                   labelText: _text('mobileLabel', context),
+                  labelStyle: TextStyle(
+                    color: AppColors.getTextSecondaryColor(isDark),
+                  ),
                   border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.phone),
+                  prefixIcon: Icon(
+                    Icons.phone,
+                    color: AppColors.getPrimaryColor(isDark),
+                  ),
                   counterText: "",
+                  filled: true,
+                  fillColor: AppColors.getSurfaceColor(isDark),
                 ),
                 onChanged: (value) {
                   if (value.length > 11) {
@@ -581,7 +624,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 8),
               Text(
                 _text('mobileValidation', context),
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.getTextSecondaryColor(isDark),
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -600,13 +646,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(_text('mobileValidation', context)),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.getErrorColor(isDark),
                     ),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[800],
+                backgroundColor: AppColors.getPrimaryColor(isDark),
                 foregroundColor: Colors.white,
               ),
               child: Text(_text('next', context)),
@@ -619,29 +665,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // 🔥 কনফার্মেশন ডায়ালগ
   Future<bool> _showConfirmationDialog(String mobileNumber) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(_text('confirmation', context)),
+              backgroundColor: AppColors.getCardColor(isDark),
+              title: Text(
+                _text('confirmation', context),
+                style: TextStyle(color: AppColors.getTextColor(isDark)),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_text('confirmRequest', context)),
+                  Text(
+                    _text('confirmRequest', context),
+                    style: TextStyle(color: AppColors.getTextColor(isDark)),
+                  ),
                   const SizedBox(height: 10),
                   Text(
                     "${_text('mobileNumber', context)}: $mobileNumber",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.getTextColor(isDark),
+                    ),
                   ),
                   Text(
                     _text('pointsDeducted', context),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.getTextColor(isDark),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     _text('warning', context),
-                    style: const TextStyle(color: Colors.orange),
+                    style: TextStyle(color: Colors.orange),
                   ),
                 ],
               ),
@@ -653,7 +714,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context, true),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[800],
+                    backgroundColor: AppColors.getPrimaryColor(isDark),
                   ),
                   child: Text(_text('confirm', context)),
                 ),
@@ -667,15 +728,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // 🔥 গিফট হিস্ট্রি দেখানোর ফাংশন
   Future<void> _showRechargeHistory() async {
     final history = await PointManager.getGiftHistory();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: AppColors.getCardColor(isDark),
         title: Row(
           children: [
-            const Icon(Icons.history),
+            Icon(Icons.history, color: AppColors.getPrimaryColor(isDark)),
             const SizedBox(width: 8),
-            Text(_text('myRewardHistory', context)),
+            Text(
+              _text('myRewardHistory', context),
+              style: TextStyle(color: AppColors.getTextColor(isDark)),
+            ),
           ],
         ),
         content: SizedBox(
@@ -686,18 +752,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.receipt_long,
                         size: 64,
-                        color: Colors.grey,
+                        color: AppColors.getTextSecondaryColor(isDark),
                       ),
                       const SizedBox(height: 16),
-                      Text(_text('noRewardRequests', context)),
+                      Text(
+                        _text('noRewardRequests', context),
+                        style: TextStyle(color: AppColors.getTextColor(isDark)),
+                      ),
                       Text(
                         _text('rewardInstruction', context),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: AppColors.getTextSecondaryColor(isDark),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -727,6 +796,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Map<String, dynamic> request,
     BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     Color statusColor = Colors.orange;
     IconData statusIcon = Icons.pending;
     String statusText = _text('pending', context);
@@ -745,26 +816,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final pointsText = pointsUsed != null ? pointsUsed.toString() : '0';
 
     return Card(
+      color: AppColors.getSurfaceColor(isDark),
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         leading: Icon(statusIcon, color: statusColor),
         title: Text(
           "5000 ${_text('pointsEarned', context)} - ${request['mobileNumber'] ?? 'N/A'}",
+          style: TextStyle(color: AppColors.getTextColor(isDark)),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${_text('status', context)} $statusText"),
+            Text(
+              "${_text('status', context)} $statusText",
+              style: TextStyle(color: AppColors.getTextSecondaryColor(isDark)),
+            ),
             Text(
               "${_text('date', context)} ${_formatDate(request['requestedAt'])}",
+              style: TextStyle(color: AppColors.getTextSecondaryColor(isDark)),
             ),
           ],
         ),
         trailing: Text(
           "$pointsText ${_text('pointsEarned', context).contains('পয়েন্ট') ? 'পয়েন্ট' : 'Points'}",
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.green,
+            color: AppColors.getPrimaryColor(isDark),
           ),
         ),
       ),
@@ -773,45 +850,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // 🔥 NEW: Additional Features Section Widget
   Widget _buildAdditionalFeaturesSection(bool isSmallScreen) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 3,
       margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 8 : 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: AppColors.getCardColor(isDark),
       child: Padding(
         padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
         child: Column(
           children: [
-            // কমপ্যাক্ট হেডার
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.auto_awesome, color: Colors.green[700], size: 18),
+                Icon(
+                  Icons.auto_awesome,
+                  color: AppColors.getPrimaryColor(isDark),
+                  size: 18,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   _text('earnPointsFromCategories', context),
                   style: TextStyle(
                     fontSize: isSmallScreen ? 15 : 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green[800],
+                    color: AppColors.getTextColor(isDark),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-
-            // প্রফেশনাল বাটন
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.green[600]!, Colors.green[700]!],
+                  colors: isDark
+                      ? AppColors.darkHeaderGradient
+                      : [Colors.green[600]!, Colors.green[700]!],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.green.withOpacity(0.4),
+                    color: AppColors.getPrimaryColor(isDark).withOpacity(0.4),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),
@@ -879,18 +962,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final isTablet = screenWidth > 600;
     final isSmallScreen = screenHeight < 700;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: AppColors.getBackgroundColor(isDark),
       appBar: AppBar(
-        backgroundColor: Colors.green[800],
+        backgroundColor: AppColors.getAppBarColor(isDark),
         title: Text(
           _text('pageTitle', context),
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
         ),
-        //centerTitle: true,
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -947,15 +1028,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const CircularProgressIndicator(),
+                    CircularProgressIndicator(
+                      color: AppColors.getPrimaryColor(isDark),
+                    ),
                     const SizedBox(height: 16),
-                    Text(_text('loadingProfile', context)),
+                    Text(
+                      _text('loadingProfile', context),
+                      style: TextStyle(color: AppColors.getTextColor(isDark)),
+                    ),
                   ],
                 ),
               )
             : Column(
                 children: [
-                  // Main content - Scrollable with compact design
                   Expanded(
                     child: SingleChildScrollView(
                       padding: EdgeInsets.symmetric(
@@ -964,52 +1049,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: Column(
                         children: [
-                          // SECTION 1: ইউজার প্রোফাইল কার্ড
                           _buildUserProfileSection(
                             isTablet,
                             isSmallScreen,
                             context,
                           ),
-
                           SizedBox(height: isSmallScreen ? 16 : 20),
-
-                          // SECTION 2: পয়েন্ট ও স্ট্যাটাস
                           _buildPointsStatsSection(
                             isTablet,
                             isSmallScreen,
                             context,
                           ),
                           SizedBox(height: isSmallScreen ? 16 : 20),
-
-                          // SECTION 3: মুল গিফট সেকশন
                           _buildGiftSection(isTablet, isSmallScreen, context),
                           SizedBox(height: isSmallScreen ? 16 : 20),
-
-                          // SECTION 4: ভিডিও রিওয়ার্ড সেকশন
                           _buildVideoRewardSection(
                             isTablet,
                             isSmallScreen,
                             context,
                           ),
-
                           SizedBox(height: isSmallScreen ? 16 : 20),
-
-                          // SECTION 5: ADDITIONAL FEATURES SECTION
                           _buildAdditionalFeaturesSection(isSmallScreen),
                           SizedBox(height: isSmallScreen ? 16 : 20),
-
-                          // SECTION 6: প্রিমিয়াম সেকশন
                           _buildPremiumSection(
                             isTablet,
                             isSmallScreen,
                             context,
                           ),
                           SizedBox(height: isSmallScreen ? 16 : 20),
-
-                          // SECTION 7: তথ্য বক্স
                           _buildInfoSection(isTablet, isSmallScreen, context),
-
-                          // Bottom spacer for banner ad
                           SizedBox(
                             height: _isBannerAdLoaded
                                 ? (isSmallScreen ? 12 : 16)
@@ -1019,8 +1087,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ),
-
-                  // 🔥 Adaptive Banner Ad at bottom
                   if (_isBannerAdLoaded && _bannerAd != null)
                     Container(
                       width: double.infinity,
@@ -1044,8 +1110,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isSmallScreen,
     BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 4,
+      color: AppColors.getCardColor(isDark),
       child: Padding(
         padding: EdgeInsets.all(
           isSmallScreen ? 16.0 : (isTablet ? 24.0 : 20.0),
@@ -1057,7 +1126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: isSmallScreen ? 25 : (isTablet ? 40 : 30),
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppColors.getPrimaryColor(isDark),
                   child: Icon(
                     Icons.person,
                     size: isSmallScreen ? 25 : (isTablet ? 40 : 30),
@@ -1070,9 +1139,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: AppColors.getAccentColor('blue', isDark),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(
+                        color: AppColors.getCardColor(isDark),
+                        width: 2,
+                      ),
                     ),
                     child: GestureDetector(
                       onTap: _editProfile,
@@ -1087,8 +1159,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
             SizedBox(height: isSmallScreen ? 12 : (isTablet ? 20 : 16)),
-
-            // ✅ প্রফাইল কমপ্লিটনেস প্রোগ্রেস বার যোগ করুন
             SizedBox(height: isSmallScreen ? 12 : (isTablet ? 20 : 16)),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1099,6 +1169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(
                       fontSize: isSmallScreen ? 16 : (isTablet ? 22 : 18),
                       fontWeight: FontWeight.bold,
+                      color: AppColors.getTextColor(isDark),
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -1112,7 +1183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _userEmail,
               style: TextStyle(
                 fontSize: isSmallScreen ? 12 : (isTablet ? 16 : 14),
-                color: Colors.grey,
+                color: AppColors.getTextSecondaryColor(isDark),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -1123,7 +1194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _userMobile,
                 style: TextStyle(
                   fontSize: isSmallScreen ? 11 : (isTablet ? 14 : 12),
-                  color: Colors.blue,
+                  color: AppColors.getAccentColor('blue', isDark),
                 ),
               ),
             ],
@@ -1139,8 +1210,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isSmallScreen,
     BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 3,
+      color: AppColors.getCardColor(isDark),
       child: Padding(
         padding: EdgeInsets.all(
           isSmallScreen ? 12.0 : (isTablet ? 20.0 : 16.0),
@@ -1152,7 +1226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(
                 fontSize: isSmallScreen ? 16 : (isTablet ? 20 : 18),
                 fontWeight: FontWeight.bold,
-                color: Colors.purple,
+                color: AppColors.getAccentColor('purple', isDark),
               ),
             ),
             const SizedBox(height: 12),
@@ -1160,36 +1234,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _text('pendingPoints', context),
               _pendingPoints.toString(),
               Icons.monetization_on,
-              Colors.green,
+              AppColors.getAccentColor('green', isDark),
               isTablet: isTablet,
               isSmallScreen: isSmallScreen,
+              isDark: isDark,
             ),
-            const Divider(height: 1),
+            Divider(height: 1, color: AppColors.getBorderColor(isDark)),
             _buildStatItem(
               _text('totalPointsEarned', context),
               _totalPoints.toString(),
               Icons.attach_money,
-              Colors.blue,
+              AppColors.getAccentColor('blue', isDark),
               isTablet: isTablet,
               isSmallScreen: isSmallScreen,
+              isDark: isDark,
             ),
-            const Divider(height: 1),
+            Divider(height: 1, color: AppColors.getBorderColor(isDark)),
             _buildStatItem(
               _text('totalQuizzesTaken', context),
               _totalQuizzes.toString(),
               Icons.quiz,
-              Colors.orange,
+              AppColors.getAccentColor('orange', isDark),
               isTablet: isTablet,
               isSmallScreen: isSmallScreen,
+              isDark: isDark,
             ),
-            const Divider(height: 1),
+            Divider(height: 1, color: AppColors.getBorderColor(isDark)),
             _buildStatItem(
               _text('totalCorrectAnswers', context),
               _totalCorrectAnswers.toString(),
               Icons.check_circle,
-              Colors.purple,
+              AppColors.getAccentColor('purple', isDark),
               isTablet: isTablet,
               isSmallScreen: isSmallScreen,
+              isDark: isDark,
             ),
           ],
         ),
@@ -1203,8 +1281,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isSmallScreen,
     BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 3,
+      color: AppColors.getCardColor(isDark),
       child: Padding(
         padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
         child: Column(
@@ -1212,18 +1293,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                /*Icon(
-                  Icons.card_giftcard,
-                  color: Colors.purple,
-                  size: isSmallScreen ? 20 : 24,
-                ),*/
                 const SizedBox(width: 8),
                 Text(
                   _text('getRealGifts', context),
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.purple,
+                    color: AppColors.getAccentColor('purple', isDark),
                   ),
                 ),
               ],
@@ -1233,7 +1309,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _text('giftDescription', context),
               style: TextStyle(
                 fontSize: isSmallScreen ? 12 : 14,
-                color: Colors.purple.shade800,
+                color: AppColors.getTextColor(isDark),
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,
@@ -1243,7 +1319,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _pendingPoints >= 5000 ? _requestRecharge : null,
-                //icon: const Icon(Icons.redeem),
                 label: Text(
                   _pendingPoints >= 5000
                       ? _text('getGiftReady', context)
@@ -1254,7 +1329,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple,
+                  backgroundColor: AppColors.getAccentColor('purple', isDark),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(
                     vertical: isSmallScreen ? 12 : 14,
@@ -1269,8 +1344,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 8),
               LinearProgressIndicator(
                 value: _pendingPoints / 5000,
-                backgroundColor: Colors.purple.shade200,
-                color: Colors.purple,
+                backgroundColor: AppColors.getSurfaceColor(isDark),
+                color: AppColors.getAccentColor('purple', isDark),
                 minHeight: 6,
               ),
               const SizedBox(height: 4),
@@ -1278,7 +1353,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 "$_pendingPoints/5000 ${_text('pointsCollected', context)}",
                 style: TextStyle(
                   fontSize: isSmallScreen ? 10 : 12,
-                  color: Colors.purple.shade700,
+                  color: AppColors.getTextSecondaryColor(isDark),
                 ),
               ),
             ],
@@ -1289,16 +1364,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // SECTION 4: ভিডিও রিওয়ার্ড সেকশন
-  // ✅ সংশোধিত কোড - profile_screen.dart এ পরিবর্তন করুন
-
-  // বাটন টেক্সটও পরিবর্তন করুন
   Widget _buildVideoRewardSection(
     bool isTablet,
     bool isSmallScreen,
     BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 3,
+      color: AppColors.getCardColor(isDark),
       child: Padding(
         padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
         child: Column(
@@ -1306,27 +1381,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Row(
               children: [
                 Icon(
-                  Icons.card_giftcard, // অ্যাড আইকন পরিবর্তন করুন
-                  color: Colors.orange,
+                  Icons.card_giftcard,
+                  color: AppColors.getAccentColor('orange', isDark),
                   size: isSmallScreen ? 20 : 24,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  _text('earnPointsFromRewards', context), // আপডেটেড টেক্সট
+                  _text('earnPointsFromRewards', context),
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.orange,
+                    color: AppColors.getAccentColor('orange', isDark),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             Text(
-              _text('rewardDescription', context), // আপডেটেড ডেসক্রিপশন
+              _text('rewardDescription', context),
               style: TextStyle(
                 fontSize: isSmallScreen ? 12 : 14,
-                color: Colors.grey,
+                color: AppColors.getTextSecondaryColor(isDark),
               ),
               textAlign: TextAlign.center,
             ),
@@ -1337,14 +1412,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: _navigateToReward,
                 icon: const Icon(Icons.card_giftcard),
                 label: Text(
-                  _text('viewRewards', context), // আপডেটেড বাটন টেক্সট
+                  _text('viewRewards', context),
                   style: TextStyle(
                     fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: AppColors.getAccentColor('orange', isDark),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(
                     vertical: isSmallScreen ? 12 : 15,
@@ -1367,8 +1442,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isSmallScreen,
     BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 3,
+      color: AppColors.getCardColor(isDark),
       child: Padding(
         padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
         child: Column(
@@ -1378,7 +1456,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Icon(
                   Icons.workspace_premium,
-                  color: Colors.amber,
+                  color: AppColors.getAccentColor('orange', isDark),
                   size: isSmallScreen ? 20 : 24,
                 ),
                 const SizedBox(width: 8),
@@ -1387,7 +1465,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue.shade800,
+                    color: AppColors.getTextColor(isDark),
                   ),
                 ),
               ],
@@ -1397,34 +1475,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _text('premiumDescription', context),
               style: TextStyle(
                 fontSize: isSmallScreen ? 12 : 14,
-                color: Colors.blue.shade800,
+                color: AppColors.getTextSecondaryColor(isDark),
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
-            // প্রিমিয়াম ফিচার লিস্ট
             Column(
               children: [
                 _buildPremiumFeature(
                   _text('adFreeUsage', context),
                   Icons.block,
                   isSmallScreen,
+                  isDark: isDark,
                 ),
                 _buildPremiumFeature(
                   _text('exclusiveQuizzes', context),
                   Icons.quiz,
                   isSmallScreen,
+                  isDark: isDark,
                 ),
                 _buildPremiumFeature(
                   _text('prioritySupport', context),
                   Icons.support_agent,
                   isSmallScreen,
+                  isDark: isDark,
                 ),
                 _buildPremiumFeature(
                   _text('doublePoints', context),
                   Icons.bolt,
                   isSmallScreen,
+                  isDark: isDark,
                 ),
               ],
             ),
@@ -1439,8 +1520,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.blue.shade800,
-                  side: BorderSide(color: Colors.blue.shade600),
+                  foregroundColor: AppColors.getPrimaryColor(isDark),
+                  side: BorderSide(color: AppColors.getPrimaryColor(isDark)),
                   padding: EdgeInsets.symmetric(
                     vertical: isSmallScreen ? 12 : 14,
                   ),
@@ -1462,23 +1543,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isSmallScreen,
     BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 10 : (isTablet ? 16 : 12)),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
+        color: AppColors.getSurfaceColor(isDark),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.blue[200]!),
+        border: Border.all(color: AppColors.getBorderColor(isDark)),
       ),
       child: Row(
         children: [
-          Icon(Icons.info, color: Colors.blue, size: isSmallScreen ? 18 : 24),
+          Icon(
+            Icons.info,
+            color: AppColors.getPrimaryColor(isDark),
+            size: isSmallScreen ? 18 : 24,
+          ),
           SizedBox(width: isSmallScreen ? 8 : (isTablet ? 12 : 8)),
           Expanded(
             child: Text(
               _text('infoTitle', context),
               style: TextStyle(
                 fontSize: isSmallScreen ? 10 : (isTablet ? 14 : 12),
-                color: Colors.blue,
+                color: AppColors.getTextColor(isDark),
               ),
             ),
           ),
@@ -1494,6 +1581,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Color color, {
     required bool isTablet,
     required bool isSmallScreen,
+    required bool isDark,
   }) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -1512,6 +1600,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title,
               style: TextStyle(
                 fontSize: isSmallScreen ? 14 : (isTablet ? 18 : 16),
+                color: AppColors.getTextColor(isDark),
               ),
             ),
           ),
@@ -1532,26 +1621,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildPremiumFeature(
     String feature,
     IconData icon,
-    bool isSmallScreen,
-  ) {
+    bool isSmallScreen, {
+    required bool isDark,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(icon, color: Colors.green, size: isSmallScreen ? 16 : 18),
+          Icon(
+            icon,
+            color: AppColors.getPrimaryColor(isDark),
+            size: isSmallScreen ? 16 : 18,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               feature,
               style: TextStyle(
                 fontSize: isSmallScreen ? 12 : 14,
-                color: Colors.blue.shade700,
+                color: AppColors.getTextColor(isDark),
               ),
             ),
           ),
           Icon(
             Icons.check_circle,
-            color: Colors.green,
+            color: AppColors.getPrimaryColor(isDark),
             size: isSmallScreen ? 16 : 18,
           ),
         ],

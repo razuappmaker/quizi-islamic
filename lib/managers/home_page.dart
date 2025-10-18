@@ -949,7 +949,7 @@ class _HomePageState extends State<HomePage>
               _buildCompactIslamicCard(
                 context,
                 languageProvider.isEnglish ? 'Prayer Time' : 'নামাজের সময়',
-                Icons.access_time_rounded,
+                Icons.schedule_rounded,
                 iconColor,
                 cardColor,
                 textColor,
@@ -981,7 +981,7 @@ class _HomePageState extends State<HomePage>
               ),
               _buildCompactIslamicCard(
                 context,
-                languageProvider.isEnglish ? 'Prayers' : 'দুআ',
+                languageProvider.isEnglish ? 'Dua' : 'দুআ',
                 Icons.lightbulb_outline_rounded,
                 iconColor,
                 cardColor,

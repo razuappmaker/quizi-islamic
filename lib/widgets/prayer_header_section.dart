@@ -614,7 +614,7 @@ class PrayerHeaderSection extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Prayer Info (Left side)
+          // Prayer Info (Left side) - একই থাকবে
           Expanded(
             flex: 5,
             child: Column(
@@ -702,31 +702,41 @@ class PrayerHeaderSection extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Countdown numbers and labels in organized columns
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildTimeUnit(
-                        _text('hours', context),
-                        countdown.inHours,
-                        timeUnitFontSize,
-                        timeLabelFontSize,
-                        isDark,
+                      // ঘণ্টা কলাম
+                      _buildTimeUnitColumn(
+                        value: countdown.inHours,
+                        label: _text('hours', context),
+                        timeFontSize: timeUnitFontSize,
+                        labelFontSize: timeLabelFontSize,
+                        isDark: isDark,
                       ),
+
+                      // প্রথম ডিভাইডার
                       _buildDivider(isVerySmallScreen, isSmallScreen, isDark),
-                      _buildTimeUnit(
-                        _text('minutes', context),
-                        countdown.inMinutes % 60,
-                        timeUnitFontSize,
-                        timeLabelFontSize,
-                        isDark,
+
+                      // মিনিট কলাম
+                      _buildTimeUnitColumn(
+                        value: countdown.inMinutes % 60,
+                        label: _text('minutes', context),
+                        timeFontSize: timeUnitFontSize,
+                        labelFontSize: timeLabelFontSize,
+                        isDark: isDark,
                       ),
+
+                      // দ্বিতীয় ডিভাইডার
                       _buildDivider(isVerySmallScreen, isSmallScreen, isDark),
-                      _buildTimeUnit(
-                        _text('seconds', context),
-                        countdown.inSeconds % 60,
-                        timeUnitFontSize,
-                        timeLabelFontSize,
-                        isDark,
+
+                      // সেকেন্ড কলাম
+                      _buildTimeUnitColumn(
+                        value: countdown.inSeconds % 60,
+                        label: _text('seconds', context),
+                        timeFontSize: timeUnitFontSize,
+                        labelFontSize: timeLabelFontSize,
+                        isDark: isDark,
                       ),
                     ],
                   ),
@@ -737,6 +747,7 @@ class PrayerHeaderSection extends StatelessWidget {
                         ? 2
                         : 4,
                   ),
+
                   // Countdown status text
                   Text(
                     _getCountdownStatus(countdown, context),
@@ -751,6 +762,82 @@ class PrayerHeaderSection extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // নতুন মেথড যোগ করুন - শুধু সংখ্যার জন্য
+  // নতুন মেথড - সংখ্যা এবং লেবেল একই কলামে
+  Widget _buildTimeUnitColumn({
+    required int value,
+    required String label,
+    required double timeFontSize,
+    required double labelFontSize,
+    required bool isDark,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // সংখ্যা (০৩, ২৬, ৪৫)
+        Text(
+          value.toString().padLeft(2, '0'),
+          style: TextStyle(
+            fontSize: timeFontSize,
+            fontWeight: FontWeight.w900,
+            color: isDark ? Colors.white : Color(0xFF1B5E20),
+            fontFeatures: const [FontFeature.tabularFigures()],
+            shadows: isDark
+                ? [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 2,
+                      offset: const Offset(1, 1),
+                    ),
+                  ]
+                : null,
+          ),
+        ),
+
+        SizedBox(height: 2),
+
+        // লেবেল (ঘণ্টা, মিনিট, সেকেন্ড)
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: labelFontSize,
+            color: isDark ? Colors.white.withOpacity(0.9) : Color(0xFF388E3C),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ডিভাইডার মেথড - উচ্চতা ঠিক করুন
+  Widget _buildDivider(
+    bool isVerySmallScreen,
+    bool isSmallScreen,
+    bool isDark,
+  ) {
+    return Container(
+      width: 1,
+      height: isVerySmallScreen
+          ? 28 // ← কলামের মোট উচ্চতার সাথে মিল করুন
+          : isSmallScreen
+          ? 32
+          : 36,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.transparent,
+            isDark
+                ? Colors.white.withOpacity(0.6)
+                : Color(0xFF4CAF50).withOpacity(0.6),
+            Colors.transparent,
+          ],
+        ),
       ),
     );
   }
@@ -981,34 +1068,6 @@ class PrayerHeaderSection extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildDivider(
-    bool isVerySmallScreen,
-    bool isSmallScreen,
-    bool isDark,
-  ) {
-    return Container(
-      width: 1,
-      height: isVerySmallScreen
-          ? 20
-          : isSmallScreen
-          ? 24
-          : 28,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.transparent,
-            isDark
-                ? Colors.white.withOpacity(0.6)
-                : Color(0xFF4CAF50).withOpacity(0.6),
-            Colors.transparent,
-          ],
-        ),
-      ),
     );
   }
 

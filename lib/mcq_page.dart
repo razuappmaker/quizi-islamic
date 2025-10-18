@@ -9,7 +9,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'ad_helper.dart';
 import 'mcq_security_manager.dart';
 import 'package:provider/provider.dart';
-import '../providers/language_provider.dart'; // ✅ Language Provider import
+import '../providers/language_provider.dart';
+import '../utils/app_colors.dart'; // ✅ AppColors import করুন
 
 class MCQPage extends StatefulWidget {
   final String category;
@@ -92,9 +93,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   static const double _optionCardPaddingRatioVertical = 0.165;
   static const double _optionCardPaddingRatioHorizontal = 0.22;
 
-  // Primary Color - Fixed non-nullable
-  final Color primaryColor = Colors.green[800] ?? Colors.green;
-
   @override
   void initState() {
     super.initState();
@@ -112,7 +110,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     _audioPlayer.dispose();
     _bannerAd?.dispose();
     AdHelper.disposeInterstitialAd();
-    _securityManager.dispose(); // ✅ Security manager dispose করুন
+    _securityManager.dispose();
     super.dispose();
   }
 
@@ -390,15 +388,25 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text(_text('timeUp', context)),
-        content: Text(_text('timeUpMessage', context)),
+        backgroundColor: ThemeHelper.card(context),
+        title: Text(
+          _text('timeUp', context),
+          style: TextStyle(color: ThemeHelper.text(context)),
+        ),
+        content: Text(
+          _text('timeUpMessage', context),
+          style: TextStyle(color: ThemeHelper.textSecondary(context)),
+        ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               goToNextQuestion();
             },
-            child: Text(_text('nextQuestion', context)),
+            child: Text(
+              _text('nextQuestion', context),
+              style: TextStyle(color: ThemeHelper.primary(context)),
+            ),
           ),
         ],
       ),
@@ -434,7 +442,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   // ==================== UI BUILD METHODS ====================
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -460,6 +467,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        backgroundColor: ThemeHelper.background(context),
         appBar: AppBar(
           title: Text(
             '${_text('questionProgress', context)} ${currentQuestionIndex + 1}/${_securityManager.questions.length}',
@@ -469,7 +477,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
               color: Colors.white,
             ),
           ),
-          backgroundColor: primaryColor,
+          backgroundColor: ThemeHelper.appBar(context),
           elevation: 0,
           centerTitle: true,
           leading: IconButton(
@@ -495,7 +503,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                           // Progress Bar Section - Increased by 10%
                           _buildProgressSection(
                             context,
-                            isDarkMode,
                             screenWidth,
                             screenHeight,
                             responsiveFontSize,
@@ -511,7 +518,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                           // Question Container - Increased by 10%
                           _buildQuestionContainer(
                             question,
-                            isDarkMode,
                             isTablet,
                             isSmallPhone,
                             screenHeight,
@@ -524,7 +530,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                           // Options - Increased by 10%
                           _buildOptionsSection(
                             question,
-                            isDarkMode,
                             screenHeight,
                             screenWidth,
                             isTablet,
@@ -546,7 +551,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                           // Google Search Button - Increased by 10%
                           if (isAnswered)
                             _buildGoogleSearchButton(
-                              isDarkMode,
                               screenHeight,
                               screenWidth,
                               responsiveFontSize,
@@ -628,7 +632,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
         child: Container(
           width: MediaQuery.of(context).size.width * 0.85,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: ThemeHelper.card(context),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -646,7 +650,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.orange[50],
+                  color: ThemeHelper.primary(context).withOpacity(0.1),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
@@ -658,22 +662,22 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                       width: 70,
                       height: 70,
                       decoration: BoxDecoration(
-                        color: Colors.orange[100],
+                        color: ThemeHelper.primary(context).withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.hourglass_top_rounded,
-                        color: Colors.orange,
+                        color: ThemeHelper.primary(context),
                         size: 40,
                       ),
                     ),
                     const SizedBox(height: 15),
                     Text(
                       _text('pleaseWait', context),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.deepOrange,
+                        color: ThemeHelper.primary(context),
                       ),
                     ),
                   ],
@@ -687,10 +691,10 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                   children: [
                     Text(
                       message,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         height: 1.5,
-                        color: Colors.black87,
+                        color: ThemeHelper.text(context),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -700,9 +704,11 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     SizedBox(
                       height: 4,
                       child: LinearProgressIndicator(
-                        backgroundColor: Colors.grey[200],
+                        backgroundColor: ThemeHelper.textSecondary(
+                          context,
+                        ).withOpacity(0.2),
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.orange[400]!,
+                          ThemeHelper.primary(context),
                         ),
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -715,7 +721,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
               Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: ThemeHelper.background(context),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(20),
                     bottomRight: Radius.circular(20),
@@ -730,7 +736,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                           Navigator.of(context).pop();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
+                          backgroundColor: ThemeHelper.primary(context),
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -760,12 +766,13 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   // ==================== UI COMPONENT METHODS ====================
   Widget _buildLoadingScreen() {
     return Scaffold(
+      backgroundColor: ThemeHelper.background(context),
       appBar: AppBar(
         title: Text(
           widget.category,
           style: const TextStyle(color: Colors.white),
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: ThemeHelper.appBar(context),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -781,12 +788,16 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ThemeHelper.primary(context),
+              ),
+            ),
             const SizedBox(height: 13.2),
             Text(
               _text('loadingQuiz', context),
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: ThemeHelper.text(context),
                 fontSize: 15.4,
                 fontWeight: FontWeight.bold,
               ),
@@ -799,6 +810,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
 
   Widget _buildErrorScreen() {
     return Scaffold(
+      backgroundColor: ThemeHelper.background(context),
       appBar: AppBar(
         title: Text(
           _text('loadingQuiz', context),
@@ -807,7 +819,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: ThemeHelper.appBar(context),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -823,13 +835,18 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ThemeHelper.primary(context),
+              ),
             ),
             const SizedBox(height: 13.2),
             Text(
               _text('loadingQuestions', context),
-              style: const TextStyle(fontSize: 15.4),
+              style: TextStyle(
+                fontSize: 15.4,
+                color: ThemeHelper.text(context),
+              ),
             ),
           ],
         ),
@@ -839,7 +856,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
 
   Widget _buildProgressSection(
     BuildContext context,
-    bool isDarkMode,
     double screenWidth,
     double screenHeight,
     double responsiveFontSize,
@@ -851,7 +867,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
         horizontal: screenWidth * 0.033,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: ThemeHelper.card(context),
         borderRadius: BorderRadius.circular(13.2),
         boxShadow: [
           BoxShadow(
@@ -878,14 +894,14 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                         style: TextStyle(
                           fontSize: responsiveFontSize,
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
+                          color: ThemeHelper.text(context),
                         ),
                       ),
                       Text(
                         '${((currentQuestionIndex + 1) / _securityManager.questions.length * 100).toStringAsFixed(0)}% of ${_securityManager.questions.length}',
                         style: TextStyle(
                           fontSize: responsiveFontSize - 1,
-                          color: primaryColor,
+                          color: ThemeHelper.primary(context),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -894,7 +910,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 ),
                 Container(
                   height: 3.3,
-                  decoration: BoxDecoration(color: Colors.grey[300]),
+                  decoration: BoxDecoration(
+                    color: ThemeHelper.textSecondary(context).withOpacity(0.3),
+                  ),
                   child: Stack(
                     children: [
                       AnimatedContainer(
@@ -903,7 +921,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                             MediaQuery.of(context).size.width *
                             ((currentQuestionIndex + 1) /
                                 _securityManager.questions.length),
-                        decoration: BoxDecoration(color: primaryColor),
+                        decoration: BoxDecoration(
+                          color: ThemeHelper.primary(context),
+                        ),
                       ),
                     ],
                   ),
@@ -930,6 +950,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
     double responsiveFontSize,
     BuildContext context,
   ) {
+    final primaryColor = ThemeHelper.primary(context);
+
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: screenHeight * 0.0088,
@@ -968,7 +990,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                       fontSize: isTablet
                           ? responsiveFontSize - 2
                           : responsiveFontSize - 5,
-                      color: Colors.grey[500],
+                      color: ThemeHelper.textSecondary(context),
                     ),
                   ),
                   Text(
@@ -993,7 +1015,9 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
               strokeWidth: _timeLeft <= 10
                   ? (isTablet ? 5.5 : 4.4)
                   : (isTablet ? 4.4 : 3.3),
-              backgroundColor: Colors.grey[200],
+              backgroundColor: ThemeHelper.textSecondary(
+                context,
+              ).withOpacity(0.2),
               valueColor: AlwaysStoppedAnimation<Color>(
                 _timeLeft <= 10 ? Colors.red : primaryColor,
               ),
@@ -1027,8 +1051,11 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
           errorBuilder: (context, error, stackTrace) {
             return Container(
               height: screenHeight * 0.165,
-              color: Colors.grey[200],
-              child: const Icon(Icons.error_outline, color: Colors.grey),
+              color: ThemeHelper.card(context),
+              child: Icon(
+                Icons.error_outline,
+                color: ThemeHelper.textSecondary(context),
+              ),
             );
           },
         ),
@@ -1038,7 +1065,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
 
   Widget _buildQuestionContainer(
     dynamic question,
-    bool isDarkMode,
     bool isTablet,
     bool isSmallPhone,
     double screenHeight,
@@ -1061,7 +1087,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
             : screenWidth * 0.0385,
       ),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+        color: ThemeHelper.card(context),
         borderRadius: BorderRadius.circular(
           isTablet
               ? 13.2
@@ -1089,7 +1115,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
               right: isTablet ? 17.6 : (isSmallPhone ? 10 : 13.2),
             ),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.green[800] : Colors.green[100],
+              color: ThemeHelper.primary(context).withOpacity(0.1),
               borderRadius: BorderRadius.circular(8.8),
               boxShadow: [
                 BoxShadow(
@@ -1108,7 +1134,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     ? responsiveFontSize - 1
                     : responsiveFontSize,
                 fontWeight: FontWeight.w700,
-                color: isDarkMode ? Colors.green[100] : Colors.green[800],
+                color: ThemeHelper.primary(context),
                 height: isTablet
                     ? 1.4
                     : isSmallPhone
@@ -1127,7 +1153,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     ? responsiveFontSize - 3
                     : responsiveFontSize - 1,
                 fontWeight: FontWeight.w600,
-                color: isDarkMode ? Colors.white : Colors.black87,
+                color: ThemeHelper.text(context),
                 height: isTablet
                     ? 1.4
                     : isSmallPhone
@@ -1144,7 +1170,6 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
 
   Widget _buildOptionsSection(
     dynamic question,
-    bool isDarkMode,
     double screenHeight,
     double screenWidth,
     bool isTablet,
@@ -1229,37 +1254,29 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 optionCardHeight *
                 (isSmallPhone ? 0.15 : _optionCardPaddingRatioHorizontal);
 
-            Color optionColor = isDarkMode ? Colors.grey[800]! : Colors.white;
-            Color textColor = isDarkMode ? Colors.white70 : Colors.black87;
+            Color optionColor = ThemeHelper.card(context);
+            Color textColor = ThemeHelper.text(context);
             BoxBorder? border;
             Color? shadowColor;
 
             if (isAnswered) {
               if (option == question['answer']) {
-                optionColor = isDarkMode
-                    ? Colors.green.withOpacity(0.16)
-                    : Colors.green.withOpacity(0.10);
-                textColor = isDarkMode
-                    ? Colors.green[400]!
-                    : Colors.green[700]!;
+                optionColor = Colors.green.withOpacity(0.16);
+                textColor = Colors.green[700]!;
                 border = Border.all(
                   color: Colors.green,
                   width: _optionSelectedBorderWidth,
                 );
               } else if (option == selectedOption) {
-                optionColor = isDarkMode
-                    ? Colors.red.withOpacity(0.16)
-                    : Colors.red.withOpacity(0.10);
-                textColor = isDarkMode ? Colors.red[400]! : Colors.red[700]!;
+                optionColor = Colors.red.withOpacity(0.16);
+                textColor = Colors.red[700]!;
                 border = Border.all(
                   color: Colors.red,
                   width: _optionSelectedBorderWidth,
                 );
               }
             } else {
-              shadowColor = isDarkMode
-                  ? Colors.black.withOpacity(0.20)
-                  : Colors.black.withOpacity(0.06);
+              shadowColor = Colors.black.withOpacity(0.06);
             }
 
             return Container(
@@ -1284,14 +1301,10 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                   borderRadius: BorderRadius.circular(_optionCardBorderRadius),
                   splashColor: isAnswered
                       ? Colors.transparent
-                      : (isDarkMode
-                            ? Colors.white.withOpacity(0.08)
-                            : Colors.black.withOpacity(0.04)),
+                      : ThemeHelper.primary(context).withOpacity(0.1),
                   highlightColor: isAnswered
                       ? Colors.transparent
-                      : (isDarkMode
-                            ? Colors.white.withOpacity(0.04)
-                            : Colors.black.withOpacity(0.02)),
+                      : ThemeHelper.primary(context).withOpacity(0.05),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
                     curve: Curves.easeInOut,
@@ -1321,12 +1334,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                                       ? Colors.green.withOpacity(0.1)
                                       : option == selectedOption
                                       ? Colors.red.withOpacity(0.1)
-                                      : isDarkMode
-                                      ? Colors.grey[700]
-                                      : Colors.grey[200])
-                                : (isDarkMode
-                                      ? Colors.grey[700]
-                                      : Colors.grey[200]),
+                                      : ThemeHelper.background(context))
+                                : ThemeHelper.background(context),
                             borderRadius: BorderRadius.circular(
                               isSmallPhone ? 5 : 6,
                             ),
@@ -1355,12 +1364,8 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                                           ? Colors.green
                                           : option == selectedOption
                                           ? Colors.red
-                                          : isDarkMode
-                                          ? Colors.white60
-                                          : Colors.black54)
-                                    : (isDarkMode
-                                          ? Colors.white70
-                                          : Colors.black87),
+                                          : ThemeHelper.textSecondary(context))
+                                    : ThemeHelper.text(context),
                               ),
                             ),
                           ),
@@ -1435,7 +1440,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
       child: ElevatedButton(
         onPressed: isAnswered ? goToNextQuestion : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
+          backgroundColor: ThemeHelper.primary(context),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(11),
@@ -1461,13 +1466,17 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
   }
 
   Widget _buildGoogleSearchButton(
-    bool isDarkMode,
     double screenHeight,
     double screenWidth,
     double responsiveFontSize,
     dynamic question,
     BuildContext context,
   ) {
+    final blueAccent = AppColors.getAccentColor(
+      'blue',
+      Theme.of(context).brightness == Brightness.dark,
+    );
+
     return Container(
       margin: const EdgeInsets.only(bottom: 13.2),
       child: Column(
@@ -1478,7 +1487,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
               children: [
                 Expanded(
                   child: Divider(
-                    color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                    color: ThemeHelper.textSecondary(context).withOpacity(0.3),
                     thickness: 1.1,
                   ),
                 ),
@@ -1489,13 +1498,13 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                     style: TextStyle(
                       fontSize: responsiveFontSize - 4,
                       fontWeight: FontWeight.w500,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: ThemeHelper.textSecondary(context),
                     ),
                   ),
                 ),
                 Expanded(
                   child: Divider(
-                    color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                    color: ThemeHelper.textSecondary(context).withOpacity(0.3),
                     thickness: 1.1,
                   ),
                 ),
@@ -1511,19 +1520,12 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
                 question: question['question'] ?? '',
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: isDarkMode
-                    ? Colors.blue[300]
-                    : Colors.blue[600],
-                side: BorderSide(
-                  color: isDarkMode ? Colors.blue[400]! : Colors.blue[300]!,
-                  width: 1.32,
-                ),
+                foregroundColor: blueAccent,
+                side: BorderSide(color: blueAccent, width: 1.32),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.8),
                 ),
-                backgroundColor: isDarkMode
-                    ? Colors.blue[900]!.withOpacity(0.1)
-                    : Colors.blue[50]!.withOpacity(0.5),
+                backgroundColor: blueAccent.withOpacity(0.1),
                 textStyle: TextStyle(
                   fontSize: responsiveFontSize - 2,
                   fontWeight: FontWeight.w600,
@@ -1536,7 +1538,7 @@ class _MCQPageState extends State<MCQPage> with WidgetsBindingObserver {
               icon: Icon(
                 Icons.search,
                 size: responsiveFontSize - 1,
-                color: isDarkMode ? Colors.blue[300] : Colors.blue[600],
+                color: blueAccent,
               ),
               label: Text(_text('searchGoogle', context)),
             ),

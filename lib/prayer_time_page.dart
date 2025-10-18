@@ -1,25 +1,23 @@
-// Pyaer time page
-// Prayer Time
-// prayer_time_page.dart - Final Version with Dual Language Support
-
+// prayer time page
+// prayer_time_page.dart - Final Clean Version
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../ad_helper.dart';
 import '../prayer_time_service.dart';
 import '../prohibited_time_service.dart';
+import '../utils/notification_manager.dart';
 import '../widgets/prayer_header_section.dart';
 import '../widgets/prayer_list_section.dart';
 import '../widgets/prohibited_time_section.dart';
 import '../widgets/location_modal.dart';
 import '../widgets/prayer_time_adjustment_modal.dart';
-import '../utils/app_colors.dart'; // Import the AppColors class
+import '../utils/app_colors.dart';
 
 class PrayerTimePage extends StatefulWidget {
   const PrayerTimePage({Key? key}) : super(key: key);
@@ -28,9 +26,11 @@ class PrayerTimePage extends StatefulWidget {
   State<PrayerTimePage> createState() => _PrayerTimePageState();
 }
 
-class _PrayerTimePageState extends State<PrayerTimePage> {
+class _PrayerTimePageState extends State<PrayerTimePage>
+    with WidgetsBindingObserver {
   // ---------- Services ----------
   final PrayerTimeService _prayerTimeService = PrayerTimeService();
+  final NotificationManager _notificationManager = NotificationManager();
   ProhibitedTimeService? _prohibitedTimeService;
 
   // ---------- Prayer Times ----------
@@ -70,6 +70,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     "মাগরিব": 0,
     "ইশা": 0,
   };
+
+  // ---------- Timers ----------
+  Timer? _notificationCheckTimer;
 
   // Language Texts
   final Map<String, Map<String, String>> _texts = {
@@ -111,33 +114,88 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initializeData();
     _loadAd();
     _initializeAds();
-    _initializeNotificationChannel();
+    _initializeNotificationSystem();
     _loadManualLocation();
     _loadPrayerTimeAdjustments();
     _startInterstitialTimer();
-
-    // ProhibitedTimeService কে পরে initialize করব যখন context available হবে
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // এখন context available, তাই ProhibitedTimeService initialize করতে পারি
-    if (_prohibitedTimeService == null) {
-      _prohibitedTimeService = ProhibitedTimeService(context);
-    }
+    _startNotificationMonitoring();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     timer?.cancel();
     _interstitialTimer?.cancel();
+    _notificationCheckTimer?.cancel();
     _bannerAd?.dispose();
     AdHelper.disposeInterstitialAd();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print('App lifecycle state changed: $state');
+
+    if (state == AppLifecycleState.resumed) {
+      _checkAndRescheduleNotifications();
+    } else if (state == AppLifecycleState.paused) {
+      _ensureNotificationsScheduled();
+    }
+  }
+
+  // নোটিফিকেশন সিস্টেম ইনিশিয়ালাইজেশন
+  Future<void> _initializeNotificationSystem() async {
+    await _notificationManager.initializeNotificationChannel();
+  }
+
+  // নোটিফিকেশন মনিটরিং শুরু করুন
+  void _startNotificationMonitoring() {
+    // ৫ সেকেন্ড পর প্রথম চেক
+    Future.delayed(Duration(seconds: 5), () {
+      _notificationManager.checkNotificationSystemHealth();
+    });
+
+    // প্রতি ১ ঘন্টা পর পর চেক
+    _notificationCheckTimer = Timer.periodic(Duration(hours: 1), (timer) {
+      _notificationManager.checkNotificationSystemHealth();
+    });
+  }
+
+  Future<void> _ensureNotificationsScheduled() async {
+    final shouldReschedule = await _notificationManager
+        .shouldRescheduleNotifications();
+    if (shouldReschedule) {
+      await _scheduleAllNotifications();
+    }
+  }
+
+  Future<void> _checkAndRescheduleNotifications() async {
+    final shouldReschedule = await _notificationManager
+        .shouldRescheduleNotifications();
+    if (shouldReschedule) {
+      await _scheduleAllNotifications();
+    }
+  }
+
+  // সব নোটিফিকেশন শিডিউল করা
+  Future<void> _scheduleAllNotifications() async {
+    if (prayerTimes.isEmpty) return;
+
+    await _notificationManager.scheduleAllPrayerNotifications(
+      prayerTimes,
+      _prayerTimeAdjustments,
+    );
+  }
+
+  // নোটিফিকেশন রিশিডিউল করা
+  Future<void> _rescheduleNotifications() async {
+    await _scheduleAllNotifications();
+    print('🔄 Notifications rescheduled with adjusted times');
   }
 
   // Helper method to get text based on current language
@@ -175,29 +233,21 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     return prayerName;
   }
 
-  // Get prayer adjustment key based on language
-  String _getPrayerAdjustmentKey(String prayerName) {
-    final languageProvider = Provider.of<LanguageProvider>(
-      context,
-      listen: false,
-    );
-    if (languageProvider.isEnglish) {
-      switch (prayerName) {
-        case 'Fajr':
-          return 'ফজর';
-        case 'Dhuhr':
-          return 'যোহর';
-        case 'Asr':
-          return 'আসর';
-        case 'Maghrib':
-          return 'মাগরিব';
-        case 'Isha':
-          return 'ইশা';
-        default:
-          return prayerName;
-      }
+  // _initializeData মেথড
+  Future<void> _initializeData() async {
+    await _checkPermissions();
+    await _loadSavedData();
+
+    final hasInternet = await _prayerTimeService.checkInternetConnection();
+    setState(() {
+      _isOnline = hasInternet;
+    });
+
+    if (_locationPermissionGranted && hasInternet) {
+      await fetchLocationAndPrayerTimes();
+    } else {
+      await _scheduleAllNotifications();
     }
-    return prayerName;
   }
 
   // ম্যানুয়াল লোকেশন লোড করা
@@ -265,10 +315,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       int hours = int.parse(parts[0]);
       int minutes = int.parse(parts[1]);
 
-      // মিনিট অ্যাডজাস্ট করা
       minutes += adjustmentMinutes;
 
-      // ঘণ্টা সামঞ্জস্য করা
       while (minutes >= 60) {
         minutes -= 60;
         hours = (hours + 1) % 24;
@@ -318,7 +366,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       await prefs.setString('manual_country_name', country ?? '');
     }
 
-    // নতুন লোকেশনে নামাজের সময় আপডেট করুন
     await fetchLocationAndPrayerTimes();
   }
 
@@ -329,8 +376,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           (_prayerTimeAdjustments[prayerName] ?? 0) + adjustment;
     });
     _savePrayerTimeAdjustments();
-
-    // UI আপডেট করার জন্য
     findNextPrayer();
   }
 
@@ -370,8 +415,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         onAdjustmentChanged: _adjustPrayerTimeByName,
         onResetAll: _resetAllAdjustments,
         onSaveAdjustments: _savePrayerTimeAdjustments,
-        onRescheduleNotifications:
-            _rescheduleNotifications, // নতুন callback যোগ করুন
+        onRescheduleNotifications: _rescheduleNotifications,
       ),
     );
   }
@@ -395,20 +439,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     ).showSnackBar(SnackBar(content: Text(_text('resetSuccess'))));
   }
 
-  // নোটিফিকেশন চ্যানেল ইনিশিয়ালাইজেশন
-  Future<void> _initializeNotificationChannel() async {
-    await AwesomeNotifications().initialize(null, [
-      NotificationChannel(
-        channelKey: 'prayer_reminder_channel',
-        channelName: 'Prayer Reminders',
-        channelDescription: 'Notifications for prayer times',
-        defaultColor: AppColors.darkPrimary,
-        ledColor: AppColors.darkPrimary,
-        importance: NotificationImportance.High,
-      ),
-    ]);
-  }
-
   // ব্যানার অ্যাড লোড করা
   Future<void> _loadAd() async {
     try {
@@ -430,11 +460,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
             print('Adaptive Banner ad failed to load: $error');
             ad.dispose();
             _isBannerAdReady = false;
-            // ৩০ সেকেন্ড পর রিট্রাই
             Future.delayed(Duration(seconds: 30), () {
-              if (!_isBannerAdReady) {
-                _loadAd();
-              }
+              if (!_isBannerAdReady) _loadAd();
             });
           },
           onAdOpened: (Ad ad) {
@@ -465,7 +492,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
       _showInterstitialAds = prefs.getBool('show_interstitial_ads') ?? true;
 
-      // শেষ interstitial ad দেখানোর সময় লোড করুন
       final lastShownTimestamp = prefs.getInt('last_interstitial_timestamp');
       if (lastShownTimestamp != null) {
         _lastInterstitialShownTime = DateTime.fromMillisecondsSinceEpoch(
@@ -509,15 +535,10 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
       return false;
     }
 
-    if (_lastInterstitialShownTime == null) {
-      print('First interstitial ad - can show');
-      return true;
-    }
+    if (_lastInterstitialShownTime == null) return true;
 
     final now = DateTime.now();
     final difference = now.difference(_lastInterstitialShownTime!);
-
-    // ২ ঘণ্টার কম হলে দেখাবেন না
     final canShow = difference.inHours >= 2;
 
     if (!canShow) {
@@ -562,7 +583,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
 
       print('✅ Interstitial ad shown and recorded at: $now');
 
-      // ইউজারকে জানানো (ঐচ্ছিক)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_text('interstitialShown')),
@@ -575,24 +595,7 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
-  // ডেটা ইনিশিয়ালাইজেশন
-  Future<void> _initializeData() async {
-    await _checkPermissions();
-    await _loadSavedData();
-
-    final hasInternet = await _prayerTimeService.checkInternetConnection();
-    setState(() {
-      _isOnline = hasInternet;
-    });
-
-    if (_locationPermissionGranted && hasInternet) {
-      await fetchLocationAndPrayerTimes();
-    } else {
-      await _scheduleAllNotifications();
-    }
-  }
-
-  // পারমিশন চেক করা
+  // পারমিশন চেক
   Future<void> _checkPermissions() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -606,13 +609,8 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
         permission == LocationPermission.always;
 
     // নোটিফিকেশন পারমিশন চেক
-    bool isNotificationAllowed = await AwesomeNotifications()
-        .isNotificationAllowed();
-    if (!isNotificationAllowed) {
-      isNotificationAllowed = await AwesomeNotifications()
-          .requestPermissionToSendNotifications();
-    }
-    _notificationPermissionGranted = isNotificationAllowed;
+    _notificationPermissionGranted = await _notificationManager
+        .checkAndRequestNotificationPermission();
 
     await prefs.setBool('locationPermission', _locationPermissionGranted);
     await prefs.setBool(
@@ -727,188 +725,12 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
     }
   }
 
-  // সব নোটিফিকেশন শিডিউল করা (অ্যাডজাস্টেড টাইমস সহ)
-  Future<void> _scheduleAllNotifications() async {
-    if (prayerTimes.isEmpty) return;
-
-    // অ্যাডজাস্ট করা নামাজের সময় ব্যবহার করুন
-    final adjustedTimesForNotifications = _prayerTimeService
-        .getAdjustedPrayerTimesForNotifications(
-          prayerTimes,
-          _prayerTimeAdjustments,
-        );
-
-    for (final entry in adjustedTimesForNotifications.entries) {
-      final prayerName = entry.key;
-      final time = entry.value;
-
-      if (["ফজর", "যোহর", "আসর", "মাগরিব", "ইশা"].contains(prayerName)) {
-        await _schedulePrayerNotification(prayerName, time);
-      }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_prohibitedTimeService == null) {
+      _prohibitedTimeService = ProhibitedTimeService(context);
     }
-
-    print('✅ All notifications scheduled with adjusted times');
-  }
-
-  // নোটিফিকেশন রিশিডিউল করা
-  Future<void> _rescheduleNotifications() async {
-    try {
-      // প্রথমে সব পুরানো নোটিফিকেশন ক্যানসেল করুন
-      await AwesomeNotifications().cancelAll();
-
-      // তারপর নতুন অ্যাডজাস্টেড টাইমস দিয়ে রিশিডিউল করুন
-      await _scheduleAllNotifications();
-
-      print('🔄 Notifications rescheduled with adjusted times');
-    } catch (e) {
-      print('Error rescheduling notifications: $e');
-    }
-  }
-
-  // নামাজের নোটিফিকেশন শিডিউল করা
-  Future<void> _schedulePrayerNotification(
-    String prayerName,
-    String time,
-  ) async {
-    if (!_notificationPermissionGranted) return;
-
-    try {
-      await AwesomeNotifications().cancel(prayerName.hashCode);
-
-      final prayerDate = _prayerTimeService.parsePrayerTime(time);
-      if (prayerDate == null) return;
-
-      final notificationTime = prayerDate.subtract(const Duration(minutes: 5));
-      final now = DateTime.now();
-
-      if (notificationTime.isAfter(now)) {
-        await AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: prayerName.hashCode,
-            channelKey: 'prayer_reminder_channel',
-            title: _text('title'),
-            body: '${_getPrayerName(prayerName)} ${_getNotificationBody()}',
-            notificationLayout: NotificationLayout.Default,
-          ),
-          schedule: NotificationCalendar(
-            year: notificationTime.year,
-            month: notificationTime.month,
-            day: notificationTime.day,
-            hour: notificationTime.hour,
-            minute: notificationTime.minute,
-            second: 0,
-          ),
-        );
-      } else {
-        final tomorrowNotificationTime = notificationTime.add(
-          const Duration(days: 1),
-        );
-        await AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: prayerName.hashCode,
-            channelKey: 'prayer_reminder_channel',
-            title: _text('title'),
-            body: '${_getPrayerName(prayerName)} ${_getNotificationBody()}',
-            notificationLayout: NotificationLayout.Default,
-          ),
-          schedule: NotificationCalendar(
-            year: tomorrowNotificationTime.year,
-            month: tomorrowNotificationTime.month,
-            day: tomorrowNotificationTime.day,
-            hour: tomorrowNotificationTime.hour,
-            minute: tomorrowNotificationTime.minute,
-            second: 0,
-          ),
-        );
-      }
-    } catch (e) {
-      print("Error scheduling notification for $prayerName: $e");
-    }
-  }
-
-  String _getNotificationBody() {
-    final languageProvider = Provider.of<LanguageProvider>(
-      context,
-      listen: false,
-    );
-    return languageProvider.isEnglish
-        ? 'Azan starts in 5 minutes, Prepare for Prayer'
-        : 'আযান এর মাত্র ৫ মিনিট বাকি, নামাজের প্রস্তুতি নিন';
-  }
-
-  // Prayer time detail dialog
-  void _showPrayerTimeDetail(String prayerName, String time) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: AppColors.getSurfaceColor(isDarkMode),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                _prayerTimeService.getPrayerIcon(prayerName),
-                size: 48,
-                color: AppColors.getPrimaryColor(isDarkMode),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _getPrayerName(prayerName),
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.getTextColor(isDarkMode),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _prayerTimeService.formatTimeTo12Hour(time),
-                style: TextStyle(
-                  fontSize: 18,
-                  color: AppColors.getTextSecondaryColor(isDarkMode),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                time,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Monospace',
-                  color: AppColors.getTextSecondaryColor(isDarkMode),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.getPrimaryColor(isDarkMode),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                ),
-                child: Text(
-                  _text('ok'),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildOfflineIndicator() {
@@ -946,13 +768,13 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           _text('title'),
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 16, // ফন্ট সাইজ ছোট করা হয়েছে
+            fontSize: 16,
             color: Colors.white,
-            height: 1.2, // লাইন হাইট কম করা হয়েছে
+            height: 1.2,
           ),
-          maxLines: 2, // সর্বোচ্চ ২ লাইন
-          overflow: TextOverflow.ellipsis, // ২ লাইনের বেশি হলে ... দেখাবে
-          textAlign: TextAlign.start, // টেক্সট অ্যালাইনমেন্ট
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.start,
         ),
         centerTitle: false,
         elevation: 0,
@@ -1116,7 +938,6 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
   }
 
   Widget _buildPrayerTab() {
-    // ProhibitedTimeService null check
     if (_prohibitedTimeService == null) {
       return Center(child: CircularProgressIndicator());
     }
@@ -1188,6 +1009,81 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           ],
         );
       },
+    );
+  }
+
+  // Prayer time detail dialog
+  void _showPrayerTimeDetail(String prayerName, String time) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: AppColors.getSurfaceColor(isDarkMode),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _prayerTimeService.getPrayerIcon(prayerName),
+                size: 48,
+                color: AppColors.getPrimaryColor(isDarkMode),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _getPrayerName(prayerName),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.getTextColor(isDarkMode),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _prayerTimeService.formatTimeTo12Hour(time),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: AppColors.getTextSecondaryColor(isDarkMode),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                time,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Monospace',
+                  color: AppColors.getTextSecondaryColor(isDarkMode),
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.getPrimaryColor(isDarkMode),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+                child: Text(
+                  _text('ok'),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_colors.dart';
 
 class DeveloperPage extends StatelessWidget {
   DeveloperPage({Key? key}) : super(key: key);
@@ -138,7 +139,9 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                 ? 'Could not launch: $value'
                 : 'খোলা যায়নি: $value',
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.getErrorColor(
+            Theme.of(context).brightness == Brightness.dark,
+          ),
         ),
       );
     }
@@ -151,7 +154,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: AppColors.getBackgroundColor(isDark),
       body: SafeArea(
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -162,7 +165,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                 pinned: true,
                 snap: false,
                 stretch: true,
-                backgroundColor: isDark ? Colors.black : Colors.green[800],
+                backgroundColor: AppColors.getAppBarColor(isDark),
                 foregroundColor: Colors.white,
                 toolbarHeight: 60,
                 collapsedHeight: 60,
@@ -209,11 +212,9 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                           Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [
-                                  Colors.green[900]!,
-                                  Colors.green[700]!,
-                                  Colors.green[500]!,
-                                ],
+                                colors: isDark
+                                    ? AppColors.darkHeaderGradient
+                                    : AppColors.lightHeaderGradient,
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -336,7 +337,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        color: isDark ? Colors.grey[800] : Colors.white,
+                        color: AppColors.getCardColor(isDark),
                         child: Padding(
                           padding: const EdgeInsets.all(20),
                           child: Column(
@@ -346,7 +347,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                                 children: [
                                   Icon(
                                     Icons.rocket_launch_rounded,
-                                    color: Colors.green[600],
+                                    color: AppColors.getPrimaryColor(isDark),
                                     size: 28,
                                   ),
                                   const SizedBox(width: 12),
@@ -357,9 +358,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.green[800],
+                                      color: AppColors.getTextColor(isDark),
                                     ),
                                   ),
                                 ],
@@ -372,9 +371,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
-                                  color: isDark
-                                      ? Colors.white
-                                      : Colors.grey[800],
+                                  color: AppColors.getTextColor(isDark),
                                   height: 1.6,
                                 ),
                               ),
@@ -383,8 +380,12 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? Colors.green[900]!.withOpacity(0.3)
-                                      : Colors.green[50],
+                                      ? AppColors.getPrimaryColor(
+                                          isDark,
+                                        ).withOpacity(0.2)
+                                      : AppColors.getPrimaryColor(
+                                          isDark,
+                                        ).withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
@@ -393,9 +394,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                                       : '💡 ধারণা থেকে বাস্তবায়ন - আপনার ব্যবসার জন্য সম্পূর্ণ প্রযুক্তিগত সমাধান',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: isDark
-                                        ? Colors.green[100]
-                                        : Colors.green[800],
+                                    color: AppColors.getPrimaryColor(isDark),
                                     fontStyle: FontStyle.italic,
                                   ),
                                 ),
@@ -413,7 +412,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.green[800],
+                          color: AppColors.getTextColor(isDark),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -422,7 +421,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        color: isDark ? Colors.grey[800] : Colors.white,
+                        color: AppColors.getCardColor(isDark),
                         child: Padding(
                           padding: const EdgeInsets.all(20),
                           child: Text(
@@ -432,7 +431,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                             style: TextStyle(
                               fontSize: 15,
                               height: 1.6,
-                              color: isDark ? Colors.white70 : Colors.grey[700],
+                              color: AppColors.getTextSecondaryColor(isDark),
                             ),
                           ),
                         ),
@@ -446,7 +445,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.green[800],
+                          color: AppColors.getTextColor(isDark),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -455,7 +454,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        color: isDark ? Colors.grey[800] : Colors.white,
+                        color: AppColors.getCardColor(isDark),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(
@@ -473,23 +472,26 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                                           contact['title']!,
                                           style: TextStyle(
                                             fontWeight: FontWeight.w500,
-                                            color: isDark
-                                                ? Colors.white
-                                                : Colors.grey[800],
+                                            color: AppColors.getTextColor(
+                                              isDark,
+                                            ),
                                           ),
                                         ),
                                         subtitle: Text(
                                           contact['value']!,
                                           style: TextStyle(
-                                            color: isDark
-                                                ? Colors.white70
-                                                : Colors.grey[600],
+                                            color:
+                                                AppColors.getTextSecondaryColor(
+                                                  isDark,
+                                                ),
                                           ),
                                         ),
                                         trailing: Icon(
                                           Icons.arrow_forward_ios_rounded,
                                           size: 16,
-                                          color: Colors.green[600],
+                                          color: AppColors.getPrimaryColor(
+                                            isDark,
+                                          ),
                                         ),
                                         onTap: () => _launchContact(
                                           contact['type']!,
@@ -511,7 +513,9 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Colors.green[700]!, Colors.green[500]!],
+                            colors: isDark
+                                ? AppColors.darkHeaderGradient
+                                : AppColors.lightHeaderGradient,
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),

@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
         _permissionsRequested = true;
       });
 
-      Timer(const Duration(seconds: 3), () {
+      Timer(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const HomePage()),
