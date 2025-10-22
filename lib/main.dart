@@ -1,20 +1,17 @@
 // main.dart
-// main.dart
-// main.dart
-//main.dart
 // main.dart - CORRECTED VERSION
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:islamicquiz/utils/notification_manager.dart';
+import 'package:islamicquiz/core/utils/notification_manager.dart';
 import 'package:provider/provider.dart';
 
-import 'providers/theme_provider.dart';
-import 'providers/language_provider.dart';
-import 'screens/splash_screen.dart';
-import 'utils/in_app_purchase_manager.dart';
-import 'ad_helper.dart';
-import 'managers/home_page.dart'; // ✅ সঠিক path
+import 'presentation/providers/theme_provider.dart';
+import 'presentation/providers/language_provider.dart';
+import 'presentation/screens/splash_screen.dart';
+import 'core/services/in_app_purchase_manager.dart';
+import 'core/constants/ad_helper.dart';
+import 'presentation/features/home/home_page.dart'; // ✅ সঠিক path
 
 // Route Observer global ভাবে declare করুন - শুধু একবার
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
