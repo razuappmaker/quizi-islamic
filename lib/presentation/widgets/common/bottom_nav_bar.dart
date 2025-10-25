@@ -22,7 +22,7 @@ class CustomBottomNavBar extends StatelessWidget {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final bool tablet = isTablet(context);
 
-    // Navigation items with both languages
+    // Navigation items with both languages - UPDATED WITH DOYA
     final List<BottomNavItem> navItems = [
       BottomNavItem(
         icon: Icons.home,
@@ -31,9 +31,9 @@ class CustomBottomNavBar extends StatelessWidget {
         index: 0,
       ),
       BottomNavItem(
-        icon: Icons.menu_book_rounded,
-        labelBn: 'শব্দে সূরা',
-        labelEn: 'Surah by Word',
+        icon: Icons.lightbulb_outline_rounded, // দুআর জন্য আইকন
+        labelBn: 'দুআ',
+        labelEn: 'Dua',
         index: 2,
       ),
       BottomNavItem(
@@ -54,10 +54,9 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Container(
         width: double.infinity,
         margin: EdgeInsets.symmetric(vertical: tablet ? 1 : 0),
-        // মার্জিন প্রায় শূন্য
         padding: EdgeInsets.symmetric(
-          horizontal: tablet ? 16 : 12, // হরিজন্টাল প্যাডিং ঠিক রাখা
-          vertical: tablet ? 2 : 1, // ভার্টিক্যাল প্যাডিং অনেক কম
+          horizontal: tablet ? 16 : 12,
+          vertical: tablet ? 2 : 1,
         ),
         decoration: BoxDecoration(
           color: isDarkMode ? _Colors.darkSurface : Colors.white,
@@ -108,7 +107,6 @@ class CustomBottomNavBar extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: EdgeInsets.symmetric(vertical: isTablet ? 2 : 1),
-          // ভার্টিক্যাল প্যাডিং অনেক কম
           decoration: BoxDecoration(
             gradient: isDefault && isSelected
                 ? LinearGradient(
@@ -137,27 +135,25 @@ class CustomBottomNavBar extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            // সেন্টার অ্যালাইনমেন্ট
             children: [
               CircleAvatar(
-                radius: isTablet ? 20 : 16, // আইকন সাইজ ঠিক রাখা
+                radius: isTablet ? 20 : 16,
                 backgroundColor: isSelected
                     ? (isDarkMode ? _Colors.darkPrimary : Colors.green[700])
                     : (isDarkMode ? _Colors.darkCard : Colors.green[200]),
                 child: Icon(
                   icon,
-                  size: isTablet ? 22 : 18, // আইকন সাইজ ঠিক রাখা
+                  size: isTablet ? 22 : 18,
                   color: isSelected
                       ? Colors.white
                       : (isDarkMode ? _Colors.darkText : Colors.green[700]),
                 ),
               ),
-              SizedBox(height: isTablet ? 4 : 3), // আইকন-টেক্সট দূরত্ব কম
+              SizedBox(height: isTablet ? 4 : 3),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: isTablet ? 14 : 12,
-                  // ফন্ট সাইজ ঠিক রাখা
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   color: isSelected
                       ? (isDarkMode ? _Colors.darkPrimary : Colors.green[700]!)
@@ -167,10 +163,10 @@ class CustomBottomNavBar extends StatelessWidget {
                   fontFamily: languageProvider.isEnglish
                       ? 'Roboto'
                       : 'HindSiliguri',
-                  height: 1.0, // লাইন হাইট কম
+                  height: 1.0,
                 ),
                 textAlign: TextAlign.center,
-                maxLines: 1, // এক লাইনে সীমিত
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ],

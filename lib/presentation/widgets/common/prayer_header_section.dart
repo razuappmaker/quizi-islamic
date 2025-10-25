@@ -1402,6 +1402,7 @@ class PrayerHeaderSection extends StatelessWidget {
   }
 
   int _getPrayerInfoFlex(double headerHeight) {
+    if (headerHeight < 120) return 2; // ← খুব ছোট স্ক্রিনে আরও কম Flex
     if (headerHeight < 150) return 3; // Reduced
     if (headerHeight < 180) return 4; // Reduced
     return 5; // Reduced
@@ -1420,6 +1421,7 @@ class PrayerHeaderSection extends StatelessWidget {
   }
 
   double _calculatePrayerNameFontSize(double headerHeight) {
+    if (headerHeight < 120) return 8; // ← নতুন condition যোগ করুন
     if (headerHeight < 150) return 12;
     if (headerHeight < 180) return 14;
     return 16;

@@ -1009,12 +1009,14 @@ class _HomePageState extends State<HomePage>
               ),
               _buildCompactIslamicCard(
                 context,
-                languageProvider.isEnglish ? 'Dua' : 'দুআ',
-                Icons.lightbulb_outline_rounded,
+                languageProvider.isEnglish
+                    ? 'Word by Word Quran'
+                    : 'শব্দে শব্দে কুরআন',
+                Icons.menu_book_rounded,
                 iconColor,
                 cardColor,
                 textColor,
-                const DoyaCategoryPage(),
+                const WordByWordQuranPage(),
                 isDarkMode,
                 isTablet,
               ),
@@ -1532,7 +1534,7 @@ class _HomePageState extends State<HomePage>
         if (mounted) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => WordByWordQuranPage()),
+            MaterialPageRoute(builder: (context) => DoyaCategoryPage()),
           );
         }
         break;
