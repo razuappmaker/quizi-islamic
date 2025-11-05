@@ -277,375 +277,348 @@ class _TasbeehPageState extends State<TasbeehPage> {
         ? screenWidth * 0.9
         : screenWidth * 0.75;
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: _isDarkMode
-          ? ThemeData.dark().copyWith(
-              primaryColor: Colors.green[800],
-              scaffoldBackgroundColor: Colors.grey[900],
-              cardColor: Colors.grey[800],
-              appBarTheme: AppBarTheme(
-                backgroundColor: AppColors.darkAppBar,
-                elevation: 0,
-              ),
-            )
-          : ThemeData.light().copyWith(
-              primaryColor: Colors.green[800],
-              scaffoldBackgroundColor: Colors.grey[100],
-              appBarTheme: AppBarTheme(
-                backgroundColor: AppColors.lightAppBar,
-                elevation: 0,
-              ),
-            ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            _text('pageTitle', context),
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-              color: Colors.white,
-            ),
+    // MaterialApp সরিয়ে শুধু Scaffold ব্যবহার করুন
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          _text('pageTitle', context),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: Colors.white,
           ),
-          backgroundColor: _isDarkMode
-              ? AppColors.darkAppBar
-              : AppColors.lightAppBar,
-          elevation: 2,
-          leading: Container(
-            margin: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: Icon(
-                Icons.arrow_back_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-              onPressed: () {
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context);
-                }
-              },
-              splashRadius: 20,
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                _isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                color: Colors.white,
-                size: 22,
-              ),
-              onPressed: _toggleDarkMode,
-              tooltip: _isDarkMode
-                  ? _text('lightMode', context)
-                  : _text('darkMode', context),
-            ),
-            PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: Colors.white, size: 22),
-              itemBuilder: (BuildContext context) => [
-                PopupMenuItem(
-                  value: "reset_session",
-                  child: Row(
-                    children: [
-                      Icon(Icons.refresh, size: 20, color: Colors.green),
-                      SizedBox(width: 8),
-                      Text(_text('resetSession', context)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: "reset_all",
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete_forever, size: 20, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text(_text('resetAll', context)),
-                    ],
-                  ),
-                ),
-              ],
-              onSelected: (value) {
-                if (value == "reset_session") {
-                  _resetUICounts();
-                } else if (value == "reset_all") {
-                  _resetAllCounts();
-                }
-              },
-            ),
-          ],
         ),
-        body: Container(
-          color: _backgroundColor,
-          child: Column(
-            children: [
-              // Main Content - SafeArea ব্যবহার করে
-              Expanded(
-                child: SafeArea(
-                  bottom: false,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    color: _backgroundColor,
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: (screenWidth - contentWidth) / 2,
-                        vertical: 16,
-                      ),
-                      child: Column(
-                        children: [
-                          // Header Display Card
-                          Container(
-                            width: cardWidth,
-                            margin: EdgeInsets.only(bottom: 20),
-                            child: Card(
-                              elevation: 8,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              color: _isDarkMode
-                                  ? Colors.grey[800]
-                                  : Colors.white,
-                              child: Padding(
-                                padding: const EdgeInsets.all(24),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      selectedPhrase,
-                                      style: TextStyle(
-                                        fontSize: isSmallScreen ? 26 : 30,
-                                        fontWeight: FontWeight.bold,
-                                        color: _isDarkMode
-                                            ? Colors.green[300]
-                                            : Colors.green[700],
-                                        height: 1.4,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      _getCurrentCount().toString(),
-                                      style: TextStyle(
-                                        fontSize: isSmallScreen ? 52 : 60,
-                                        fontWeight: FontWeight.w800,
-                                        color: _isDarkMode
-                                            ? Colors.green[300]
-                                            : Colors.green[700],
-                                        letterSpacing: 1.5,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.access_time,
-                                          size: 16,
-                                          color: _isDarkMode
-                                              ? Colors.grey[400]
-                                              : Colors.grey[600],
-                                        ),
-                                        SizedBox(width: 6),
-                                        Text(
-                                          _text('currentSession', context),
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: _isDarkMode
-                                                ? Colors.grey[400]
-                                                : Colors.grey[600],
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      "${_text('totalZikr', context)}: ${_getTotalCount()}",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: _isDarkMode
-                                            ? Colors.green[300]
-                                            : Colors.green[600],
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          // Tasbeeh Buttons
-                          Container(
-                            width: contentWidth,
-                            margin: EdgeInsets.only(bottom: 20),
-                            child: Column(
-                              children: tasbeehPhrases.asMap().entries.map((
-                                entry,
-                              ) {
-                                int index = entry.key;
-                                String phrase = entry.value;
-                                Color color = colors[index % colors.length];
-                                Color darkColor = index == 0
-                                    ? Colors.green[300]!
-                                    : index == 1
-                                    ? Colors.blue[300]!
-                                    : Colors.orange[300]!;
-
-                                return Container(
-                                  margin: EdgeInsets.only(bottom: 12),
-                                  child: _buildTasbeehButton(
-                                    phrase: phrase,
-                                    color: color,
-                                    darkColor: darkColor,
-                                    count: _getCountForPhrase(phrase),
-                                    isSelected: selectedPhrase == phrase,
-                                    context: context,
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-
-                          // Simple Hadith Text (without extra space)
-                          Container(
-                            width: contentWidth,
-                            margin: EdgeInsets.only(bottom: 8), // কম margin
-                            child: Text(
-                              _text('zikrHadith', context),
-                              style: TextStyle(
-                                fontSize: 14,
-                                height: 1.4,
-                                color: _isDarkMode
-                                    ? Colors.grey[300]
-                                    : Colors.grey[700],
-                                fontStyle: FontStyle.italic,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-
-                          // Extra space for bottom buttons and ad
-                          SizedBox(height: _isBannerAdReady ? 80 : 120),
-                        ],
-                      ),
-                    ),
-                  ),
+        backgroundColor: _isDarkMode
+            ? AppColors.darkAppBar
+            : AppColors.lightAppBar,
+        elevation: 2,
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () {
+              Navigator.pop(context); // সরাসরি Navigator.pop ব্যবহার করুন
+            },
+            splashRadius: 20,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: Colors.white,
+              size: 22,
+            ),
+            onPressed: _toggleDarkMode,
+            tooltip: _isDarkMode
+                ? _text('lightMode', context)
+                : _text('darkMode', context),
+          ),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: Colors.white, size: 22),
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem(
+                value: "reset_session",
+                child: Row(
+                  children: [
+                    Icon(Icons.refresh, size: 20, color: Colors.green),
+                    SizedBox(width: 8),
+                    Text(_text('resetSession', context)),
+                  ],
                 ),
               ),
-
-              // Bottom Section (Buttons + Ad)
-              SafeArea(
-                top: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+              PopupMenuItem(
+                value: "reset_all",
+                child: Row(
                   children: [
-                    // Action Buttons Section
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: (screenWidth - contentWidth) / 2,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _isDarkMode ? Colors.grey[900] : Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 8,
-                            offset: Offset(0, -2),
-                          ),
-                        ],
-                      ),
-                      child: isSmallScreen
-                          ? Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildActionButton(
-                                        icon: Icons.refresh,
-                                        text: _text('resetSession', context),
-                                        color: Colors.orange,
-                                        onPressed: _resetUICounts,
-                                        isSmall: true,
-                                        context: context,
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Expanded(
-                                      child: _buildActionButton(
-                                        icon: Icons.bar_chart,
-                                        text: _text('lifetimeStats', context),
-                                        color: Colors.blue,
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  TasbeehStatsPage(),
-                                            ),
-                                          );
-                                        },
-                                        isSmall: true,
-                                        context: context,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Expanded(
-                                  child: _buildActionButton(
-                                    icon: Icons.refresh,
-                                    text: _text('resetSession', context),
-                                    color: Colors.orange,
-                                    onPressed: _resetUICounts,
-                                    isSmall: false,
-                                    context: context,
-                                  ),
-                                ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildActionButton(
-                                    icon: Icons.bar_chart,
-                                    text: _text('lifetimeStats', context),
-                                    color: Colors.blue,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              TasbeehStatsPage(),
-                                        ),
-                                      );
-                                    },
-                                    isSmall: false,
-                                    context: context,
-                                  ),
-                                ),
-                              ],
-                            ),
-                    ),
-
-                    // ✅ Adaptive Banner Ad
-                    if (_isBannerAdReady && _bannerAd != null)
-                      Container(
-                        width: double.infinity,
-                        height: _bannerAd!.size.height.toDouble(),
-                        alignment: Alignment.center,
-                        color: _isDarkMode ? Colors.grey[900] : Colors.white,
-                        child: AdWidget(ad: _bannerAd!),
-                      ),
+                    Icon(Icons.delete_forever, size: 20, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text(_text('resetAll', context)),
                   ],
                 ),
               ),
             ],
+            onSelected: (value) {
+              if (value == "reset_session") {
+                _resetUICounts();
+              } else if (value == "reset_all") {
+                _resetAllCounts();
+              }
+            },
           ),
+        ],
+      ),
+      body: Container(
+        color: _backgroundColor,
+        child: Column(
+          children: [
+            // Main Content - SafeArea ব্যবহার করে
+            Expanded(
+              child: SafeArea(
+                bottom: false,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  color: _backgroundColor,
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: (screenWidth - contentWidth) / 2,
+                      vertical: 16,
+                    ),
+                    child: Column(
+                      children: [
+                        // Header Display Card
+                        Container(
+                          width: cardWidth,
+                          margin: EdgeInsets.only(bottom: 20),
+                          child: Card(
+                            elevation: 8,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            color: _isDarkMode
+                                ? Colors.grey[800]
+                                : Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    selectedPhrase,
+                                    style: TextStyle(
+                                      fontSize: isSmallScreen ? 26 : 30,
+                                      fontWeight: FontWeight.bold,
+                                      color: _isDarkMode
+                                          ? Colors.green[300]
+                                          : Colors.green[700],
+                                      height: 1.4,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    _getCurrentCount().toString(),
+                                    style: TextStyle(
+                                      fontSize: isSmallScreen ? 52 : 60,
+                                      fontWeight: FontWeight.w800,
+                                      color: _isDarkMode
+                                          ? Colors.green[300]
+                                          : Colors.green[700],
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.access_time,
+                                        size: 16,
+                                        color: _isDarkMode
+                                            ? Colors.grey[400]
+                                            : Colors.grey[600],
+                                      ),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        _text('currentSession', context),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: _isDarkMode
+                                              ? Colors.grey[400]
+                                              : Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "${_text('totalZikr', context)}: ${_getTotalCount()}",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: _isDarkMode
+                                          ? Colors.green[300]
+                                          : Colors.green[600],
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Tasbeeh Buttons
+                        Container(
+                          width: contentWidth,
+                          margin: EdgeInsets.only(bottom: 20),
+                          child: Column(
+                            children: tasbeehPhrases.asMap().entries.map((
+                              entry,
+                            ) {
+                              int index = entry.key;
+                              String phrase = entry.value;
+                              Color color = colors[index % colors.length];
+                              Color darkColor = index == 0
+                                  ? Colors.green[300]!
+                                  : index == 1
+                                  ? Colors.blue[300]!
+                                  : Colors.orange[300]!;
+
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 12),
+                                child: _buildTasbeehButton(
+                                  phrase: phrase,
+                                  color: color,
+                                  darkColor: darkColor,
+                                  count: _getCountForPhrase(phrase),
+                                  isSelected: selectedPhrase == phrase,
+                                  context: context,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+
+                        // Simple Hadith Text (without extra space)
+                        Container(
+                          width: contentWidth,
+                          margin: EdgeInsets.only(bottom: 8), // কম margin
+                          child: Text(
+                            _text('zikrHadith', context),
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 1.4,
+                              color: _isDarkMode
+                                  ? Colors.grey[300]
+                                  : Colors.grey[700],
+                              fontStyle: FontStyle.italic,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+
+                        // Extra space for bottom buttons and ad
+                        SizedBox(height: _isBannerAdReady ? 80 : 120),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Bottom Section (Buttons + Ad)
+            SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Action Buttons Section
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: (screenWidth - contentWidth) / 2,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _isDarkMode ? Colors.grey[900] : Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, -2),
+                        ),
+                      ],
+                    ),
+                    child: isSmallScreen
+                        ? Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildActionButton(
+                                      icon: Icons.refresh,
+                                      text: _text('resetSession', context),
+                                      color: Colors.orange,
+                                      onPressed: _resetUICounts,
+                                      isSmall: true,
+                                      context: context,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Expanded(
+                                    child: _buildActionButton(
+                                      icon: Icons.bar_chart,
+                                      text: _text('lifetimeStats', context),
+                                      color: Colors.blue,
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                TasbeehStatsPage(),
+                                          ),
+                                        );
+                                      },
+                                      isSmall: true,
+                                      context: context,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              Expanded(
+                                child: _buildActionButton(
+                                  icon: Icons.refresh,
+                                  text: _text('resetSession', context),
+                                  color: Colors.orange,
+                                  onPressed: _resetUICounts,
+                                  isSmall: false,
+                                  context: context,
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: _buildActionButton(
+                                  icon: Icons.bar_chart,
+                                  text: _text('lifetimeStats', context),
+                                  color: Colors.blue,
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            TasbeehStatsPage(),
+                                      ),
+                                    );
+                                  },
+                                  isSmall: false,
+                                  context: context,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+
+                  // ✅ Adaptive Banner Ad
+                  if (_isBannerAdReady && _bannerAd != null)
+                    Container(
+                      width: double.infinity,
+                      height: _bannerAd!.size.height.toDouble(),
+                      alignment: Alignment.center,
+                      color: _isDarkMode ? Colors.grey[900] : Colors.white,
+                      child: AdWidget(ad: _bannerAd!),
+                    ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

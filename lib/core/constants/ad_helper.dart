@@ -448,11 +448,11 @@ class AdHelper {
 
 // ==================== অ্যাড লিমিট ম্যানেজমেন্ট ক্লাস ====================
 class AdLimitManager {
-  static const int maxDailyImpressions = 400; // production এ 20 হবে
+  static const int maxDailyImpressions = 20; // production এ 20 হবে
   static const int maxDailyClicks = 5;
-  static const int maxImpressionsPerMinute = 30; // production এ 3 হবে
-  static const int maxBannerAdsPerHour = 100; // production এ 10 হবে
-  static const int maxInterstitialAdsPerHour = 30; // production এ 3 হবে
+  static const int maxImpressionsPerMinute = 3; // production এ 3 হবে
+  static const int maxBannerAdsPerHour = 10; // production এ 10 হবে
+  static const int maxInterstitialAdsPerHour = 3; // production এ 3 হবে
 
   // 🔥 ব্যানার অ্যাড দেখানো যাবে কিনা চেক করুন
   Future<bool> canShowBannerAd() async {

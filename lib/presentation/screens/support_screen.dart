@@ -32,95 +32,101 @@ class _SupportScreenState extends State<SupportScreen> {
     'title': {'en': 'App Support', 'bn': 'অ্যাপ সাপোর্ট'},
     'headerTitle': {
       'en': 'Support App Development',
-      'bn': 'অ্যাপ ডেভেলপমেন্টে সহায়তা করুন',
+      'bn': 'অ্যাপ ডেভেলপমেন্টে সহযোগিতা করুন',
     },
     'headerSubtitle': {
       'en': 'Optional support to help improve the app experience',
-      'bn': 'অ্যাপের অভিজ্ঞতা উন্নত করতে ঐচ্ছিক সহায়তা',
+      'bn': 'অ্যাপের উন্নতির জন্য আপনার স্বতঃস্ফূর্ত সহযোগিতা',
     },
     'whySupport': {
       'en': 'How Your Support Helps',
-      'bn': 'আপনার সহায়তা কীভাবে সাহায্য করে',
+      'bn': 'আপনার সহযোগিতার উপকারিতা',
     },
-    'serverCosts': {'en': 'Server Maintenance', 'bn': 'সার্ভার রক্ষণাবেক্ষণ'},
+    'serverCosts': {'en': 'Server Maintenance', 'bn': 'সার্ভার মেইনটেন্যান্স'},
     'serverDesc': {
       'en': 'Helps keep the app running smoothly',
-      'bn': 'অ্যাপটি সচল রাখতে সাহায্য করে',
+      'bn': 'অ্যাপটি সচল ও দ্রুত রাখতে সহায়তা করে',
     },
-    'appDevelopment': {'en': 'App Improvements', 'bn': 'অ্যাপ উন্নয়ন'},
+    'appDevelopment': {'en': 'App Improvements', 'bn': 'অ্যাপের উন্নয়ন'},
     'appDevDesc': {
       'en': 'Enables new features and updates',
-      'bn': 'নতুন ফিচার এবং আপডেট সক্ষম করে',
+      'bn': 'নতুন ফিচার এবং আপডেট যুক্ত করতে সাহায্য করে',
     },
     'security': {'en': 'App Maintenance', 'bn': 'অ্যাপ রক্ষণাবেক্ষণ'},
     'securityDesc': {
       'en': 'Regular updates and bug fixes',
-      'bn': 'নিয়মিত আপডেট এবং বাগ ফিক্স',
+      'bn': 'নিয়মিত আপডেট এবং সমস্যা সমাধান',
     },
-    'makeDifference': {'en': 'Contribute', 'bn': 'অবদান রাখুন'},
-    'supportGooglePlay': {'en': 'In-app Support', 'bn': 'ইন-অ্যাপ সাপোর্ট'},
-    'donateWebsite': {'en': 'External Support', 'bn': 'বাহ্যিক সাপোর্ট'},
+    'makeDifference': {'en': 'Contribute', 'bn': 'সহযোগিতা করুন'},
+    'supportGooglePlay': {
+      'en': 'In-app Support',
+      'bn': 'অ্যাপের মধ্যেই সহযোগিতা',
+    },
+    'donateWebsite': {'en': 'External Support', 'bn': 'বাহ্যিক সহযোগিতা'},
     'contactInfo': {'en': 'Contact Information', 'bn': 'যোগাযোগের তথ্য'},
-    'liveDonations': {'en': 'Community Activity', 'bn': 'কমিউনিটি কার্যক্রম'},
-    'supportersToday': {'en': 'Active Today', 'bn': 'আজকের কার্যক্রম'},
+    'liveDonations': {'en': 'Community Activity', 'bn': 'কমিউনিটির কার্যক্রম'},
+    'supportersToday': {
+      'en': 'Active Today',
+      'bn': 'আজকের সক্রিয় ব্যবহারকারী',
+    },
     'multipleCurrencies': {
       'en': 'Free Options Available',
       'bn': 'বিনামূল্যের অপশন উপলব্ধ',
     },
     'hideTicker': {'en': 'Hide Activity', 'bn': 'কার্যকলাপ লুকান'},
-    'showTicker': {'en': 'Show Activity', 'bn': 'কার্যকলাপ দেখান'},
+    'showTicker': {'en': 'Show Activity', 'bn': 'কার্যকলাপ দেখুন'},
     'demoDataInfo': {
       'en': 'Shows community engagement examples',
-      'bn': 'কমিউনিটি এনগেজমেন্ট উদাহরণ দেখায়',
+      'bn': 'কমিউনিটির অংশগ্রহণের উদাহরণ দেখায়',
     },
-    'visitWebsite': {'en': 'More Information', 'bn': 'আরও তথ্য'},
+    'visitWebsite': {'en': 'More Information', 'bn': 'আরও তথ্য জানুন'},
     'websiteDialogContent': {
       'en':
           'For additional information about optional support options, visit our website. All app features remain available without support.',
       'bn':
-          'ঐচ্ছিক সাপোর্ট অপশন সম্পর্কে অতিরিক্ত তথ্যের জন্য আমাদের ওয়েবসাইট ভিজিট করুন। সমস্ত অ্যাপ ফিচার সাপোর্ট ছাড়াই উপলব্ধ থাকবে।',
+          'ঐচ্ছিক সহযোগিতার বিকল্পগুলো সম্পর্কে আরও জানতে আমাদের ওয়েবসাইট ভিজিট করুন। সকল অ্যাপ ফিচার বিনামূল্যেই ব্যবহারযোগ্য।',
     },
     'cancel': {'en': 'Cancel', 'bn': 'বাতিল'},
-    'visitWebsiteBtn': {'en': 'Learn More', 'bn': 'আরও জানুন'},
-    'linkError': {'en': 'Could not open link', 'bn': 'লিঙ্ক খুলতে ব্যর্থ'},
+    'visitWebsiteBtn': {'en': 'Learn More', 'bn': 'বিস্তারিত জানুন'},
+    'linkError': {'en': 'Could not open link', 'bn': 'লিংকটি খোলা যায়নি'},
     'googlePlayMessage': {
       'en': 'Optional in-app support will be implemented here',
-      'bn': 'ঐচ্ছিক ইন-অ্যাপ সাপোর্ট এখানে ইমপ্লিমেন্ট করা হবে',
+      'bn': 'অ্যাপের মধ্যেই সহযোগিতার অপশন শীঘ্রই যুক্ত হবে',
     },
-    'rateApp': {'en': 'Rate App', 'bn': 'অ্যাপ রেট করুন'},
+    'rateApp': {'en': 'Rate App', 'bn': 'অ্যাপটি রেট করুন'},
     'rateAppSubtitle': {
       'en': 'Free way to support development',
-      'bn': 'ডেভেলপমেন্ট সাপোর্টের বিনামূল্যের উপায়',
+      'bn': 'ডেভেলপমেন্টে সহযোগিতার বিনামূল্যের উপায়',
     },
-    'shareApp': {'en': 'Share App', 'bn': 'অ্যাপ শেয়ার করুন'},
+    'shareApp': {'en': 'Share App', 'bn': 'অ্যাপটি শেয়ার করুন'},
     'shareAppSubtitle': {
       'en': 'Help others discover this app',
-      'bn': 'অন্যদের এই অ্যাপটি খুঁজে পেতে সাহায্য করুন',
+      'bn': 'অন্যকেও এই অ্যাপটির সাথে পরিচয় করিয়ে দিন',
     },
-    'removeAds': {'en': 'Ad-Free Experience', 'bn': 'এড-মুক্ত অভিজ্ঞতা'},
+    'removeAds': {'en': 'Ad-Free Experience', 'bn': 'বিজ্ঞাপনমুক্ত অভিজ্ঞতা'},
     'removeAdsSubtitle': {
       'en': 'Optional ad-free version',
-      'bn': 'ঐচ্ছিক এড-মুক্ত ভার্সন',
+      'bn': 'ঐচ্ছিক বিজ্ঞাপনমুক্ত ভার্সন',
     },
-    'makeDonation': {'en': 'External Support', 'bn': 'বাহ্যিক সহায়তা'},
+    'makeDonation': {'en': 'External Support', 'bn': 'বাহ্যিক সহযোগিতা'},
     'makeDonationSubtitle': {
       'en': 'Optional external support options',
-      'bn': 'ঐচ্ছিক বাহ্যিক সহায়তা অপশন',
+      'bn': 'বাহ্যিক সহযোগিতার ঐচ্ছিক অপশনসমূহ',
     },
     'policyNote': {
       'en':
           'All support options are completely voluntary. The app remains fully functional without any support. No features are restricted.',
       'bn':
-          'সমস্ত সাপোর্ট অপশন সম্পূর্ণ ঐচ্ছিক। অ্যাপটি কোনো সাপোর্ট ছাড়াই সম্পূর্ণ কার্যকরী থাকবে। কোনো ফিচার সীমাবদ্ধ নেই।',
+          'সকল সহযোগিতার অপশন সম্পূর্ণ ঐচ্ছিক। অ্যাপটি সকল ফিচারসহ সম্পূর্ণ ফ্রি। কোনো সীমাবদ্ধতা আরোপিত হবে না।',
     },
     'voluntaryNotice': {
       'en': 'VOLUNTARY SUPPORT - NOT REQUIRED',
-      'bn': 'ঐচ্ছিক সহায়তা - বাধ্যতামূলক নয়',
+      'bn': 'স্বতঃস্ফূর্ত সহযোগিতা - বাধ্যতামূলক নয়',
     },
-    'yourContributions': {'en': 'Your Activity', 'bn': 'আপনার কার্যকলাপ'},
+    'yourContributions': {'en': 'Your Activity', 'bn': 'আপনার কার্যক্রম'},
     'communityEngagement': {
       'en': 'Community Engagement',
-      'bn': 'কমিউনিটি অংশগ্রহণ',
+      'bn': 'কমিউনিটির অংশগ্রহণ',
     },
   };
 
@@ -272,7 +278,7 @@ class _SupportScreenState extends State<SupportScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              _launchURL('https://www.islamicquiz.com/support');
+              _launchURL('https://codescapebd.com/support-us/');
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
@@ -1181,8 +1187,8 @@ class _SupportScreenState extends State<SupportScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            _buildContactItem(Icons.email, 'support@islamicquiz.com'),
-            _buildContactItem(Icons.language, 'www.islamicquiz.com'),
+            _buildContactItem(Icons.email, 'info@codescapebd.com'),
+            _buildContactItem(Icons.language, 'www.codescapebd.com'),
           ],
         ),
       ),

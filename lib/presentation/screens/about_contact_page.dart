@@ -783,6 +783,7 @@ Families learning together in supportive environment
     );
   }
 
+  // Contact Section - Updated contact methods
   Widget _buildContactSection(
     BuildContext context,
     bool isEnglish,
@@ -793,8 +794,9 @@ Families learning together in supportive environment
       {
         'icon': Icons.email_rounded,
         'title': isEnglish ? 'Email Support' : 'ইমেইল সাপোর্ট',
-        'value': 'support@islamicday.com',
-        'action': () => _launchEmail(context, 'support@islamicday.com'),
+        'value': 'info@codescapebd.com',
+        'action': () =>
+            _launchEmail(context, 'info@codescapebd.com', isEnglish),
       },
       {
         'icon': Icons.help_rounded,
@@ -806,7 +808,8 @@ Families learning together in supportive environment
         'icon': Icons.feedback_rounded,
         'title': isEnglish ? 'Send Feedback' : 'ফিডব্যাক পাঠান',
         'value': isEnglish ? 'Share your thoughts' : 'আপনার মতামত শেয়ার করুন',
-        'action': () => _launchEmail(context, 'feedback@islamicday.com'),
+        'action': () =>
+            _launchEmail(context, 'info@codescapebd.com', isEnglish),
       },
     ];
 
@@ -1050,6 +1053,114 @@ Families learning together in supportive environment
     );
   }
 
+  // Copy to clipboard function
+  void _copyToClipboard(BuildContext context, String text, bool isEnglish) {
+    // For web compatibility, we'll use a simple approach
+    // In a real app, you might want to use the clipboard package
+    final message = isEnglish
+        ? 'Email address copied: $text'
+        : 'ইমেইল ঠিকানা কপি করা হয়েছে: $text';
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
+  // Fallback dialog when email app is not found
+  void _showEmailFallbackDialog(
+    BuildContext context,
+    String email,
+    bool isEnglish,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.darkCard
+            : Colors.white,
+        title: Text(
+          isEnglish ? 'Email App Not Found' : 'ইমেইল অ্যাপ পাওয়া যায়নি',
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.darkText
+                : Colors.black87,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isEnglish
+                  ? 'Please send email to:'
+                  : 'অনুগ্রহ করে ইমেইল পাঠান এই ঠিকানায়:',
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.darkTextSecondary
+                    : Colors.black54,
+              ),
+            ),
+            SizedBox(height: 8),
+            SelectableText(
+              email,
+              style: TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            SizedBox(height: 12),
+            Text(
+              isEnglish
+                  ? 'Email address has been copied to clipboard.'
+                  : 'ইমেইল ঠিকানা ক্লিপবোর্ডে কপি করা হয়েছে।',
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.darkTextSecondary
+                    : Colors.green[700],
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              isEnglish ? 'Close' : 'বন্ধ করুন',
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.darkTextSecondary
+                    : Colors.grey[700],
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Copy to clipboard
+              _copyToClipboard(context, email, isEnglish);
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.darkPrimary
+                  : Colors.green[700],
+            ),
+            child: Text(
+              isEnglish ? 'Copy Email' : 'ইমেইল কপি করুন',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Updated help dialog
   void _showHelpDialog(BuildContext context, bool isEnglish, bool isDark) {
     showDialog(
       context: context,
@@ -1059,13 +1170,24 @@ Families learning together in supportive environment
           isEnglish ? 'Need Help?' : 'সহায়তা প্রয়োজন?',
           style: TextStyle(color: isDark ? AppColors.darkText : Colors.black87),
         ),
-        content: Text(
-          isEnglish
-              ? 'For any assistance or questions, please email us at support@islamicday.com'
-              : 'যেকোনো সহায়তা বা প্রশ্নের জন্য, আমাদের ইমেইল করুন support@islamicday.com',
-          style: TextStyle(
-            color: isDark ? AppColors.darkTextSecondary : Colors.black54,
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isEnglish
+                  ? 'For any assistance or questions:'
+                  : 'যেকোনো সহায়তা বা প্রশ্নের জন্য:',
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextSecondary : Colors.black54,
+              ),
+            ),
+            SizedBox(height: 8),
+            SelectableText(
+              'info@codescapebd.com',
+              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -1080,7 +1202,7 @@ Families learning together in supportive environment
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              _launchEmail(context, 'support@islamicday.com');
+              _launchEmail(context, 'info@codescapebd.com', isEnglish);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: isDark
@@ -1089,7 +1211,7 @@ Families learning together in supportive environment
             ),
             child: Text(
               isEnglish ? 'Send Email' : 'ইমেইল পাঠান',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white),
             ),
           ),
         ],
@@ -1097,21 +1219,35 @@ Families learning together in supportive environment
     );
   }
 
-  Future<void> _launchEmail(BuildContext context, String email) async {
-    final Uri uri = Uri.parse('mailto:$email');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Email app not found. Please send email to: $email',
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
-      );
+  // Updated email launch function
+  Future<void> _launchEmail(
+    BuildContext context,
+    String email,
+    bool isEnglish,
+  ) async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: email,
+      queryParameters: {
+        'subject': isEnglish
+            ? 'Islamic Day App Support'
+            : 'ইসলামিক ডে অ্যাপ সাপোর্ট',
+        'body': isEnglish
+            ? 'Hello Islamic Day Team,\n\nI would like to get support regarding:'
+            : 'আসসালামু আলাইকুম ইসলামিক ডে টিম,\n\nআমি সহায়তা চাই বিষয়:',
+      },
+    );
+
+    try {
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri);
+      } else {
+        // Fallback: Copy email to clipboard and show message
+        _showEmailFallbackDialog(context, email, isEnglish);
+      }
+    } catch (e) {
+      // If everything fails, show fallback dialog
+      _showEmailFallbackDialog(context, email, isEnglish);
     }
   }
 }

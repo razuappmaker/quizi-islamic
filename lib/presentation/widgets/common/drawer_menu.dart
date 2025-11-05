@@ -344,7 +344,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
               null,
               isDarkMode: isDarkMode,
               isSmallPhone: isSmallPhone,
-              url: 'https://sites.google.com/view/islamicquize/home',
+              url: 'https://sites.google.com/view/islamicday/home',
             ),
             _buildDivider(isDarkMode),
 

@@ -15,7 +15,7 @@
 
     <application
         android:icon="@mipmap/ic_launcher"
-        android:label="islamicquiz"
+        android:label="Islamic Day"
         android:roundIcon="@mipmap/ic_launcher_round"> <!-- ← এখানে ঠিক করুন -->
 
         <!-- AdMob App ID -->

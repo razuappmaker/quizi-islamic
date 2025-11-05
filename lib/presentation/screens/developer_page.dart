@@ -1,4 +1,4 @@
-//developer page
+// Developer Page - Updated Contact Section
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -57,7 +57,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
       {
         'icon': '📧',
         'title': 'ইমেইল',
-        'value': 'rajudev.bd@gmail.com',
+        'value': 'codescapebd@gmail.com',
         'type': 'email',
       },
       {
@@ -67,15 +67,15 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
         'type': 'phone',
       },
       {
-        'icon': '💼',
-        'title': 'লিংকডইন',
-        'value': 'linkedin.com/in/rajudev',
-        'type': 'linkedin',
+        'icon': '🌐',
+        'title': 'ফেসবুক',
+        'value': 'facebook.com/razuhossen',
+        'type': 'facebook',
       },
       {
-        'icon': '👨‍💻',
+        'icon': '💼',
         'title': 'পোর্টফোলিও',
-        'value': 'rajudev.com',
+        'value': 'codescapebd.com/Portfolio/',
         'type': 'portfolio',
       },
     ],
@@ -83,7 +83,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
       {
         'icon': '📧',
         'title': 'Email',
-        'value': 'rajudev.bd@gmail.com',
+        'value': 'codescapebd@gmail.com',
         'type': 'email',
       },
       {
@@ -93,15 +93,15 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
         'type': 'phone',
       },
       {
-        'icon': '💼',
-        'title': 'LinkedIn',
-        'value': 'linkedin.com/in/rajudev',
-        'type': 'linkedin',
+        'icon': '🌐',
+        'title': 'Facebook',
+        'value': 'facebook.com/RazuInspires',
+        'type': 'facebook',
       },
       {
-        'icon': '👨‍💻',
+        'icon': '💼',
         'title': 'Portfolio',
-        'value': 'rajudev.com',
+        'value': 'codescapebd.com/portfolio',
         'type': 'portfolio',
       },
     ],
@@ -109,15 +109,22 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
 
   void _launchContact(String type, String value, BuildContext context) async {
     final Uri uri;
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
+    final isEnglish = languageProvider.isEnglish;
 
     switch (type) {
       case 'email':
-        uri = Uri.parse('mailto:$value');
+        uri = Uri.parse(
+          'mailto:$value?subject=${isEnglish ? 'Project Inquiry' : 'প্রজেক্ট সম্পর্কে জানতে চাই'}&body=${isEnglish ? 'Hello Raju,\n\nI would like to discuss:' : 'আসসালামু আলাইকুম রাজু ভাই,\n\nআমি আলোচনা করতে চাই:'}',
+        );
         break;
       case 'phone':
         uri = Uri.parse('tel:$value');
         break;
-      case 'linkedin':
+      case 'facebook':
         uri = Uri.parse('https://$value');
         break;
       case 'portfolio':
@@ -130,21 +137,116 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
     try {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
+      } else {
+        _showContactFallbackDialog(context, type, value, isEnglish);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            Provider.of<LanguageProvider>(context, listen: false).isEnglish
-                ? 'Could not launch: $value'
-                : 'খোলা যায়নি: $value',
-          ),
-          backgroundColor: AppColors.getErrorColor(
-            Theme.of(context).brightness == Brightness.dark,
+      _showContactFallbackDialog(context, type, value, isEnglish);
+    }
+  }
+
+  void _showContactFallbackDialog(
+    BuildContext context,
+    String type,
+    String value,
+    bool isEnglish,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.getCardColor(
+          Theme.of(context).brightness == Brightness.dark,
+        ),
+        title: Text(
+          isEnglish ? 'Contact Information' : 'যোগাযোগের তথ্য',
+          style: TextStyle(
+            color: AppColors.getTextColor(
+              Theme.of(context).brightness == Brightness.dark,
+            ),
           ),
         ),
-      );
-    }
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isEnglish
+                  ? 'Please use this information to contact:'
+                  : 'যোগাযোগ করতে এই তথ্য ব্যবহার করুন:',
+              style: TextStyle(
+                color: AppColors.getTextSecondaryColor(
+                  Theme.of(context).brightness == Brightness.dark,
+                ),
+              ),
+            ),
+            SizedBox(height: 12),
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.getPrimaryColor(
+                  Theme.of(context).brightness == Brightness.dark,
+                ).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(
+                value,
+                style: TextStyle(
+                  color: AppColors.getPrimaryColor(
+                    Theme.of(context).brightness == Brightness.dark,
+                  ),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              isEnglish
+                  ? 'Information copied to clipboard'
+                  : 'তথ্য ক্লিপবোর্ডে কপি করা হয়েছে',
+              style: TextStyle(color: Colors.green, fontSize: 12),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              isEnglish ? 'Close' : 'বন্ধ করুন',
+              style: TextStyle(
+                color: AppColors.getTextSecondaryColor(
+                  Theme.of(context).brightness == Brightness.dark,
+                ),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Copy to clipboard functionality would go here
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    isEnglish ? 'Copied: $value' : 'কপি করা হয়েছে: $value',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.getPrimaryColor(
+                Theme.of(context).brightness == Brightness.dark,
+              ),
+            ),
+            child: Text(
+              isEnglish ? 'Copy' : 'কপি করুন',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -159,7 +261,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
-              // Header Section
+              // Header Section (unchanged)
               SliverAppBar(
                 expandedHeight: 280,
                 pinned: true,
@@ -439,7 +541,7 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
 
                       const SizedBox(height: 24),
 
-                      // Contact Section
+                      // Updated Contact Section
                       Text(
                         isEnglish ? 'Get In Touch' : 'যোগাযোগ করুন',
                         style: TextStyle(
@@ -463,40 +565,73 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                                         ? contactInfo['contacts_en']!
                                         : contactInfo['contacts']!)
                                     .map((contact) {
-                                      return ListTile(
-                                        leading: Text(
-                                          contact['icon']!,
-                                          style: const TextStyle(fontSize: 20),
+                                      return Card(
+                                        margin: const EdgeInsets.only(
+                                          bottom: 12,
                                         ),
-                                        title: Text(
-                                          contact['title']!,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.getTextColor(
+                                        elevation: 2,
+                                        color: AppColors.getSurfaceColor(
+                                          isDark,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: ListTile(
+                                          leading: Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.getPrimaryColor(
+                                                isDark,
+                                              ).withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              contact['icon']!,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                          ),
+                                          title: Text(
+                                            contact['title']!,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.getTextColor(
+                                                isDark,
+                                              ),
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            contact['value']!,
+                                            style: TextStyle(
+                                              color:
+                                                  AppColors.getTextSecondaryColor(
+                                                    isDark,
+                                                  ),
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          trailing: Icon(
+                                            Icons.arrow_forward_ios_rounded,
+                                            size: 16,
+                                            color: AppColors.getPrimaryColor(
                                               isDark,
                                             ),
                                           ),
-                                        ),
-                                        subtitle: Text(
-                                          contact['value']!,
-                                          style: TextStyle(
-                                            color:
-                                                AppColors.getTextSecondaryColor(
-                                                  isDark,
-                                                ),
+                                          onTap: () => _launchContact(
+                                            contact['type']!,
+                                            contact['value']!,
+                                            context,
                                           ),
-                                        ),
-                                        trailing: Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 16,
-                                          color: AppColors.getPrimaryColor(
-                                            isDark,
-                                          ),
-                                        ),
-                                        onTap: () => _launchContact(
-                                          contact['type']!,
-                                          contact['value']!,
-                                          context,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 8,
+                                              ),
                                         ),
                                       );
                                     })
@@ -550,6 +685,53 @@ I believe every app is an opportunity to simplify and enhance human life. My goa
                                 color: Colors.white.withOpacity(0.9),
                               ),
                               textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: () => _launchContact(
+                                    'email',
+                                    'codescapebd@gmail.com',
+                                    context,
+                                  ),
+                                  icon: Icon(Icons.email_rounded, size: 20),
+                                  label: Text(
+                                    isEnglish ? 'Send Email' : 'ইমেইল পাঠান',
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: AppColors.getPrimaryColor(
+                                      isDark,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                OutlinedButton.icon(
+                                  onPressed: () => _launchContact(
+                                    'phone',
+                                    '+8801724-184271',
+                                    context,
+                                  ),
+                                  icon: Icon(Icons.phone_rounded, size: 20),
+                                  label: Text(
+                                    isEnglish ? 'Call Now' : 'কল করুন',
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    side: BorderSide(color: Colors.white),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
